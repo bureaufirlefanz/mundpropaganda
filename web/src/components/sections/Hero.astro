@@ -3,18 +3,19 @@ import Button from "../ui/Button.astro";
 import Picture from "../ui/Picture.astro";
 import Reviews from "../ui/Reviews.astro";
 
+import ToothLines from "../ui/ToothLines.astro";
+
 interface Props {
   /** Die beiden kleinen Blöcke unter der Wortmarke. Zeilenumbrüche zählen. */
-  zeilen?: string[];
+  zeilen: string[];
 }
 
-const {
-  zeilen = [
-    "Praxis für ästhetische\n& allgemeine Zahnmedizin\nauf höchstem Niveau",
-    "Zahnarzt\nPrenzlauer Berg\nBerlin",
-  ],
-} = Astro.props;
-import ToothLines from "../ui/ToothLines.astro";
+/* Keine Vorgabe: Die Zeilen sind im Schema Pflicht, die Seite reicht sie
+   durch. Eine Vorgabe hier wäre der stille Rückfall, den Aufgabe 4
+   abgeschafft hat.
+   Die Wortmarke selbst bleibt fest im Markup — sie ist die Marke, kein
+   Inhalt. Das ist Klasse 3 und ehrlich so. */
+const { zeilen } = Astro.props;
 ---
 
 <!-- ==================================================================

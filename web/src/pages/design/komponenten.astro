@@ -6,10 +6,10 @@
  * Bewusst OHNE Farben, Typografie und Bewegungswerte: die stehen im
  * Styleguide. Was hier steht, sind die zusammengesetzten Teile.
  *
- * Die Beispiele laufen mit echten Beispieldaten aus lib/fixtures.ts — nicht
- * mit eigens erfundenen. Dieselbe Quelle versorgt die Leistungsseiten, wenn
- * das CMS nichts liefert; damit ist ausgeschlossen, dass diese Seite etwas
- * zeigt, das es so nirgends gibt.
+ * Die Beispiele laufen mit echten Daten, nicht mit eigens erfundenen: die
+ * Startseiten-Bausteine mit dem Inhalt aus dem CMS, die Leistungsbausteine mit
+ * denselben Beispieldaten, die auch eine ungepflegte Leistung versorgen. Damit
+ * ist ausgeschlossen, dass diese Seite etwas zeigt, das es so nirgends gibt.
  *
  * Nicht eingebettet sind die Bausteine, die den Seitenrahmen bilden
  * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen) und die beiden
@@ -21,6 +21,7 @@
  */
 import Design from "../../layouts/Design.astro";
 import { beispielLeistung as bl } from "../../lib/fixtures";
+import { ladeStartseite } from "../../lib/startseite";
 import {
   ZAHLEN, STELLEN, ABLAUF, STIMMEN,
   VERGLEICH_SPALTEN, VERGLEICH_ZEILEN, VERGLEICH_HINWEIS,
@@ -55,6 +56,15 @@ import Jobs from "../../components/sections/Jobs.astro";
 import Compare from "../../components/sections/Compare.astro";
 import Timeline from "../../components/sections/Timeline.astro";
 import Voices from "../../components/sections/Voices.astro";
+
+/* Die Startseiten-Bausteine bekommen ihre Inhalte aus dem CMS — dieselbe
+   Quelle wie die Startseite selbst.
+
+   Bis Aufgabe 4 standen sie hier ganz ohne Props da und lebten von den
+   Vorgaben in ihrem Frontmatter. Die Vorgaben sind weg, und eigens erfundene
+   Beispieldaten wären der falsche Ersatz: Diese Seite soll zeigen, was es
+   wirklich gibt, nicht etwas, das so nirgends steht. */
+const inhalt = await ladeStartseite();
 
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
@@ -312,7 +322,9 @@ const RING_BILDER = [
         beschnitten statt über <code>overflow</code> - bei gerundeten Ecken und
         beschleunigten Kindern zeigte sich sonst eine Haarlinie an der Kante.
       </p>
-      <div class="d-live"><Split /></div>
+      <div class="d-live">
+        <Split topline={inhalt.splitTopline} titel={inhalt.splitTitel} absaetze={inhalt.splitAbsaetze} bild={inhalt.splitBild} />
+      </div>
     </div>
 
     <div class="d-abschnitt">
@@ -325,7 +337,7 @@ const RING_BILDER = [
         im Studio, dieselbe Quelle wie Menü und Fuß. Beim Überfahren färbt sich
         die Linie mit, und eine Bildvorschau folgt dem Zeiger.
       </p>
-      <div class="d-live"><Services /></div>
+      <div class="d-live"><Services titel={inhalt.servicesTitel} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -337,7 +349,7 @@ const RING_BILDER = [
         Nummerierte Auswahlliste links, Bild rechts in der Zahnmaske. Die Liste
         klappt immer genau einen Eintrag auf und wandert von selbst weiter.
       </p>
-      <div class="d-live"><Standards /></div>
+      <div class="d-live"><Standards titel={inhalt.standardsTitel} eintraege={inhalt.standardsEintraege} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -366,7 +378,7 @@ const RING_BILDER = [
         Zylinder. Darunter die beiden Praxen mit Anschrift, aus den
         Einstellungen. Hier steht die Reihe - den Ring zeigt der Baustein oben.
       </p>
-      <div class="d-live"><Gallery /></div>
+      <div class="d-live"><Gallery titel={inhalt.standorteTitel} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -375,7 +387,9 @@ const RING_BILDER = [
         <span class="d-probe__pfad">components/sections/Experts.astro</span>
       </div>
       <p class="d-probe__text d-eingerueckt">Das Team - Bild, Namen, Kurzprofil.</p>
-      <div class="d-live"><Experts /></div>
+      <div class="d-live">
+        <Experts titel={inhalt.expertenTitel} namen={inhalt.expertenNamen} absaetze={inhalt.expertenAbsaetze} bild={inhalt.expertenBild} />
+      </div>
     </div>
 
     <div class="d-abschnitt">
@@ -390,7 +404,7 @@ const RING_BILDER = [
         ein pinkes Zeichen auf Taupe lag bei 1,26:1 und damit weit unter den
         3:1, die WCAG für Bedienelemente verlangt.
       </p>
-      <div class="d-live"><Stories /></div>
+      <div class="d-live"><Stories eintraege={inhalt.storiesEintraege} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -468,7 +482,9 @@ const RING_BILDER = [
         Beitragskarten als Schieber. Teilt sich Pfeile und Punkte mit der
         Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
       </p>
-      <div class="d-live"><Magazine /></div>
+      <div class="d-live">
+        <Magazine topline={inhalt.magazinTopline} titel={inhalt.magazinTitel} text={inhalt.magazinText} />
+      </div>
     </div>
 
     <div class="d-abschnitt">
@@ -480,7 +496,7 @@ const RING_BILDER = [
         Das Akkordeon im Panel. Die Fragen kommen je Seite von woanders - auf
         den Leistungsseiten aus dem CMS, auf der Startseite aus der Seite selbst.
       </p>
-      <div class="d-live"><Faq titel="Häufige Fragen" fragen={bl.faq} /></div>
+      <div class="d-live"><Faq titel={inhalt.faqTitel} text={inhalt.faqText} fragen={inhalt.faq} /></div>
     </div>
 
     <div class="d-abschnitt">

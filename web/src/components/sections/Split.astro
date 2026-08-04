@@ -1,33 +1,27 @@
 ---
 /**
- * Alle Texte sind wahlfrei. Was die Seite nicht übergibt, steht als Vorgabe
- * hier — dadurch ist der Baustein für sich lauffähig und die Seite bleibt
- * heil, solange im CMS noch nichts gepflegt ist.
+ * Text links auf brauner Fläche, Bild rechts.
  *
- * Die Vorgaben stehen bewusst HIER und nicht in der Datenschicht: Sonst
- * gäbe es sie zweimal, und beim nächsten Textwechsel pflegte jemand nur
- * eine der beiden Stellen.
+ * Die Texte sind Pflicht und kommen aus dem CMS — hier steht keine Vorgabe
+ * mehr. Eine Vorgabe wäre der stille Rückfall, den Aufgabe 4 abgeschafft
+ * hat: Der Kunde löschte den Satz und sähe ihn weiter stehen.
+ *
+ * Das Bild bleibt wahlfrei und fällt auf das lokale Motiv zurück. Das ist die
+ * bewusste Ausnahme: Der Kunde hat dieses Foto nie getippt, ein leeres
+ * Bildfeld heißt „noch nicht hochgeladen“ und nicht „bewusst gelöscht“.
  */
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
 import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 interface Props {
-  topline?: string;
-  titel?: string;
-  absaetze?: string[];
+  topline: string;
+  titel: string;
+  absaetze: string[];
   bild?: Bildquelle;
 }
 
-const {
-  topline = "Form & Funktion",
-  titel = "Ästhetik & Gesundheit - für ein besseres Wohlbefinden und dein perfektes Lächeln",
-  absaetze = [
-    "Unser Schwerpunkt sind Veneers und Keramikimplantate. Beides Behandlungen, die wir täglich machen und in denen wir richtig gut sind. Unser Team übernimmt alles andere, was du brauchst: Prophylaxe, Inlays, Wurzelbehandlungen, Weisheitszähne.",
-    "Was bleibt: dasselbe Niveau, egal was wir an deinen Zähnen gerade machen. Kein Behandlungszimmer zweiter Klasse, keine Standardlösung von der Stange.",
-  ],
-  bild,
-} = Astro.props;
+const { topline, titel, absaetze, bild } = Astro.props;
 ---
 
 <!-- ==================================================================

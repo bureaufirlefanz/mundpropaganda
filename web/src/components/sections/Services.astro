@@ -1,12 +1,18 @@
 ---
-interface Props {
-  titel?: string;
-}
-const { titel = "Unsere Services" } = Astro.props;
 /**
  * Services-Tabelle. Die Zeilen kommen aus der Leistungen-Collection, nicht
- * mehr aus dem Markup — dieselbe Quelle wie Menü und Footer.
+ * mehr aus dem Markup — dieselbe Quelle wie Menü und Footer. Das gilt auch
+ * für die kleineren Links darunter: alles mit `platzierung: "liste"`.
+ *
+ * Deshalb gibt es kein Feld „Weitere Verweise“ mehr auf der Startseite. Es gab
+ * eines (`servicesZusatz`), und es hat nie etwas bewirkt.
  */
+interface Props {
+  titel: string;
+}
+
+/* Keine Vorgabe: Pflichtfeld im Schema, die Seite reicht es durch. */
+const { titel } = Astro.props;
 import Button from "../ui/Button.astro";
 import { ladeLeistungsliste, fuerTabelle, fuerListe, pfad } from "../../lib/leistungsliste";
 import { istCmsBild, bildUrl } from "../../lib/bilder";

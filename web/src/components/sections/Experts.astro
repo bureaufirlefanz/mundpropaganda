@@ -4,22 +4,23 @@ import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
 import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
+/**
+ * Teamfoto links, Text rechts.
+ *
+ * `absaetze` war bis Aufgabe 4 eine Prop mit zwei fest eingebauten Absätzen,
+ * die niemand je übergab — im Studio stand daneben ein Feld `expertenText`,
+ * das die Seite nie durchreichte. Der Kunde konnte es füllen, ohne dass sich
+ * etwas änderte. Beides ist zusammengeführt: Das Feld heißt jetzt
+ * `expertenAbsaetze`, ist ein Array wie bei Split und landet hier.
+ */
 interface Props {
-  titel?: string;
-  namen?: string;
-  absaetze?: string[];
+  titel: string;
+  namen: string;
+  absaetze: string[];
   bild?: Bildquelle;
 }
 
-const {
-  titel = "Unsere Experten",
-  namen = "Dr. Hannes Schulte-Ostermann &\nDr. Kerrin Gratecap",
-  absaetze = [
-    "Beide seit über fünfzehn Jahren auf ästhetische Zahnmedizin spezialisiert, beide mit eigener Laborausbildung. Das ist der Grund, warum bei uns Planung und Umsetzung nicht auseinanderfallen.",
-    "Dazu ein Team aus vierzehn Kolleginnen und Kollegen, das denselben Anspruch teilt - von der Prophylaxe bis zur Nachsorge.",
-  ],
-  bild,
-} = Astro.props;
+const { titel, namen, absaetze, bild } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -46,7 +47,6 @@ const {
             {absaetze.map((x, i) => (
               <p data-reveal="up" data-reveal-delay={0.06 + i * 0.06} data-reveal-trigger=".s-experts">{x}</p>
             ))}
-          </div>
           </div>
         </div>
       </section>

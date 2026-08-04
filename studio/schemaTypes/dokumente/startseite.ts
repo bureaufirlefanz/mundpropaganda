@@ -9,10 +9,26 @@ import { HomeIcon } from "@sanity/icons/Home";
  * Reihenfolge, in der sie auf der Seite stehen — wer im Studio den zweiten
  * Reiter öffnet, sieht den zweiten Abschnitt der Seite.
  *
- * Jedes Feld ist freiwillig. Bleibt eines leer, greift der Text, der heute im
- * Baustein steht. Das ist der Unterschied zwischen „ins CMS umgezogen“ und
- * „im CMS kaputtgespart“: Die Seite ist nie leer, auch nicht während der
- * Einrichtung.
+ * Jedes Feld liegt seit Aufgabe 4 in genau einer von drei Klassen:
+ *
+ *   1. Trägt die Seite   → `required()`. Der Baustein darf sich auf das Feld
+ *                          verlassen; leeren lässt es sich nicht mehr, ohne
+ *                          dass das Studio den Publish verweigert.
+ *   2. Wahlfrei          → keine Regel. Was fehlt, VERSCHWINDET von der
+ *                          Seite. Nichts tritt an seine Stelle.
+ *   3. Nie gepflegt      → gar kein Feld. Steht fest im Baustein, und das
+ *                          ist ehrlich so.
+ *
+ * Vorher war alles freiwillig und fiel still auf den Text im Baustein zurück.
+ * Das war für einen Prototyp die richtige Abwägung und für einen Kunden der
+ * Moment, in dem das CMS sein Vertrauen verliert: Er löscht einen Satz,
+ * publiziert, und der Satz steht weiter da.
+ *
+ * Bilder sind die eine bewusste Ausnahme von Klasse 2. Ein leeres Bildfeld
+ * fällt weiter auf das gestaltete Motiv aus der lokalen Bildpipeline zurück,
+ * statt den Abschnitt auszublenden — der Kunde hat dieses Foto nie getippt,
+ * der Vertrauensbruch, um den es bei Text geht, gilt hier nicht. Ein leeres
+ * Bildfeld heißt „noch nicht hochgeladen“, nicht „bewusst gelöscht“.
  */
 
 const gruppen = [
@@ -67,9 +83,12 @@ export const startseite = defineType({
       of: [{ type: "text", rows: 3 }],
       description:
         "Die beiden kleinen Blöcke links und rechts unter der Wortmarke. Zeilenumbrüche bleiben erhalten. Genau zwei Einträge.",
-      validation: (r) => r.max(2),
       group: "hero",
-      validation: (r) => r.required(),
+      /* Beide Regeln in EINEM Ausdruck. Sie standen als zwei `validation`-Keys
+         am selben Feld — im Objektliteral gewinnt der letzte, und `max(2)` war
+         damit still weg. Eine dritte Meta-Zeile hätte das Hero-Raster
+         gesprengt, ohne dass das Studio gemuckt hätte. */
+      validation: (r) => r.required().max(2),
     }),
 
     /* --- Über uns ------------------------------------------------------- */
@@ -93,24 +112,15 @@ export const startseite = defineType({
       group: "services",
       validation: (r) => r.required(),
     }),
-    defineField({
-      name: "servicesZusatz",
-      title: "Weitere Verweise",
-      type: "array",
-      description: "Die kleineren Links unter der Tabelle, in Spalten gruppiert.",
-      group: "services",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "verweis",
-          fields: [
-            defineField({ name: "text", title: "Text", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "ziel", title: "Ziel", type: "string", description: "Pfad oder Sprungmarke, z. B. /leistungen oder #kontakt." }),
-          ],
-          preview: { select: { title: "text", subtitle: "ziel" } },
-        }),
-      ],
-    }),
+    /* `servicesZusatz` stand hier bis Aufgabe 4 — „Weitere Verweise“, ein
+       Array aus Text und rohem Zielpfad. Es hat nie etwas bewirkt: Die
+       kleineren Links unter der Tabelle kommen aus der Leistungen-Collection,
+       nämlich aus allem mit `platzierung: "liste"`. Der Kunde konnte das Feld
+       pflegen und sah auf der Seite nichts.
+       Nicht angeschlossen, sondern entfernt: Die Collection ist die bessere
+       Quelle — ein Verweis dorthin kann keinen Pfad vertippen und bricht nicht,
+       wenn sich ein Slug ändert. Damit erledigt sich auch der Hinweis auf
+       `servicesZusatz.ziel` in Aufgabe 11 der Umbauliste. */
 
     /* --- Standards ------------------------------------------------------ */
     ...kopf("standards", false),
@@ -131,8 +141,17 @@ export const startseite = defineType({
           preview: { select: { title: "name", subtitle: "text" } },
         }),
       ],
+      /* Klasse 1: Die Punkte SIND der Abschnitt. Ohne sie bliebe eine
+         Überschrift über einer leeren Liste stehen. */
+      validation: (r) => r.required(),
     }),
-    defineField({ name: "standardsBild", title: "Bild", type: "bild", group: "standards" }),
+    /* `standardsBild` stand hier und hat nie etwas bewirkt — `Standards.astro`
+       hat gar keine Bild-Prop. Es war auch strukturell falsch: Der Abschnitt
+       zeigt FÜNF Motive in der Zahnmaske, eines je Punkt, die beim Wechsel
+       überblenden. Ein einzelnes Bildfeld kann das nicht bedienen.
+       Damit die Redaktion sie tauschen kann, müssten sie eins zu eins an den
+       Punkten hängen — das ist ein eigener Schritt und keine Nebensache. Bis
+       dahin gilt Klasse 3: fest im Baustein, und das ist ehrlich so. */
 
     /* --- Standorte ------------------------------------------------------ */
     defineField({
@@ -143,28 +162,29 @@ export const startseite = defineType({
       group: "standorte",
       validation: (r) => r.required(),
     }),
-    defineField({
-      name: "standorteBilder",
-      title: "Bilder im Karussell",
-      type: "array",
-      group: "standorte",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "ringBild",
-          fields: [
-            defineField({ name: "bild", title: "Bild", type: "bild", validation: (r) => r.required() }),
-            defineField({ name: "beschriftung", title: "Beschriftung", type: "string", description: "Die Pille im Bild. Leer lassen für keine." }),
-          ],
-          preview: { select: { title: "beschriftung", media: "bild" }, prepare: ({ title, media }) => ({ title: title || "ohne Beschriftung", media }) },
-        }),
-      ],
-    }),
+    /* `standorteBilder` stand hier und hat nie etwas bewirkt — `Gallery.astro`
+       baut seinen Ring aus fünf fest verdrahteten Motiven der lokalen
+       Bildpipeline und nimmt keine Bilder entgegen. Die fünf sind eine
+       gestaltete Komposition: drei Praxisaufnahmen mit Beschriftung und zwei
+       schmale Abstraktionen dazwischen. Klasse 3, bis der Ring CMS-Bilder
+       lernt — das ist ein eigener Umbau. */
 
     /* --- Team ----------------------------------------------------------- */
     ...kopf("experten", false),
-    defineField({ name: "expertenText", title: "Text", type: "text", rows: 4, group: "experten" }),
     defineField({ name: "expertenNamen", title: "Namenszeile", type: "string", group: "experten", validation: (r) => r.required() }),
+    /* Vorher `expertenText`, ein einzelnes Textfeld — und ebenfalls tot: Die
+       Seite reichte es nie durch, `Experts.astro` erwartet ZWEI Absätze und
+       hatte sie als Vorgabe im Frontmatter stehen. Jetzt als Array wie
+       `splitAbsaetze`, damit die gesetzte Zweiteilung des Entwurfs erhalten
+       bleibt und die Redaktion sie in der Hand hat. */
+    defineField({
+      name: "expertenAbsaetze",
+      title: "Absätze",
+      type: "array",
+      of: [{ type: "text", rows: 4 }],
+      group: "experten",
+      validation: (r) => r.required(),
+    }),
     defineField({ name: "expertenBild", title: "Bild", type: "bild", group: "experten" }),
 
     /* --- Geschichten ---------------------------------------------------- */
@@ -186,6 +206,11 @@ export const startseite = defineType({
           preview: { select: { title: "name", subtitle: "zitat", media: "bild" } },
         }),
       ],
+      /* Klasse 1. Der Abschnitt ist ein Kartenfächer mit gekoppeltem
+         Zitatband — ohne Einträge bleibt ein leerer Fächer über einem leeren
+         Zitat stehen. Dieselben Geschichten stehen auch auf den
+         Leistungsseiten; sie werden EINMAL hier gepflegt. */
+      validation: (r) => r.required(),
     }),
 
     /* --- Magazin -------------------------------------------------------- */
@@ -194,12 +219,18 @@ export const startseite = defineType({
 
     /* --- Fragen --------------------------------------------------------- */
     defineField({ name: "faqTitel", title: "Überschrift", type: "string", group: "faq", validation: (r) => r.required() }),
+    /* Klasse 2: Die Zusatzzeile unter der Überschrift darf fehlen. Dann steht
+       sie nicht da — `Panel.astro` rendert den Absatz nur, wenn Text kommt.
+       Kein Ersatztext. */
     defineField({ name: "faqText", title: "Zusatzzeile", type: "text", rows: 2, group: "faq" }),
     defineField({
       name: "faq",
       title: "Fragen",
       type: "array",
       group: "faq",
+      /* Klasse 1: Die sechs Fragen standen bis Aufgabe 4 fest in
+         `index.astro`. Ein FAQ-Panel ohne Fragen ist eine leere Zusage. */
+      validation: (r) => r.required(),
       of: [
         defineArrayMember({
           type: "object",

@@ -25,8 +25,12 @@ import { ClientRouter } from "astro:transitions";
 interface Props {
   title: string;
   description?: string;
+  /** Setzt `noindex`. Aus dem SEO-Feld des jeweiligen Dokuments. */
+  nichtIndexieren?: boolean;
+  /** Absolute URL des Teilen-Motivs. Aus dem CMS, deshalb schon absolut. */
+  bild?: string;
 }
-const { title, description = "" } = Astro.props;
+const { title, description = "", nichtIndexieren = false, bild } = Astro.props;
 ---
 
 <!doctype html>
@@ -60,6 +64,33 @@ const { title, description = "" } = Astro.props;
 
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    {nichtIndexieren && <meta name="robots" content="noindex, nofollow" />}
+
+    {/*
+      Open Graph und Twitter — was Messenger, soziale Netzwerke und Slack
+      auslesen, wenn jemand einen Link auf die Praxis teilt. Ohne diese Zeilen
+      raten sie, und das Ergebnis ist meist der erste Textbrocken der Seite.
+
+      `og:url` fehlt bewusst: Es müsste absolut sein, und dafür bräuchte es
+      `site` in astro.config.mjs. Die Domain steht noch nicht fest — ein
+      geratener Wert stünde als `http://localhost:4321` im ausgelieferten
+      HTML, und das ist schlechter als die fehlende Angabe. Sobald die Domain
+      da ist: `site` setzen und `og:url` mit `Astro.url` ergänzen.
+
+      Das Bild kommt aus dem CMS und trägt deshalb schon eine absolute
+      URL vom Sanity-CDN. Ein lokales Motiv ginge hier nicht ohne `site`.
+    */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mundpropaganda" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {bild && <meta property="og:image" content={bild} />}
+
+    <meta name="twitter:card" content={bild ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    {bild && <meta name="twitter:image" content={bild} />}
 
     <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
          blitzt die Fallback-Schrift im Hero auf. -->

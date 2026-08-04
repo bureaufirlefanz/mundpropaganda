@@ -79,18 +79,24 @@ export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current
  *
  * Abgefragt wird alles auf einmal statt je Abschnitt: Es ist ein Dokument,
  * und ein Rundgang zum Server ist billiger als neun.
+ *
+ * Vier Felder sind mit Aufgabe 4 herausgefallen, weil sie nichts bewirkt
+ * haben: `servicesZusatz`, `standardsBild` und `standorteBilder` erreichten
+ * kein Markup, `expertenText` heißt jetzt `expertenAbsaetze` und ist ein
+ * Array. Eine Abfrage, die mehr auswählt, als die Seite verwendet, ist keine
+ * Reserve — sie ist die Behauptung, das Feld täte etwas.
  */
 export const STARTSEITE_QUERY = defineQuery(`
   *[_id == "startseite"][0]{
     heroZeilen,
     splitTopline, splitTitel, splitAbsaetze, splitBild,
-    servicesTitel, servicesZusatz[]{ text, ziel },
-    standardsTitel, standardsEintraege[]{ name, text }, standardsBild,
-    standorteTitel, standorteBilder[]{ bild, beschriftung },
-    expertenTitel, expertenText, expertenNamen, expertenBild,
+    servicesTitel,
+    standardsTitel, standardsEintraege[]{ name, text },
+    standorteTitel,
+    expertenTitel, expertenAbsaetze, expertenNamen, expertenBild,
     storiesEintraege[]{ name, bild, zitat },
     magazinTopline, magazinTitel, magazinText,
     faqTitel, faqText, faq[]{ frage, antwort },
-    seo
+    seo{ titel, beschreibung, nichtIndexieren, bild${BILD} }
   }
 `);

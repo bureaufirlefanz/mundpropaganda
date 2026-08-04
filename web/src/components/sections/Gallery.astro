@@ -16,15 +16,25 @@ import type { RingBild } from "../ui/BildRing.astro";
 
 interface Props {
   variante?: "reihe" | "ring";
-  titel?: string;
+  titel: string;
 }
-const { variante = "reihe", titel = "Unsere Standorte" } = Astro.props;
+
+/* Keine Vorgabe für den Titel: Pflichtfeld im Schema, die Seite reicht ihn
+   durch. `variante` ist dagegen eine Gestaltungsentscheidung der Seite und
+   kein Inhalt — sie behält ihre Vorgabe. */
+const { variante = "reihe", titel } = Astro.props;
 
 /* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
 const { standorte } = await ladeEinstellungen();
 
 /* Für den Ring dieselben Motive, aber ohne die schmalen Abstraktionen —
-   auf dem Zylinder haben alle Karten dasselbe Maß. */
+   auf dem Zylinder haben alle Karten dasselbe Maß.
+
+   Fest verdrahtet, und das ist Klasse 3: Die fünf sind eine gestaltete
+   Komposition aus drei beschrifteten Praxisaufnahmen und zwei Abstraktionen
+   dazwischen. `standorteBilder` stand dafür im Schema und erreichte nie ein
+   Markup — es ist mit Aufgabe 4 entfallen. Soll der Ring CMS-Bilder zeigen,
+   ist das ein eigener Umbau an BildRing, keine Nebensache. */
 const ringBilder: RingBild[] = [
   { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
   { name: "praxis-01", widths: "640", alt: "Empfangsbereich Prenzlauer Allee" },

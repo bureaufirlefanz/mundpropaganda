@@ -18,6 +18,7 @@ import Magazine from "../../components/sections/Magazine.astro";
 import Faq from "../../components/sections/Faq.astro";
 import Contact from "../../components/sections/Contact.astro";
 import { ladeLeistung, ladeSlugs } from "../../lib/leistungen";
+import { ladeStartseite } from "../../lib/startseite";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
@@ -27,6 +28,14 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const { daten: d, ausCms } = await ladeLeistung(slug!);
+
+/* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
+   deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4
+   standen sie als Vorgabe im Baustein, sodass jede Seite ihre eigene Kopie
+   bekam; wer eine Geschichte änderte, änderte sie nirgends sichtbar.
+   Ein zweites Feld je Leistung wäre die falsche Antwort: Es liefe auseinander,
+   und niemand pflegt zwölf Mal dieselben fünf Zitate. */
+const { storiesEintraege } = await ladeStartseite();
 ---
 
 <Base title={`${d.titel} - Mundpropaganda`} description={d.seoBeschreibung ?? d.hero.text}>
@@ -48,7 +57,7 @@ const { daten: d, ausCms } = await ladeLeistung(slug!);
 
   {d.schritte && <Steps titel={d.schritte.titel} schritte={d.schritte.eintraege} />}
 
-  <Stories />
+  <Stories eintraege={storiesEintraege} />
 
   <Prices preise={d.preise} />
 

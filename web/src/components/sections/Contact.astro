@@ -10,22 +10,26 @@ import Button from "../ui/Button.astro";
 import Panel from "../ui/Panel.astro";
 
 interface Props {
-  titel?: string;
-  text?: string;
   /** Vorauswahl im Feld „Leistung". */
   leistung?: string;
 }
 
-const {
-  titel = "Unverbindliches Angebot",
-  text = "Schicken Sie uns ein Foto Ihrer Zähne - wir melden uns mit einer ersten Einschätzung und einem Kostenrahmen.",
-  leistung,
-} = Astro.props;
+const { leistung } = Astro.props;
+
+/* Klasse 3: Überschrift und Einstieg stehen fest, und das ist ehrlich so —
+   es gibt kein Feld dafür im Studio, und keine Seite reicht eines durch.
+   Vorher standen dieselben Sätze als Prop-Vorgaben da. Das las sich wie ein
+   Rückfall auf einen CMS-Wert, der nie kommt; als Konstante ist zu sehen, was
+   sie sind. Wandert der Kontaktbereich ins CMS, werden daraus Props ohne
+   Vorgabe — so wie beim Magazin. */
+const TITEL = "Unverbindliches Angebot";
+const TEXT =
+  "Schicken Sie uns ein Foto Ihrer Zähne - wir melden uns mit einer ersten Einschätzung und einem Kostenrahmen.";
 
 const LEISTUNGEN = ["Veneers", "Zahnimplantate", "Keramik Inlays", "Bleaching", "Aligner"];
 ---
 
-<Panel id="kontakt" topline="Kontakt" titel={titel} text={text}>
+<Panel id="kontakt" topline="Kontakt" titel={TITEL} text={TEXT}>
   <form class="c-form" data-form novalidate data-reveal-stagger="0.06">
     <div class="c-field" data-field data-reveal-child>
       <label class="c-field__label" for="f-name">Name <span>*</span></label>

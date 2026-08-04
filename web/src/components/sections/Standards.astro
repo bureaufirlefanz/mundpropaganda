@@ -1,32 +1,27 @@
 ---
 /**
- * Texte wahlfrei; die Vorgaben stehen hier, damit der Baustein ohne CMS
- * lauffähig bleibt.
+ * Nummerierte Punkte links, ein zahnförmig maskiertes Foto rechts.
  *
- * Die Bilder in der Zahnmaske bleiben vorerst fest verdrahtet: Sie sind
- * fünf Motive, die zu den fünf Punkten gehören und beim Wechsel überblenden.
- * Damit die Redaktion sie tauschen kann, müssten sie eins zu eins an den
- * Punkten hängen — das ist ein eigener Schritt und keine Nebensache.
+ * Überschrift und Punkte sind Pflicht und kommen aus dem CMS — keine Vorgaben
+ * mehr im Frontmatter.
+ *
+ * Die fünf Bilder in der Zahnmaske bleiben fest verdrahtet, und das ist
+ * Klasse 3: Sie gehören eins zu eins zu den fünf Punkten und blenden beim
+ * Wechsel ineinander über. Ein einzelnes Bildfeld im Studio könnte das nicht
+ * bedienen — genau deshalb ist `standardsBild` mit Aufgabe 4 aus dem Schema
+ * geflogen, statt es dort stehen zu lassen, wo es nichts tut. Sollen die
+ * Motive pflegbar werden, gehören sie an die Punkte, nicht an die Section.
  */
 import Button from "../ui/Button.astro";
 import Thread from "../ui/Thread.astro";
 import ToothRings from "../ui/ToothRings.astro";
 
 interface Props {
-  titel?: string;
-  eintraege?: { name: string; text?: string }[];
+  titel: string;
+  eintraege: { name: string; text?: string }[];
 }
 
-const {
-  titel = "Wir setzen neue Standards",
-  eintraege = [
-    { name: "Modernste Technik", text: "Digitale Abformung, 3D-Planung und ein eigenes Praxislabor. Wir sehen das Ergebnis, bevor wir den ersten Schliff machen." },
-    { name: "Individuelle Beratung", text: "Kein Katalog, keine Pauschale. Wir hören zu, analysieren Form und Farbe und entwickeln daraus deinen Plan." },
-    { name: "Kompromisslose Qualität", text: "Wir arbeiten nur mit Materialien und Laboren, die wir selbst geprüft haben. Auch wenn es länger dauert." },
-    { name: "Spürbar angenehme Atmosphäre", text: "Räume, in denen man gerne wartet. Kein Praxisgeruch, kein Neonlicht, keine Hektik am Empfang." },
-    { name: "Nachhaltig auf allen Ebenen", text: "Maximaler Zahnerhalt, langlebige Materialien, kurze Wege zu unseren Partnerlaboren in Berlin." },
-  ],
-} = Astro.props;
+const { titel, eintraege } = Astro.props;
 ---
 
 <!-- ==================================================================

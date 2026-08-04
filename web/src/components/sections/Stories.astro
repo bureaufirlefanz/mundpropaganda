@@ -5,35 +5,42 @@
  * Listen. Zwei Listen liefen beim nächsten Eintrag auseinander, und niemand
  * merkte es, bis ein Zitat unter dem falschen Gesicht stünde.
  *
- * Die Vorgaben stehen hier, damit der Baustein ohne CMS lauffähig bleibt.
+ * Name und Zitat kommen aus dem CMS und sind dort Pflicht — die fünf
+ * eingebauten Geschichten sind mit Aufgabe 4 verschwunden.
+ *
+ * Nur die Motive bleiben als Rückfall, positionsgenau: Solange im Studio kein
+ * Foto hochgeladen ist, tritt das gestaltete Motiv an derselben Stelle ein.
+ * Über den Index und nicht über ein einzelnes Ersatzbild — sonst trügen alle
+ * fünf Karten dasselbe Gesicht.
  */
 import Button from "../ui/Button.astro";
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
 import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
-export interface Geschichte {
+interface Geschichte {
   name: string;
   zitat?: string;
-  /** Bild aus dem CMS. Fehlt es, greift das eingebaute Motiv. */
+  /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
   bild?: Bildquelle;
-  /** Name aus der lokalen Bildpipeline — nur für die Vorgaben. */
-  bildName?: string;
-  bildBreiten?: string;
-  alt?: string;
 }
 
 interface Props {
-  eintraege?: Geschichte[];
+  eintraege: Geschichte[];
 }
 
-const { eintraege = [
-  { name: "Karolina", bildName: "smile-portrait", bildBreiten: "563", alt: "Karolina - Veneers", zitat: "Ich hatte vorher bei drei Praxen einen Kostenvoranschlag geholt und überall dasselbe Gefühl: Man verkauft mir ein Produkt. Hier hat mir zum ersten Mal jemand erklärt, warum weniger abschleifen mehr ist - und warum das bei mir länger dauert und trotzdem die bessere Entscheidung war. Nach acht Monaten würde ich es genauso wieder machen. Ich lache wieder auf Fotos, ohne vorher zu überlegen." },
-  { name: "Jonas", bildName: "motion-01", bildBreiten: "640,1024", alt: "Jonas - Keramikimplantate", zitat: "Nach dem Implantat hatte ich mit Wochen Schonung gerechnet. Am zweiten Tag war ich wieder im Büro. Was mir am meisten geblieben ist: Man hat mir vorher genau gesagt, was passiert, wie lange es dauert und was danach kommt - und dann ist genau das passiert. Keine Überraschung, keine Nachforderung, kein Termin, der plötzlich doch noch nötig war." },
-  { name: "Alina", bildName: "motion-02", bildBreiten: "640,1024", alt: "Alina - Aligner", zitat: "Achtzehn Monate Aligner, alle sechs Wochen ein Termin. Nie das Gefühl gehabt, dass jemand nur die Schiene wechselt und weiterwill. Zwischendurch gab es zwei Stellen, die nicht so liefen wie geplant - das wurde offen angesprochen und nachjustiert, statt es auszusitzen. Am Ende sah es aus wie im Mock-up vom ersten Tag." },
-  { name: "Mo", bildName: "motion-03", bildBreiten: "640,1024", alt: "Mo - Bleaching", zitat: "Ich wollte eigentlich nur zwei Nuancen heller. Herausgekommen ist ein Gespräch darüber, warum meine Zähne überhaupt nachgedunkelt sind und was ich daran ändern kann, bevor überhaupt gebleicht wird. Das Bleaching kam danach - und hält bis heute, weil die Ursache mit behandelt wurde und nicht nur das Ergebnis." },
-  { name: "Thea", bildName: "motion-04", bildBreiten: "640,1024", alt: "Thea - Veneers", zitat: "Ich habe zehn Jahre nicht auf Fotos gelächelt. Das Mock-up zum Probetragen hat mir die Entscheidung abgenommen: Ich konnte sehen, wohin es geht, im Spiegel, im Tageslicht und auf Fotos, bevor irgendetwas endgültig war. Diese eine Stunde hat mehr gebracht als alle Beratungsgespräche davor zusammen." },
-] } = Astro.props;
+const { eintraege } = Astro.props;
+
+/* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
+   Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
+   Stand, auf dem die Section steht, bis echte Fotos da sind. */
+const MOTIVE = [
+  { name: "smile-portrait", breiten: "563" },
+  { name: "motion-01", breiten: "640,1024" },
+  { name: "motion-02", breiten: "640,1024" },
+  { name: "motion-03", breiten: "640,1024" },
+  { name: "motion-04", breiten: "640,1024" },
+];
 ---
 
 <!-- ==================================================================
@@ -66,12 +73,12 @@ const { eintraege = [
           <div class="s-stories__stack" data-deck-stack>
             <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
                  dahinter durchscheinen lassen. -->
-            {eintraege.map((e) => (
+            {eintraege.map((e, i) => (
               <figure class="s-stories__card" data-deck-card>
                 {istCmsBild(e.bild) ? (
-                  <CmsImage quelle={e.bild} alt={e.alt ?? e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
+                  <CmsImage quelle={e.bild} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
                 ) : (
-                  <Picture name={e.bildName ?? "smile-portrait"} widths={e.bildBreiten ?? "563"} alt={e.alt ?? e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
+                  <Picture name={MOTIVE[i % MOTIVE.length].name} widths={MOTIVE[i % MOTIVE.length].breiten} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
                 )}
                 <figcaption class="s-stories__name">{e.name}</figcaption>
               </figure>
