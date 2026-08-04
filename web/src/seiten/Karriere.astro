@@ -1,0 +1,164 @@
+---
+/**
+ * Der Zusammenbau der Karriereseite.
+ *
+ * Fünf eigene Bausteine, drei geliehene. Die Seite soll nicht aussehen wie
+ * eine Leistungsseite mit anderem Text — geteilt sind nur der Seitenkopf
+ * (damit sie zur Seite gehört), das Panel und das FAQ.
+ *
+ * Aufbau, und warum in dieser Reihenfolge:
+ *   Hero      Wer sucht, und wofür
+ *   Intro     Warum hier und nicht woanders — die Haltung
+ *   Facts     Vier überprüfbare Angaben statt Versprechen         (eigener Baustein)
+ *   Compare   Übliche Bedingungen gegen unsere, Zeile für Zeile   (eigener Baustein)
+ *   Jobs      Der eigentliche Zweck der Seite. Steht in der Mitte,
+ *             nicht am Ende: Wer wegen einer Stelle kommt, soll
+ *             nicht erst durch die Selbstdarstellung scrollen.    (eigener Baustein)
+ *   Voices    Drei Stimmen aus dem Team, versetzt gesetzt         (eigener Baustein)
+ *   Timeline  Der Bewerbungsablauf als Bahn — nimmt die Hürde     (eigener Baustein)
+ *   Panel     Initiativbewerbung, für alle ohne passende Stelle
+ *   Faq       Was sonst noch gefragt wird
+ *
+ * Liegt seit Aufgabe 5 hier statt unter `pages/`: Die Route lädt und ruft
+ * auf, der Zusammenbau steht daneben. Nebengewinn — der `<style>`-Block am
+ * Ende war unter `pages/` ein Regelbruch (STRUKTUR.md: „Seiten setzen
+ * zusammen, sie gestalten nicht"). Hier ist er am richtigen Ort, denn die
+ * Initiativ-Box ist Markup dieses Zusammenbaus und keines Bausteins.
+ *
+ * Nimmt bewusst keine `daten`-Prop: Die Karriereseite hängt an keinem
+ * CMS-Dokument, ihre Inhalte stehen als Konstanten in `lib/karriere.ts`.
+ * Sobald sie ins CMS wandert, kommt die Prop dazu — der Aufrufer ändert sich
+ * dann, dieser Zusammenbau nicht.
+ */
+import Base from "../layouts/Base.astro";
+import ServiceHero from "../components/sections/ServiceHero.astro";
+import Intro from "../components/sections/Intro.astro";
+import Facts from "../components/sections/Facts.astro";
+import Compare from "../components/sections/Compare.astro";
+import Jobs from "../components/sections/Jobs.astro";
+import Timeline from "../components/sections/Timeline.astro";
+import Voices from "../components/sections/Voices.astro";
+import Panel from "../components/ui/Panel.astro";
+import Button from "../components/ui/Button.astro";
+import Faq from "../components/sections/Faq.astro";
+
+import {
+  ZAHLEN,
+  STELLEN,
+  ABLAUF,
+  STIMMEN,
+  VERGLEICH_SPALTEN,
+  VERGLEICH_ZEILEN,
+  VERGLEICH_HINWEIS,
+  KARRIERE_FAQ,
+  BEWERBUNG_MAIL,
+  bewerbungLink,
+} from "../lib/karriere";
+---
+
+<Base
+  title="Karriere - Mundpropaganda"
+  description="Offene Stellen in unseren Praxen im Prenzlauer Berg: ZFA, Prophylaxe, Zahntechnik und Ausbildung. Vier-Tage-Woche möglich, Fortbildung im Vertrag."
+>
+  <ServiceHero
+    topline="Arbeiten bei Mundpropaganda"
+    titel="Karriere"
+    text="Zwei Praxen, ein Meisterlabor im Haus, durchgängig digitaler Workflow. Wir suchen Behandlerinnen und Behandler, die fachlich Anspruch haben - und denen wir die Zeit dafür in den Kalender schreiben."
+    bild="/img/praxis-01-800.webp"
+    alt="Blick in den Empfangsbereich der Praxis"
+    aktion="Offene Stellen"
+    aktionZiel="#stellen"
+  />
+
+  <Intro
+    topline="Warum hier"
+    headline="Fachlicher Anspruch braucht Zeit - die planen wir ein, statt sie zu versprechen"
+    spalten={[
+      "Die meisten Praxen suchen Verstärkung, weil etwas brennt. Dann geht es schnell, und ein halbes Jahr später behandelt jemand im Zwanzig-Minuten-Takt, was eine Stunde gebraucht hätte. Wir gehen den umgekehrten Weg: 60 Minuten je Termin, keine Umsatzvorgaben, freie Materialwahl nach Indikation.",
+      "Dazu ein Meisterlabor zwei Türen weiter, DVT, geführte Implantologie, Mikroskop für die Endodontie und ein durchgängig digitaler Workflow. Nicht, weil Technik für sich etwas beweist - sondern weil sie die Entscheidung vorverlegt: Wir sehen das Ergebnis, bevor der erste Schliff fällt.",
+    ]}
+  />
+
+  <Facts topline="Die Praxis in Zahlen" headline="Was sich nachprüfen lässt" zahlen={ZAHLEN} />
+
+  <Compare
+    topline="Was drin ist"
+    headline="Was anderswo Verhandlungssache ist, steht bei uns im Vertrag"
+    spalten={VERGLEICH_SPALTEN}
+    zeilen={VERGLEICH_ZEILEN}
+    hinweis={VERGLEICH_HINWEIS}
+  />
+
+  <Jobs
+    id="stellen"
+    topline="Offene Stellen"
+    headline="Vier Stellen für Behandelnde, alle unbefristet"
+    stellen={STELLEN}
+  />
+
+  <Voices
+    topline="Aus dem Team"
+    headline="Drei Kolleginnen, die es besser beurteilen können als wir"
+    stimmen={STIMMEN}
+  />
+
+  <Timeline
+    topline="Der Weg hierher"
+    headline="So läuft eine Bewerbung"
+    etappen={ABLAUF}
+  />
+
+  <Panel
+    id="initiativ"
+    topline="Nichts dabei?"
+    titel="Schreib uns trotzdem"
+    text="Wir besetzen selten aus dem Stand, sondern meist aus Gesprächen, die ein halbes Jahr vorher angefangen haben."
+  >
+    <div class="k-initiativ">
+      <p>
+        Drei Sätze reichen: woran du fachlich arbeitest, was du suchst, ab wann.
+        Ein Anschreiben brauchen wir nicht - den Lebenslauf gern, wenn du einen
+        zur Hand hast.
+      </p>
+      <div class="k-initiativ__aktion">
+        <Button label="Initiativ bewerben" href={bewerbungLink()} />
+        <a class="k-initiativ__mail" href={`mailto:${BEWERBUNG_MAIL}`}>{BEWERBUNG_MAIL}</a>
+      </div>
+    </div>
+  </Panel>
+
+  <Faq titel="Fragen zur Bewerbung" fragen={KARRIERE_FAQ} />
+</Base>
+
+<style>
+  .k-initiativ {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+    max-width: 52ch;
+    font-size: var(--fs-text-large);
+    line-height: 1.45;
+  }
+
+  .k-initiativ__aktion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4) var(--sp-6);
+  }
+
+  /* Die Adresse steht neben dem Knopf, nicht statt seiner: Manche schreiben
+     lieber aus ihrem eigenen Postfach, statt einen mailto-Link zu öffnen. */
+  .k-initiativ__mail {
+    font-family: var(--f-mono);
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.04em;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .k-initiativ__mail:hover {
+    text-decoration-color: var(--c-brand);
+    text-decoration-thickness: 2px;
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+/**
+ * Der Zusammenbau der Startseite — Bausteine und ihre Reihenfolge.
+ *
+ * Bekommt die Inhalte als Prop und lädt selbst nichts. Das ist die
+ * Bedingung, unter der die Vorschau-Route (Aufgabe 6) dasselbe rendern kann
+ * wie die echte Seite: Sie reicht Entwurfsdaten herein, wo hier die
+ * veröffentlichten stehen.
+ *
+ * Zwei Zusammenbauten, die dasselbe zeigen sollen, laufen garantiert
+ * auseinander — und zwar unbemerkt, weil man immer nur eine von beiden
+ * ansieht. Deshalb gibt es diesen einen.
+ */
+import Base from "../layouts/Base.astro";
+import Hero from "../components/sections/Hero.astro";
+import Split from "../components/sections/Split.astro";
+import Services from "../components/sections/Services.astro";
+import Standards from "../components/sections/Standards.astro";
+import Gallery from "../components/sections/Gallery.astro";
+import Experts from "../components/sections/Experts.astro";
+import Stories from "../components/sections/Stories.astro";
+import Magazine from "../components/sections/Magazine.astro";
+import Faq from "../components/sections/Faq.astro";
+import { istCmsBild, bildUrl } from "../lib/bilder";
+import type { StartseiteInhalt } from "../lib/startseite";
+
+interface Props {
+  daten: StartseiteInhalt;
+}
+
+const { daten } = Astro.props;
+
+/* Seitentitel und Beschreibung aus dem SEO-Feld. Kein Rückfall im Sinne der
+   Aufgabe 4: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
+   Dokument ohne <title> ist kaputt statt leer. Das Schema sagt dem Kunden
+   genau das zu — „Leer lassen übernimmt die Überschrift der Seite". */
+const titel = daten.seo?.titel || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
+const beschreibung =
+  daten.seo?.beschreibung ||
+  "Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg.";
+
+/* Das Teilen-Motiv. 1200 breit im Format 1.91:1 — das ist, was Facebook,
+   LinkedIn und WhatsApp erwarten; mit `ratio` beschneidet Sanity serverseitig,
+   und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
+const teilenBild = istCmsBild(daten.seo?.bild)
+  ? bildUrl(daten.seo.bild, 1200, 1.91)
+  : undefined;
+---
+
+<Base
+  title={titel}
+  description={beschreibung}
+  nichtIndexieren={daten.seo?.nichtIndexieren}
+  bild={teilenBild}
+>
+  <Hero zeilen={daten.heroZeilen} />
+  <Split
+    topline={daten.splitTopline}
+    titel={daten.splitTitel}
+    absaetze={daten.splitAbsaetze}
+    bild={daten.splitBild}
+  />
+  <Services titel={daten.servicesTitel} />
+  <Standards titel={daten.standardsTitel} eintraege={daten.standardsEintraege} />
+  <Gallery variante="ring" titel={daten.standorteTitel} />
+  <Experts
+    titel={daten.expertenTitel}
+    namen={daten.expertenNamen}
+    absaetze={daten.expertenAbsaetze}
+    bild={daten.expertenBild}
+  />
+  <Stories eintraege={daten.storiesEintraege} />
+  <Magazine
+    topline={daten.magazinTopline}
+    titel={daten.magazinTitel}
+    text={daten.magazinText}
+  />
+  <Faq titel={daten.faqTitel} text={daten.faqText} fragen={daten.faq} />
+</Base>

@@ -1,0 +1,108 @@
+---
+/**
+ * Der Zusammenbau einer Leistungsseite.
+ *
+ * Bekommt alles als Prop und lädt nichts — dieselbe Bedingung wie bei
+ * `Startseite.astro`: Die Vorschau-Route aus Aufgabe 6 reicht Entwurfsdaten
+ * herein, wo hier die veröffentlichten stehen, und rendert dadurch
+ * garantiert dasselbe.
+ *
+ * Jeder Abschnitt hängt an seinen eigenen Daten. Was das Dokument nicht
+ * trägt, steht nicht da — das ist der Unterschied zu vor Aufgabe 4, wo eine
+ * ungepflegte Leistung die Abschnitte einer anderen zeigte.
+ */
+import Base from "../layouts/Base.astro";
+import ServiceHero from "../components/sections/ServiceHero.astro";
+import Intro from "../components/sections/Intro.astro";
+import Statement from "../components/sections/Statement.astro";
+import Prices from "../components/sections/Prices.astro";
+import Benefits from "../components/sections/Benefits.astro";
+import BeforeAfter from "../components/sections/BeforeAfter.astro";
+import Steps from "../components/sections/Steps.astro";
+import Stories from "../components/sections/Stories.astro";
+import Features from "../components/sections/Features.astro";
+import Magazine from "../components/sections/Magazine.astro";
+import Faq from "../components/sections/Faq.astro";
+import Contact from "../components/sections/Contact.astro";
+import type { Leistung } from "../lib/leistungen";
+import type { StartseiteInhalt } from "../lib/startseite";
+
+interface Props {
+  daten: Leistung | undefined;
+  /** Aus der Liste, falls das Dokument fehlt — sonst stünde oben nichts. */
+  titel: string;
+  /** Dieselben Stimmen wie auf der Startseite, dort gepflegt. */
+  stories: StartseiteInhalt["storiesEintraege"];
+}
+
+const { daten: d, titel, stories } = Astro.props;
+
+/* Ein Abschnitt ist wahlfrei, aber nicht halb.
+ *
+ * Das Schema verlangt innerhalb von Intro und Benefits alle Felder — wer den
+ * Abschnitt anlegt, füllt ihn auch. Die Abfrage kann das nicht zusagen: GROQ
+ * liefert jedes Feld für sich, und TypeGen bildet genau das ab. Die Prüfung
+ * steht deshalb hier, an einer Stelle, statt in den Bausteinen als vier
+ * einzelne `&&`. Fehlt ein Teil, erscheint der Abschnitt gar nicht — eine
+ * Überschrift ohne Text wäre die halbe Wahrheit statt keiner. */
+const intro =
+  d?.intro?.topline && d.intro.headline && d.intro.spalten?.length
+    ? { topline: d.intro.topline, headline: d.intro.headline, spalten: d.intro.spalten }
+    : undefined;
+
+const benefits =
+  d?.benefits?.topline && d.benefits.headline && d.benefits.eintraege?.length
+    ? { topline: d.benefits.topline, headline: d.benefits.headline, eintraege: d.benefits.eintraege }
+    : undefined;
+
+const statement =
+  d?.statement?.topline && d.statement.text
+    ? { topline: d.statement.topline, text: d.statement.text }
+    : undefined;
+
+const schritte =
+  d?.schritte?.titel && d.schritte.eintraege?.length
+    ? { titel: d.schritte.titel, eintraege: d.schritte.eintraege }
+    : undefined;
+---
+
+<Base title={`${titel} - Mundpropaganda`} description={d?.seoBeschreibung ?? d?.hero?.text}>
+  <ServiceHero
+    topline={d?.topline}
+    titel={titel}
+    text={d?.hero?.text}
+    bild={d?.hero?.bild}
+    alt={d?.hero?.bild?.alt ?? ""}
+  />
+
+  {intro && <Intro {...intro} />}
+
+  {benefits && <Benefits {...benefits} />}
+
+  {d?.vorherNachher?.topline && (
+    <BeforeAfter topline={d.vorherNachher.topline} vorher={d.vorherNachher.vorher} nachher={d.vorherNachher.nachher} />
+  )}
+
+  {statement && <Statement {...statement} />}
+
+  {schritte && <Steps titel={schritte.titel} schritte={schritte.eintraege} />}
+
+  <Stories eintraege={stories} />
+
+  {d?.preise?.length ? <Prices preise={d.preise} /> : null}
+
+  {d?.features?.length ? <Features zeilen={d.features} /> : null}
+
+  {/* Die Überschrift stand bis Aufgabe 4 fest im Baustein. Sie gehört hierher:
+      Auf der Startseite kommt sie aus dem CMS, hier ist sie auf die Leistung
+      bezogen und damit Sache des Zusammenbaus. */}
+  <Magazine
+    topline="Passend zum Thema"
+    titel="Magazin"
+    text={`Weiterlesen zu ${titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
+  />
+
+  {d?.faq?.length ? <Faq titel={`Häufige Fragen zu ${titel}`} fragen={d.faq} /> : null}
+
+  <Contact leistung={titel} />
+</Base>

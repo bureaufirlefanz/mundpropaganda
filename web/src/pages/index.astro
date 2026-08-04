@@ -1,77 +1,15 @@
 ---
 /**
- * Startseite. Jede Section ist ein eigener Baustein — damit lässt sich eine
- * neue Seite aus denselben Teilen zusammenstecken, statt Markup zu kopieren.
+ * Die Route. Daten laden, Renderer aufrufen — mehr steht hier nicht.
+ *
+ * Der Zusammenbau liegt in `seiten/Startseite.astro`, damit die
+ * Vorschau-Route aus Aufgabe 6 exakt dasselbe rendern kann. Zwei
+ * Zusammenbauten, die dasselbe zeigen sollen, laufen unbemerkt auseinander.
  */
-import Base from "../layouts/Base.astro";
-import Hero from "../components/sections/Hero.astro";
-import Split from "../components/sections/Split.astro";
-import Services from "../components/sections/Services.astro";
-import Standards from "../components/sections/Standards.astro";
-import Gallery from "../components/sections/Gallery.astro";
-import Experts from "../components/sections/Experts.astro";
-import Stories from "../components/sections/Stories.astro";
-import Magazine from "../components/sections/Magazine.astro";
-import Faq from "../components/sections/Faq.astro";
+import Startseite from "../seiten/Startseite.astro";
 import { ladeStartseite } from "../lib/startseite";
-import { istCmsBild, bildUrl } from "../lib/bilder";
 
-/* Ein Dokument, alle Abschnitte.
- *
- * Seit Aufgabe 4 steht hier kein `??` mehr: Die Pflichtfelder liefert die
- * Datenschicht garantiert, und was wahlfrei ist, blendet der Baustein aus.
- * Ein Ersatztext an dieser Stelle wäre genau der stille Rückfall, den die
- * Aufgabe abgeschafft hat — der Kunde löschte einen Satz und sähe ihn weiter
- * stehen.
- *
- * Auch die sechs FAQ-Einträge sind weg, die bis hierher fest in dieser Datei
- * standen. Sie liegen im CMS, wo der Kunde sie erwartet. */
-const inhalt = await ladeStartseite();
-
-/* Seitentitel und Beschreibung aus dem SEO-Feld. Kein Rückfall im Sinne der
-   Aufgabe: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
-   Dokument ohne <title> ist kaputt statt leer. Das Schema sagt genau das
-   zu — „Leer lassen übernimmt die Überschrift der Seite". */
-const titel = inhalt.seo?.titel || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
-const beschreibung =
-  inhalt.seo?.beschreibung ||
-  "Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg.";
-
-/* Das Teilen-Motiv. 1200 breit im Format 1.91:1 — das ist, was Facebook,
-   LinkedIn und WhatsApp erwarten; mit `ratio` beschneidet Sanity serverseitig,
-   und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
-const teilenBild = istCmsBild(inhalt.seo?.bild)
-  ? bildUrl(inhalt.seo.bild, 1200, 1.91)
-  : undefined;
+const daten = await ladeStartseite();
 ---
 
-<Base
-  title={titel}
-  description={beschreibung}
-  nichtIndexieren={inhalt.seo?.nichtIndexieren}
-  bild={teilenBild}
->
-  <Hero zeilen={inhalt.heroZeilen} />
-  <Split
-    topline={inhalt.splitTopline}
-    titel={inhalt.splitTitel}
-    absaetze={inhalt.splitAbsaetze}
-    bild={inhalt.splitBild}
-  />
-  <Services titel={inhalt.servicesTitel} />
-  <Standards titel={inhalt.standardsTitel} eintraege={inhalt.standardsEintraege} />
-  <Gallery variante="ring" titel={inhalt.standorteTitel} />
-  <Experts
-    titel={inhalt.expertenTitel}
-    namen={inhalt.expertenNamen}
-    absaetze={inhalt.expertenAbsaetze}
-    bild={inhalt.expertenBild}
-  />
-  <Stories eintraege={inhalt.storiesEintraege} />
-  <Magazine
-    topline={inhalt.magazinTopline}
-    titel={inhalt.magazinTitel}
-    text={inhalt.magazinText}
-  />
-  <Faq titel={inhalt.faqTitel} text={inhalt.faqText} fragen={inhalt.faq} />
-</Base>
+<Startseite daten={daten} />
