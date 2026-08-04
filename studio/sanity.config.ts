@@ -3,7 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 
 import { schemaTypes } from "./schemaTypes";
-import { structure, EINZELDOKUMENTE } from "./structure";
+import { structure, EINZELDOKUMENTE, OHNE_ROUTE } from "./structure";
 import { dokumentAnsichten } from "./structure/dokumentAnsichten";
 
 // Eigenständiges Studio, nicht in die Astro-App eingebettet: Redaktion und
@@ -34,6 +34,9 @@ export default defineConfig({
        hängen an einer festen ID. Ohne diesen Filter böte „Neu“ an, eine
        zweite Startseite zu erzeugen; die läge dann unter einer zufälligen ID
        und würde von der Website nie gefunden. */
-    templates: (vorlagen) => vorlagen.filter((v) => !EINZELDOKUMENTE.includes(v.schemaType)),
+    templates: (vorlagen) =>
+      vorlagen.filter(
+        (v) => ![...EINZELDOKUMENTE, ...OHNE_ROUTE].includes(v.schemaType)
+      ),
   },
 });

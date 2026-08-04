@@ -3,14 +3,8 @@ import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { CogIcon } from "@sanity/icons/Cog";
 import { TagsIcon } from "@sanity/icons/Tags";
 import { HomeIcon } from "@sanity/icons/Home";
-import { UsersIcon } from "@sanity/icons/Users";
-import { DocumentsIcon } from "@sanity/icons/Documents";
-import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { CaseIcon } from "@sanity/icons/Case";
-import { EnvelopeIcon } from "@sanity/icons/Envelope";
-import { WarningOutlineIcon } from "@sanity/icons/WarningOutline";
 import { UserIcon } from "@sanity/icons/User";
-import { FolderIcon } from "@sanity/icons/Folder";
 import type { ComponentType } from "react";
 
 /**
@@ -22,9 +16,21 @@ import type { ComponentType } from "react";
  * Seitenstruktur in der Reihenfolge der Navigation, darunter erst, was keine
  * eigene Seite ist: Team, Stellen, Einstellungen.
  *
- * Die Rechtstexte liegen in einem eigenen Ordner statt in der Seitenliste.
- * Sie gehören zur Website, aber niemand pflegt sie wöchentlich — im ersten
- * Block stünden sie nur im Weg.
+ * ── Was hier NICHT steht, und warum ──────────────────────────────────────
+ *
+ * Praxis & Team, Magazin (Übersicht und Beiträge), Kontakt, Notdienst, die
+ * Leistungs-Übersicht, Pillar Pages und die Rechtstexte sind bewusst
+ * ausgeblendet: **Diese Seiten gibt es auf der Website nicht.** Wer sie hier
+ * pflegt und publiziert, sieht das Ergebnis nirgends — und glaubt danach
+ * keinem anderen Feld mehr.
+ *
+ * Die Schemadateien bleiben liegen, sie sind fertig. Zurück kommt ein Typ,
+ * sobald seine Route steht; `npm run web:check` meldet unter „Routen-Deckung“
+ * genau diese Liste, bis das geschehen ist.
+ *
+ * Reihenfolge beim Zurückholen: erst die Route in `web/src/pages/` bauen,
+ * dann hier eintragen. Andersherum entsteht wieder die Lücke, die diese
+ * Aufgabe geschlossen hat.
  */
 
 /**
@@ -33,27 +39,26 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = [
-  "startseite",
+export const EINZELDOKUMENTE = ["startseite", "karriere", "einstellungen"];
+
+/**
+ * Einzeldokumente ohne Seite. Sie stehen weiterhin in den Vorlagen-Sperren
+ * und in dieser Liste, damit niemand sie versehentlich über die generische
+ * Auflistung wieder hereinholt — sichtbar sind sie nicht.
+ */
+export const OHNE_ROUTE = [
   "leistungenIndex",
   "praxis",
   "magazinIndex",
-  "karriere",
   "kontakt",
   "notdienst",
-  "einstellungen",
-];
-
-/** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
-const AUSGESCHRIEBEN = [
-  ...EINZELDOKUMENTE,
-  "leistung",
   "beitrag",
   "pillar",
   "rechtstext",
-  "person",
-  "stelle",
 ];
+
+/** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
+const AUSGESCHRIEBEN = [...EINZELDOKUMENTE, ...OHNE_ROUTE, "leistung", "person", "stelle"];
 
 function einzeldokument(
   S: StructureBuilder,
@@ -74,48 +79,17 @@ export const structure: StructureResolver = (S, context) =>
       /* --- Die Seiten, in der Reihenfolge der Navigation --------------- */
       einzeldokument(S, "startseite", "Startseite", HomeIcon),
 
-      /* Übersicht und Einzelseiten der Leistungen liegen zusammen — sie
-         gehören inhaltlich zusammen, und getrennt sucht man die Übersicht
-         zwischen den Leistungen. */
-      S.listItem()
-        .title("Leistungen")
-        .icon(TagsIcon)
-        .child(
-          S.list()
-            .title("Leistungen")
-            .items([
-              einzeldokument(S, "leistungenIndex", "Übersichtsseite", TagsIcon),
-              S.divider(),
-              orderableDocumentListDeskItem({
-                type: "leistung",
-                title: "Alle Leistungen",
-                icon: TagsIcon,
-                S,
-                context,
-              }),
-            ])
-        ),
-
-      einzeldokument(S, "praxis", "Praxis & Team", UsersIcon),
-
-      S.listItem()
-        .title("Magazin")
-        .icon(DocumentsIcon)
-        .child(
-          S.list()
-            .title("Magazin")
-            .items([
-              einzeldokument(S, "magazinIndex", "Übersichtsseite", DocumentsIcon),
-              S.divider(),
-              S.documentTypeListItem("beitrag").title("Alle Beiträge"),
-            ])
-        ),
+      /* Nur die Leistungen selbst, ohne Übersichtsseite: `/leistungen` gibt
+         es nicht, `/leistungen/<slug>` schon. */
+      orderableDocumentListDeskItem({
+        type: "leistung",
+        title: "Leistungen",
+        icon: TagsIcon,
+        S,
+        context,
+      }),
 
       einzeldokument(S, "karriere", "Karriere", CaseIcon),
-      einzeldokument(S, "kontakt", "Kontakt", EnvelopeIcon),
-      einzeldokument(S, "notdienst", "Notdienst", WarningOutlineIcon),
-
-      S.documentTypeListItem("pillar").title("Pillar Pages").icon(BlockContentIcon),
 
       S.divider(),
 
@@ -124,12 +98,6 @@ export const structure: StructureResolver = (S, context) =>
       S.documentTypeListItem("stelle").title("Stellen").icon(CaseIcon),
 
       S.divider(),
-
-      /* --- Selten angefasst -------------------------------------------- */
-      S.listItem()
-        .title("Rechtliches")
-        .icon(FolderIcon)
-        .child(S.documentTypeList("rechtstext").title("Rechtstexte")),
 
       einzeldokument(S, "einstellungen", "Einstellungen", CogIcon),
 

@@ -7,20 +7,13 @@ import { WebVorschau } from "./WebVorschau";
  * Einen Vorschaureiter bekommt, was eine eigene URL hat. Team, Stellen und
  * Einstellungen tauchen auf fremden Seiten auf — für sie gäbe es nichts zu
  * zeigen, und ein leerer Vorschaureiter wäre schlimmer als keiner.
+ *
+ * Die Liste ist mit Aufgabe 3 von elf auf drei geschrumpft. Die übrigen acht
+ * Typen zeigten auf Seiten, die es nicht gibt: Der Reiter öffnete sich, und
+ * darin stand eine 404. Sie kommen zurück, sobald ihre Route steht — die
+ * Bedingung steht in `structure/index.ts` unter OHNE_ROUTE.
  */
-const MIT_SEITE = [
-  "startseite",
-  "leistung",
-  "leistungenIndex",
-  "praxis",
-  "magazinIndex",
-  "beitrag",
-  "karriere",
-  "kontakt",
-  "notdienst",
-  "pillar",
-  "rechtstext",
-];
+const MIT_SEITE = ["startseite", "leistung", "karriere"];
 
 export const dokumentAnsichten: DefaultDocumentNodeResolver = (S, { schemaType }) => {
   if (MIT_SEITE.includes(schemaType)) {

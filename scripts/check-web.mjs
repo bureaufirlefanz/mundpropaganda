@@ -218,6 +218,12 @@ async function pruefeBarrierefreiheit(browser, pfad, vp) {
  */
 async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
   const { FESTE_PFADE, VERZEICHNIS, OBERSTE_EBENE } = await ladePfadmodell();
+  const ausgeblendet = await ladeAusgeblendete();
+
+  /* Ein Typ, den das Studio gar nicht anbietet, kann auch niemanden
+     enttäuschen. Geprüft wird, was der Kunde sieht — nicht, was das
+     Pfadmodell für später vorsieht. */
+  const zeigtStudio = (typ) => !ausgeblendet.includes(typ);
 
   const seite = await browser.newPage();
   const fehlend = [];
@@ -225,6 +231,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
 
   /* Einzeldokumente: ihr fester Pfad muss antworten. */
   for (const [typ, pfad] of Object.entries(FESTE_PFADE)) {
+    if (!zeigtStudio(typ)) continue;
     geprueft++;
     const antwort = await seite.goto(BASE + pfad, { waitUntil: "domcontentloaded", timeout: 30000 });
     if (!antwort || antwort.status() >= 400) fehlend.push({ typ, pfad, status: antwort?.status() ?? 0 });
@@ -238,6 +245,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
      gecrawlte Liste statt gegen das nackte Verzeichnis: sonst meldete die
      Prüfung `leistung` als fehlend, obwohl es elf Seiten hat. */
   for (const [typ, ordner] of Object.entries(VERZEICHNIS)) {
+    if (!zeigtStudio(typ)) continue;
     geprueft++;
     if (!gefundeneSeiten.some((p) => p.startsWith(`/${ordner}/`))) {
       fehlend.push({ typ, pfad: `/${ordner}/<slug>`, status: 0 });
@@ -249,6 +257,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
      Route überhaupt gibt: eine Datei, die `/[slug]` bedient. */
   const { existsSync } = await import("node:fs");
   for (const typ of OBERSTE_EBENE) {
+    if (!zeigtStudio(typ)) continue;
     geprueft++;
     if (!existsSync("web/src/pages/[slug].astro")) {
       fehlend.push({ typ, pfad: "/<slug>", status: 0 });
@@ -273,6 +282,15 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
  * eine zweite Wahrheit anzulegen, werden sie hier aus der Quelle gelesen.
  * Bricht das Einlesen, ist das ein Befund und keine stille Null.
  */
+/** Die Typen, die das Studio bewusst nicht anbietet (structure/index.ts). */
+async function ladeAusgeblendete() {
+  const { readFile } = await import("node:fs/promises");
+  const quelle = await readFile("studio/structure/index.ts", "utf8");
+  const treffer = quelle.match(/OHNE_ROUTE\s*=\s*\[([\s\S]*?)\]/);
+  if (!treffer) throw new Error("In studio/structure/index.ts fehlt OHNE_ROUTE.");
+  return [...treffer[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+}
+
 async function ladePfadmodell() {
   const { readFile } = await import("node:fs/promises");
   const quelle = await readFile("studio/lib/pfade.ts", "utf8");
