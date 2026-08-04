@@ -6,18 +6,18 @@ export default defineCliConfig({
     dataset: "production",
   },
 
-  /* TypeGen ist hier bewusst aus.
+  /* TypeGen läuft — seit Aufgabe 1 der Umbauliste, gesteuert über
+   * `sanity-typegen.json` im Projektstamm und `npm run types`.
    *
-   * Es erzeugt Typen aus Schema und Abfragen — nur bleibt es dabei in seinem
-   * Projektordner: Pfade nach `../web` verwirft es, und von der Wurzel aus
-   * findet es keine Projektwurzel. Es liefe also nur mit einer zweiten
-   * sanity.cli.ts an der Wurzel oder indem die Abfragen hierher wandern, weg
-   * von der Seite, die sie benutzt.
+   * Hier stand die Begründung, warum es aus sei: Es bleibe in seinem
+   * Projektordner, verwerfe Pfade nach `../web` und finde von der Wurzel aus
+   * keine Projektwurzel. Das beschrieb ein lösbares Problem — man muss ihm
+   * die Pfade nur ausdrücklich geben.
    *
-   * Beides kostet mehr, als es bringt: die Typen in web/src/lib/fixtures.ts
-   * sind von Hand geschrieben, weil sie doppelt dienen — als Vertrag für die
-   * Abfrage und als Form der Beispieldaten, die einspringen, wenn im CMS noch
-   * nichts liegt. Erzeugte Typen könnten das zweite nicht. Bei deutlich mehr
-   * Collections lohnt die Umstellung; bei einer nicht.
+   * Der zweite Teil der alten Begründung ist mit Aufgabe 4 ohnehin
+   * hinfällig: Die Typen lägen von Hand in `web/src/lib/fixtures.ts`, weil
+   * sie doppelt dienten, als Vertrag UND als Form der Beispieldaten. Diese
+   * Doppelrolle gibt es nicht mehr — der Inhalt liegt im CMS, die Datei ist
+   * gelöscht, und der Vertrag kommt aus der Abfrage.
    */
 });

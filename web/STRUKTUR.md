@@ -42,8 +42,11 @@ Zwei Dinge, die dabei leicht schiefgehen:
   Innereien eines anderen nicht ansprechen, ohne es auszuschreiben.
 - **Typen gehören nicht ins Frontmatter.** Eine `.astro`-Datei kann nur sich
   selbst exportieren. Gemeinsame Formen (`Frage`, `Schritt`, `Preis`,
-  `FeatureZeile`) stehen deshalb in `lib/fixtures.ts` und werden von dort
-  importiert.
+  `Eintrag`) stehen deshalb in `lib/formen.ts` und werden von dort importiert.
+  Was nur ein Baustein braucht, bleibt bei ihm — `Geschichte` in `Stories`,
+  `FeatureZeile` in `Features`. Bis Aufgabe 4 lagen alle vier in
+  `lib/fixtures.ts`; die Datei trug zugleich die Beispieldaten und ist mit
+  deren Umzug ins CMS entfallen.
 
 ## Stilebenen
 

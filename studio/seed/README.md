@@ -1,11 +1,9 @@
 # Startbestand einspielen
 
-Zwei Dateien, weil zwei Importarten nötig sind. Beide werden erzeugt, nicht
-von Hand geschrieben:
-
-```bash
-node studio/seed/erzeuge.mjs
-```
+Zwei Dateien, weil zwei Importarten nötig sind. Sie sind **die Quelle** —
+erzeugt wurden sie einmalig von `erzeuge.mjs`, das die Vorgaben aus den
+Bausteinen las. Diese Vorgaben gibt es seit Aufgabe 4 nicht mehr, das Skript
+läuft nicht mehr und liegt nur noch als Beleg daneben.
 
 Einspielen — schreibt echte Dokumente in den Datensatz:
 
@@ -35,9 +33,13 @@ im Studio.
 **Einstellungen** — Telefon, E-Mail, Bewertungszahlen, Profile, beide
 Anschriften.
 
-**Startseite** — alle siebzehn Felder mit dem Text, den die Seite zeigt:
-Hero-Zeilen, Split, Services-Titel, die fünf Standards, Standorte-Titel,
-Experten, die fünf Stories, Magazin und die sechs FAQ-Einträge.
+**Startseite** — jedes Feld mit dem Text, den die Seite zeigt: Hero-Zeilen,
+Split, Services-Titel, die fünf Standards, Standorte-Titel, Experten mit
+beiden Absätzen, die fünf Stories, Magazin und die sechs FAQ-Einträge.
+
+Bilder und SEO trägt der Seed nicht — die pflegt der Kunde. Ein leeres
+Bildfeld fällt auf das gestaltete Motiv zurück, ein leeres SEO-Feld auf den
+Seitentitel.
 
 ## Warum der Seed jetzt Inhalt trägt
 
@@ -65,3 +67,18 @@ npm run web:styles          # im zweiten Terminal
 
 Gemessen beim Einspielen: 3918 Elemente über drei Breakpoints, keine
 Abweichung.
+
+## Ein Sonderfall: Veneers
+
+`leistung-veneers` ist die einzige voll gepflegte Leistung und steht **nicht**
+in `leistungen.ndjson` — die trägt nur Grunddaten und wird mit `--missing`
+eingespielt, rührt das Dokument also nicht an.
+
+Mit Aufgabe 4 sind vier Abschnitte dazugekommen, die gebaut waren und im
+Schema fehlten: Vorher/Nachher, Kernaussage, Ablauf und die Bild-Text-Zeilen.
+Sie lagen als Beispieldaten in `web/src/lib/fixtures.ts`, und die Datenschicht
+setzte bei **jeder** Leistung dieselben ein — auf der Bleaching-Seite stand
+deshalb „In vier Schritten zu neuen Veneers".
+
+Dieser Inhalt ist einmalig in das Veneers-Dokument gezogen. Er ist damit
+umgezogen, nicht abgetippt, und `fixtures.ts` ist entfallen.

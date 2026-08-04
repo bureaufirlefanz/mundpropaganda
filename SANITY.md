@@ -1,12 +1,18 @@
 # Sanity + Astro — Stand und Bedienung
 
-Testaufbau neben dem bestehenden Prototyp. Der Prototyp bleibt unberührt.
+Astro + Sanity ist das Produkt. Wie der Ordner aufgebaut ist, steht in
+`CLAUDE.md`; hier geht es um das CMS und seine Anbindung.
 
 ```
-studio/   Sanity Studio, eigenständig (nicht in die App eingebettet)
-web/      Astro-App, zieht Inhalte aus Sanity
-src/ public/ index.html …   der bisherige Prototyp, unverändert
+studio/          Sanity Studio, eigenständig (nicht in die App eingebettet)
+web/             Astro-App, zieht Inhalte aus Sanity
+prototypen/      Vite-Handlebars-Stand und Webflow-Notizen, eingefroren
 ```
+
+Hier stand, dies sei ein „Testaufbau neben dem bestehenden Prototyp" und der
+Prototyp bleibe unberührt. Beides ist seit Stufe A überholt: Der Prototyp trug
+bis dahin Tokens, Basis-CSS und das gesamte JavaScript der ausgelieferten
+Seite — wer dort etwas änderte, änderte die Live-Website.
 
 Projekt `a6bjftwf`, Dataset `production`.
 
@@ -98,13 +104,15 @@ Stega-Markierungen in der Ausgabe und einen Vorschau-Endpunkt in der Astro-App.
 Gezeigt wird der Dev-Server auf :4321, also der letzte Build und nicht der
 Entwurf.
 
-**TypeGen ist bewusst aus.** Es bliebe in seinem Projektordner: Pfade nach
-`../web` verwirft es, von der Wurzel aus findet es keine Projektwurzel. Es
-liefe nur mit einer zweiten `sanity.cli.ts` oder indem die Abfragen ins Studio
-wandern, weg von der Seite, die sie benutzt. Die Typen in
-`web/src/lib/fixtures.ts` sind von Hand geschrieben, weil sie doppelt dienen —
-als Vertrag für die Abfrage und als Form der Beispieldaten. Erzeugte Typen
-könnten das zweite nicht. Bei deutlich mehr Collections lohnt die Umstellung.
+**TypeGen läuft** (Aufgabe 1 der Umbauliste): `npm run types` zieht das Schema
+und erzeugt `web/src/lib/sanity.types.ts`, gesteuert über `sanity-typegen.json`
+im Projektstamm. Es hängt in `web:check`, ein falsch geschriebener Feldname in
+einer Abfrage bricht damit die Prüfung.
+
+Hier stand die Begründung, warum es aus sei — es bliebe in seinem
+Projektordner, und die Typen in `fixtures.ts` seien von Hand geschrieben, weil
+sie doppelt dienten. Beides ist überholt: Man muss TypeGen die Pfade nur
+ausdrücklich geben, und `fixtures.ts` gibt es seit Aufgabe 4 nicht mehr.
 
 ## Collections
 
@@ -123,10 +131,14 @@ Bislang gibt es eine Sammlung und ein Einzeldokument.
 
 **Einstellungen** trägt, was auf jeder Seite gleich ist: Telefon, E-Mail, die
 Zahlen im Bewertungsbalken und die Profile in den sozialen Netzwerken. Alles
-davon stand vorher fest im Markup. Gepflegte Felder gewinnen einzeln — ein
-gesetztes Telefon gilt auch dann, wenn die Bewertungszahlen noch fehlen; nur
-leere Felder fallen auf den Prototyp-Stand zurück. Profile ohne Adresse
-verschwinden ganz, statt als Symbol ins Leere zu führen.
+davon stand vorher fest im Markup.
+
+Seit Aufgabe 4 ohne Rückfall: Telefon, E-Mail und Standorte sind Pflicht, die
+Bewertungen sind wahlfrei — und zwar zusammen. Fehlt eine der drei Angaben,
+erscheint der Balken gar nicht, statt „0 Bewertungen" zu zeigen. Profile ohne
+Adresse verschwinden einzeln, statt als Symbol ins Leere zu führen. Vorher
+fiel jedes leere Feld auf den Prototyp-Stand zurück, also auf eine Rufnummer
+und 272 Bewertungen, die im Studio nirgends standen.
 
 **Leistungen** ist die Sammlung. Sie trägt zwei Rollen, und die Felder im
 Studio sind danach gruppiert:
@@ -153,33 +165,40 @@ jeder zweite Menüpunkt ins Leere.
 
 ### Startbestand einspielen
 
-Die dreizehn Leistungen, die bisher fest im Markup standen, liegen als
-Seed-Datei bereit — siehe `studio/seed/README.md`. Solange sie nicht
-eingespielt sind, trägt die Liste in `leistungsliste.ts` die Seite;
-umgeschaltet wird, sobald mindestens eine Leistung eine Menüspalte hat.
+Der Startbestand ist eingespielt: elf Leistungen, die Einstellungen und die
+Startseite — siehe `studio/seed/README.md`. Damit trägt die Collection, und
+`leistungsliste.ts` hat seine Beispielliste verloren. Wer eine Leistung im
+Studio löscht, sieht sie auch aus Tabelle, Menü und Fuß verschwinden.
 
 ## Wie die Inhalte an die Seite kommen
 
 - `studio/schemaTypes/leistung.ts` — das Inhaltsmodell. Zugeschnitten auf die
   Abschnitte, die die Seite wirklich hat: Hero, Intro, Benefits, Kosten, FAQ.
 - `web/src/lib/queries.ts` — die GROQ-Abfragen.
-- `web/src/lib/leistungen.ts` — Datenzugriff mit zwei Rückfallebenen: ohne
-  Dokument treten Beispieldaten ein, ohne gepflegte Bilder die lokalen Motive.
+- `web/src/lib/leistungen.ts` — der Datenzugriff, seit Aufgabe 4 ohne
+  Rückfall. Was das Dokument nicht trägt, erscheint nicht. Nur die Bilder
+  fallen weiter auf die lokalen Motive zurück, und das entscheidet der
+  Baustein, nicht die Datenschicht.
 - `web/src/pages/leistungen/[slug].astro` — **eine** Route für alle
   Leistungsseiten. Eine zweite Leistung kostet nur noch ein Dokument im
   Studio, keinen Code.
 
 ## Was noch offen ist
 
-- Die Startseite ist noch nicht im CMS. Ihre Inhalte stehen als Markup in den
-  Sections, ihre Bilder kommen weiterhin aus der lokalen Bildpipeline.
-- Visual Editing (Klick-zum-Bearbeiten) ist nicht eingerichtet.
-- Das Inhaltsmodell kennt Hero, Intro, Benefits, Kosten und FAQ. Vier weitere
-  Abschnitte der Leistungsseite sind gebaut, aber noch nicht im Schema:
-  **Before/After, Statement, „In vier Schritten" und die Feature-Zeilen.** Sie
-  stehen als Beispieldaten in `web/src/lib/fixtures.ts`, und die Datenschicht
-  setzt sie ein, solange das CMS sie nicht liefert. Wächst das Schema um
-  dieselben Feldnamen, gewinnt es automatisch.
+- Visual Editing (Klick-zum-Bearbeiten) ist nicht eingerichtet — das ist
+  Stufe 2 der Umbauliste.
+- **Zehn der elf Leistungen sind ungepflegt.** Sie tragen Grunddaten und
+  sonst nichts, ihre Seiten zeigen deshalb Hero, Stories, Magazin und
+  Kontakt. Bis Aufgabe 4 sahen sie vollständig aus, weil der Rückfall den
+  Inhalt von Veneers einsetzte — samt dessen Preisen. Was fehlt, ist Text,
+  kein Code.
+- Die Motive in der Zahnmaske (Standards) und die fünf Bilder im
+  Standorte-Ring sind fest verdrahtet. Sie gehören eins zu eins an ihre
+  Punkte bzw. an eine gestaltete Komposition; pflegbar zu machen ist je ein
+  eigener Umbau, nicht ein Feld mehr.
+- `og:url` fehlt in `Base.astro`, weil `site` in `astro.config.mjs` nicht
+  gesetzt ist — die Domain steht noch nicht fest. Sobald sie da ist: `site`
+  setzen und die Zeile ergänzen.
 
 ## Aufbau einer Leistungsseite
 
@@ -190,15 +209,20 @@ Die Reihenfolge entspricht der Vanilla-Vorlage `leistungen/veneers.html`:
 | Service-Hero | `[slug].astro` | CMS |
 | Intro | `[slug].astro` | CMS |
 | Benefits | `Benefits.astro` | CMS |
-| Vorher/Nachher | `BeforeAfter.astro` | Beispieldaten |
-| Statement | `[slug].astro` | Beispieldaten |
-| In vier Schritten | `Steps.astro` | Beispieldaten |
-| Transformation Stories | `Stories.astro` | fest (wie Startseite) |
+| Vorher/Nachher | `BeforeAfter.astro` | CMS |
+| Statement | `[slug].astro` | CMS |
+| In vier Schritten | `Steps.astro` | CMS |
+| Transformation Stories | `Stories.astro` | CMS, aus dem Startseiten-Dokument |
 | Kosten | `[slug].astro` | CMS |
-| Feature-Zeilen | `Features.astro` | Beispieldaten |
-| Magazin | `Magazine.astro` | fest, Einstieg über Props |
+| Feature-Zeilen | `Features.astro` | CMS |
+| Magazin | `Magazine.astro` | Einstieg aus der Seite, Beiträge fest |
 | FAQ | `Faq.astro` | CMS |
 | Kontakt | `Contact.astro` | fest |
+
+Jeder Abschnitt hängt an seinen eigenen Daten: Was das Dokument nicht trägt,
+erscheint nicht. Die Patientenstimmen stehen im Startseiten-Dokument, weil es
+dieselben sind wie dort — ein zweites Feld je Leistung liefe auseinander, und
+niemand pflegt elf Mal dieselben fünf Zitate.
 
 `Faq` und `Contact` teilen sich den Rahmen `ui/Panel.astro` — schmaler Kopf
 links, Inhalt rechts. Beide schreiben `.s-panel` aus; läge die Regel in einer
