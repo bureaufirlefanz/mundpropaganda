@@ -1,96 +1,78 @@
 # Mundpropaganda
 
-## Aufbau
+## Was ist das Produkt
 
-| Ort | Was |
-|---|---|
-| `src/` | Vite + Handlebars — der ursprüngliche Prototyp (`npm run dev`, Port 5173) |
-| `web/` | **Astro-App** — der aktuelle Stand (`npm run web`, Port 4321) |
-| `studio/` | Sanity Studio (`npm run studio`, Port 3333) |
-| `scripts/` | Bildoptimierung, Screenshots, Checks |
+**Astro + Sanity.** Entschieden am 04.08.2026. Alles andere ist Prototyp.
 
-Weiterführend: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (Aufbau der Astro-App, verbindlich)
+| Ordner | Was | Status |
+|---|---|---|
+| `web/` | Astro — die Website | **Produkt** |
+| `studio/` | Sanity — das CMS | **Produkt** |
+| `prototypen/vite/` | Handlebars-Stand | Archiv, nicht ändern |
+| `prototypen/webflow/` | Lumos-Rekonstruktion | Prototyp, nur auf Ansage |
+| `scripts/` | Bildpipeline, Aufnahmen, Prüfungen | Werkzeug |
+
+Wer hier landet, ohne den Aufbau zu kennen: Änderungen an der Website gehören
+nach `web/` oder `studio/`. Ein Eingriff unter `prototypen/` ändert nichts an
+dem, was ausgeliefert wird — und wird nicht erwartet.
+
+Bis A2 war das umgekehrt: `web/` importierte Tokens, Basis-CSS und das gesamte
+JavaScript aus dem Prototyp, und `web/public` war ein Symlink dorthin. Wer im
+„Prototyp" arbeitete, änderte die Live-Website. Diese Falle ist zu.
+
+```bash
+npm run web         # Astro, Port 4321
+npm run studio      # Sanity Studio, Port 3333
+npm run web:check   # Typen, Rauchtest, Barrierefreiheit
+npm run web:deploy  # bauen und auf Netlify veröffentlichen
+```
+
+Weiterführend: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (Aufbau der
+Astro-App, verbindlich) · `CMS-UMBAU.md` (die laufende Umbauliste)
+
+Je eine `CLAUDE.md` liegt in `web/` und `studio/` mit dem, was dort gilt.
 
 ## Grundregeln
 
-- **Seiten setzen zusammen, sie gestalten nicht.** Ein `<style>`-Block unter `pages/` ist der
-  Hinweis, dass ein Baustein fehlt. Siehe `web/STRUKTUR.md`.
+- **Seiten setzen zusammen, sie gestalten nicht.** Ein `<style>`-Block unter
+  `pages/` ist der Hinweis, dass ein Baustein fehlt. Siehe `web/STRUKTUR.md`.
 - **Ein Baustein, eine Datei** — Markup und Regeln zusammen.
-- `src/styles/tokens.css` ist die einzige Quelle für Werte. Keine Magic Numbers, keine Hex-Werte
-  außerhalb davon.
+- `web/src/styles/tokens.css` ist die einzige Quelle für Werte. Keine Magic
+  Numbers, keine Hex-Werte außerhalb davon.
 - CSS-Konvention: `s-*` Abschnitt, `c-*` Komponente, `__element`, `--modifier`.
   Kein Tailwind, keine atomaren Utilities.
-
-## Webflow + Lumos
-
-Die Site soll perspektivisch als Webflow-Projekt auf **Lumos v2.2.3** rekonstruiert werden.
-Verbunden über den Webflow-MCP-Server.
-
-| | |
-|---|---|
-| **Webflow-Site** | `Mundpropaganda` |
-| **site_id** | `6a70585b5d65de23c37135b7` |
-| **Primäre Sprache** | `de` |
-
-**Vor jeder Webflow-Arbeit das Skill `webflow-lumos` verwenden**
-(`.agents/skills/webflow-lumos/`, verlinkt nach `.claude/skills/`). Es enthält Klassen- und
-Variablen-Konventionen, MCP-Aufrufreihenfolge, CMS-Schemata und die QA-Checkliste.
-Nicht aus dem Gedächtnis arbeiten.
-
-Sessionstart für Webflow:
-
-```
-1. webflow_guide_tool
-2. data_agent_instructions_tool > search_instructions   (Site-Rules haben Vorrang)
-3. Discovery-Pass — Skill-Referenz: mcp-workflow.md §1
-```
-
-`site_id` nie annehmen. **Nie eine `u-`-Klasse oder einen Variablennamen erfinden** — erst
-`get_styles` / `get_variables` lesen und wiederverwenden, was existiert.
-
-Die Abbildung von hiesigen BEM-Klassen und Tokens auf Lumos steht in
-`.claude/rules/astro-webflow-parity.md`.
-
-### Grenze des MCP
-
-MCP kann **Quelle, Filter und Sortierung einer Collection List nicht setzen** — das bleibt
-Handarbeit im Designer. Hülle anlegen, dann übergeben. Bindings an Kindelemente funktionieren erst
-danach. Eine Liste nie als fertig melden, wenn sie es nicht ist.
-
-Ebenfalls nicht verfügbar: IX3-Interaktionen/Animationen, Conditional-Visibility-Bindings,
-Datums-/Zahlenformatierung an Bindings, Anlegen lokalisierter CMS-Items.
-
-Empirisch festgestellt (Stand 2026-08-03, MCP 2.0.1):
-
-- **`custom_value` bei Variablen schlägt serverseitig fehl** (jeder Typ, jede Collection —
-  „internal error"). Fluide `clamp()`-Werte lassen sich nur im Designer/Fluid Builder ändern.
-  Workaround für Transparenzfarben: Hex mit Alphakanal (exakt äquivalent zu
-  `color-mix(... transparent)`). `create_style` mit `var()`-Property-Werten schlägt ebenfalls
-  fehl — derselbe Wert lässt sich aber per `update_style` nachträglich setzen.
-- **Component-Instanzen in Slots verschachtelter Instanzen** (z. B. Footer Groups im
-  Grid-Slot des Footers) sind headless nicht adressierbar — Props nur im Designer setzbar.
-
-### Nicht anfassen
-
-- Variable `site/column-width`
-- Variablen-Collection *Column Count* (eine Collection *Alignment* existiert auf der Site
-  nicht — nur die Klassen `u-alignment-*`)
-- Variablen-Collections *Gap*, *Trigger*, *State*, *Responsive* — Framework-Schaltmechanik,
-  keine Design-Tokens
-- `page_main` muss ein Page Slot bleiben
-- Die `Global Styles`-Komponente
+- **Keine Gedankenstriche in Texten**, die auf der Seite erscheinen. Ein
+  Bindestrich tut es; besser ist ein Satz, der ohne auskommt. Bereiche
+  („Mo–Fr", „8–19 Uhr") und Preise („450,–") sind davon nicht betroffen.
 
 ## Sanity
 
 Siehe `SANITY.md` und das Skill `sanity-best-practices` (`.agents/skills/`).
 Abfragen liegen in `web/src/lib/`.
 
+## Webflow + Lumos
+
+**Ein Prototyp. Arbeit daran nur auf ausdrückliche Ansage.**
+
+Die Site *sollte* einmal in Webflow rekonstruiert werden; diese Absicht steht
+nicht mehr. Was für den Fall gälte, dass sie zurückkommt, liegt vollständig in
+`prototypen/webflow/` — Site-ID, Lumos-Version, die Grenzen des MCP und die
+Abbildung der BEM-Klassen auf Lumos.
+
+Falls es doch losgeht: **erst das Skill `webflow-lumos` lesen**
+(`.agents/skills/webflow-lumos/`, verlinkt nach `.claude/skills/`), nicht aus
+dem Gedächtnis arbeiten. `site_id` nie annehmen, nie eine `u-`-Klasse oder
+einen Variablennamen erfinden.
+
 ## Projektentscheidungen
 
 <!-- Getroffene Entscheidungen hier festhalten, damit sie Sessions überdauern. -->
 
-- **Webflow-Collections:** Magazin, Reviews, Team, Offene Stellen + Hilfscollections
-  (Kategorie, Tag, Abteilung, Standort, Leistung) — Schemata im Skill unter `cms-collections.md`
-- **Slug-Sprache:** `TODO — deutsch mit Transliteration, oder englisch?`
-- **Filterung:** `TODO — nativ, oder Finsweet Attributes List Filter?`
-- **Spacing-Tokens:** aktuell px; für Lumos in rem zu überführen — noch offen
+- **Astro + Sanity ist das Produkt** (04.08.2026). Webflow/Lumos und der
+  Vite-Stand sind Prototypen.
+- **Der CMS-Umbau läuft nach `CMS-UMBAU.md`** — Stufe A (Ordnung), Stufe 0
+  (Absicherung), Stufe 1 (das Studio sagt die Wahrheit), Stufe 2
+  (Presentation Tool), danach Politur und Betrieb. Die Liste sticht, wo
+  ältere Begründungen in `SANITY.md` ihr widersprechen.
+- **Offene Webflow-Fragen** (Slug-Sprache, Filterung, Spacing in rem) stehen
+  in `prototypen/webflow/README.md` und sind ruhend gestellt.
