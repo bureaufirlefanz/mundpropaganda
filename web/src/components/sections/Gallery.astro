@@ -13,35 +13,44 @@ import Picture from "../ui/Picture.astro";
 import BildRing from "../ui/BildRing.astro";
 import { ladeEinstellungen } from "../../lib/einstellungen";
 import type { RingBild } from "../ui/BildRing.astro";
+import type { Bildquelle } from "../../lib/bilder";
 
 interface Props {
   variante?: "reihe" | "ring";
   titel: string;
+  /** Die Motive auf dem Ring, aus dem CMS. */
+  bilder?: { bild: Bildquelle; beschriftung?: string }[];
 }
 
 /* Keine Vorgabe für den Titel: Pflichtfeld im Schema, die Seite reicht ihn
    durch. `variante` ist dagegen eine Gestaltungsentscheidung der Seite und
    kein Inhalt — sie behält ihre Vorgabe. */
-const { variante = "reihe", titel } = Astro.props;
+const { variante = "reihe", titel, bilder } = Astro.props;
 
 /* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
 const { standorte } = await ladeEinstellungen();
 
-/* Für den Ring dieselben Motive, aber ohne die schmalen Abstraktionen —
-   auf dem Zylinder haben alle Karten dasselbe Maß.
+/* Klasse 3: die gestalteten Motive, solange im Studio keine hochgeladen sind.
+   Drei beschriftete Praxisaufnahmen und zwei Abstraktionen dazwischen — auf
+   dem Zylinder haben alle Karten dasselbe Maß.
 
-   Fest verdrahtet, und das ist Klasse 3: Die fünf sind eine gestaltete
-   Komposition aus drei beschrifteten Praxisaufnahmen und zwei Abstraktionen
-   dazwischen. `standorteBilder` stand dafür im Schema und erreichte nie ein
-   Markup — es ist mit Aufgabe 4 entfallen. Soll der Ring CMS-Bilder zeigen,
-   ist das ein eigener Umbau an BildRing, keine Nebensache. */
-const ringBilder: RingBild[] = [
+   `standorteBilder` gab es im Schema schon einmal und es erreichte nie ein
+   Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
+   Standortfotos hochlädt, sieht sie hier. */
+const MOTIVE: RingBild[] = [
   { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
   { name: "praxis-01", widths: "640", alt: "Empfangsbereich Prenzlauer Allee" },
   { name: "praxis-02", widths: "640", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
   { name: "abstract-01", widths: "640,1024" },
   { name: "abstract-02", widths: "640,1024" },
 ];
+
+/* Gepflegte Bilder gewinnen als GANZE Liste, nicht Karte für Karte: Der Ring
+   ist eine Komposition, und drei eigene Fotos zwischen zwei geliehenen
+   Abstraktionen sähen aus wie ein Fehler. */
+const ringBilder: RingBild[] = bilder?.length
+  ? bilder.map((b) => ({ bild: b.bild, alt: b.beschriftung ?? "", caption: b.beschriftung }))
+  : MOTIVE;
 ---
 
 <!-- ==================================================================

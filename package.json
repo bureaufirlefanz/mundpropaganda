@@ -8,7 +8,7 @@
     "proto:build": "vite build --config prototypen/vite/vite.config.js",
     "proto:preview": "vite preview --config prototypen/vite/vite.config.js",
     "schema:extract": "npm --prefix studio run schema:extract",
-    "types": "npm run schema:extract && npx --yes sanity@latest typegen generate",
+    "types": "npm run schema:extract && ./studio/node_modules/.bin/sanity typegen generate",
     "images": "node scripts/optimize-images.mjs",
     "shots": "node scripts/shots.mjs",
     "intro": "node scripts/intro.mjs",

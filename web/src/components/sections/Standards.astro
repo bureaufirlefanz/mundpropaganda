@@ -5,23 +5,35 @@
  * Überschrift und Punkte sind Pflicht und kommen aus dem CMS — keine Vorgaben
  * mehr im Frontmatter.
  *
- * Die fünf Bilder in der Zahnmaske bleiben fest verdrahtet, und das ist
- * Klasse 3: Sie gehören eins zu eins zu den fünf Punkten und blenden beim
- * Wechsel ineinander über. Ein einzelnes Bildfeld im Studio könnte das nicht
- * bedienen — genau deshalb ist `standardsBild` mit Aufgabe 4 aus dem Schema
- * geflogen, statt es dort stehen zu lassen, wo es nichts tut. Sollen die
- * Motive pflegbar werden, gehören sie an die Punkte, nicht an die Section.
+ * Die Motive in der Zahnmaske hängen am einzelnen Punkt und kommen aus dem
+ * CMS: Zu jedem Punkt gehört ein Bild, und beim Weiterwandern blendet es um.
+ * Es gab dafür einmal ein Feld `standardsBild` am Abschnitt — eines für fünf
+ * Motive, das deshalb nichts bewirken konnte. Jetzt hängt es richtig.
+ *
+ * Ohne gepflegtes Bild greift das gestaltete Motiv an derselben Position.
  */
 import Button from "../ui/Button.astro";
 import Thread from "../ui/Thread.astro";
 import ToothRings from "../ui/ToothRings.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 interface Props {
   titel: string;
-  eintraege: { name: string; text?: string }[];
+  eintraege: { name: string; text?: string; bild?: Bildquelle }[];
 }
 
 const { titel, eintraege } = Astro.props;
+
+/* Klasse 3: die gestalteten Motive, positionsgenau. Über den Index und
+   modulo, damit auch ein sechster Punkt ein Bild bekommt. */
+const MOTIVE = [
+  "/img/treatment-01-1024.webp",
+  "/img/lab-veneers-1024.webp",
+  "/img/teeth-macro-1024.webp",
+  "/img/praxis-03-1024.webp",
+  "/img/abstract-02-1024.webp",
+];
 ---
 
 <!-- ==================================================================
@@ -34,12 +46,19 @@ const { titel, eintraege } = Astro.props;
           <!-- Zwei Ebenen mit derselben Zahnmaske: die hintere ist minimal
                größer und liefert dadurch den weichen Rand. Alle Motive
                liegen übereinander, aktiv ist immer genau eines. -->
+          {/* Eines je Punkt, in derselben Reihenfolge — standards.js schaltet
+              nach Index um. Als feste Fünferliste konnte das auseinanderlaufen,
+              sobald jemand einen sechsten Punkt anlegte. */}
           <div class="s-standards__stage" data-standards-stage>
-            <img src="/img/treatment-01-1024.webp" alt="" data-standards-img />
-            <img src="/img/lab-veneers-1024.webp" alt="" data-standards-img />
-            <img src="/img/teeth-macro-1024.webp" alt="" data-standards-img />
-            <img src="/img/praxis-03-1024.webp" alt="" data-standards-img />
-            <img src="/img/abstract-02-1024.webp" alt="" data-standards-img />
+            {eintraege.map((e, i) => (
+              <CmsImage
+                quelle={istCmsBild(e.bild) ? e.bild : MOTIVE[i % MOTIVE.length]}
+                alt=""
+                widths={[640, 1024]}
+                sizes="40vw"
+                data-standards-img
+              />
+            ))}
           </div>
           <ToothRings />
         </div>

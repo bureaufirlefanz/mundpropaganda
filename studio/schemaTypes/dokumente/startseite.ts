@@ -137,21 +137,22 @@ export const startseite = defineType({
           fields: [
             defineField({ name: "name", title: "Titel", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
+            /* Das Motiv gehört an den PUNKT, nicht an den Abschnitt: Die
+               Zahnmaske rechts zeigt zu jedem Punkt ein anderes Bild und
+               blendet beim Weiterwandern um.
+               Es gab dafür einmal ein einzelnes Feld `standardsBild` am
+               Abschnitt. Das konnte der Baustein nicht bedienen — fünf Motive
+               lassen sich nicht aus einem Feld speisen, und deshalb tat es
+               nichts. Hier hängt es richtig. */
+            defineField({ name: "bild", title: "Bild in der Zahnmaske", type: "bild" }),
           ],
-          preview: { select: { title: "name", subtitle: "text" } },
+          preview: { select: { title: "name", subtitle: "text", media: "bild" } },
         }),
       ],
       /* Klasse 1: Die Punkte SIND der Abschnitt. Ohne sie bliebe eine
          Überschrift über einer leeren Liste stehen. */
       validation: (r) => r.required(),
     }),
-    /* `standardsBild` stand hier und hat nie etwas bewirkt — `Standards.astro`
-       hat gar keine Bild-Prop. Es war auch strukturell falsch: Der Abschnitt
-       zeigt FÜNF Motive in der Zahnmaske, eines je Punkt, die beim Wechsel
-       überblenden. Ein einzelnes Bildfeld kann das nicht bedienen.
-       Damit die Redaktion sie tauschen kann, müssten sie eins zu eins an den
-       Punkten hängen — das ist ein eigener Schritt und keine Nebensache. Bis
-       dahin gilt Klasse 3: fest im Baustein, und das ist ehrlich so. */
 
     /* --- Standorte ------------------------------------------------------ */
     defineField({
@@ -162,12 +163,33 @@ export const startseite = defineType({
       group: "standorte",
       validation: (r) => r.required(),
     }),
-    /* `standorteBilder` stand hier und hat nie etwas bewirkt — `Gallery.astro`
-       baut seinen Ring aus fünf fest verdrahteten Motiven der lokalen
-       Bildpipeline und nimmt keine Bilder entgegen. Die fünf sind eine
-       gestaltete Komposition: drei Praxisaufnahmen mit Beschriftung und zwei
-       schmale Abstraktionen dazwischen. Klasse 3, bis der Ring CMS-Bilder
-       lernt — das ist ein eigener Umbau. */
+    defineField({
+      name: "standorteBilder",
+      title: "Bilder im Karussell",
+      type: "array",
+      description:
+        "Die Motive auf dem Ring. Fünf sind ein guter Stand - der Ring füllt sich von selbst auf, bis er rund ist. Ohne eigene Bilder stehen hier die gestalteten Motive.",
+      group: "standorte",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "ringBild",
+          fields: [
+            defineField({ name: "bild", title: "Bild", type: "bild", validation: (r) => r.required() }),
+            defineField({
+              name: "beschriftung",
+              title: "Beschriftung",
+              type: "string",
+              description: "Die Pille im Bild, z. B. der Standortname. Leer lassen für keine.",
+            }),
+          ],
+          preview: {
+            select: { title: "beschriftung", media: "bild" },
+            prepare: ({ title, media }) => ({ title: title || "ohne Beschriftung", media }),
+          },
+        }),
+      ],
+    }),
 
     /* --- Team ----------------------------------------------------------- */
     ...kopf("experten", false),

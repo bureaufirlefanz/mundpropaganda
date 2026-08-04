@@ -8,6 +8,8 @@
  */
 import Button from "../ui/Button.astro";
 import Panel from "../ui/Panel.astro";
+import { ladeEinstellungen } from "../../lib/einstellungen";
+import { ladeLeistungsliste, fuerTabelle } from "../../lib/leistungsliste";
 
 interface Props {
   /** Vorauswahl im Feld „Leistung". */
@@ -16,20 +18,24 @@ interface Props {
 
 const { leistung } = Astro.props;
 
-/* Klasse 3: Überschrift und Einstieg stehen fest, und das ist ehrlich so —
-   es gibt kein Feld dafür im Studio, und keine Seite reicht eines durch.
-   Vorher standen dieselben Sätze als Prop-Vorgaben da. Das las sich wie ein
-   Rückfall auf einen CMS-Wert, der nie kommt; als Konstante ist zu sehen, was
-   sie sind. Wandert der Kontaktbereich ins CMS, werden daraus Props ohne
-   Vorgabe — so wie beim Magazin. */
-const TITEL = "Unverbindliches Angebot";
-const TEXT =
-  "Schicken Sie uns ein Foto Ihrer Zähne - wir melden uns mit einer ersten Einschätzung und einem Kostenrahmen.";
+/* Überschrift und Einstieg kommen aus den Einstellungen — der Kontaktbereich
+   steht auf mehreren Seiten und ist überall derselbe. Der Baustein holt sie
+   selbst, wie Reviews und Footer es auch tun; sie durch jede Seite
+   durchzureichen hieße, sie an jeder Seite vergessen zu können.
 
-const LEISTUNGEN = ["Veneers", "Zahnimplantate", "Keramik Inlays", "Bleaching", "Aligner"];
+   Vorher standen beide Sätze fest hier. Das war der letzte Textblock der
+   Seite, den der Kunde nicht ändern konnte. */
+const { kontaktTitel, kontaktText } = await ladeEinstellungen();
+
+/* Die Auswahlliste kommt aus der Leistungen-Collection. Sie war ein fest
+   verdrahtetes Array aus fünf Namen — mit eigener Schreibweise („Keramik
+   Inlays" gegen „Keramikinlays" in der Tabelle) und ohne Bezug dazu, was die
+   Praxis tatsächlich anbietet. Wer eine Leistung umbenennt, benennt sie jetzt
+   auch hier um. */
+const LEISTUNGEN = fuerTabelle(await ladeLeistungsliste()).map((l) => l.name);
 ---
 
-<Panel id="kontakt" topline="Kontakt" titel={TITEL} text={TEXT}>
+<Panel id="kontakt" topline="Kontakt" titel={kontaktTitel} text={kontaktText}>
   <form class="c-form" data-form novalidate data-reveal-stagger="0.06">
     <div class="c-field" data-field data-reveal-child>
       <label class="c-field__label" for="f-name">Name <span>*</span></label>

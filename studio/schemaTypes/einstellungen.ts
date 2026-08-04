@@ -38,6 +38,28 @@ export const einstellungen = defineType({
       validation: (rule) => rule.required().email(),
     }),
 
+    /* Der Kontaktbereich steht auf mehreren Seiten und ist überall derselbe.
+       Deshalb hier und nicht je Seite: Ein zweites Feld je Leistungsseite
+       liefe auseinander, und niemand pflegt elf Mal denselben Satz.
+       Die Auswahlliste im Formular kommt aus der Leistungen-Collection und
+       braucht kein eigenes Feld — sie war bis dahin ein fest verdrahtetes
+       Array aus fünf Namen, das mit der Collection nichts zu tun hatte. */
+    defineField({
+      name: "kontaktTitel",
+      title: "Überschrift im Kontaktbereich",
+      type: "string",
+      group: "kontakt",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "kontaktText",
+      title: "Einstieg im Kontaktbereich",
+      type: "text",
+      rows: 3,
+      description: "Steht unter der Überschrift, links neben dem Formular.",
+      group: "kontakt",
+    }),
+
     defineField({
       name: "bewertungenAnbieter",
       title: "Quelle",

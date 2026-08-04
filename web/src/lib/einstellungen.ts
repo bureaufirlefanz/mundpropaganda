@@ -58,6 +58,10 @@ export interface Einstellungen {
   standorte: Standort[];
   bewertungen?: Bewertungen;
   social: Social;
+  /* Der Kontaktbereich steht auf mehreren Seiten und ist überall derselbe —
+     deshalb hier und nicht je Seite. */
+  kontaktTitel: string;
+  kontaktText?: string;
 }
 
 /* Einmal je Build. Rahmen und Hero fragen dasselbe Dokument ab. */
@@ -76,6 +80,8 @@ export function ladeEinstellungen(): Promise<Einstellungen> {
       telefon: d?.telefon || "",
       email: d?.email || "",
       standorte: d?.standorte ?? [],
+      kontaktTitel: d?.kontaktTitel || "",
+      kontaktText: d?.kontaktText || undefined,
 
       /* Klasse 2, alles oder nichts. `!= null` und nicht `||`: Ein Schnitt von
          0 ist ein gepflegter Wert und keine Lücke. */
@@ -95,7 +101,7 @@ export function ladeEinstellungen(): Promise<Einstellungen> {
     /* Kein Rückfall mehr im Fehlerfall. Ist das CMS nicht erreichbar, soll der
        Build eine sichtbar leere Seite ergeben und nicht eine, die mit alten
        Daten aus dem Prototyp vollständig aussieht. */
-    .catch(() => ({ telefon: "", email: "", standorte: [], social: {} }));
+    .catch(() => ({ telefon: "", email: "", standorte: [], social: {}, kontaktTitel: "" }));
 
   return gemerkt;
 }

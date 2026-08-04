@@ -18,6 +18,8 @@ export const EINSTELLUNGEN_QUERY = defineQuery(`
   *[_id == "einstellungen"][0]{
     telefon,
     email,
+    kontaktTitel,
+    kontaktText,
     bewertungenAnbieter,
     bewertungenAnzahl,
     bewertungenSchnitt,
@@ -92,19 +94,24 @@ export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current
  * Abgefragt wird alles auf einmal statt je Abschnitt: Es ist ein Dokument,
  * und ein Rundgang zum Server ist billiger als neun.
  *
- * Vier Felder sind mit Aufgabe 4 herausgefallen, weil sie nichts bewirkt
- * haben: `servicesZusatz`, `standardsBild` und `standorteBilder` erreichten
- * kein Markup, `expertenText` heißt jetzt `expertenAbsaetze` und ist ein
- * Array. Eine Abfrage, die mehr auswählt, als die Seite verwendet, ist keine
- * Reserve — sie ist die Behauptung, das Feld täte etwas.
+ * Vier Felder erreichten bis Aufgabe 4 kein Markup. Eine Abfrage, die mehr
+ * auswählt, als die Seite verwendet, ist keine Reserve — sie ist die
+ * Behauptung, das Feld täte etwas. Aufgelöst wurden sie unterschiedlich:
+ *
+ *   `servicesZusatz`   entfernt. Die Links unter der Tabelle kommen aus der
+ *                      Leistungen-Collection, und die ist die bessere Quelle.
+ *   `expertenText`     angeschlossen, heißt jetzt `expertenAbsaetze`.
+ *   `standardsBild`    an die richtige Stelle gerückt: Das Motiv hängt am
+ *                      einzelnen Punkt, nicht am Abschnitt.
+ *   `standorteBilder`  angeschlossen — der Ring liest jetzt daraus.
  */
 export const STARTSEITE_QUERY = defineQuery(`
   *[_id == "startseite"][0]{
     heroZeilen,
     splitTopline, splitTitel, splitAbsaetze, splitBild,
     servicesTitel,
-    standardsTitel, standardsEintraege[]{ name, text },
-    standorteTitel,
+    standardsTitel, standardsEintraege[]{ name, text, bild${BILD} },
+    standorteTitel, standorteBilder[]{ bild${BILD}, beschriftung },
     expertenTitel, expertenAbsaetze, expertenNamen, expertenBild,
     storiesEintraege[]{ name, bild, zitat },
     magazinTopline, magazinTitel, magazinText,

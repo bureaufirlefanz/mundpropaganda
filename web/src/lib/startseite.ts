@@ -38,9 +38,12 @@ export interface StartseiteInhalt {
   servicesTitel: string;
 
   standardsTitel: string;
-  standardsEintraege: { name: string; text?: string }[];
+  /* Das Motiv hängt am Punkt: Die Zahnmaske zeigt zu jedem Punkt ein anderes
+     Bild und blendet beim Weiterwandern um. */
+  standardsEintraege: { name: string; text?: string; bild?: Bildquelle }[];
 
   standorteTitel: string;
+  standorteBilder?: { bild: Bildquelle; beschriftung?: string }[];
 
   expertenTitel: string;
   expertenNamen: string;

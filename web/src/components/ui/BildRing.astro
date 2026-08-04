@@ -13,10 +13,20 @@
  * zweimal angesagt wäre nur Lärm.
  */
 import Picture from "./Picture.astro";
+import CmsImage from "./CmsImage.astro";
+import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
+/**
+ * Eine Karte auf dem Ring. Entweder ein Bild aus dem CMS (`bild`) oder ein
+ * Motiv aus der lokalen Bildpipeline (`name` + `widths`) — beides muss hier
+ * ankommen können, weil der Ring seinen Rückfall braucht, solange im Studio
+ * nichts hochgeladen ist.
+ */
 export interface RingBild {
-  name: string;
-  widths: string;
+  bild?: Bildquelle;
+  /** Nur für den Rückfall: Name aus public/img, ohne Größe und Endung. */
+  name?: string;
+  widths?: string;
   alt?: string;
   caption?: string;
 }
@@ -68,12 +78,21 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
     <div class="c-ring__rotor" data-ring-rotor>
       {karten.map(({ bild, wiederholung }) => (
         <figure class="c-ring__card" data-ring-card aria-hidden={wiederholung ? "true" : undefined}>
-          <Picture
-            name={bild.name}
-            widths={bild.widths}
-            alt={wiederholung ? "" : (bild.alt ?? "")}
-            sizes="(max-width: 700px) 80vw, 38vw"
-          />
+          {istCmsBild(bild.bild) ? (
+            <CmsImage
+              quelle={bild.bild}
+              alt={wiederholung ? "" : (bild.alt ?? "")}
+              widths={[640, 1024]}
+              sizes="(max-width: 700px) 80vw, 38vw"
+            />
+          ) : (
+            <Picture
+              name={bild.name ?? "praxis-01"}
+              widths={bild.widths ?? "640"}
+              alt={wiederholung ? "" : (bild.alt ?? "")}
+              sizes="(max-width: 700px) 80vw, 38vw"
+            />
+          )}
           {bild.caption && !wiederholung && (
             <figcaption class="c-ring__caption">{bild.caption}</figcaption>
           )}
