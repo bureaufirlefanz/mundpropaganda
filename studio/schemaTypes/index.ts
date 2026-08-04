@@ -2,6 +2,7 @@ import { leistung } from "./leistung";
 import { einstellungen } from "./einstellungen";
 
 import { seo } from "./objekte/seo";
+import { link } from "./objekte/link";
 import { bild } from "./objekte/bild";
 import {
   abschnitte,
@@ -28,12 +29,14 @@ import {
 } from "./dokumente/einzelseiten";
 
 import { beitrag, pillar, rechtstext, person, stelle } from "./dokumente/sammlungen";
+import { navigation, footer } from "./dokumente/rahmen";
 
 export const schemaTypes = [
   /* Bausteine zuerst — die Dokumente verweisen darauf. Die Reihenfolge ist
      für Sanity egal, für das Lesen nicht. */
   seo,
   bild,
+  link,
   abschnittIntro,
   abschnittFacts,
   abschnittCompare,
@@ -55,6 +58,8 @@ export const schemaTypes = [
   kontakt,
   notdienst,
   einstellungen,
+  navigation,
+  footer,
 
   /* Sammlungen */
   leistung,

@@ -2,6 +2,7 @@ import { sanityClient } from "sanity:client";
 import { ohneNull } from "./ohne-null";
 import { STARTSEITE_QUERY } from "./queries";
 import type { Bildquelle } from "./bilder";
+import type { Verweis } from "./navigation";
 
 /**
  * Die Inhalte der Startseite aus dem CMS.
@@ -51,6 +52,9 @@ export interface StartseiteInhalt {
   expertenBild?: Bildquelle;
 
   storiesEintraege: { name: string; bild?: Bildquelle; zitat?: string }[];
+  /* Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner — vorher stand
+     dort einer mit `href="#"`. Die Form kommt aus lib/navigation.ts. */
+  storiesAktion?: Verweis;
 
   magazinTopline: string;
   magazinTitel: string;

@@ -2,6 +2,7 @@
 import Button from "./Button.astro";
 import { ladeLeistungsliste, fuerTabelle, pfad } from "../../lib/leistungsliste";
 import { ladeEinstellungen, telLink } from "../../lib/einstellungen";
+import { ladeFooter, aufgeloest } from "../../lib/navigation";
 
 // Dieselbe Quelle wie Services-Tabelle und Menü. Gezeigt werden die
 // Hauptleistungen; die Zusatzlinks der Startseite bleiben dort.
@@ -10,17 +11,45 @@ const e = await ladeEinstellungen();
 
 // Nur Netzwerke zeigen, die gepflegt sind — ein Symbol ohne Ziel führt nirgends
 // hin und sieht trotzdem nach Angebot aus.
+//
+// „#" gilt dabei NICHT als gepflegt. Der Prototyp trug die vier Profile als
+// Platzhalter mit genau diesem Wert, und der Seed hat ihn übernommen: Damit
+// standen auf jeder Seite vier Symbole, die den Browser nach oben springen
+// ließen. Ein Platzhalter, der die Prüfung besteht, ist schlimmer als ein
+// leeres Feld.
 const PROFILE = [
   { schluessel: "facebook", titel: "Facebook", symbol: "#i-facebook" },
   { schluessel: "instagram", titel: "Instagram", symbol: "#i-instagram" },
   { schluessel: "linkedin", titel: "LinkedIn", symbol: "#i-linkedin" },
   { schluessel: "youtube", titel: "YouTube", symbol: "#i-youtube" },
 ] as const;
-const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filter((p) => p.url);
+const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filter(
+  (p) => p.url && p.url !== "#"
+);
 
 // Jahreszahl zur Bauzeit — die Seite ist statisch, ein Skript dafür wäre
-// unnötiges Gewicht.
+// unnötiges Gewicht. Sie steht bewusst NICHT im CMS: Eine getippte
+// Jahreszahl ist am 1. Januar falsch, und niemand denkt daran.
 const jahr = new Date().getFullYear();
+
+/* Spalten, Knopf und Rechtliches seit Aufgabe 8 aus dem CMS. Die vier
+   Rechtstext-Links standen vorher auf `href="#"` — sie sahen aus wie ein
+   Angebot und führten nirgendwohin. Jetzt zeigen sie auf Rechtstext-
+   Dokumente, und solange es die nicht gibt, steht die Zeile leer. */
+const f = await ladeFooter();
+const hier = Astro.url.pathname;
+
+const aktion = (await aufgeloest([f?.aktion ?? null], hier))[0];
+const rechtliches = await aufgeloest(f?.rechtliches, hier);
+
+const spalten = (
+  await Promise.all(
+    (f?.spalten ?? []).map(async (sp) => ({
+      titel: sp?.titel ?? "",
+      links: await aufgeloest(sp?.links, hier),
+    }))
+  )
+).filter((sp) => sp.titel && sp.links.length > 0);
 ---
 
 <footer class="c-footer">
@@ -44,7 +73,7 @@ const jahr = new Date().getFullYear();
         {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
       </div>
 
-      <Button label="Termin buchen" href="#kontakt" />
+      {aktion && <Button label={aktion.text} href={aktion.href} />}
 
       {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
           Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
@@ -67,8 +96,8 @@ const jahr = new Date().getFullYear();
       </div>
     </div>
 
-    <nav class="c-footer__nav" aria-label="Leistungen">
-      <p class="c-footer__nav-title">Services</p>
+    <nav class="c-footer__nav" aria-label={f?.leistungenTitel ?? "Leistungen"}>
+      <p class="c-footer__nav-title">{f?.leistungenTitel}</p>
       {leistungen.map((l) => (
         <a class="c-link" href={pfad(l)}>{l.name}</a>
       ))}
@@ -77,25 +106,25 @@ const jahr = new Date().getFullYear();
     {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
         Zeile höher als die anderen — drei Spalten, von denen eine ohne
         Anlass aus der Reihe fällt. */}
-    <nav class="c-footer__nav" aria-label="Praxis">
-      <p class="c-footer__nav-title">Praxis</p>
-      <a class="c-link" href="#experten">About</a>
-      <a class="c-link" href="#magazin">Guides</a>
-      <a class="c-link" href="/karriere">Karriere</a>
-      <a class="c-link" href="#experten">Team</a>
-      <a class="c-link" href="#standorte">Standorte</a>
-      <a class="c-link" href="#kontakt">Kontakt</a>
-    </nav>
+    {spalten.map((spalte) => (
+      <nav class="c-footer__nav" aria-label={spalte.titel}>
+        <p class="c-footer__nav-title">{spalte.titel}</p>
+        {spalte.links.map((l) => (
+          <a class="c-link" href={l.href}>{l.text}</a>
+        ))}
+      </nav>
+    ))}
   </div>
 
   <div class="c-footer__bottom">
-    <p>© {jahr} Copyright. All rights reserved.</p>
-    <div class="c-footer__legal">
-      <a class="c-link" href="#">Impressum</a>
-      <a class="c-link" href="#">Datenschutz</a>
-      <a class="c-link" href="#">AGB</a>
-      <a class="c-link" href="#">Barrierefreiheit</a>
-    </div>
+    <p>© {jahr}{f?.copyright ? ` ${f.copyright}` : ""}</p>
+    {rechtliches.length > 0 && (
+      <div class="c-footer__legal">
+        {rechtliches.map((l) => (
+          <a class="c-link" href={l.href}>{l.text}</a>
+        ))}
+      </div>
+    )}
   </div>
 </footer>
 

@@ -27,9 +27,11 @@ interface Geschichte {
 
 interface Props {
   eintraege: Geschichte[];
+  /** Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner. */
+  aktion?: { text: string; href: string };
 }
 
-const { eintraege } = Astro.props;
+const { eintraege, aktion } = Astro.props;
 
 /* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
    Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
@@ -119,9 +121,15 @@ const MOTIVE = [
           <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
         </div>
 
-        <div class="s-quote__foot">
-          <Button label="Ganze Story lesen" href="#" />
-        </div>
+        {/* Vorher stand hier fest „Ganze Story lesen" mit href="#" — ein
+            Knopf, der den Browser nach oben springen ließ. Es gibt keine
+            ganze Story: Die Stimmen sind Zitate, keine Beiträge. Wohin er
+            führt, entscheidet die Redaktion. */}
+        {aktion && (
+          <div class="s-quote__foot">
+            <Button label={aktion.text} href={aktion.href} />
+          </div>
+        )}
       </section>
 
 <style>

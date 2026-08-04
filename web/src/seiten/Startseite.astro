@@ -22,6 +22,7 @@ import Stories from "../components/sections/Stories.astro";
 import Magazine from "../components/sections/Magazine.astro";
 import Faq from "../components/sections/Faq.astro";
 import { istCmsBild, bildUrl } from "../lib/bilder";
+import { aufgeloest } from "../lib/navigation";
 import type { StartseiteInhalt } from "../lib/startseite";
 import type { Beitrag } from "../lib/magazin";
 
@@ -44,6 +45,8 @@ const beschreibung =
 /* Das Teilen-Motiv. 1200 breit im Format 1.91:1 — das ist, was Facebook,
    LinkedIn und WhatsApp erwarten; mit `ratio` beschneidet Sanity serverseitig,
    und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
+const storiesAktion = (await aufgeloest([daten.storiesAktion ?? null], Astro.url.pathname))[0];
+
 const teilenBild = istCmsBild(daten.seo?.bild)
   ? bildUrl(daten.seo.bild, 1200, 1.91)
   : undefined;
@@ -71,7 +74,7 @@ const teilenBild = istCmsBild(daten.seo?.bild)
     absaetze={daten.expertenAbsaetze}
     bild={daten.expertenBild}
   />
-  <Stories eintraege={daten.storiesEintraege} />
+  <Stories eintraege={daten.storiesEintraege} aktion={storiesAktion} />
   {beitraege.length > 0 && (
     <Magazine
       topline={daten.magazinTopline}

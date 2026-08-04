@@ -88,6 +88,40 @@ export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current
 }`);
 
 /**
+ * Ein Verweis, aufgelöst so weit GROQ es kann.
+ *
+ * `ziel->` holt Typ und Slug des Zieldokuments — daraus baut `linkZiel()` in
+ * `lib/navigation.ts` den Pfad, über dieselbe Regel wie das Studio. Der Pfad
+ * steht nirgends als Text im Datensatz; er entsteht an einer Stelle.
+ */
+const LINK = `{
+    text,
+    art,
+    anker,
+    url,
+    ziel->{ _type, "slug": slug.current }
+  }`;
+
+/** Navigation und Seitenfuß — der Rahmen, der auf jeder Seite gleich ist. */
+export const NAVIGATION_QUERY = defineQuery(`
+  *[_id == "navigation"][0]{
+    hauptmenue[]${LINK},
+    menueSpalten[]{ titel, links[]${LINK} },
+    aktion${LINK}
+  }
+`);
+
+export const FOOTER_QUERY = defineQuery(`
+  *[_id == "footer"][0]{
+    leistungenTitel,
+    spalten[]{ titel, links[]${LINK} },
+    aktion${LINK},
+    rechtliches[]${LINK},
+    copyright
+  }
+`);
+
+/**
  * Die Magazinbeiträge als Karten — für das Karussell auf Start- und
  * Leistungsseiten und für die Übersicht unter /magazin.
  *
@@ -155,6 +189,7 @@ export const STARTSEITE_QUERY = defineQuery(`
     standorteTitel, standorteBilder[]{ bild${BILD}, beschriftung },
     expertenTitel, expertenAbsaetze, expertenNamen, expertenBild,
     storiesEintraege[]{ name, bild, zitat },
+    storiesAktion${LINK},
     magazinTopline, magazinTitel, magazinText,
     faqTitel, faqText, faq[]{ frage, antwort },
     seo{ titel, beschreibung, nichtIndexieren, bild${BILD} }

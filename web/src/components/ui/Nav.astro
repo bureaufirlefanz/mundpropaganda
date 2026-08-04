@@ -1,16 +1,38 @@
 ---
 /**
  * Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie
- * Services-Tabelle und Footer. Die vierte Spalte („Direkt") sind Sprungmarken
- * auf dieser Seite und bleibt deshalb ausgeschrieben.
+ * Services-Tabelle und Footer. Alles Übrige (Hauptmenü, Zusatzspalten, der
+ * Knopf) steht seit Aufgabe 8 im Dokument „Navigation".
+ *
+ * Desktop und Telefon zeigen jetzt dieselben Zusatzspalten. Vorher waren es
+ * zwei verschiedene Sätze — „Direkt" am Schreibtisch, „Praxis" am Telefon —
+ * ohne dass ein Grund dafür erkennbar wäre; es war schlicht zweimal getipptes
+ * Markup.
  */
 import Button from "./Button.astro";
 import { ladeLeistungsliste, fuerGruppe, pfad, GRUPPEN } from "../../lib/leistungsliste";
+import { ladeNavigation, aufgeloest } from "../../lib/navigation";
 
 const liste = await ladeLeistungsliste();
-const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(liste, g.wert) }));
+const leistungsSpalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(liste, g.wert) }));
 
-/* Das Mobil-Menü zeigt weniger: die erste Spalte und die Sprungmarken. */
+const nav = await ladeNavigation();
+const hier = Astro.url.pathname;
+
+const hauptmenue = await aufgeloest(nav?.hauptmenue, hier);
+const aktion = (await aufgeloest([nav?.aktion ?? null], hier))[0];
+
+/* Die Zusatzspalten, jede für sich aufgelöst. Ein Verweis ohne Ziel fällt
+   dabei heraus, eine Spalte ohne Verweise ebenfalls — statt eine leere
+   Überschrift stehen zu lassen. */
+const zusatzSpalten = (
+  await Promise.all(
+    (nav?.menueSpalten ?? []).map(async (sp) => ({
+      titel: sp?.titel ?? "",
+      links: await aufgeloest(sp?.links, hier),
+    }))
+  )
+).filter((sp) => sp.titel && sp.links.length > 0);
 
 ---
 
@@ -21,25 +43,25 @@ const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(list
       <span>Mundpropaganda</span>
     </a>
 
+    {/* Der ERSTE Eintrag öffnet das große Menü — daran hängt nav.js über
+        `data-nav-item="leistungen"`. Das ist eine Eigenschaft des Aufbaus,
+        keine des Inhalts: Die Leistungen sind der einzige Punkt mit
+        Unterpunkten.
+
+        Die übrigen tragen einen LEEREN Wert, nicht `true`: nav.js liest
+        `dataset.navItem` und sucht damit ein Panel. Bei "true" suchte es
+        nach `[data-megamenu="true"]` — findet nichts, schadet nichts,
+        behauptet aber einen Namen, den es nicht gibt. */}
     <nav class="c-nav__menu" aria-label="Hauptnavigation">
-      <div class="c-nav__item" data-nav-item="leistungen" data-open="false">
-        <a class="c-nav__link" href="#leistungen">Leistungen</a>
-
-      </div>
-
-      <div class="c-nav__item" data-nav-item>
-        <a class="c-nav__link" href="#experten">Praxis</a>
-      </div>
-      <div class="c-nav__item" data-nav-item>
-        <a class="c-nav__link" href="#magazin">Magazin</a>
-      </div>
-      <div class="c-nav__item" data-nav-item>
-        <a class="c-nav__link" href="#kontakt">Kontakt</a>
-      </div>
+      {hauptmenue.map((eintrag, i) => (
+        <div class="c-nav__item" data-nav-item={i === 0 ? "leistungen" : ""} data-open={i === 0 ? "false" : undefined}>
+          <a class="c-nav__link" href={eintrag.href}>{eintrag.text}</a>
+        </div>
+      ))}
     </nav>
 
     <div class="c-nav__actions">
-      <Button label="Termin buchen" href="#kontakt" />
+      {aktion && <Button label={aktion.text} href={aktion.href} />}
 
       <button
         class="c-nav__burger"
@@ -55,7 +77,7 @@ const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(list
 
   <div class="c-megamenu" data-megamenu="leistungen">
     <div class="c-megamenu__inner">
-      {spalten.map((spalte) => (
+      {leistungsSpalten.map((spalte) => (
         <div data-megamenu-item>
           <p class="c-megamenu__col-title">{spalte.titel}</p>
           {spalte.eintraege.map((l) => (
@@ -64,13 +86,14 @@ const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(list
         </div>
       ))}
 
-      <div data-megamenu-item>
-        <p class="c-megamenu__col-title">Direkt</p>
-        <a class="c-megamenu__link" href="#kontakt">Termin buchen</a>
-        <a class="c-megamenu__link" href="#kosten">Kosten &amp; Ablauf</a>
-        <a class="c-megamenu__link" href="#faq">Häufige Fragen</a>
-        <a class="c-megamenu__link" href="#standorte">Standorte</a>
-      </div>
+      {zusatzSpalten.map((spalte) => (
+        <div data-megamenu-item>
+          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          {spalte.links.map((l) => (
+            <a class="c-megamenu__link" href={l.href}>{l.text}</a>
+          ))}
+        </div>
+      ))}
     </div>
   </div>
 
@@ -80,7 +103,7 @@ const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(list
           das Menü zeigte damit vier von elf Leistungen, und welche vier war
           reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt
           dieselbe Auswahl wie am Schreibtisch. */}
-      {spalten.map((spalte) => (
+      {leistungsSpalten.map((spalte) => (
         <div data-megamenu-item>
           <p class="c-megamenu__col-title">{spalte.titel}</p>
           {spalte.eintraege.map((l) => (
@@ -88,13 +111,14 @@ const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(list
           ))}
         </div>
       ))}
-      <div data-megamenu-item>
-        <p class="c-megamenu__col-title">Praxis</p>
-        <a class="c-megamenu__link" href="#experten">Team</a>
-        <a class="c-megamenu__link" href="#standorte">Standorte</a>
-        <a class="c-megamenu__link" href="#magazin">Magazin</a>
-        <a class="c-megamenu__link" href="#kontakt">Kontakt</a>
-      </div>
+      {zusatzSpalten.map((spalte) => (
+        <div data-megamenu-item>
+          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          {spalte.links.map((l) => (
+            <a class="c-megamenu__link" href={l.href}>{l.text}</a>
+          ))}
+        </div>
+      ))}
     </div>
   </div>
 </header>

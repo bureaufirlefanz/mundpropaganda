@@ -7,6 +7,8 @@ import { CaseIcon } from "@sanity/icons/Case";
 import { UserIcon } from "@sanity/icons/User";
 import { DocumentsIcon } from "@sanity/icons/Documents";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
+import { MenuIcon } from "@sanity/icons/Menu";
+import { StackCompactIcon } from "@sanity/icons/StackCompact";
 import type { ComponentType } from "react";
 
 /**
@@ -41,7 +43,7 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = ["startseite", "magazinIndex", "karriere", "einstellungen"];
+export const EINZELDOKUMENTE = ["startseite", "magazinIndex", "karriere", "einstellungen", "navigation", "footer"];
 
 /**
  * Einzeldokumente ohne Seite. Sie stehen weiterhin in den Vorlagen-Sperren
@@ -107,6 +109,11 @@ export const structure: StructureResolver = (S, context) =>
 
       S.divider(),
 
+      /* Der Rahmen: was auf jeder Seite gleich ist. Unter den Seiten, weil
+         man ihn seltener anfasst — aber auffindbar unter dem Namen, unter dem
+         man ihn sucht. Bis Aufgabe 8 stand beides fest im Markup. */
+      einzeldokument(S, "navigation", "Navigation", MenuIcon),
+      einzeldokument(S, "footer", "Seitenfuß", StackCompactIcon),
       einzeldokument(S, "einstellungen", "Einstellungen", CogIcon),
 
       /* Was künftig dazukommt, erscheint hier von selbst — ohne dass jemand
