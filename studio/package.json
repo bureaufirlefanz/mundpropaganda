@@ -8,7 +8,8 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "schema:deploy": "sanity schema deploy"
+    "schema:deploy": "sanity schema deploy",
+    "schema:extract": "sanity schema extract --workspace default --path ../schema.json --enforce-required-fields --force"
   },
   "dependencies": {
     "@sanity/orderable-document-list": "^2.0.17",

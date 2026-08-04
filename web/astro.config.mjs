@@ -31,4 +31,24 @@ export default defineConfig({
       // studioBasePath, sonst würde es in die Auslieferung eingebettet.
     }),
   ],
+
+  vite: {
+    /* Alle fünf Fremdpakete beim Serverstart bündeln, nicht erst beim ersten
+       Import.
+
+       Nötig geworden durch A2: Vorher lagen die Module außerhalb der
+       Vite-Wurzel und wurden nicht gescannt. Jetzt liegen sie in `src/js/`,
+       und Vite entdeckt `gsap/CustomEase` erst dann, wenn das eine Modul
+       lädt, das es braucht — mitten in der Sitzung. Es bündelt daraufhin neu,
+       und jede Anfrage mit dem alten Hash beantwortet es mit
+       „504 Outdated Optimize Dep".
+
+       Gemessen: Der Rauchtest scheiterte reproduzierbar beim Seitenwechsel
+       mit fünf solchen 504ern, und nach ihnen lief kein Modul mehr an — 44
+       Reveals und 11 Headlines standen unverändert da. Nur im
+       Entwicklungsmodus, der Build bündelt ohnehin alles. */
+    optimizeDeps: {
+      include: ["gsap", "gsap/ScrollTrigger", "gsap/SplitText", "gsap/CustomEase", "lenis"],
+    },
+  },
 });

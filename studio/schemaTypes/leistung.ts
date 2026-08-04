@@ -176,7 +176,17 @@ export const leistung = defineType({
               name: "eintrag",
               fields: [
                 defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-                defineField({ name: "text", title: "Text", type: "text", rows: 4 }),
+                defineField({
+                  name: "text",
+                  title: "Text",
+                  type: "text",
+                  rows: 4,
+                  /* Pflicht: Ein Eintrag ohne Text klappt auf und zeigt nichts.
+                     Bis Aufgabe 1 war das Feld wahlfrei, während der Vertrag im
+                     Frontend `string` verlangte — TypeGen hat den Widerspruch
+                     aufgedeckt. */
+                  validation: (r) => r.required(),
+                }),
                 defineField({ name: "bild", title: "Bild", type: "image", options: { hotspot: true } }),
               ],
               preview: { select: { title: "name", media: "bild" } },
@@ -198,7 +208,14 @@ export const leistung = defineType({
           name: "preis",
           fields: [
             defineField({ name: "name", title: "Bezeichnung", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "preis", title: "Preisangabe", type: "string", description: "Frei formuliert, z. B. „€ 450,– / Zahn“." }),
+            defineField({
+              name: "preis",
+              title: "Preisangabe",
+              type: "string",
+              description: "Frei formuliert, z. B. „€ 450,– / Zahn“.",
+              /* Pflicht: eine Preiskarte ohne Preis ist keine. */
+              validation: (r) => r.required(),
+            }),
           ],
           preview: { select: { title: "name", subtitle: "preis" } },
         }),

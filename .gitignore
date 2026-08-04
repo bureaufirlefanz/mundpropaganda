@@ -13,3 +13,10 @@ studio/dist/
 # und damit nichts, was dauerhaft in der Versionsgeschichte liegen sollte.
 # Dieselbe Überlegung wie bei .shots/ eine Zeile darüber.
 aufnahmen/
+
+# Erzeugt von `npm run types` — schema.json aus dem Studio-Schema,
+# sanity.types.ts daraus und aus den Abfragen. Beide sind Ableitungen und
+# gehören nicht in die Versionsgeschichte: Ein eingecheckter Stand wäre die
+# zweite Wahrheit neben dem Schema und liefe irgendwann daneben.
+schema.json
+web/src/lib/sanity.types.ts

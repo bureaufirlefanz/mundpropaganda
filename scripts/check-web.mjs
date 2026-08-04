@@ -205,6 +205,96 @@ async function pruefeBarrierefreiheit(browser, pfad, vp) {
   return { liste: wcagBefunde(ergebnis), ergebnis };
 }
 
+/**
+ * Für jeden Dokumenttyp, der laut Studio eine eigene Seite hat, muss es sie
+ * auch geben.
+ *
+ * Das ist der Fall, der einem Kunden am schnellsten das Vertrauen kostet: Er
+ * pflegt „Praxis & Team", drückt Publish — und findet nirgends etwas. Das
+ * Studio hat ihm eine Seite versprochen, die die Website nicht hat.
+ *
+ * Gelesen wird aus `studio/lib/pfade.ts`, der einzigen Stelle, an der URLs
+ * entstehen. Eine zweite Liste hier würde genau den Zweck verfehlen.
+ */
+async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
+  const { FESTE_PFADE, VERZEICHNIS, OBERSTE_EBENE } = await ladePfadmodell();
+
+  const seite = await browser.newPage();
+  const fehlend = [];
+  let geprueft = 0;
+
+  /* Einzeldokumente: ihr fester Pfad muss antworten. */
+  for (const [typ, pfad] of Object.entries(FESTE_PFADE)) {
+    geprueft++;
+    const antwort = await seite.goto(BASE + pfad, { waitUntil: "domcontentloaded", timeout: 30000 });
+    if (!antwort || antwort.status() >= 400) fehlend.push({ typ, pfad, status: antwort?.status() ?? 0 });
+  }
+  await seite.close();
+
+  /* Typen mit Slug: Es genügt, dass ES Seiten in ihrem Verzeichnis gibt —
+     `/leistungen/veneers` beweist die Route, auch wenn `/leistungen` selbst
+     keine Übersicht hat. Die Übersicht ist ein eigener Typ
+     (`leistungenIndex`) und wird oben geprüft. Deshalb hier gegen die
+     gecrawlte Liste statt gegen das nackte Verzeichnis: sonst meldete die
+     Prüfung `leistung` als fehlend, obwohl es elf Seiten hat. */
+  for (const [typ, ordner] of Object.entries(VERZEICHNIS)) {
+    geprueft++;
+    if (!gefundeneSeiten.some((p) => p.startsWith(`/${ordner}/`))) {
+      fehlend.push({ typ, pfad: `/${ordner}/<slug>`, status: 0 });
+    }
+  }
+
+  /* Die Typen der obersten Ebene haben keinen festen Pfad, den man aufrufen
+     könnte — sie leben unter freien Slugs. Geprüft wird deshalb, ob es die
+     Route überhaupt gibt: eine Datei, die `/[slug]` bedient. */
+  const { existsSync } = await import("node:fs");
+  for (const typ of OBERSTE_EBENE) {
+    geprueft++;
+    if (!existsSync("web/src/pages/[slug].astro")) {
+      fehlend.push({ typ, pfad: "/<slug>", status: 0 });
+    }
+  }
+
+  if (!fehlend.length) {
+    console.log(`  ✓ ${geprueft} Dokumenttypen haben eine Seite`);
+    return 0;
+  }
+
+  console.log(`  ✗ ${fehlend.length} Dokumenttyp(en) ohne Seite`);
+  for (const { typ, pfad, status } of fehlend) {
+    console.log(`      ${typ.padEnd(16)} ${pfad.padEnd(14)} ${status || "keine Route"}`);
+  }
+  console.log(`      Entweder die Seite bauen oder den Typ aus studio/structure/index.ts nehmen.`);
+  return fehlend.length;
+}
+
+/**
+ * `pfade.ts` ist TypeScript und exportiert die drei Tabellen nicht. Statt
+ * eine zweite Wahrheit anzulegen, werden sie hier aus der Quelle gelesen.
+ * Bricht das Einlesen, ist das ein Befund und keine stille Null.
+ */
+async function ladePfadmodell() {
+  const { readFile } = await import("node:fs/promises");
+  const quelle = await readFile("studio/lib/pfade.ts", "utf8");
+
+  const block = (name) => {
+    const treffer = quelle.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
+    if (!treffer) throw new Error(`In studio/lib/pfade.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
+    return treffer[1];
+  };
+
+  const paare = (roh) =>
+    Object.fromEntries(
+      [...roh.matchAll(/(\w+)\s*:\s*"([^"]+)"/g)].map((m) => [m[1], m[2]])
+    );
+
+  return {
+    FESTE_PFADE: paare(block("FESTE_PFADE")),
+    VERZEICHNIS: paare(block("VERZEICHNIS")),
+    OBERSTE_EBENE: [...block("OBERSTE_EBENE").matchAll(/"([^"]+)"/g)].map((m) => m[1]),
+  };
+}
+
 const browser = await starteBrowser();
 const SEITEN = await findeSeiten(browser);
 console.log(`Gefundene Seiten: ${SEITEN.join(" · ")}`);
@@ -253,6 +343,9 @@ if (ziel) {
   console.log(`\n── Seitenwechsel (Router) ──`);
   probleme += melde(`/ → ${ziel}`, await pruefeWechsel(browser, ziel, VIEWPORTS[0]));
 }
+
+console.log(`\n── Routen-Deckung ──`);
+probleme += await pruefeRoutenDeckung(browser, SEITEN);
 
 await browser.close();
 console.log(probleme ? `\n${probleme} Befund(e).` : "\nAlles sauber.");

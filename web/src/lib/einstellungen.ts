@@ -1,4 +1,5 @@
 import { sanityClient } from "sanity:client";
+import { ohneNull } from "./ohne-null";
 import { EINSTELLUNGEN_QUERY } from "./queries";
 
 /**
@@ -23,7 +24,10 @@ export interface Standort {
   name: string;
   strasse: string;
   ort: string;
-  beschreibung: string;
+  /* Wahlfrei — im Schema steht keine Pflichtregel. Bis Aufgabe 4 entscheidet,
+     ob dieses Feld die Section trägt, bildet der Vertrag ab, was das Schema
+     wirklich zusagt. TypeGen hat den Unterschied aufgedeckt. */
+  beschreibung?: string;
 }
 
 export interface Einstellungen {
@@ -71,7 +75,8 @@ let gemerkt: Promise<Einstellungen> | null = null;
 
 export function ladeEinstellungen(): Promise<Einstellungen> {
   gemerkt ??= sanityClient
-    .fetch<Partial<Einstellungen> | null>(EINSTELLUNGEN_QUERY)
+    .fetch(EINSTELLUNGEN_QUERY)
+    .then(ohneNull)
     .then((d) => ({
       // Feld für Feld auffüllen, nicht das ganze Dokument verwerfen: ein
       // gepflegtes Telefon soll auch dann gelten, wenn die Bewertungszahlen

@@ -1,4 +1,5 @@
 import { sanityClient } from "sanity:client";
+import { ohneNull } from "./ohne-null";
 import { STARTSEITE_QUERY } from "./queries";
 import type { Bildquelle } from "./bilder";
 
@@ -60,7 +61,8 @@ let gemerkt: Promise<StartseiteInhalt> | null = null;
 
 export function ladeStartseite(): Promise<StartseiteInhalt> {
   gemerkt ??= sanityClient
-    .fetch<StartseiteInhalt | null>(STARTSEITE_QUERY)
+    .fetch(STARTSEITE_QUERY)
+    .then(ohneNull)
     /* Leere Zeichenketten wie fehlende Felder behandeln: Ein Feld, das im
        Studio angefasst und wieder geleert wurde, ist "" und nicht
        undefined — ohne diese Reinigung stünde auf der Seite nichts, statt

@@ -1,4 +1,5 @@
 import { sanityClient } from "sanity:client";
+import { ohneNull } from "./ohne-null";
 import { LEISTUNGSLISTE_QUERY } from "./queries";
 import type { CmsBild } from "./bilder";
 
@@ -90,7 +91,8 @@ let gemerkt: Promise<LeistungsEintrag[]> | null = null;
 
 export function ladeLeistungsliste(): Promise<LeistungsEintrag[]> {
   gemerkt ??= sanityClient
-    .fetch<LeistungsEintrag[]>(LEISTUNGSLISTE_QUERY)
+    .fetch(LEISTUNGSLISTE_QUERY)
+    .then(ohneNull)
     .then((liste) => (liste?.length && istGepflegt(liste) ? liste : beispielListe))
     .catch(() => beispielListe);
 
