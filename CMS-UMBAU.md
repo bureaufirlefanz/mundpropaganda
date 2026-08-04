@@ -72,14 +72,14 @@ Prototypen leihen es sich.** Heute ist es umgekehrt.
 
 ### A1. Git anlegen — vor allem anderen
 
-Es gibt kein Repository. `git rev-parse` sagt „not a git repository", und der
-Ordner liegt in Dropbox. Ein Umbau dieser Größe ohne Versionsverwaltung, mit
-einem Sync-Dienst, der nebenher Dateien anfasst, ist die eine Sache in dieser
-Liste, die wirklich schiefgehen kann.
+Es gibt kein Repository — `git rev-parse` sagt „not a git repository". Stufe A
+verschiebt hunderte Dateien und ändert Importpfade in mehreren Sprachen
+gleichzeitig. Ohne `git reset --hard` als Rückweg ist ein halb gelungener
+Umzug von Hand zurückzubauen, und zwar genau in dem Moment, in dem man nicht
+mehr sicher weiß, was vorher wo lag.
 
 `git init`, `.gitignore` steht schon (`node_modules/`, `dist/`, `.astro/`,
-`.env`), ein erster Commit über den jetzigen Stand. Dropbox-Sync währenddessen
-pausieren.
+`.env`), ein erster Commit über den jetzigen Stand.
 
 **Fertig, wenn** `git status` sauber ist und `git log` einen Commit zeigt.
 Erst danach A2.
@@ -127,6 +127,11 @@ er wäre sonst genau die Sorte falscher Begründung, vor der Aufgabe 19 warnt.
 
 **Fertig, wenn** an der Wurzel nur noch `web/`, `studio/`, `prototypen/`,
 `scripts/` und die Doku-Dateien liegen.
+
+*Praktisch:* Läuft ein Datei-Sync über dem Ordner, ihn für die Dauer der
+Verschiebung pausieren — sonst legt er beim Umbenennen unter Umständen
+„conflicted copy"-Dateien an. Mit A1 im Rücken ist das folgenlos, aber
+lästig.
 
 **Zur Frage, ob der Vite-Stand noch laufen muss:** Nach A2 zeigt er auf
 `web/src/…` — er baut also weiter, solange dort nichts umgebaut wird. Diese
