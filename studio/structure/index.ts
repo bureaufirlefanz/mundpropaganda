@@ -5,6 +5,8 @@ import { TagsIcon } from "@sanity/icons/Tags";
 import { HomeIcon } from "@sanity/icons/Home";
 import { CaseIcon } from "@sanity/icons/Case";
 import { UserIcon } from "@sanity/icons/User";
+import { DocumentsIcon } from "@sanity/icons/Documents";
+import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import type { ComponentType } from "react";
 
 /**
@@ -39,7 +41,7 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = ["startseite", "karriere", "einstellungen"];
+export const EINZELDOKUMENTE = ["startseite", "magazinIndex", "karriere", "einstellungen"];
 
 /**
  * Einzeldokumente ohne Seite. Sie stehen weiterhin in den Vorlagen-Sperren
@@ -49,16 +51,14 @@ export const EINZELDOKUMENTE = ["startseite", "karriere", "einstellungen"];
 export const OHNE_ROUTE = [
   "leistungenIndex",
   "praxis",
-  "magazinIndex",
   "kontakt",
   "notdienst",
-  "beitrag",
   "pillar",
   "rechtstext",
 ];
 
 /** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
-const AUSGESCHRIEBEN = [...EINZELDOKUMENTE, ...OHNE_ROUTE, "leistung", "person", "stelle"];
+const AUSGESCHRIEBEN = [...EINZELDOKUMENTE, ...OHNE_ROUTE, "leistung", "beitrag", "person", "stelle"];
 
 function einzeldokument(
   S: StructureBuilder,
@@ -88,6 +88,14 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
+
+      /* Das Magazin: erst die Übersichtsseite, darunter die Beiträge. In
+         dieser Reihenfolge, weil /magazin die Beiträge trägt und nicht
+         umgekehrt. Beide waren bis hierher ausgeblendet — der Typ `beitrag`
+         hatte keine Route, und die vier Beiträge standen fest im Markup des
+         Karussells. Jetzt gibt es /magazin und /magazin/<slug>. */
+      einzeldokument(S, "magazinIndex", "Magazin", DocumentsIcon),
+      S.documentTypeListItem("beitrag").title("Beiträge").icon(DocumentTextIcon),
 
       einzeldokument(S, "karriere", "Karriere", CaseIcon),
 

@@ -23,6 +23,7 @@
 import Design from "../../layouts/Design.astro";
 import { ladeStartseite } from "../../lib/startseite";
 import { ladeLeistung } from "../../lib/leistungen";
+import { ladeBeitraege } from "../../lib/magazin";
 import {
   ZAHLEN, STELLEN, ABLAUF, STIMMEN,
   VERGLEICH_SPALTEN, VERGLEICH_ZEILEN, VERGLEICH_HINWEIS,
@@ -71,6 +72,7 @@ const inhalt = await ladeStartseite();
    Leistung. Bis Aufgabe 4 kamen sie aus `beispielLeistung` in fixtures.ts;
    die Datei hat damit ihre letzte Aufgabe verloren und ist entfallen. */
 const bl = await ladeLeistung("veneers");
+const beitraege = await ladeBeitraege();
 
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
@@ -489,7 +491,7 @@ const RING_BILDER = [
         Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
       </p>
       <div class="d-live">
-        <Magazine topline={inhalt.magazinTopline} titel={inhalt.magazinTitel} text={inhalt.magazinText} />
+        <Magazine topline={inhalt.magazinTopline} titel={inhalt.magazinTitel} text={inhalt.magazinText} beitraege={beitraege} />
       </div>
     </div>
 

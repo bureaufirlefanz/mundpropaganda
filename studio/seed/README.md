@@ -10,6 +10,7 @@ Einspielen — schreibt echte Dokumente in den Datensatz:
 ```bash
 cd studio
 npx sanity dataset import ../studio/seed/leistungen.ndjson --dataset production --missing
+npx sanity dataset import ../studio/seed/magazin.ndjson    --dataset production --missing
 npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production --replace
 ```
 
@@ -18,6 +19,7 @@ npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production 
 | Datei | Inhalt | Import | Grund |
 |---|---|---|---|
 | `leistungen.ndjson` | 11 Leistungen, nur Grunddaten | `--missing` | `leistung-veneers` ist voll gepflegt. `--replace` überschriebe seinen Inhalt mit Titel und Slug — ohne Rückfrage. |
+| `magazin.ndjson` | Magazin-Übersicht und 4 Beiträge | `--missing` | Sobald jemand einen Beitrag redigiert, soll ein erneuter Import ihn nicht zurücksetzen. |
 | `seiten.ndjson` | Einstellungen, Startseite | `--replace` | Beide sollen genau diesen Stand bekommen. |
 
 Die IDs sind fest (`leistung-<slug>`, `einstellungen`, `startseite`), der

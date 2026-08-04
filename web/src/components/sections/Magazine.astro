@@ -1,22 +1,44 @@
 ---
 import Button from "../ui/Button.astro";
 import Picture from "../ui/Picture.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild } from "../../lib/bilder";
+import { kategorieText, beitragPfad, type Beitrag } from "../../lib/magazin";
 
 /**
  * Dieselben Beiträge überall, nur der Einstieg wechselt: auf der Startseite
  * allgemein, auf einer Leistungsseite auf sie bezogen.
+ *
+ * Die Karten kamen bis hierher aus dem Markup — vier Beiträge mit Kategorie,
+ * Titel, Anrisstext und Bild, dazu zwei Links auf `#`. Sie stehen jetzt als
+ * Dokumente im Studio.
  */
 interface Props {
   topline: string;
   titel: string;
   text: string;
+  beitraege: Beitrag[];
 }
 
-/* Keine Vorgaben mehr: Die drei Felder sind im Schema Pflicht, die Seite
+/* Keine Vorgaben: Die drei Textfelder sind im Schema Pflicht, die Seite
    reicht sie durch. Eine Vorgabe hier wäre der stille Rückfall, den
    Aufgabe 4 abgeschafft hat — der Kunde löschte die Zeile und sähe sie
    weiter stehen. */
-const { topline, titel, text } = Astro.props;
+const { topline, titel, text, beitraege } = Astro.props;
+
+/* Klasse 3: die gestalteten Motive, positionsgenau, solange an einem Beitrag
+   kein Vorschaubild hängt.
+
+   Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
+   WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
+   es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
+   Telefon das Bild in voller Breite aus. */
+const MOTIVE = [
+  { name: "motion-04", breiten: "640,1024" },
+  { name: "teeth-macro", breiten: "640,1024,1600,2048" },
+  { name: "lab-veneers", breiten: "640,1024,1600,2200" },
+  { name: "treatment-03", breiten: "640,1024,1600,2200" },
+];
 ---
 
 <!-- ==================================================================
@@ -44,73 +66,25 @@ const { topline, titel, text } = Astro.props;
           </div>
 
           <div class="s-magazine__track" data-magazine-track>
-            <article class="c-post" data-magazine-item>
-              <div class="c-post__media">
-                <Picture name="motion-04" widths="640,1024" alt="" sizes="24vw" parallax="9" />
-              </div>
-              <div class="c-post__card">
-                <span class="c-post__kicker">Knowhow</span>
-                <h3 class="c-post__title">
-                  <a class="c-post__link" href="#">Zahngesundheit<br />&amp; Fitness</a>
-                </h3>
-                <p class="c-post__text">
-                  Warum Sportlerinnen und Sportler häufiger Karies haben - und
-                  was dagegen hilft.
-                </p>
-              </div>
-              <Button label="Beitrag lesen" static />
-            </article>
-
-            <article class="c-post" data-magazine-item>
-              <div class="c-post__media">
-                <Picture name="teeth-macro" widths="640,1024,1600,2048" alt="" sizes="24vw" parallax="9" />
-              </div>
-              <div class="c-post__card">
-                <span class="c-post__kicker">Tipps &amp; Tricks</span>
-                <h3 class="c-post__title">
-                  <a class="c-post__link" href="#">Bleaching<br />für Zuhause</a>
-                </h3>
-                <p class="c-post__text">
-                  Was die Schienen aus der Drogerie können, wo sie aufhören und
-                  wann es schadet.
-                </p>
-              </div>
-              <Button label="Beitrag lesen" static />
-            </article>
-
-            <article class="c-post" data-magazine-item>
-              <div class="c-post__media">
-                <Picture name="lab-veneers" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" />
-              </div>
-              <div class="c-post__card">
-                <span class="c-post__kicker">Tipps &amp; Tricks</span>
-                <h3 class="c-post__title">
-                  <a class="c-post__link" href="#">Der Weg zur<br />Hygiene</a>
-                </h3>
-                <p class="c-post__text">
-                  Zahnseide, Bürstchen, Spülung - was davon wirklich etwas
-                  bringt und in welcher Reihenfolge.
-                </p>
-              </div>
-              <Button label="Beitrag lesen" static />
-            </article>
-
-            <article class="c-post" data-magazine-item>
-              <div class="c-post__media">
-                <Picture name="treatment-03" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" />
-              </div>
-              <div class="c-post__card">
-                <span class="c-post__kicker">Knowhow</span>
-                <h3 class="c-post__title">
-                  <a class="c-post__link" href="#">Veneers aus<br />der Türkei</a>
-                </h3>
-                <p class="c-post__text">
-                  Eine ehrliche Rechnung - inklusive der Kosten, die erst später
-                  anfallen.
-                </p>
-              </div>
-              <Button label="Beitrag lesen" static />
-            </article>
+            {beitraege.map((p, i) => (
+              <article class="c-post" data-magazine-item>
+                <div class="c-post__media">
+                  {istCmsBild(p.vorschaubild) ? (
+                    <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes="24vw" data-parallax="9" />
+                  ) : (
+                    <Picture name={MOTIVE[i % MOTIVE.length].name} widths={MOTIVE[i % MOTIVE.length].breiten} alt="" sizes="24vw" parallax="9" />
+                  )}
+                </div>
+                <div class="c-post__card">
+                  {p.kategorie && <span class="c-post__kicker">{kategorieText(p.kategorie)}</span>}
+                  <h3 class="c-post__title">
+                    <a class="c-post__link" href={beitragPfad(p.slug)}>{p.titel}</a>
+                  </h3>
+                  {p.einleitung && <p class="c-post__text">{p.einleitung}</p>}
+                </div>
+                <Button label="Beitrag lesen" static />
+              </article>
+            ))}
           </div>
 
           <div class="s-magazine__nav">
@@ -123,7 +97,7 @@ const { topline, titel, text } = Astro.props;
               </button>
             </div>
             <div class="s-gallery__dots" data-magazine-dots role="tablist" aria-label="Beiträge"></div>
-            <Button label="Alle Beiträge" href="#" variant="dark" />
+            <Button label="Alle Beiträge" href="/magazin" variant="dark" />
           </div>
         </div>
       </section>

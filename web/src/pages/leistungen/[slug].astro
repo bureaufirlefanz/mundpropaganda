@@ -9,6 +9,7 @@ import Leistung from "../../seiten/Leistung.astro";
 import { ladeLeistung, ladeSlugs } from "../../lib/leistungen";
 import { ladeLeistungsliste } from "../../lib/leistungsliste";
 import { ladeStartseite } from "../../lib/startseite";
+import { ladeBeitraege } from "../../lib/magazin";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
@@ -30,6 +31,9 @@ const titel = daten?.titel || eintrag?.name || "";
    standen sie als Vorgabe im Baustein, sodass jede Seite ihre eigene Kopie
    bekam; wer eine Geschichte änderte, änderte sie nirgends sichtbar. */
 const { storiesEintraege } = await ladeStartseite();
+
+/* Nur die Beiträge, die auf diese Leistung verweisen. */
+const beitraege = await ladeBeitraege(slug!);
 ---
 
-<Leistung daten={daten} titel={titel} stories={storiesEintraege} />
+<Leistung daten={daten} titel={titel} stories={storiesEintraege} beitraege={beitraege} />

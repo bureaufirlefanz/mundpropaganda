@@ -8,8 +8,10 @@
  */
 import Startseite from "../seiten/Startseite.astro";
 import { ladeStartseite } from "../lib/startseite";
+import { ladeBeitraege } from "../lib/magazin";
 
 const daten = await ladeStartseite();
+const beitraege = await ladeBeitraege();
 ---
 
-<Startseite daten={daten} />
+<Startseite daten={daten} beitraege={beitraege} />

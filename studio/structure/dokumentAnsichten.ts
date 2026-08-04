@@ -12,8 +12,12 @@ import { WebVorschau } from "./WebVorschau";
  * Typen zeigten auf Seiten, die es nicht gibt: Der Reiter öffnete sich, und
  * darin stand eine 404. Sie kommen zurück, sobald ihre Route steht — die
  * Bedingung steht in `structure/index.ts` unter OHNE_ROUTE.
+ *
+ * Zwei sind zurück: `magazinIndex` (/magazin) und `beitrag`
+ * (/magazin/<slug>). Die Route kam zuerst, dann der Eintrag — andersherum
+ * entstünde wieder die Lücke, die Aufgabe 3 geschlossen hat.
  */
-const MIT_SEITE = ["startseite", "leistung", "karriere"];
+const MIT_SEITE = ["startseite", "leistung", "karriere", "magazinIndex", "beitrag"];
 
 export const dokumentAnsichten: DefaultDocumentNodeResolver = (S, { schemaType }) => {
   if (MIT_SEITE.includes(schemaType)) {

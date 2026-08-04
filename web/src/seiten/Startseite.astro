@@ -23,12 +23,14 @@ import Magazine from "../components/sections/Magazine.astro";
 import Faq from "../components/sections/Faq.astro";
 import { istCmsBild, bildUrl } from "../lib/bilder";
 import type { StartseiteInhalt } from "../lib/startseite";
+import type { Beitrag } from "../lib/magazin";
 
 interface Props {
   daten: StartseiteInhalt;
+  beitraege: Beitrag[];
 }
 
-const { daten } = Astro.props;
+const { daten, beitraege } = Astro.props;
 
 /* Seitentitel und Beschreibung aus dem SEO-Feld. Kein Rückfall im Sinne der
    Aufgabe 4: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
@@ -70,10 +72,13 @@ const teilenBild = istCmsBild(daten.seo?.bild)
     bild={daten.expertenBild}
   />
   <Stories eintraege={daten.storiesEintraege} />
-  <Magazine
-    topline={daten.magazinTopline}
-    titel={daten.magazinTitel}
-    text={daten.magazinText}
-  />
+  {beitraege.length > 0 && (
+    <Magazine
+      topline={daten.magazinTopline}
+      titel={daten.magazinTitel}
+      text={daten.magazinText}
+      beitraege={beitraege}
+    />
+  )}
   <Faq titel={daten.faqTitel} text={daten.faqText} fragen={daten.faq} />
 </Base>

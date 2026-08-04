@@ -1,0 +1,16 @@
+---
+/**
+ * Die Route. Daten laden, Renderer aufrufen.
+ *
+ * `/magazin` gab es bis hierher nicht — der Dokumenttyp lag seit Aufgabe 3
+ * auf Eis, weil die Route fehlte, und die vier Beiträge standen fest im
+ * Markup des Karussells. Beides ist damit aufgelöst.
+ */
+import Magazin from "../../seiten/Magazin.astro";
+import { ladeBeitraege, ladeMagazinKopf } from "../../lib/magazin";
+
+const kopf = await ladeMagazinKopf();
+const beitraege = await ladeBeitraege();
+---
+
+<Magazin kopf={kopf} beitraege={beitraege} />

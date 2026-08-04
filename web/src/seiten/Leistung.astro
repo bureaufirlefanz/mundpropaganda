@@ -26,6 +26,7 @@ import Faq from "../components/sections/Faq.astro";
 import Contact from "../components/sections/Contact.astro";
 import type { Leistung } from "../lib/leistungen";
 import type { StartseiteInhalt } from "../lib/startseite";
+import type { Beitrag } from "../lib/magazin";
 
 interface Props {
   daten: Leistung | undefined;
@@ -33,9 +34,11 @@ interface Props {
   titel: string;
   /** Dieselben Stimmen wie auf der Startseite, dort gepflegt. */
   stories: StartseiteInhalt["storiesEintraege"];
+  /** Beiträge, die im Studio auf genau diese Leistung verweisen. */
+  beitraege: Beitrag[];
 }
 
-const { daten: d, titel, stories } = Astro.props;
+const { daten: d, titel, stories, beitraege } = Astro.props;
 
 /* Ein Abschnitt ist wahlfrei, aber nicht halb.
  *
@@ -93,14 +96,18 @@ const schritte =
 
   {d?.features?.length ? <Features zeilen={d.features} /> : null}
 
-  {/* Die Überschrift stand bis Aufgabe 4 fest im Baustein. Sie gehört hierher:
-      Auf der Startseite kommt sie aus dem CMS, hier ist sie auf die Leistung
-      bezogen und damit Sache des Zusammenbaus. */}
-  <Magazine
-    topline="Passend zum Thema"
-    titel="Magazin"
-    text={`Weiterlesen zu ${titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
-  />
+  {/* Nur Beiträge, die im Studio auf diese Leistung verweisen — dafür ist die
+      Referenz im Schema da. Gibt es keine, entfällt der Abschnitt; ein
+      Karussell, das dieselben vier Beiträge unter jeder Behandlung zeigt,
+      war genau das Muster, das Aufgabe 4 abgeräumt hat. */}
+  {beitraege.length > 0 && (
+    <Magazine
+      topline="Passend zum Thema"
+      titel="Magazin"
+      text={`Weiterlesen zu ${titel} und allem, was damit zusammenhängt.`}
+      beitraege={beitraege}
+    />
+  )}
 
   {d?.faq?.length ? <Faq titel={`Häufige Fragen zu ${titel}`} fragen={d.faq} /> : null}
 

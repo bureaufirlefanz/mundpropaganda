@@ -1,0 +1,169 @@
+---
+/**
+ * Der Zusammenbau einer Beitragsseite.
+ *
+ * Der Fließtext ist Portable Text und wird mit `astro-portabletext`
+ * gerendert. Die Bausteine dafür sind knapp gehalten, weil das Schema die
+ * Auswahl schon begrenzt: Absatz, Zwischentitel, Unterpunkt und Bild. Kein
+ * h1 — den setzt diese Seite.
+ */
+import { PortableText } from "astro-portabletext";
+import Base from "../layouts/Base.astro";
+import Contact from "../components/sections/Contact.astro";
+import CmsImage from "../components/ui/CmsImage.astro";
+import Button from "../components/ui/Button.astro";
+import { istCmsBild } from "../lib/bilder";
+import { kategorieText, datumText, type BeitragVoll } from "../lib/magazin";
+
+interface Props {
+  daten: BeitragVoll | undefined;
+  /** Aus der Liste, falls das Dokument fehlt. */
+  titel: string;
+}
+
+const { daten: d, titel } = Astro.props;
+
+const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
+---
+
+<Base
+  title={d?.seo?.titel || `${titel} - Mundpropaganda`}
+  description={beschreibung}
+  nichtIndexieren={d?.seo?.nichtIndexieren}
+>
+  <article class="s-beitrag">
+    <header class="container s-beitrag__kopf">
+      <div class="s-beitrag__meta">
+        {d?.kategorie && <span class="c-topline">{kategorieText(d.kategorie)}</span>}
+        {d?.datum && <time datetime={d.datum}>{datumText(d.datum)}</time>}
+      </div>
+
+      <h1 class="s-beitrag__titel" data-split="lines">{titel}</h1>
+      {d?.einleitung && <p class="s-beitrag__lead" data-reveal="up">{d.einleitung}</p>}
+    </header>
+
+    {istCmsBild(d?.vorschaubild) && (
+      <div class="container s-beitrag__bild" data-reveal="scale">
+        <CmsImage quelle={d.vorschaubild} alt="" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 80vw" eager />
+      </div>
+    )}
+
+    {d?.text && (
+      <div class="container s-beitrag__text" data-reveal="up">
+        <PortableText value={d.text} />
+      </div>
+    )}
+
+    {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist. Das ist
+        der Gewinn der Referenz im Schema: Sie trägt in beide Richtungen — die
+        Leistungsseite zeigt passende Beiträge, der Beitrag führt zurück. */}
+    {d?.leistung?.slug && (
+      <div class="container s-beitrag__zurueck">
+        <Button label={`Zur Leistung: ${d.leistung.titel}`} href={`/leistungen/${d.leistung.slug}`} variant="dark" />
+      </div>
+    )}
+  </article>
+
+  <Contact />
+</Base>
+
+<style>
+  .s-beitrag {
+    padding-block: calc(var(--section-space) + 80px) var(--section-space);
+  }
+
+  /* Ein Beitrag liest sich in einer Spalte, nicht über die Seitenbreite.
+     65 Zeichen sind die Grenze, ab der das Auge die nächste Zeile nicht mehr
+     sicher findet. */
+  .s-beitrag__kopf,
+  .s-beitrag__text,
+  .s-beitrag__zurueck {
+    max-width: 68ch;
+  }
+
+  .s-beitrag__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-5);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .s-beitrag__titel {
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .s-beitrag__lead {
+    margin-top: var(--sp-6);
+    font-size: var(--fs-text-large);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  .s-beitrag__bild {
+    margin-block: var(--sp-10);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
+  .s-beitrag__bild :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  /* :global(), weil PortableText das Markup zur Laufzeit erzeugt — es trägt
+     das Scope-Attribut dieser Datei nicht. */
+  .s-beitrag__text :global(p) {
+    margin-bottom: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: 1.6;
+  }
+
+  .s-beitrag__text :global(h2) {
+    margin-top: var(--sp-10);
+    margin-bottom: var(--sp-4);
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-beitrag__text :global(h3) {
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-h5);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .s-beitrag__text :global(ul) {
+    margin-bottom: var(--sp-5);
+    padding-left: var(--sp-5);
+    list-style: disc;
+  }
+
+  .s-beitrag__text :global(li) {
+    margin-bottom: var(--sp-2);
+    font-size: var(--fs-text-main);
+    line-height: 1.6;
+  }
+
+  .s-beitrag__text :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--c-brand);
+  }
+
+  .s-beitrag__zurueck {
+    margin-top: var(--sp-10);
+  }
+</style>

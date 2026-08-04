@@ -88,6 +88,47 @@ export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current
 }`);
 
 /**
+ * Die Magazinbeiträge als Karten — für das Karussell auf Start- und
+ * Leistungsseiten und für die Übersicht unter /magazin.
+ *
+ * Nur die Felder, die eine Karte braucht. Der Fließtext bleibt draußen: Er
+ * wird für die Karte nicht gebraucht und wäre bei zwölf Beiträgen der
+ * größte Posten der Antwort.
+ *
+ * `$leistung` filtert auf Beiträge, die auf eine Leistung verweisen — dafür
+ * ist die Referenz im Schema da. Ohne Wert (null) kommen alle.
+ */
+export const BEITRAEGE_QUERY = defineQuery(`
+  *[_type == "beitrag" && defined(slug.current)
+    && ($leistung == null || leistung->slug.current == $leistung)]
+    | order(datum desc) {
+    "slug": slug.current,
+    titel,
+    datum,
+    kategorie,
+    einleitung,
+    vorschaubild${BILD}
+  }
+`);
+
+/** Ein einzelner Beitrag mit Fließtext. */
+export const BEITRAG_QUERY = defineQuery(`*[_type == "beitrag" && slug.current == $slug][0]{
+  titel,
+  datum,
+  kategorie,
+  einleitung,
+  vorschaubild${BILD},
+  text[]{ ..., _type == "bild" => ${BILD} },
+  "leistung": leistung->{ titel, "slug": slug.current },
+  seo
+}`);
+
+/** Der Kopf der Magazin-Übersicht. Die Beiträge kommen aus der Collection. */
+export const MAGAZIN_INDEX_QUERY = defineQuery(`
+  *[_id == "magazinIndex"][0]{ titel, topline, einleitung, seo }
+`);
+
+/**
  * Die Startseite. Ein Einzeldokument mit fester ID — jeder Abschnitt der
  * Seite hat hier seine Felder.
  *
