@@ -1,0 +1,236 @@
+---
+/**
+ * Zeitstrahl — ein Ablauf als waagerechte Bahn, an der sich beim Scrollen
+ * eine Linie entlangzieht und die Marken nacheinander anspringen.
+ *
+ * Bewusst kein Kartenraster: Ein Ablauf hat eine Richtung, und die soll man
+ * sehen. Die vier Schritte stehen deshalb an einer durchgehenden Linie und
+ * nicht in vier gleichwertigen Kästen nebeneinander.
+ *
+ * Unter 900px kippt die Bahn in die Senkrechte — dort ist Scrollen die
+ * natürliche Richtung, und vier Spalten auf einem Telefon sind keine.
+ *
+ * Die Linie füllt sich über einen Scroll-Fortschritt (siehe
+ * modules/timeline.js). Ohne JavaScript und ohne Bewegung steht sie
+ * vollständig da: Der gefüllte Teil ist die Voreinstellung, nicht der leere.
+ */
+
+export interface Etappe {
+  marke: string;
+  titel: string;
+  text: string;
+}
+
+interface Props {
+  topline: string;
+  headline: string;
+  etappen: Etappe[];
+}
+const { topline, headline, etappen } = Astro.props;
+---
+
+<section class="s-timeline container" data-timeline>
+  <div class="s-timeline__head">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-timeline__title" data-split="lines">{headline}</h2>
+  </div>
+
+  <ol class="s-timeline__bahn" data-reveal-stagger="0.1">
+    {/* Die Bahn selbst: eine blasse Linie über die volle Breite, darüber die
+        farbige, die mitwächst. Zwei Elemente statt eines Verlaufs — ein
+        Verlauf ließe sich nicht sauber auf einen Fortschritt abbilden. */}
+    <div class="s-timeline__gleis" aria-hidden="true">
+      <span class="s-timeline__fortschritt" data-timeline-fill></span>
+    </div>
+
+    {etappen.map((e, i) => (
+      <li class="s-timeline__etappe" data-reveal-child>
+        <span class="s-timeline__punkt" aria-hidden="true"></span>
+        <span class="s-timeline__marke">{e.marke}</span>
+        <h3 class="s-timeline__etappe-titel">
+          {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
+              Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
+          <span class="s-timeline__nummer" aria-hidden="true">{i + 1}</span>
+          {e.titel}
+        </h3>
+        <p class="s-timeline__text">{e.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .s-timeline {
+    padding-block: var(--section-space);
+  }
+
+  .s-timeline__head {
+    max-width: 34ch;
+    margin-bottom: var(--sp-10);
+  }
+
+  .s-timeline__head .c-topline {
+    margin-bottom: var(--sp-4);
+  }
+
+  .s-timeline__title {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-timeline__bahn {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--site-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Das Gleis liegt auf Höhe der Punkte, nicht am oberen Rand: Die Punkte
+     sitzen mittig auf ihm, deshalb dieselbe Rechnung an beiden Stellen
+     (halbe Punktgröße). */
+  .s-timeline__gleis {
+    position: absolute;
+    top: 7px;
+    right: 0;
+    left: 0;
+    height: 2px;
+    background: var(--c-line);
+  }
+
+  .s-timeline__fortschritt {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--c-brand);
+    transform-origin: 0 50%;
+    /* Voreinstellung ist VOLL. Ohne JavaScript bleibt sie so — eine leere
+       Bahn wäre eine falsche Aussage über den Ablauf. modules/timeline.js
+       setzt sie zurück und zieht sie beim Scrollen wieder auf. */
+    transform: scaleX(1);
+  }
+
+  .s-timeline__etappe {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: var(--sp-6);
+  }
+
+  .s-timeline__punkt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--r-round);
+    background: var(--c-bg);
+    border: 2px solid var(--c-line);
+    transition: background var(--d-base) var(--e-out),
+      border-color var(--d-base) var(--e-out);
+  }
+
+  /* Erreichte Marke: gefüllt. Das Attribut setzt timeline.js. */
+  .s-timeline__etappe[data-erreicht] .s-timeline__punkt {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+  }
+
+  .s-timeline__marke {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .s-timeline__etappe-titel {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    margin-top: var(--sp-2);
+    font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Brauner Kreis mit heller Ziffer — dieselbe Form wie die Ziffernkreise
+     im Benefits-Band und die Symbolkreise der Leistungstabelle. Grau auf
+     Braun misst 8.65:1.
+
+     Keine Konturschrift mehr: Die ist ein Schaueffekt und zog Aufmerksamkeit
+     auf die Zahl, obwohl die Zahl nur die Reihenfolge angibt und der Titel
+     die Aussage trägt. Der Kreis ordnet, ohne zu schreien.
+
+     `align-self: center` statt der Grundlinie des Titels: Ein Kreis hat
+     keine Grundlinie, an der man ihn ausrichten könnte — er säße sonst
+     sichtbar zu tief. */
+  .s-timeline__nummer {
+    flex: 0 0 auto;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: var(--r-round);
+    background: var(--c-dark);
+    color: var(--c-grey);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.62em;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .s-timeline__text {
+    max-width: 34ch;
+    margin-top: var(--sp-3);
+    font-size: var(--fs-text-main);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  /* Senkrecht ab hier: Das Gleis wandert nach links, die Etappen stapeln. */
+  @media (max-width: 900px) {
+    .s-timeline__bahn {
+      grid-auto-flow: row;
+      gap: var(--sp-8);
+      padding-left: var(--sp-6);
+    }
+
+    .s-timeline__gleis {
+      top: 7px;
+      bottom: 7px;
+      right: auto;
+      left: 7px;
+      width: 2px;
+      height: auto;
+    }
+
+    .s-timeline__fortschritt {
+      transform-origin: 50% 0;
+    }
+
+    .s-timeline__etappe {
+      padding-top: 0;
+      padding-left: var(--sp-6);
+    }
+
+    .s-timeline__punkt {
+      left: calc(-1 * var(--sp-6));
+    }
+
+    .s-timeline__text {
+      max-width: 46ch;
+    }
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+/**
+ * Responsives Bild. Ersetzt picture.hbs samt der beiden Handlebars-Helfer
+ * (srcset/fallback) — die Logik liegt jetzt hier statt in der Build-Konfig.
+ *
+ * AVIF zuerst, WebP als Rückfall: der Browser nimmt das erste Format, das er
+ * versteht. Der src zeigt auf die kleinste Breite, damit alte Browser ohne
+ * srcset nicht das größte Bild ziehen.
+ */
+interface Props {
+  name: string;
+  widths: string;
+  alt?: string;
+  sizes?: string;
+  eager?: boolean;
+  parallax?: string;
+}
+const { name, widths, alt = "", sizes = "100vw", eager = false, parallax } = Astro.props;
+
+const liste = widths.split(",").map((w) => w.trim());
+const srcset = (ext: string) => liste.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
+const fallback = `/img/${name}-${liste[0]}.webp`;
+---
+<picture>
+  <source type="image/avif" srcset={srcset("avif")} sizes={sizes} />
+  <source type="image/webp" srcset={srcset("webp")} sizes={sizes} />
+  <img
+    src={fallback}
+    alt={alt}
+    loading={eager ? "eager" : "lazy"}
+    fetchpriority={eager ? "high" : undefined}
+    decoding={eager ? undefined : "async"}
+    data-parallax={parallax}
+  />
+</picture>

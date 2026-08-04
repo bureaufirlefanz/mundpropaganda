@@ -1,0 +1,473 @@
+---
+interface Props {
+  titel?: string;
+}
+const { titel = "Unsere Services" } = Astro.props;
+/**
+ * Services-Tabelle. Die Zeilen kommen aus der Leistungen-Collection, nicht
+ * mehr aus dem Markup — dieselbe Quelle wie Menü und Footer.
+ */
+import Button from "../ui/Button.astro";
+import { ladeLeistungsliste, fuerTabelle, fuerListe, pfad } from "../../lib/leistungsliste";
+import { istCmsBild, bildUrl } from "../../lib/bilder";
+
+const liste = await ladeLeistungsliste();
+const zeilen = fuerTabelle(liste);
+const weitere = fuerListe(liste);
+
+/* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
+   Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
+const vorschauPfad = (v: (typeof zeilen)[number]["vorschau"]) =>
+  istCmsBild(v) ? bildUrl(v, 640) : (v as string | undefined);
+
+/* Die Linkliste steht in einem Raster mit drei Spalten und fließt zeilenweise.
+   Vorher wurde sie hier in drei Spalten VORSORTIERT (jeder dritte Eintrag in
+   dieselbe Spalte) — das las sich auf breiten Fenstern zwar von links nach
+   rechts, aber gestapelt kam die Reihenfolge durcheinander: Auf 390px stand
+   der vierte Eintrag an zweiter Stelle. Das Raster ordnet in beiden Fällen
+   richtig, ohne dass hier etwas gerechnet werden muss. */
+---
+
+<!-- ==================================================================
+           UNSERE SERVICES — Tabelle mit Cursor-Preview
+           ================================================================== -->
+      <section class="s-services" id="leistungen" data-services>
+        <div class="container">
+          <h2 class="s-services__title" data-split="lines">{titel}</h2>
+
+          <div class="s-services__head" data-reveal="fade">
+            <span>Leistung</span>
+            <span class="s-services__head-praxis">Praxis</span>
+            {/* Leere Zelle für die Pfeilspalte — sie trägt dieselbe Klasse wie
+                der Pfeil in den Zeilen und erscheint und verschwindet
+                deshalb mit ihm. Ohne diese Kopplung stünde der Kopf dort, wo
+                auf Touch der Pfeil sitzt, und läge eine Pfeilbreite neben
+                seiner eigenen Spalte. */}
+            <span class="s-services__pfeil" aria-hidden="true"></span>
+          </div>
+
+          <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
+            {zeilen.map((l) => (
+              <a
+                class="s-services__row"
+                href={pfad(l)}
+                data-service-row
+                data-reveal-child
+                data-preview={vorschauPfad(l.vorschau)}
+                data-preview-label="Mehr Info"
+              >
+                <span class="s-services__name">{l.name}</span>
+                <span class="s-services__tag">{l.tag}</span>
+                {/* Zeigt, dass die Zeile irgendwohin führt. Auf Zeigergeräten
+                    verrät das der Hover, auf dem Telefon gäbe es sonst kein
+                    Anzeichen — der Pfeil steht dort dauerhaft. */}
+                <span class="s-services__pfeil" aria-hidden="true">
+                  <svg><use href="#i-arrow" /></svg>
+                </span>
+              </a>
+            ))}
+          </div>
+
+          <div class="s-services__more" data-reveal-stagger="0.06">
+            {weitere.map((l) => (
+              <a href={pfad(l)} data-reveal-child>
+                <span>{l.name}</span>
+                {/* Der Pfeil steckt in einem überlaufversteckten Fenster —
+                    das ist die Maske, aus der er beim Überfahren
+                    hochfährt. */}
+                <span class="s-services__more-icon" aria-hidden="true">
+                  <span><svg><use href="#i-arrow" /></svg></span>
+                </span>
+              </a>
+            ))}
+          </div>
+
+          <div class="s-services__foot" data-reveal="up">
+            <Button label="Termin buchen" href="#kontakt" />
+          </div>
+        </div>
+
+        <div class="s-services__preview" data-services-preview aria-hidden="true">
+          <img src="/img/teeth-macro-640.webp" alt="" />
+          {/* Der Button des Hauses statt eines eigenen Schildchens. Das Label
+              trägt `data-preview-label`, weil services.js seinen Text je Zeile
+              austauscht. */}
+          <Button label="Mehr Info" static labelAttrs={{ "data-preview-label": true }} />
+        </div>
+      </section>
+
+<style>
+  /* Zeilen mit Hover-Highlight in Brand-Pink; ein Bild folgt dem Cursor. */
+  .s-services {
+    position: relative;
+    background: var(--c-taupe);
+    color: var(--c-dark);
+    padding-block: var(--section-space);
+  }
+
+  /* H1-Grad (70px @1728), zentriert — wie im Entwurf. */
+  .s-services__title {
+    text-align: center;
+    margin-bottom: var(--sp-10);
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Kopf und Zeilen teilen sich EIN Raster, nicht zwei ähnliche Aufteilungen.
+     Vorher lag über beiden ein `space-between`: In der Zeile verteilte das
+     zwei sichtbare Zellen (Name links, Kürzel rechts), im Kopf aber drei —
+     die leere Pfeilzelle saß rechts und schob „PRAXIS" in die Mitte. Gemessen
+     stand die Kopfzeile damit rund 850px neben ihrer eigenen Spalte.
+
+     Als Raster gibt es diesen Unterschied nicht mehr: Beide haben dieselben
+     Spuren, und die letzte endet am rechten Rand. Was sich ändert, ändert
+     sich für beide zugleich. */
+  .s-services__head,
+  .s-services__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  .s-services__head {
+    padding: 0 var(--sp-2) var(--sp-2);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    /* Diese Section liegt auf Taupe, nicht auf Grau — dort ist der Grund
+       dunkler und es braucht mehr Deckung: 82 % ergeben 4.55:1, die
+       urspruenglichen 60 % nur 2.90:1 (WCAG 1.4.3 verlangt 4.5:1). */
+    color: color-mix(in srgb, var(--c-dark) 82%, transparent);
+  }
+
+  .s-services__list {
+    border-top: var(--bw) solid var(--c-line);
+    transition: border-color var(--d-base) var(--e-swift);
+  }
+
+  /* Zeilenraster 103px: Name 40px auf 1.2 (=48px) plus 27px Innenabstand
+     oben und unten. Kein Radius auf der Zeile selbst — sonst werden die
+     Trennlinien an den Enden mitgerundet. Der Radius sitzt allein auf der
+     Pink-Füllung. */
+  .s-services__row {
+    position: relative;
+    padding: clamp(18px, 1.56vw, 27px) var(--sp-2);
+    border-bottom: var(--bw) solid var(--c-line);
+    /* Wie oben: Grund ist Taupe, 82 % statt der urspruenglichen 62 % (3.03:1). */
+    color: color-mix(in srgb, var(--c-dark) 82%, transparent);
+    transition: color var(--d-fast) var(--e-swift),
+      padding-left var(--d-base) var(--e-out),
+      border-color var(--d-base) var(--e-swift);
+  }
+
+  /* Die Füllung blendet auf, statt von links einzuwachsen — ruhiger und
+     ohne Richtung. Ohne Radius: die Zeilen sollen als Tabelle lesen, nicht
+     als Pillen. */
+  .s-services__row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--c-brand);
+    opacity: 0;
+    transition: opacity var(--d-base) var(--e-swift);
+    z-index: 0;
+  }
+
+  .s-services__row > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .s-services__name {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .s-services__tag {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+  }
+
+  @media (hover: hover) {
+    .s-services__row:hover {
+      color: var(--c-dark);
+      padding-left: var(--sp-4);
+    }
+
+    .s-services__row:hover::before {
+      opacity: 1;
+    }
+
+    /* Die Trennlinien der überfahrenen Zeile färben mit.
+       Jede Zeile trägt nur ihre untere Linie — die obere gehört damit der
+       Zeile darüber, und bei der ersten der Liste selbst. Ohne die beiden
+       Zusatzfälle bekäme die Pink-Fläche nur unten einen Rand und säße oben
+       weiter an einer grauen Kante. */
+    .s-services__row:hover {
+      border-bottom-color: var(--c-brand);
+    }
+
+    .s-services__row:has(+ .s-services__row:hover) {
+      border-bottom-color: var(--c-brand);
+    }
+
+    .s-services__list:has(> .s-services__row:first-child:hover) {
+      border-top-color: var(--c-brand);
+    }
+
+    /* Die Links darunter behalten ihre graue Linie — dort tritt statt der
+       Färbung der Pfeil-Knopf aus der Maske. */
+    .s-services__more a:hover .s-services__more-icon > span {
+      transform: translateY(0);
+    }
+  }
+
+  /* Das Preview-Bild, das am Cursor hängt.
+     Entwurfsmaß: 300 × 340 bei 1728px Seitenbreite. */
+  .s-services__preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-overlay);
+    width: clamp(200px, 17.4vw, 300px);
+    aspect-ratio: 300 / 341;
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+  }
+
+  .s-services__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* :global(.c-btn), weil der Button aus Button.astro kommt und das
+     Scope-Attribut dieser Datei nicht trägt. Gesetzt wird nur die Lage —
+     Aussehen und Maße bleiben beim Button. */
+  .s-services__preview :global(.c-btn) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+  }
+
+  /* Auf breiten Fenstern mit Zeiger erscheint der Pfeil gar nicht erst im
+     Layout — dort verrät der Hover, dass die Zeile irgendwohin führt: Sie
+     färbt sich, rückt ein, und eine Bildvorschau folgt dem Zeiger. Die
+     Kopfzelle mit derselben Klasse verschwindet mit.
+
+     Form und Maß stehen hier, nicht in den beiden Media-Blöcken weiter unten:
+     Dort wird nur noch `display` umgelegt. Sonst stünde dieselbe Kontur
+     zweimal da und liefe beim nächsten Eingriff auseinander. */
+  .s-services__pfeil {
+    display: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Die Kontur bekommen nur die Zeilen. Die gleichnamige Zelle in der
+     Kopfzeile hält bloß die Spur frei — mit Rand wäre sie ein leerer Kreis
+     neben „LEISTUNG", der nach einem vergessenen Symbol aussieht. */
+  .s-services__row .s-services__pfeil {
+    border: var(--bw) solid var(--c-line);
+    border-radius: var(--r-round);
+  }
+
+  .s-services__pfeil svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .s-services__more {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--site-gutter);
+    margin-top: var(--sp-10);
+  }
+
+  /* Zweite Hierarchie, nicht Kleingedrucktes. Mit 18px las sich die Liste wie
+     eine Fußnote unter der Tabelle; es sind dieselben Leistungen, nur die
+     selteneren. 24px setzen sie unter die 40px der Haupttabelle, ohne sie
+     dorthin zu stellen — ein Schritt, keine zwei. */
+  .s-services__more a {
+    --pfeil: 18px;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-block: var(--sp-3);
+    /* Platz für den Pfeil, der aus dem Fluss genommen ist. Ohne das liefe ein
+       langer Name unter ihm hindurch. */
+    padding-right: calc(var(--pfeil) + var(--sp-3));
+    border-bottom: var(--bw) solid var(--c-line);
+    font-size: var(--fs-h5);
+    line-height: 1.2;
+    transition: padding-left var(--d-base) var(--e-out),
+      color var(--d-fast) var(--e-swift);
+  }
+
+  /* Die Maske reicht von der Ruhelage des Pfeils bis auf die Trennlinie:
+     oben `top: 50%` — die Mitte der Zeile, also die Achse des Namens — minus
+     der halben Pfeilhöhe, unten `bottom: 0`, und das ist bei einem absolut
+     gesetzten Element die Unterkante des Polsterkastens, mithin die Linie.
+
+     Der Pfeil darin füllt das Fenster und sitzt oben (`place-items: start`).
+     Verschoben um eine volle Fensterhöhe steht er unterhalb der Linie und ist
+     verdeckt; bei 0 sitzt er auf der Achse des Namens. Er steigt also aus der
+     Linie auf und kommt neben dem Namen zur Ruhe — beides zugleich, ohne
+     dass eine Zahl von Hand nachgeführt werden müsste.
+
+     Kein Kreis, keine Füllung: nur das Zeichen in Braun. Der gefüllte Kreis
+     war ein zweiter Knopf neben dem echten unten rechts. */
+  .s-services__more-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    bottom: 0;
+    margin-top: calc(var(--pfeil) / -2);
+    width: var(--pfeil);
+    overflow: hidden;
+  }
+
+  .s-services__more-icon > span {
+    display: grid;
+    place-items: start center;
+    width: 100%;
+    height: 100%;
+    color: var(--c-dark);
+    transform: translateY(100%);
+    transition: transform var(--d-base) var(--e-out);
+  }
+
+  .s-services__more-icon svg {
+    width: var(--pfeil);
+    height: var(--pfeil);
+  }
+
+  /* Rückt beim Hover ein Stück nach rechts — dieselbe Geste wie in der
+     Haupttabelle darüber, nur kleiner. */
+  @media (hover: hover) {
+    .s-services__more a:hover {
+      padding-left: var(--sp-3);
+      color: var(--c-dark);
+    }
+  }
+
+  .s-services__foot {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--sp-6);
+  }
+
+  @media (hover: none) {
+    /* Kreis mit Pfeil, dauerhaft sichtbar. Auf Zeigergeräten verrät der Hover,
+       dass die Zeile irgendwohin führt — hier gibt es davon nichts, und die
+       Zeile sähe aus wie Text. */
+    .s-services__pfeil {
+      display: grid;
+    }
+
+    /* Dritte Spur für den Pfeil. Die mittlere MUSS fest sein: Als `auto` misst
+       sie ihren eigenen Inhalt, und „PRAXIS" (62px) ist breiter als „P25"
+       (29px) — die erste Spalte fiele dadurch in Kopf und Zeile
+       unterschiedlich aus. Gemessen, nicht geraten: 68px fassen die
+       Kopfzeile mit etwas Luft. */
+    .s-services__head,
+    .s-services__row {
+      grid-template-columns: minmax(0, 1fr) 68px 32px;
+    }
+
+    /* Der maskierte Pfeil in der zweiten Hierarchie wartet sonst ewig
+       hinter seinem Fenster — ohne Hover kommt er nie hervor. */
+    .s-services__more-icon > span {
+      transform: translateY(0);
+    }
+  }
+
+  /* --- Telefon ----------------------------------------------------------
+     Hier ist die Breite die Grenze, nicht das Eingabegerät: Auf 390px stehen
+     Name, Kürzel und Pfeil zu dritt in einer Zeile, die für zwei reicht.
+     Das Kürzel geht als erstes — es ist die schwächste der drei Angaben und
+     steht auf der Zielseite ohnehin. Der Pfeil bleibt: Er ist das einzige
+     Anzeichen, dass die Zeile irgendwohin führt.
+     -------------------------------------------------------------------- */
+  @media (max-width: 700px) {
+    /* `gap: 0`, nicht sp-5. Untereinander gestapelt trennt die Lücke
+       zwischen den Spalten sonst dieselbe Aufzählung in Gruppen: gemessen
+       0, 32, 0, 32px — die Links innerhalb einer Spalte stoßen aneinander,
+       zwischen zwei Spalten klafft es. Ohne Lücke ergibt sich ein Rhythmus,
+       den die Trennlinien tragen. */
+    .s-services__more {
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin-top: var(--sp-6);
+    }
+
+    .s-services__head,
+    .s-services__row {
+      grid-template-columns: minmax(0, 1fr) 32px;
+      gap: var(--sp-3);
+    }
+
+    .s-services__tag,
+    .s-services__head-praxis {
+      display: none;
+    }
+
+    /* Der Pfeil steht hier auch mit Maus — bei dieser Breite ist die
+       Darstellung eine Telefon-Darstellung, unabhängig davon, womit gezeigt
+       wird. Sonst hinge das Anzeichen am Zufall, ob ein Trackpad
+       angeschlossen ist. */
+    .s-services__pfeil {
+      display: grid;
+    }
+
+    /* Dieselbe Kontur wie in der Haupttabelle darüber, nicht der maskierte
+       Pfeil: Ohne Hover käme der nie hervor, und zwei verschiedene
+       Pfeilformen in einer Section wären ohnehin eine Behauptung über einen
+       Unterschied, den es nicht gibt.
+
+       Damit steht der Pfeil wieder im Fluss statt absolut — der reservierte
+       Innenabstand rechts fällt weg, `margin-left: auto` schiebt ihn an den
+       Rand. */
+    .s-services__more a {
+      padding-right: 0;
+    }
+
+    .s-services__more-icon {
+      position: static;
+      flex: 0 0 auto;
+      margin: 0 0 0 auto;
+      width: 32px;
+      height: 32px;
+      overflow: visible;
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-round);
+    }
+
+    .s-services__more-icon > span {
+      place-items: center;
+      transform: none;
+    }
+
+    .s-services__more-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+</style>

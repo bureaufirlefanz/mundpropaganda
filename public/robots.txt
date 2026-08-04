@@ -1,0 +1,13 @@
+# Prototyp. Die Inhalte sind echt genug, um Schaden anzurichten, wenn sie
+# indexiert werden — Praxisadressen, Preise, Stellenanzeigen. Diese Seite darf
+# der späteren echten Seite nicht als Doppelgänger im Index gegenüberstehen.
+#
+# robots.txt hält nur Crawler ab, die sich daran halten, und verhindert die
+# Aufnahme in den Index nicht zuverlässig. Der X-Robots-Tag in `_headers` tut
+# das — beides steht hier zusammen, weil das eine ohne das andere lückenhaft
+# ist.
+#
+# Vor dem echten Livegang beide Stellen entfernen.
+
+User-agent: *
+Disallow: /

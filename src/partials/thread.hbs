@@ -1,0 +1,22 @@
+{{!--
+  Langer, organisch geschwungener Pfad ab der Standards-Section.
+  Gleiche Anmutung wie die Linien im Hero: weiß, leicht unscharf, ruhig.
+
+  Die Route ist am Inhalt ausgerichtet: bei den Standards holt sie in
+  grossen Schwuengen nach links aus und laeuft dabei teils aus dem Bild,
+  dann mittig zwischen die beiden Standorte, dann in mehreren Boegen
+  hinter das Foto des Expertenteams - das liegt im DOM nach den Standards
+  und uebermalt den Pfad von selbst. Darunter taucht sie wieder auf und
+  endet vor den Story-Karten.
+
+  Erzeugt aus Stützpunkten über Catmull-Rom, damit die Übergänge C1-stetig
+  bleiben — von Hand gesetzte Bézier-Kontrollpunkte knicken an den Nähten.
+
+  Fest hinterlegt, nicht zur Laufzeit erzeugt — sonst sähe der Pfad bei
+  jedem Build anders aus.
+--}}
+<div class="s-thread" data-thread aria-hidden="true">
+  <svg viewBox="0 0 1200 6400" preserveAspectRatio="none" fill="none">
+    <path class="s-thread__line" d="M240 0C175,50 -135,191.7 -150,300C-165,408.3 168.3,533.3 150,650C131.7,766.7 -265,883.3 -260,1000C-255,1116.7 168.3,1233.3 180,1350C191.7,1466.7 -203.3,1591.7 -190,1700C-176.7,1808.3 111.7,1906.7 260,2000C408.3,2093.3 602.6,2198.7 700,2260C797.4,2321.3 847,2275.3 844.4,2368C841.8,2460.7 748.8,2656 684.6,2816C620.4,2976 485.6,3200 459,3328C432.4,3456 501.3,3498.7 524.8,3584C548.3,3669.3 562.4,3744 600,3840C637.6,3936 758.2,4053.3 750.4,4160C742.6,4266.7 561.4,4386.7 553,4480C544.6,4573.3 709.7,4640 700,4720C690.3,4800 505,4880 495,4960C485,5040 653.3,5118.3 640,5200C626.7,5281.7 426.7,5366.7 415,5450C403.3,5533.3 573.3,5616.7 570,5700C566.7,5783.3 405,5870 395,5950C385,6030 504.2,6105 510,6180C515.8,6255 443.3,6363.3 430,6400" />
+  </svg>
+</div>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    {{> head }}
+    <title>Styleguide — Mundpropaganda</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      /* Nur für diese Seite: Raster und Beschriftungen der Bausteine. */
+      .sg {
+        padding-block: var(--sp-8);
+      }
+      .sg__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--sp-5);
+        margin-bottom: var(--sp-6);
+        padding-bottom: var(--sp-2);
+        border-bottom: var(--bw) solid var(--c-line);
+      }
+      .sg__title {
+        font-family: var(--f-mono);
+        font-weight: 300;
+        font-size: var(--fs-text-small);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .sg__note {
+        max-width: 52ch;
+        font-size: var(--fs-text-small);
+        color: var(--c-text-muted);
+      }
+      .sg__row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--sp-6);
+        margin-bottom: var(--sp-6);
+      }
+      .sg__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--sp-4);
+      }
+      .sg__swatch {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-1);
+      }
+      .sg__chip {
+        height: 96px;
+        border-radius: var(--r-sm);
+        border: var(--bw) solid var(--c-line);
+      }
+      .sg__meta {
+        font-family: var(--f-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--c-text-muted);
+      }
+      .sg__spec {
+        font-family: var(--f-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
+        color: var(--c-text-muted);
+        text-transform: uppercase;
+      }
+      .sg__type > * {
+        margin-bottom: var(--sp-3);
+      }
+      .sg__stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-4);
+        max-width: 640px;
+      }
+    </style>
+  </head>
+
+  <body>
+    {{> icons }}
+    {{> backdrop }}
+    {{> transition }}
+
+
+    {{> nav }}
+
+    <main class="container" style="padding-top: 140px">
+      <header class="sg">
+        <h1 class="t-h1">Styleguide</h1>
+        <p class="t-large t-muted" style="max-width: 56ch; margin-top: var(--sp-4)">
+          Alle Bausteine an einem Ort. Jede Section der Website setzt sich aus
+          diesen Teilen zusammen — neue Seitentypen entstehen, indem man sie neu
+          kombiniert, nicht indem man neue CSS schreibt.
+        </p>
+      </header>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Farben</h2>
+          <p class="sg__note">
+            Die vier Markenfarben plus Neutrals. Sektionen schalten ihr Schema
+            über <code>data-theme</code> um.
+          </p>
+        </div>
+
+        <div class="sg__grid">
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-brand)"></div>
+            <span class="sg__meta">Brand</span><span class="sg__spec">#FF84C8</span>
+          </div>
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-dark)"></div>
+            <span class="sg__meta">Dark / Brown</span><span class="sg__spec">#403229</span>
+          </div>
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-taupe)"></div>
+            <span class="sg__meta">Taupe</span><span class="sg__spec">#D0BEC3</span>
+          </div>
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-grey)"></div>
+            <span class="sg__meta">Grey (Seitengrund)</span><span class="sg__spec">#D6D6D6</span>
+          </div>
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-neutral-200)"></div>
+            <span class="sg__meta">Neutral 200</span><span class="sg__spec">#F4F4F4</span>
+          </div>
+          <div class="sg__swatch">
+            <div class="sg__chip" style="background: var(--c-neutral-800)"></div>
+            <span class="sg__meta">Neutral 800</span><span class="sg__spec">#201D1D</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Typografie</h2>
+          <p class="sg__note">
+            PP Neue Montreal für alles Gesetzte, GT Pressura Mono Light für
+            Labels, Meta-Angaben und Buttons. Alle Grade sind fluid.
+          </p>
+        </div>
+
+        <div class="sg__type">
+          <p class="sg__spec">Display · 250px @1728</p>
+          <p class="t-display">Mund</p>
+
+          <p class="sg__spec">Display 2 · 125px</p>
+          <p class="t-display-2">Veneers</p>
+
+          <p class="sg__spec">H1 · 70px</p>
+          <p class="t-h1">Wir setzen neue Standards</p>
+
+          <p class="sg__spec">H2 Medium · 40px</p>
+          <p class="t-h2">Unsere Services</p>
+
+          <p class="sg__spec">H3 Regular · 40px</p>
+          <p class="t-h3">Individuelle Beratung</p>
+
+          <p class="sg__spec">H5 Mono Light · 24px</p>
+          <p class="t-h5">Veneers in Berlin</p>
+
+          <p class="sg__spec">Text Large · 20px</p>
+          <p class="t-large">
+            Unser Schwerpunkt sind Veneers und Keramikimplantate.
+          </p>
+
+          <p class="sg__spec">Text Main · 18px</p>
+          <p class="t-body">
+            Beides Behandlungen, die wir täglich machen und in denen wir richtig
+            gut sind.
+          </p>
+
+          <p class="sg__spec">Label Mono · 16px</p>
+          <p class="t-label">Zahnarzt Prenzlauer Berg Berlin</p>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Buttons</h2>
+          <p class="sg__note">
+            Zweiteilig: Pill plus abgesetzter Pfeil. Beim Hover dreht sich die
+            Farbe um und der Pfeil schiebt nach rechts.
+          </p>
+        </div>
+
+        <div class="sg__row">
+          {{> button label="Termin buchen" href="#" }}
+          {{> button label="Termin buchen" href="#" variant="dark" }}
+          {{> button label="Dritter Zustand" href="#" }}
+          {{> button label="Statisch (in Cards)" static="true" variant="dark" }}
+        </div>
+
+        <div style="max-width: 420px">
+          {{> button label="Vollbreite / Formular-Submit" variant="block" }}
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Labels &amp; Badges</h2>
+          <p class="sg__note">
+            Die Topline mit Punkt markiert jede Section. Der Reviews-Badge liegt
+            immer auf Bild oder Fläche.
+          </p>
+        </div>
+
+        <div class="sg__row">
+          <span class="c-topline">Form &amp; Funktion</span>
+          <span class="c-topline c-topline--brand">Vorher &amp; Nachher</span>
+          {{> reviews }}
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Cards</h2>
+          <p class="sg__note">
+            Drei Ausprägungen: Magazin (Bild + Titel), Step (nummeriert) und
+            Preis. Alle nutzen dieselbe Radius- und Flächenlogik.
+          </p>
+        </div>
+
+        <div class="s-magazine__grid">
+          <article class="c-card">
+            <div class="media c-card__media">
+              {{> picture name="motion-02" widths="640,1024" alt="" sizes="32vw" }}
+            </div>
+            <h3 class="c-card__title">
+              <a class="c-card__link" href="#">Magazin-Card mit Bild und Titel</a>
+            </h3>
+            <p class="c-card__text">Kurzer Anreißertext über zwei Zeilen.</p>
+            {{> button label="Weiterlesen" variant="dark" static="true" }}
+          </article>
+
+          <article class="c-step">
+            <span class="c-step__num">1</span>
+            <h3 class="c-step__title">Step-Card.</h3>
+            <p class="c-step__text">
+              Nummer oben, Titel darunter, Text am Fuß. Die Karten wachsen auf
+              gleiche Höhe.
+            </p>
+          </article>
+
+          <article class="c-price">
+            <span class="c-price__label">Preis-Card</span>
+            <span class="c-price__value">ab 890 €</span>
+            <p class="c-price__text">
+              Label, Betrag und Erläuterung. Für Kostenübersichten.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Accordion</h2>
+          <p class="sg__note">
+            <code>data-accordion="single"</code> schließt die anderen Einträge
+            beim Öffnen. Ohne den Wert bleiben mehrere offen.
+          </p>
+        </div>
+
+        <div class="c-accordion" data-accordion="single">
+          <div class="c-accordion__item" data-accordion-item data-open="true">
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Erster Eintrag, geöffnet</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Die Höhe wird animiert, nicht auf <code>auto</code> gesetzt —
+                dadurch läuft der Übergang weich.
+              </div>
+            </div>
+          </div>
+          <div class="c-accordion__item" data-accordion-item>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Zweiter Eintrag</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">Inhalt des zweiten Eintrags.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Formularfelder</h2>
+          <p class="sg__note">
+            Fehlerzustand über <code>data-invalid</code> am Feld — gesetzt beim
+            Absenden, entfernt bei der ersten Korrektur.
+          </p>
+        </div>
+
+        <form class="c-form" data-form novalidate>
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="sg-name">Name <span>*</span></label>
+            <div class="c-field__control">
+              <input id="sg-name" type="text" placeholder="Dein Name" required />
+              <span class="c-field__error" aria-hidden="true">!</span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field data-invalid="true">
+            <label class="c-field__label" for="sg-err">Fehlerzustand</label>
+            <div class="c-field__control">
+              <input id="sg-err" type="text" placeholder="Dein Name" />
+              <span class="c-field__error" aria-hidden="true">!</span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="sg-sel">Auswahl</label>
+            <div class="c-field__control">
+              <select id="sg-sel">
+                <option>Leistung auswählen</option>
+                <option>Veneers</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="sg-file">Datei</label>
+            <div class="c-field__control c-file" data-file>
+              <input id="sg-file" type="file" accept="image/*" />
+              <span class="c-file__face">
+                <span data-file-name>Foto auswählen</span>
+                <svg aria-hidden="true"><use href="#i-upload" /></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="c-field c-field--full">
+            <label class="c-checkbox">
+              <input type="checkbox" checked />
+              <span>Checkbox im aktiven Zustand</span>
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Bewegung</h2>
+          <p class="sg__note">
+            Alle Reveals laufen über Data-Attribute — neue Sections animieren
+            ohne eine Zeile JavaScript.
+          </p>
+        </div>
+
+        <div class="sg__stack">
+          <p class="t-body"><code>data-reveal="up"</code> — von unten einblenden</p>
+          <p class="t-body"><code>data-reveal="fade"</code> — nur Deckkraft</p>
+          <p class="t-body"><code>data-reveal="left" | "right"</code> — von der Seite einfahren</p>
+          <p class="t-body"><code>data-reveal="scale"</code> — leicht heranfahren</p>
+          <p class="t-body"><code>data-reveal-stagger="0.08"</code> — Container, Kinder mit <code>data-reveal-child</code></p>
+          <p class="t-body"><code>data-split="lines|words|chars"</code> — Headline in Zeilen/Wörtern/Zeichen</p>
+          <p class="t-body"><code>data-parallax="10"</code> — Bild läuft langsamer als sein Rahmen</p>
+          <p class="t-body"><code>data-magnetic="0.3"</code> — Element zieht zum Cursor</p>
+          <p class="t-body"><code>data-cursor-text="Lesen"</code> — Beschriftung im Cursor</p>
+        </div>
+
+        <p class="sg__note" style="margin-top: var(--sp-6)">
+          Alle Reveals teilen sich dieselbe Kurve (<code>expo.out</code>) und
+          lange Laufzeiten. Das ist der Unterschied zwischen „animiert" und
+          „elegant": die Bewegung fällt auf, während sie läuft, nicht danach.
+        </p>
+
+        <div class="sg__head" style="margin-top: var(--sp-10)">
+          <h2 class="sg__title">Wann was</h2>
+          <p class="sg__note">
+            Die Zuordnung ist verbindlich. Wer sie aufweicht, bekommt eine
+            Seite, auf der jede Section anders aussieht.
+          </p>
+        </div>
+
+        <div class="sg__stack" style="max-width: 68ch">
+          <p class="t-body">
+            <strong>Zeilenmaske</strong> (<code>data-split="lines"</code>) —
+            <strong>nur Headlines und Display-Typo.</strong> Die Zeilen steigen
+            hinter einer Maske hoch. Bei Fließtext zerfällt der Absatz dabei in
+            Einzelzeilen und wird unruhig statt ruhig.
+          </p>
+          <p class="t-body">
+            <strong>Aufsteigen</strong> (<code>data-reveal="up"</code>) — jeder
+            Fließtext, jede Card, jede Liste. Der Block bewegt sich als Ganzes.
+          </p>
+          <p class="t-body">
+            <strong>Von der Seite</strong> (<code>data-reveal="left|right"</code>)
+            — nur Flächen und Bilder, die eine Komposition schließen. Nicht für
+            Text.
+          </p>
+          <p class="t-body">
+            <strong>Markerbalken</strong>
+            (<code>data-highlight-marker-reveal</code>) — Momente der Marke, an
+            denen die Geste selbst Inhalt ist. Sparsam einsetzen: derzeit
+            ausschließlich die Meta-Zeilen im Hero.
+          </p>
+          <p class="t-body">
+            <strong>Zeichenweise</strong> (<code>data-split="chars"</code>) —
+            allein der Wortmarke vorbehalten.
+          </p>
+        </div>
+
+        <p class="sg__note" style="margin-top: var(--sp-6)">
+          <code>?nosmooth</code> an die URL hängen schaltet Lenis ab. Bei
+          <code>prefers-reduced-motion</code> entfallen alle Bewegungen
+          automatisch.
+        </p>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Interaktive Bausteine</h2>
+          <p class="sg__note">
+            Drei Sections tragen eigene Bedienlogik. Sie stehen hier als
+            Referenz — die lauffähigen Fassungen sind auf der Startseite.
+          </p>
+        </div>
+
+        <div class="sg__stack" style="max-width: 68ch">
+          <p class="t-body">
+            <strong>Services-Tabelle</strong> — Zeilen ohne Rundung, Füllung
+            blendet auf. Ein Bild-Preview hängt am Cursor und wechselt je
+            Zeile: <code>data-services</code>, <code>data-service-row</code>,
+            <code>data-preview="/img/…"</code>.
+          </p>
+          <p class="t-body">
+            <strong>Standards-Liste</strong> — läuft von selbst durch die
+            Schritte, ein Balken auf der Trennlinie zeigt die Restzeit. Hover
+            übernimmt und pausiert, das Bild in der Zahnmaske wechselt mit:
+            <code>data-standards</code>, <code>data-standards-row</code>,
+            <code>data-standards-img</code>, <code>data-standards-bar</code>.
+          </p>
+          <p class="t-body">
+            <strong>Story-Kartendeck</strong> — gestapelte Karten statt
+            Slider. Bedienbar per Wischen, Buttons und Pfeiltasten:
+            <code>data-deck</code>, <code>data-deck-card</code>,
+            <code>data-deck-prev/next</code>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <section class="sg">
+        <div class="sg__head">
+          <h2 class="sg__title">Raster</h2>
+          <p class="sg__note">
+            12 Spalten, Gutter 32px, Seitenrand 48px (jeweils fluid nach unten).
+            Ab 900px sechs Spalten, ab 600px vier.
+          </p>
+        </div>
+
+        <div class="grid">
+          {{#times 12}}
+          <div
+            style="
+              height: 80px;
+              border-radius: var(--r-sm);
+              background: color-mix(in srgb, var(--c-brand) 30%, transparent);
+            "
+          ></div>
+          {{/times}}
+        </div>
+      </section>
+    </main>
+
+    {{> footer }}
+
+    <script type="module" src="/src/js/main.js"></script>
+  </body>
+</html>

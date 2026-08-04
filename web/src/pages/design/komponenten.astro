@@ -1,0 +1,632 @@
+---
+/**
+ * Komponenten — jeder Baustein der Seite mit Beschreibung, Quellpfad und,
+ * wo es geht, lebendem Beispiel.
+ *
+ * Bewusst OHNE Farben, Typografie und Bewegungswerte: die stehen im
+ * Styleguide. Was hier steht, sind die zusammengesetzten Teile.
+ *
+ * Die Beispiele laufen mit echten Beispieldaten aus lib/fixtures.ts — nicht
+ * mit eigens erfundenen. Dieselbe Quelle versorgt die Leistungsseiten, wenn
+ * das CMS nichts liefert; damit ist ausgeschlossen, dass diese Seite etwas
+ * zeigt, das es so nirgends gibt.
+ *
+ * Nicht eingebettet sind die Bausteine, die den Seitenrahmen bilden
+ * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen) und die beiden
+ * Heroes. Sie sind auf ihre Seite als Ganzes bezogen: die Navigation ist
+ * fixiert und läge über jedem Beispiel, die Heroes füllen ein ganzes Fenster
+ * und bringen eine Auftrittschoreografie mit, die genau einmal je Dokument
+ * laufen kann. Ein Beispiel davon wäre kein Beispiel, sondern ein zweiter,
+ * kaputter Seitenkopf. Sie stehen deshalb mit Beschreibung und Verweis da.
+ */
+import Design from "../../layouts/Design.astro";
+import { beispielLeistung as bl } from "../../lib/fixtures";
+import {
+  ZAHLEN, STELLEN, ABLAUF, STIMMEN,
+  VERGLEICH_SPALTEN, VERGLEICH_ZEILEN, VERGLEICH_HINWEIS,
+} from "../../lib/karriere";
+
+import Button from "../../components/ui/Button.astro";
+import Accordion from "../../components/ui/Accordion.astro";
+import Panel from "../../components/ui/Panel.astro";
+import Reviews from "../../components/ui/Reviews.astro";
+import Picture from "../../components/ui/Picture.astro";
+import BildRing from "../../components/ui/BildRing.astro";
+import ToothRings from "../../components/ui/ToothRings.astro";
+
+import Intro from "../../components/sections/Intro.astro";
+import Statement from "../../components/sections/Statement.astro";
+import Benefits from "../../components/sections/Benefits.astro";
+import BeforeAfter from "../../components/sections/BeforeAfter.astro";
+import Steps from "../../components/sections/Steps.astro";
+import Prices from "../../components/sections/Prices.astro";
+import Features from "../../components/sections/Features.astro";
+import Faq from "../../components/sections/Faq.astro";
+import Contact from "../../components/sections/Contact.astro";
+import Split from "../../components/sections/Split.astro";
+import Services from "../../components/sections/Services.astro";
+import Standards from "../../components/sections/Standards.astro";
+import Gallery from "../../components/sections/Gallery.astro";
+import Experts from "../../components/sections/Experts.astro";
+import Stories from "../../components/sections/Stories.astro";
+import Magazine from "../../components/sections/Magazine.astro";
+import Facts from "../../components/sections/Facts.astro";
+import Jobs from "../../components/sections/Jobs.astro";
+import Compare from "../../components/sections/Compare.astro";
+import Timeline from "../../components/sections/Timeline.astro";
+import Voices from "../../components/sections/Voices.astro";
+
+/* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
+   Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
+const RAHMEN = [
+  {
+    name: "Hero",
+    pfad: "components/sections/Hero.astro",
+    text:
+      "Der Seitenkopf der Startseite: Wortmarke über zwei Zeilen, der Zahn dazwischen - „MUND“ liegt dahinter, „PROPAGANDA“ davor. Die Wortmarke ist zugleich die h1 der Seite. Trägt die Auftrittschoreografie: Maske über der Schrift, Nav von oben, Bewertungsleiste und Scroll-Knopf zuletzt.",
+    grund: "Füllt ein ganzes Fenster und läuft genau einmal je Dokument an.",
+    zuSehen: "/",
+  },
+  {
+    name: "ServiceHero",
+    pfad: "components/sections/ServiceHero.astro",
+    text:
+      "Derselbe Auftritt für die Leistungsseiten, aber mit Titel statt Wortmarke und einem Bild rechts. Hängt an denselben data-Attributen wie der große Hero, deshalb greift dieselbe Choreografie ohne eigenen Code.",
+    grund: "Wie oben - ein zweiter Seitenkopf im Dokument.",
+    zuSehen: "/leistungen/veneers",
+  },
+  {
+    name: "Nav",
+    pfad: "components/ui/Nav.astro",
+    text:
+      "Die fixierte Leiste samt Menü. Überlebt Seitenwechsel über transition:persist, damit sie beim Wechsel nicht neu einfliegt.",
+    grund: "Fixiert - läge über jedem Beispiel auf dieser Seite.",
+    zuSehen: "/",
+  },
+  {
+    name: "Footer",
+    pfad: "components/ui/Footer.astro",
+    text:
+      "Der Seitenfuß: Kontakt, beide Praxen mit Anschrift, Leistungen und Rechtliches. Die Leistungsliste kommt aus derselben Quelle wie Menü und Services-Tabelle - drei Aufzählungen, eine Wahrheit.",
+    grund: "Schließt eine Seite ab; mitten im Dokument ergäbe er keinen Sinn.",
+    zuSehen: "/",
+  },
+  {
+    name: "Backdrop / Transition",
+    pfad: "components/ui/Backdrop.astro · Transition.astro",
+    text:
+      "Zwei Ebenen hinter und über allem: der körnige Hintergrund und die Schicht, die beim Seitenwechsel überblendet.",
+    grund: "Ganzflächig und unsichtbar, solange nichts passiert.",
+    zuSehen: "jeder Seitenwechsel",
+  },
+  {
+    name: "Thread",
+    pfad: "components/ui/Thread.astro",
+    text:
+      "Der durchlaufende Faden, der sich beim Scrollen über die ganze Seite zeichnet. Misst seinen Pfad einmal aus und liest die Transformationsmatrix dabei nur ein einziges Mal - die frühere Fassung tat das je Messpunkt und blockierte den Hauptstrang über eine Sekunde.",
+    grund: "Bezieht sich auf die Höhe des gesamten Dokuments.",
+    zuSehen: "/",
+  },
+  {
+    name: "Icons",
+    pfad: "components/ui/Icons.astro",
+    text:
+      "Das SVG-Sprite, einmal je Dokument. Alle Symbole liegen darin und werden per <use> aufgerufen.",
+    grund: "Unsichtbar - es ist die Quelle, nicht die Darstellung.",
+    zuSehen: "/design/styleguide",
+  },
+  {
+    name: "CmsImage",
+    pfad: "components/ui/CmsImage.astro",
+    text:
+      "Bild aus Sanity: baut srcset, respektiert den im Studio gesetzten Bildausschnitt und zeigt eine unscharfe Vorschau, bis das Motiv da ist. Fällt auf ein lokales Bild zurück, solange im CMS nichts liegt.",
+    grund: "Braucht ein Bildobjekt aus dem CMS; das lokale Gegenstück ist Picture.",
+    zuSehen: "/leistungen/veneers",
+  },
+];
+
+const FRAGEN_KURZ = bl.faq.slice(0, 3);
+
+const RING_BILDER = [
+  { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
+  { name: "praxis-01", widths: "640", alt: "Empfangsbereich" },
+  { name: "praxis-02", widths: "640", alt: "Wartebereich", caption: "Christburger Straße" },
+  { name: "abstract-01", widths: "640,1024" },
+  { name: "abstract-02", widths: "640,1024" },
+];
+---
+
+<Design title="Komponenten" aktiv="komponenten">
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">00</span>
+      <h1 class="d-teil__titel">Komponenten</h1>
+      <p class="d-teil__text">
+        Jeder Baustein der Seite mit Beschreibung, Quellpfad und lebendem
+        Beispiel. Farben, Typografie und Bewegungswerte stehen nicht hier,
+        sondern im <a class="c-link" href="/design/styleguide">Styleguide</a> -
+        zweimal dieselbe Sache zu zeigen heißt, sie zweimal pflegen zu müssen.
+      </p>
+      <p class="d-teil__text">
+        Die Beispiele laufen mit denselben Beispieldaten, die auch die
+        Leistungsseiten versorgen, solange im CMS nichts gepflegt ist. Ändert
+        sich eine Komponente, ändert sich diese Seite mit - sie zeigt die
+        echten Bausteine, keine Nachbauten.
+      </p>
+    </div>
+  </section>
+
+  {/* ================= Bedienelemente ================= */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">01</span>
+      <h2 class="d-teil__titel">Bedienelemente</h2>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Button</span>
+        <span class="d-probe__pfad">components/ui/Button.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Zweiteilig: Pille mit Beschriftung, daneben abgesetzt der runde Pfeil.
+        Rendert je nach Zweck <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>
+        oder <code>&lt;span&gt;</code> - Letzteres, wo er innerhalb eines bereits
+        verlinkten Bereichs sitzt, weil verschachtelte Links der Parser nicht
+        zulässt und das Layout dabei zerfällt.
+      </p>
+      <div class="d-buehne d-buehne--reihe">
+        <Button label="Termin buchen" href="#" />
+        <Button label="Dunkel" href="#" variant="dark" />
+        <Button label="Absenden" type="submit" />
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Accordion</span>
+        <span class="d-probe__pfad">components/ui/Accordion.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Immer nur ein Eintrag offen. Klappt über die Rasterzeile auf statt über
+        <code>display</code>, damit ein Übergang möglich ist. Sinkt beim Klick
+        als einziges Bedienelement nicht ein - eine ganze Zeile, die beim
+        Aufklappen zusammenzuckt, wirkt wie ein Ruckeln.
+      </p>
+      <div class="d-buehne">
+        <Accordion fragen={FRAGEN_KURZ} />
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Reviews</span>
+        <span class="d-probe__pfad">components/ui/Reviews.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Die Bewertungsleiste: Quelle, Sterne, Schnitt und Anzahl. Alle vier
+        Angaben kommen aus den Einstellungen im Studio, nichts davon steht im
+        Markup.
+      </p>
+      <div class="d-buehne">
+        <Reviews />
+      </div>
+    </div>
+  </section>
+
+  {/* ================= Flächen und Bilder ================= */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">02</span>
+      <h2 class="d-teil__titel">Flächen, Bilder, Zierrat</h2>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Panel</span>
+        <span class="d-probe__pfad">components/ui/Panel.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Der gerundete Kasten mit Topline, Überschrift und freiem Inhalt. Trägt
+        FAQ und Kontaktformular; alles, was als abgesetzte Fläche auf der Seite
+        steht, steckt darin.
+      </p>
+      <div class="d-buehne d-buehne--randlos">
+        <Panel topline="Beispiel" titel="Ein Panel" text="Die Zusatzzeile ist wahlfrei.">
+          <p style="max-width: 60ch">Beliebiger Inhalt im Schlitz.</p>
+        </Panel>
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Picture</span>
+        <span class="d-probe__pfad">components/ui/Picture.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Responsives Bild aus der lokalen Bildpipeline. AVIF zuerst, WebP als
+        Rückfall; der <code>src</code> zeigt auf die kleinste Breite, damit
+        alte Browser ohne <code>srcset</code> nicht das größte Bild ziehen.
+        Nimmt wahlweise einen Parallax-Wert entgegen.
+      </p>
+      <div class="d-buehne" style="max-width: 520px">
+        <Picture name="praxis-01" widths="640,1024" alt="Empfangsbereich Prenzlauer Allee" sizes="480px" />
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">BildRing</span>
+        <span class="d-probe__pfad">components/ui/BildRing.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Die Motive sitzen auf einem Zylinder, der Betrachter steht innen: die
+        Wölbung geht nach innen, die Karten laufen an den Rändern über das
+        Bild hinaus. Läuft langsam von selbst, rollt sanft aus, sobald der
+        Zeiger darauf steht, und lässt sich ziehen - ein Pixel Zeigerweg
+        entspricht einem Pixel Kartenweg. Radius und Perspektive rechnet das
+        Modul aus der gemessenen Kartenbreite, damit die Krümmung bei jeder
+        Fenstergröße dieselbe ist. Über die beiden Knöpfe und die Pfeiltasten
+        auch ohne Maus bedienbar.
+      </p>
+      <div class="d-buehne d-buehne--randlos">
+        <BildRing bilder={RING_BILDER} label="Beispielring" />
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">ToothRings</span>
+        <span class="d-probe__pfad">components/ui/ToothRings.astro</span>
+      </div>
+      <p class="d-probe__text">
+        Der Zierring aus konzentrischen Kreisen. Rein dekorativ und deshalb für
+        Vorlesegeräte ausgeblendet. Das Gegenstück <code>ToothLines</code> legt
+        dieselbe Handschrift als offene Linien hinter den Hero.
+      </p>
+      <div class="d-buehne d-buehne--dunkel" style="position: relative; min-height: 280px; overflow: hidden">
+        <ToothRings />
+      </div>
+    </div>
+  </section>
+
+  {/* ================= Sections ================= */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">03</span>
+      <h2 class="d-teil__titel">Sections</h2>
+      <p class="d-teil__text">
+        Die großen Bausteine, aus denen eine Seite zusammengesteckt wird. Jeder
+        läuft hier über die volle Breite, so wie im Einsatz - eine Section in
+        einem Kästchen zu zeigen verfälschte ihre Wirkung.
+      </p>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Split</span>
+        <span class="d-probe__pfad">components/sections/Split.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Text links, Bildmaske rechts. Die Maske wird per <code>clip-path</code>
+        beschnitten statt über <code>overflow</code> - bei gerundeten Ecken und
+        beschleunigten Kindern zeigte sich sonst eine Haarlinie an der Kante.
+      </p>
+      <div class="d-live"><Split /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Services</span>
+        <span class="d-probe__pfad">components/sections/Services.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Die Leistungstabelle. Zeilen und Preise kommen aus der Leistungs-Collection
+        im Studio, dieselbe Quelle wie Menü und Fuß. Beim Überfahren färbt sich
+        die Linie mit, und eine Bildvorschau folgt dem Zeiger.
+      </p>
+      <div class="d-live"><Services /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Standards</span>
+        <span class="d-probe__pfad">components/sections/Standards.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Nummerierte Auswahlliste links, Bild rechts in der Zahnmaske. Die Liste
+        klappt immer genau einen Eintrag auf und wandert von selbst weiter.
+      </p>
+      <div class="d-live"><Standards /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Benefits</span>
+        <span class="d-probe__pfad">components/sections/Benefits.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Dasselbe Verhalten wie Standards, anderes Erscheinungsbild: braunes
+        Vollbreiten-Band, Ziffern statt Nummern, gerundetes Bildfeld. Die Liste
+        hat eine feste Höhe - mit Mindesthöhe trug der längste Eintrag sie über
+        das Maß hinaus und das ganze Band sprang beim Durchlaufen.
+      </p>
+      <div class="d-live"><Benefits {...bl.benefits} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Gallery</span>
+        <span class="d-probe__pfad">components/sections/Gallery.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Die Standorte. Zwei Darstellungen derselben Motive:
+        <code>variante="reihe"</code> lässt die Bildreihe beim Scrollen
+        waagerecht durchlaufen, <code>variante="ring"</code> setzt sie auf den
+        Zylinder. Darunter die beiden Praxen mit Anschrift, aus den
+        Einstellungen. Hier steht die Reihe - den Ring zeigt der Baustein oben.
+      </p>
+      <div class="d-live"><Gallery /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Experts</span>
+        <span class="d-probe__pfad">components/sections/Experts.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">Das Team - Bild, Namen, Kurzprofil.</p>
+      <div class="d-live"><Experts /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Stories</span>
+        <span class="d-probe__pfad">components/sections/Stories.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Patientenstimmen als Kartenfächer. Die Pfeile sitzen links und rechts
+        des Fächers, das Zitat direkt darunter, damit beides zugleich ins Bild
+        passt. Gefüllte braune Kreise mit grauem Zeichen, im Hover umgekehrt -
+        ein pinkes Zeichen auf Taupe lag bei 1,26:1 und damit weit unter den
+        3:1, die WCAG für Bedienelemente verlangt.
+      </p>
+      <div class="d-live"><Stories /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Intro</span>
+        <span class="d-probe__pfad">components/sections/Intro.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Einstiegstext: Überschrift links, zwei Textspalten daneben.
+      </p>
+      <div class="d-live"><Intro {...bl.intro} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Statement</span>
+        <span class="d-probe__pfad">components/sections/Statement.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Ein einzelner Satz über die volle Breite. Trennt zwei inhaltliche
+        Blöcke und gibt der Seite Luft.
+      </p>
+      <div class="d-live">{bl.statement && <Statement {...bl.statement} />}</div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">BeforeAfter</span>
+        <span class="d-probe__pfad">components/sections/BeforeAfter.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Zwei Aufnahmen übereinander, dazwischen ein Schieberegler. Über
+        Tastatur bedienbar, nicht nur per Zeiger.
+      </p>
+      <div class="d-live"><BeforeAfter /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Steps</span>
+        <span class="d-probe__pfad">components/sections/Steps.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">Der Behandlungsablauf als nummerierte Folge.</p>
+      <div class="d-live">
+        {bl.schritte && <Steps titel={bl.schritte.titel} schritte={bl.schritte.eintraege} />}
+      </div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Prices</span>
+        <span class="d-probe__pfad">components/sections/Prices.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">Die Preiskarten einer Leistung.</p>
+      <div class="d-live"><Prices preise={bl.preise} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Features</span>
+        <span class="d-probe__pfad">components/sections/Features.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt.
+      </p>
+      <div class="d-live">{bl.features && <Features zeilen={bl.features} />}</div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Magazine</span>
+        <span class="d-probe__pfad">components/sections/Magazine.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Beitragskarten als Schieber. Teilt sich Pfeile und Punkte mit der
+        Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
+      </p>
+      <div class="d-live"><Magazine /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Faq</span>
+        <span class="d-probe__pfad">components/sections/Faq.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Das Akkordeon im Panel. Die Fragen kommen je Seite von woanders - auf
+        den Leistungsseiten aus dem CMS, auf der Startseite aus der Seite selbst.
+      </p>
+      <div class="d-live"><Faq titel="Häufige Fragen" fragen={bl.faq} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Facts</span>
+        <span class="d-probe__pfad">components/sections/Facts.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Zahlenleiste. Die Werte zählen beim Hereinscrollen hoch - der Zielwert
+        steht im Markup, das Skript setzt ihn nur kurz auf null. Ohne
+        JavaScript und ohne Bewegung steht sofort die richtige Zahl da.
+      </p>
+      <div class="d-live"><Facts topline="Beispiel" headline="Was sich nachrechnen lässt" zahlen={ZAHLEN} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Jobs</span>
+        <span class="d-probe__pfad">components/sections/Jobs.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Offene Stellen, jede Zeile klappt auf. Bringt kein eigenes JavaScript
+        mit: Die Zeilen tragen dieselben data-Attribute wie das Akkordeon,
+        damit greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
+        Vorlesegeräte beim Ansteuern den Stellentitel ausgeben.
+      </p>
+      <div class="d-live"><Jobs topline="Beispiel" headline="Offene Stellen" stellen={STELLEN.slice(0, 2)} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Compare</span>
+        <span class="d-probe__pfad">components/sections/Compare.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Vergleichstabelle. Die ganze Breitenaufteilung hängt an einer
+        Custom Property - <code>--columns-in-view</code> setzt, in wie viele
+        Spalten sich jede Zeile teilt; Kopf und Zellen richten sich danach
+        aus, ohne dass eine Breite von Hand nachgezogen werden müsste. Der
+        Kopf bleibt beim Scrollen unter der Leiste stehen. Zellen nehmen
+        Text, ein Ja/Nein-Zeichen oder eine Pille.
+      </p>
+      <div class="d-live">
+        <Compare topline="Beispiel" headline="Vergleich" spalten={VERGLEICH_SPALTEN} zeilen={VERGLEICH_ZEILEN.slice(0, 5)} hinweis={VERGLEICH_HINWEIS} />
+      </div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Voices</span>
+        <span class="d-probe__pfad">components/sections/Voices.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Zitatkarten, versetzt statt in einer Reihe. Der Versatz steckt in den
+        Daten, nicht in <code>:nth-child</code> - bei einer vierten Stimme
+        bräuchte eine Regel nach Position sonst eine neue Ausnahme.
+      </p>
+      <div class="d-live"><Voices topline="Beispiel" headline="Stimmen" stimmen={STIMMEN} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Timeline</span>
+        <span class="d-probe__pfad">components/sections/Timeline.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Ein Ablauf als Bahn: Die Linie zieht sich beim Scrollen entlang, die
+        Marken springen an, sobald sie erreicht sind. Unter 900px kippt die
+        Bahn in die Senkrechte. Die gefüllte Linie ist der voreingestellte
+        Zustand - ohne JavaScript steht sie vollständig da, eine leere Bahn
+        wäre eine falsche Aussage über den Ablauf.
+      </p>
+      <div class="d-live"><Timeline topline="Beispiel" headline="Ablauf" etappen={ABLAUF} /></div>
+    </div>
+
+    <div class="d-abschnitt">
+      <div class="d-probe__kopf d-probe__kopf--breit">
+        <span class="d-probe__name">Contact</span>
+        <span class="d-probe__pfad">components/sections/Contact.astro</span>
+      </div>
+      <p class="d-probe__text d-eingerueckt">
+        Das Kontaktformular im Panel, mit Vorauswahl der Leistung und einem
+        Feld für ein Foto.
+      </p>
+      <div class="d-live"><Contact leistung={bl.titel} /></div>
+    </div>
+  </section>
+
+  {/* ================= Seitenrahmen ================= */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">04</span>
+      <h2 class="d-teil__titel">Seitenrahmen und Einzelstücke</h2>
+      <p class="d-teil__text">
+        Diese Bausteine lassen sich nicht als Beispiel einbetten - jeder von
+        ihnen bezieht sich auf ein ganzes Dokument. Statt eines kaputten
+        Nachbaus steht hier, was sie tun und wo sie zu sehen sind.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-raster d-raster--weit">
+        {RAHMEN.map((r) => (
+          <div class="d-notiz">
+            <p class="d-probe__name" style="margin-bottom: var(--sp-1)">{r.name}</p>
+            <p class="d-probe__pfad" style="margin-bottom: var(--sp-3)">{r.pfad}</p>
+            <p style="margin-bottom: var(--sp-3)">{r.text}</p>
+            <p><strong>Nicht eingebettet:</strong> {r.grund}</p>
+            <p style="margin-top: var(--sp-2)">
+              Zu sehen: {r.zuSehen.startsWith("/") ? <a class="c-link" href={r.zuSehen}>{r.zuSehen}</a> : r.zuSehen}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* Ein Section-Beispiel läuft über die volle Breite. Der abgesetzte Rahmen
+       oben und unten macht sichtbar, wo es anfängt und aufhört — ohne ihn
+       liefen zwei Beispiele optisch ineinander. */
+    .d-abschnitt {
+      margin-bottom: var(--sp-12);
+    }
+
+    .d-probe__kopf--breit,
+    .d-eingerueckt {
+      margin-inline: var(--site-margin);
+    }
+
+    .d-live {
+      position: relative;
+      border-top: var(--bw) dashed var(--c-line);
+      border-bottom: var(--bw) dashed var(--c-line);
+      /* Die Sections bringen ihre eigenen Außenabstände mit; einige laufen
+         über die Fensterbreite hinaus (Vollbreiten-Bänder rechnen mit
+         50vw). Deshalb hier beschneiden, sonst scrollt die Seite seitwärts. */
+      overflow: hidden;
+    }
+
+    .d-raster--weit {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .d-notiz p {
+      line-height: 1.5;
+    }
+  </style>
+</Design>

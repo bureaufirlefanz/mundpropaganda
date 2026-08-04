@@ -1,0 +1,78 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#d6d6d6" />
+
+<!-- Die beiden Schnitte, die above the fold sichtbar sind, werden
+     vorgeladen — sonst blitzt die Fallback-Schrift im Hero auf. -->
+<link
+  rel="preload"
+  href="/fonts/PPNeueMontreal-Medium.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+<link
+  rel="preload"
+  href="/fonts/GT-Pressura-Mono-Light.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+
+<!-- Die Alphamaske für das Milchglas hinter dem Zahn. Ohne Preload wird
+     sie erst nach dem ersten Rendern geladen und der Blur setzt sichtbar
+     verspätet ein. -->
+<link rel="preload" href="/svg/tooth-3d-mask.png" as="image" />
+
+<link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+
+<!-- Läuft synchron vor dem ersten Bild: kommt der Aufruf von einem
+     Seitenwechsel, deckt der Vorhang von Anfang an ab. Würde das erst das
+     Modul entscheiden, wäre die Seite längst zu sehen und der Vorhang
+     legte sich sichtbar darüber. Die Markierung wird sofort gelöscht,
+     damit ein Reload nicht hängenbleibt. -->
+<!-- Kritisches CSS für den Seitenwechsel. Bewusst hier und nicht nur im
+     Stylesheet: die Spalten müssen mit dem allerersten Bild abdecken. Im
+     Entwicklungsmodus liefert Vite das CSS per JavaScript aus — bis es da
+     ist, wäre die neue Seite ungestylt zu sehen. Die paar Zeilen sind die
+     Versicherung dagegen. -->
+<style id="mp-critical">
+  .c-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    overflow: clip;
+  }
+  .c-transition__panels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  .c-transition__panel {
+    position: relative;
+    top: -100%;
+    width: 100%;
+    height: 100%;
+    background: #403229;
+  }
+  .is-entering .c-transition__panel {
+    transform: translateY(100%);
+  }
+</style>
+
+<script>
+  try {
+    if (sessionStorage.getItem("mp:transition")) {
+      sessionStorage.removeItem("mp:transition");
+      document.documentElement.classList.add("is-entering");
+      // Falls das Modul nicht lädt, gibt der Vorhang von selbst frei.
+      setTimeout(function () {
+        document.documentElement.classList.remove("is-entering");
+      }, 2500);
+    }
+  } catch (e) {}
+</script>

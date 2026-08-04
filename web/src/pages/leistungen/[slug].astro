@@ -1,0 +1,72 @@
+---
+/**
+ * Eine Route für alle Leistungsseiten. Im Prototyp war jede Seite eine
+ * eigene HTML-Datei mit dupliziertem Markup — hier entsteht sie aus den
+ * Daten. Das ist der eigentliche Gewinn der Umstellung.
+ */
+import Base from "../../layouts/Base.astro";
+import ServiceHero from "../../components/sections/ServiceHero.astro";
+import Intro from "../../components/sections/Intro.astro";
+import Statement from "../../components/sections/Statement.astro";
+import Prices from "../../components/sections/Prices.astro";
+import Benefits from "../../components/sections/Benefits.astro";
+import BeforeAfter from "../../components/sections/BeforeAfter.astro";
+import Steps from "../../components/sections/Steps.astro";
+import Stories from "../../components/sections/Stories.astro";
+import Features from "../../components/sections/Features.astro";
+import Magazine from "../../components/sections/Magazine.astro";
+import Faq from "../../components/sections/Faq.astro";
+import Contact from "../../components/sections/Contact.astro";
+import { ladeLeistung, ladeSlugs } from "../../lib/leistungen";
+
+// Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
+// zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
+export async function getStaticPaths() {
+  return await ladeSlugs();
+}
+
+const { slug } = Astro.params;
+const { daten: d, ausCms } = await ladeLeistung(slug!);
+---
+
+<Base title={`${d.titel} - Mundpropaganda`} description={d.seoBeschreibung ?? d.hero.text}>
+  <ServiceHero
+    topline={d.topline}
+    titel={d.titel}
+    text={d.hero.text}
+    bild={d.hero.bild}
+    alt={d.hero.alt ?? ""}
+  />
+
+  <Intro {...d.intro} />
+
+  <Benefits {...d.benefits} />
+
+  {d.vorherNachher && <BeforeAfter {...d.vorherNachher} />}
+
+  {d.statement && <Statement {...d.statement} />}
+
+  {d.schritte && <Steps titel={d.schritte.titel} schritte={d.schritte.eintraege} />}
+
+  <Stories />
+
+  <Prices preise={d.preise} />
+
+  {d.features && <Features zeilen={d.features} />}
+
+  <Magazine
+    topline="Passend zum Thema"
+    text={`Weiterlesen zu ${d.titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
+  />
+
+  <Faq titel={`Häufige Fragen zu ${d.titel}`} fragen={d.faq} />
+
+  <Contact leistung={d.titel} />
+
+  {!ausCms && (
+    <p class="container t-mono" style="padding-block: 2rem; opacity:.5">
+      Beispieldaten - im Dataset „production" liegt noch kein Dokument vom Typ „leistung".
+    </p>
+  )}
+</Base>
+

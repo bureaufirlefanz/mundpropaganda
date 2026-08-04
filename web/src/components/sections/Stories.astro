@@ -1,0 +1,424 @@
+---
+/**
+ * Karten und Zitate gehören zusammen: Beim Blättern wechselt beides
+ * gleichzeitig, deshalb ist es EIN Datensatz und nicht zwei parallele
+ * Listen. Zwei Listen liefen beim nächsten Eintrag auseinander, und niemand
+ * merkte es, bis ein Zitat unter dem falschen Gesicht stünde.
+ *
+ * Die Vorgaben stehen hier, damit der Baustein ohne CMS lauffähig bleibt.
+ */
+import Button from "../ui/Button.astro";
+import Picture from "../ui/Picture.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+
+export interface Geschichte {
+  name: string;
+  zitat?: string;
+  /** Bild aus dem CMS. Fehlt es, greift das eingebaute Motiv. */
+  bild?: Bildquelle;
+  /** Name aus der lokalen Bildpipeline — nur für die Vorgaben. */
+  bildName?: string;
+  bildBreiten?: string;
+  alt?: string;
+}
+
+interface Props {
+  eintraege?: Geschichte[];
+}
+
+const { eintraege = [
+  { name: "Karolina", bildName: "smile-portrait", bildBreiten: "563", alt: "Karolina - Veneers", zitat: "Ich hatte vorher bei drei Praxen einen Kostenvoranschlag geholt und überall dasselbe Gefühl: Man verkauft mir ein Produkt. Hier hat mir zum ersten Mal jemand erklärt, warum weniger abschleifen mehr ist - und warum das bei mir länger dauert und trotzdem die bessere Entscheidung war. Nach acht Monaten würde ich es genauso wieder machen. Ich lache wieder auf Fotos, ohne vorher zu überlegen." },
+  { name: "Jonas", bildName: "motion-01", bildBreiten: "640,1024", alt: "Jonas - Keramikimplantate", zitat: "Nach dem Implantat hatte ich mit Wochen Schonung gerechnet. Am zweiten Tag war ich wieder im Büro. Was mir am meisten geblieben ist: Man hat mir vorher genau gesagt, was passiert, wie lange es dauert und was danach kommt - und dann ist genau das passiert. Keine Überraschung, keine Nachforderung, kein Termin, der plötzlich doch noch nötig war." },
+  { name: "Alina", bildName: "motion-02", bildBreiten: "640,1024", alt: "Alina - Aligner", zitat: "Achtzehn Monate Aligner, alle sechs Wochen ein Termin. Nie das Gefühl gehabt, dass jemand nur die Schiene wechselt und weiterwill. Zwischendurch gab es zwei Stellen, die nicht so liefen wie geplant - das wurde offen angesprochen und nachjustiert, statt es auszusitzen. Am Ende sah es aus wie im Mock-up vom ersten Tag." },
+  { name: "Mo", bildName: "motion-03", bildBreiten: "640,1024", alt: "Mo - Bleaching", zitat: "Ich wollte eigentlich nur zwei Nuancen heller. Herausgekommen ist ein Gespräch darüber, warum meine Zähne überhaupt nachgedunkelt sind und was ich daran ändern kann, bevor überhaupt gebleicht wird. Das Bleaching kam danach - und hält bis heute, weil die Ursache mit behandelt wurde und nicht nur das Ergebnis." },
+  { name: "Thea", bildName: "motion-04", bildBreiten: "640,1024", alt: "Thea - Veneers", zitat: "Ich habe zehn Jahre nicht auf Fotos gelächelt. Das Mock-up zum Probetragen hat mir die Entscheidung abgenommen: Ich konnte sehen, wohin es geht, im Spiegel, im Tageslicht und auf Fotos, bevor irgendetwas endgültig war. Diese eine Stunde hat mehr gebracht als alle Beratungsgespräche davor zusammen." },
+] } = Astro.props;
+---
+
+<!-- ==================================================================
+           TRANSFORMATION STORIES
+           ================================================================== -->
+      <section class="s-stories" data-stories>
+        <!-- Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
+             Scroll — dadurch läuft der Schriftzug am oberen Rand entlang,
+             ohne dass er als Marquee gebaut werden muss. -->
+        <div class="s-stories__ring" data-stories-ring aria-hidden="true">
+          <svg viewBox="0 0 1000 1000">
+            <defs>
+              <path
+                id="storiesCircle"
+                d="M 500,500 m -430,0 a 430,430 0 1,1 860,0 a 430,430 0 1,1 -860,0"
+                fill="none"
+              />
+            </defs>
+            <text>
+              <textPath href="#storiesCircle" startOffset="0%">
+                Transformation Stories - Transformation Stories - Transformation
+                Stories - Transformation Stories -
+              </textPath>
+            </text>
+          </svg>
+        </div>
+        <p class="sr-only">Transformation Stories</p>
+
+        <div class="s-stories__deck" data-deck>
+          <div class="s-stories__stack" data-deck-stack>
+            <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
+                 dahinter durchscheinen lassen. -->
+            {eintraege.map((e) => (
+              <figure class="s-stories__card" data-deck-card>
+                {istCmsBild(e.bild) ? (
+                  <CmsImage quelle={e.bild} alt={e.alt ?? e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
+                ) : (
+                  <Picture name={e.bildName ?? "smile-portrait"} widths={e.bildBreiten ?? "563"} alt={e.alt ?? e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
+                )}
+                <figcaption class="s-stories__name">{e.name}</figcaption>
+              </figure>
+            ))}
+          </div>
+
+          {/* Pfeile flankieren den Fächer, der Zähler sitzt darunter. Keine
+              gemeinsame Hülle mehr: nur als direkte Kinder liegen sie im
+              selben Raster wie der Stapel und lassen sich daneben setzen.
+              Der gemeinsame Auslöser hält sie trotzdem im Gleichschritt. */}
+          <button class="s-stories__nav" data-deck-prev type="button" aria-label="Vorherige Geschichte"
+                  data-reveal="fade" data-reveal-trigger=".s-stories__deck">
+            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+          </button>
+
+          <button class="s-stories__nav" data-deck-next type="button" aria-label="Nächste Geschichte"
+                  data-reveal="fade" data-reveal-trigger=".s-stories__deck">
+            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+          </button>
+
+          <span class="s-stories__count" data-deck-count
+                data-reveal="fade" data-reveal-trigger=".s-stories__deck">1 / 5</span>
+        </div>
+      </section>
+
+      <section class="s-quote">
+        <div class="s-quote__inner">
+          <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
+
+          <!-- Wechselt mit der vordersten Karte oben. Alle Zitate liegen
+               übereinander, sichtbar ist immer genau eines. -->
+          <div class="s-quote__stage" data-deck-quotes>
+            {eintraege.map((e, i) => (
+              <blockquote class="s-quote__text" data-deck-quote data-active={i === 0 ? "true" : undefined}>{e.zitat}</blockquote>
+            ))}
+          </div>
+
+          <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
+        </div>
+
+        <div class="s-quote__foot">
+          <Button label="Ganze Story lesen" href="#" />
+        </div>
+      </section>
+
+<style>
+  /* Gebogener Lauftext auf einem Kreisbogen + gestapelte Karten, die beim
+     Scrollen auffächern.
+
+     Über der Taupe-Fläche, die von unten heraufreicht — sonst verschwänden
+     Karten und Steuerung darunter. */
+  .s-stories {
+    position: relative;
+    z-index: 1;
+    padding-block: calc(var(--section-space-lg) * 1.7) 0;
+    overflow: hidden;
+  }
+
+  /* Auf schmalen Fenstern soll vom Textkreis nur der obere Bogen zu sehen
+     sein — der untere verschwindet hinter der Taupe-Fläche.
+
+     Dafür fällt der z-index der Section weg: Mit ihm bildet sie einen
+     Stapelkontext, und darin lässt sich nichts unter die Taupe schieben, so
+     klein man den Wert am Ring auch macht. Ohne ihn liegen Ring (0) und
+     Taupe (0) im selben Kontext, die Taupe kommt später im Dokument und
+     deckt ihn ab; das Kartendeck hebt sich mit z-index 1 darüber.
+
+     Nur hier, nicht global: Auf breiten Fenstern bleibt die Staffelung so,
+     wie sie entworfen wurde. */
+  @media (max-width: 900px) {
+    .s-stories {
+      z-index: auto;
+    }
+  }
+
+  /* Voller Kreis, 135vw breit — die Schrift läuft oben durchs Bild und
+     verschwindet seitlich aus dem Viewport. Gedreht wird das ganze SVG. */
+  .s-stories__ring {
+    position: absolute;
+    top: clamp(48px, 7vw, 130px);
+    left: 50%;
+    translate: -50% 0;
+    width: 135vw;
+    aspect-ratio: 1;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+  }
+
+  .s-stories__ring svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Angabe in viewBox-Einheiten: das SVG wird auf 135vw gestreckt, ein Wert
+     von 48 landet dadurch bei rund 110px auf dem Schirm. */
+  .s-stories__ring text {
+    font-family: var(--f-sans);
+    font-weight: 500;
+    font-size: 48px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    fill: var(--c-dark);
+  }
+
+  /* --- Kartendeck --------------------------------------------------------
+     Die Karten liegen gestapelt, nicht nebeneinander. Die vorderste ist groß
+     und gerade, dahinter staffeln sich die nächsten leicht versetzt.
+     Bedienung per Wischen, Buttons oder Pfeiltasten. */
+
+  /* Pfeile links und rechts vom Fächer, der Zähler darunter — alles auf einer
+     Höhe statt untereinander. Dadurch rückt das Zitat näher heran und beides
+     ist auf einem Schirm zugleich zu sehen. */
+  .s-stories__deck {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-areas:
+      "zurueck stapel vor"
+      ".       zaehler .";
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+
+    /* Die Abstände halten den Fächer frei und sind aus seiner Geometrie
+       gerechnet, nicht geschätzt (modules/stories.js):
+
+         seitlich   19 % der Kartenbreite versetzt
+                  + Drehung bis 7° an einer Karte im Verhältnis 3:4
+                  ≈ 0,27 × Fächerbreite
+
+         unten      4,8 % versetzt + dieselbe Drehung
+                  ≈ 0,15 × Fächerbreite
+
+       Die Fächerbreite ist clamp(220px, 30vw, 420px), deshalb wachsen beide
+       Abstände mit vw und sind an denselben Enden gedeckelt. Dazu je rund
+       16px Luft, damit Pfeil und Karte sich nicht berühren.
+
+       Zu kleine Werte fallen im Ruhezustand nicht auf: die hinteren Karten
+       liegen dann unter den Pfeilen, und erst beim Weiterblättern schiebt
+       sich eine Karte sichtbar darüber. */
+    column-gap: clamp(76px, calc(8.2vw + 16px), 132px);
+    row-gap: clamp(48px, calc(4.4vw + 16px), 78px);
+
+    margin-top: clamp(40px, 5vw, 96px);
+
+    /* Knapp gehalten: zusammen mit dem Innenabstand des Zitatbands darunter
+       bleiben rund 24px zwischen Zähler und Zitat. Mehr, und die beiden
+       passen auf 720px hohen Fenstern nicht mehr gemeinsam ins Bild. */
+    padding-bottom: var(--sp-2);
+  }
+
+  .s-stories__deck [data-deck-prev] {
+    grid-area: zurueck;
+  }
+
+  .s-stories__deck [data-deck-next] {
+    grid-area: vor;
+  }
+
+  .s-stories__count {
+    grid-area: zaehler;
+  }
+
+  .s-stories__stack {
+    grid-area: stapel;
+    position: relative;
+    width: clamp(220px, 30vw, 420px);
+    aspect-ratio: 3 / 4;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  .s-stories__stack:active {
+    cursor: grabbing;
+  }
+
+  .s-stories__card {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    transform-origin: center bottom;
+    will-change: transform, opacity;
+    box-shadow: 0 24px 60px -20px rgb(64 50 41 / 0.28);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* :global(img), weil die Motive aus Picture.astro kommen. */
+  .s-stories__card :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .s-stories__name {
+    position: absolute;
+    left: 50%;
+    bottom: var(--sp-4);
+    translate: -50% 0;
+    padding: 6px 16px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    font-family: var(--f-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Gefüllter Kreis ohne Rand: braun mit grauem Zeichen, beim Überfahren
+     pink mit braunem. Gemessen 8.65:1 im Ruhezustand und 5.50:1 im Hover —
+     WCAG 1.4.11 verlangt für Bedienelemente 3:1. Der frühere Entwurf,
+     pinkes Zeichen auf Taupe, lag bei 1.26:1. */
+  .s-stories__nav {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-round);
+    background: var(--c-dark);
+    border: 0;
+    color: var(--c-grey);
+    transition: background var(--d-fast) var(--e-swift),
+      color var(--d-fast) var(--e-swift);
+  }
+
+  .s-stories__nav svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .s-stories__nav[data-deck-prev] svg {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) {
+    .s-stories__nav:hover {
+      background: var(--c-brand);
+      color: var(--c-dark);
+    }
+  }
+
+  .s-stories__count {
+    text-align: center;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.08em;
+    color: var(--c-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Zitatband ---------------------------------------------------------
+     Die Fläche reicht bis auf zwei Drittel der Kartenhöhe hinauf — die
+     Karten stehen dadurch halb im Taupe und halb im Seitengrund.
+
+     Der negative Außenabstand zieht nur die Fläche hoch; der gleich große
+     Innenabstand hält den Text an seinem Platz. Ohne ihn wanderte das Zitat
+     mit nach oben und lag unter den Karten. */
+  .s-quote {
+    --quote-lift: clamp(240px, 27vw, 400px);
+
+    position: relative;
+    z-index: 0;
+    margin-top: calc(-1 * var(--quote-lift));
+    /* Nur ein knapper Abstand über den Hub hinaus: das Zitat soll dicht
+       unter der Steuerung stehen und mit ihr als ein Block lesen. */
+    padding: calc(var(--quote-lift) + var(--sp-2)) var(--site-margin) var(--sp-12);
+    background: var(--c-taupe);
+    color: var(--c-dark);
+  }
+
+  .s-quote__inner {
+    position: relative;
+    display: flex;
+    gap: clamp(24px, 3vw, 56px);
+    align-items: flex-start;
+    justify-content: center;
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+
+  .s-quote__mark {
+    font-size: clamp(4rem, 9vw, 9rem);
+    line-height: 0.7;
+    font-weight: 500;
+    color: var(--c-dark);
+    flex: 0 0 auto;
+  }
+
+  /* Alle Zitate liegen übereinander, sichtbar ist immer genau eines. Die
+     Bühne behält die Höhe des längsten — so springt der Abschnitt beim
+     Wechsel nicht. */
+  .s-quote__stage {
+    position: relative;
+    display: grid;
+    flex: 1;
+  }
+
+  .s-quote__text {
+    grid-area: 1 / 1;
+    columns: 2;
+    column-gap: clamp(32px, 4vw, 72px);
+    font-size: var(--fs-text-large);
+    line-height: 1.4;
+    opacity: 0;
+  }
+
+  .s-quote__text[data-active="true"] {
+    opacity: 1;
+  }
+
+  .s-quote__foot {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(32px, 4vw, 64px);
+  }
+
+  /* Unter 700px ist der Fächer breiter als der Platz daneben. Dort stehen die
+     Pfeile wieder unter ihm, mit dem Zähler dazwischen — wie zuvor. */
+  @media (max-width: 700px) {
+    .s-stories__deck {
+      grid-template-areas:
+        "stapel  stapel  stapel"
+        "zurueck zaehler vor";
+      column-gap: var(--sp-5);
+      row-gap: var(--sp-6);
+    }
+
+    .s-stories__count {
+      min-width: 5ch;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .s-quote__text {
+      columns: 1;
+    }
+
+    .s-quote__inner {
+      gap: var(--sp-4);
+    }
+  }
+</style>

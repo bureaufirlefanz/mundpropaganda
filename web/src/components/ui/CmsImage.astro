@@ -1,0 +1,81 @@
+---
+/**
+ * Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im
+ * Studio keines gepflegt ist. Beide Fälle sehen im Markup gleich aus, damit
+ * die Sections keine Fallunterscheidung tragen müssen.
+ *
+ * Gegenstück zu Picture.astro: das bedient die feste Bildpipeline des
+ * Prototyps, dieses hier das CDN.
+ */
+import { istCmsBild, bildUrl, bildSrcset, type Bildquelle } from "../../lib/bilder";
+
+interface Props {
+  quelle: Bildquelle | undefined | null;
+  alt?: string;
+  /** Breiten für das srcset. Voreinstellung deckt Karten bis Vollbild ab. */
+  widths?: number[];
+  sizes?: string;
+  /** Nur für das LCP-Bild einer Seite setzen. */
+  eager?: boolean;
+  /**
+   * Seitenverhältnis (Breite/Höhe). Nur setzen, wenn serverseitig
+   * beschnitten werden soll — dann wirkt auch der Bildmittelpunkt aus dem
+   * Studio. Ohne Angabe beschneidet CSS über `object-fit: cover`.
+   */
+  ratio?: number;
+  /**
+   * Alles Übrige geht unverändert an das <img>. Die Module greifen über
+   * data-Attribute zu (`data-standards-img`, `data-parallax`) — würde die
+   * Komponente sie verschlucken, fände das Modul sein Markup nicht mehr.
+   */
+  [key: string]: unknown;
+}
+
+const {
+  quelle,
+  alt = "",
+  widths = [640, 1024, 1600, 2200],
+  sizes = "100vw",
+  eager = false,
+  ratio,
+  ...rest
+} = Astro.props;
+
+const cms = istCmsBild(quelle);
+
+/* Der Alternativtext steht am Bild im Studio. Ein ausgeschriebenes alt am
+   Aufrufort gewinnt trotzdem — dekorative Bilder brauchen ein leeres. */
+const beschreibung = alt || (cms ? (quelle as any).alt ?? "" : "");
+
+/* Platzhalter, bis das Bild da ist. Anders als die lokalen Motive liegen
+   CMS-Bilder auf einem fremden Host — ohne das bleibt der Rahmen bis dahin
+   leer. Als Hintergrund am Bild selbst, damit nichts zusätzlich im DOM steht. */
+const lqip = cms ? (quelle as any).asset?.metadata?.lqip : undefined;
+---
+
+{
+  quelle == null ? null : cms ? (
+    <img
+      {...rest}
+      src={bildUrl(quelle as any, widths[widths.length - 1], ratio)}
+      srcset={bildSrcset(quelle as any, widths, ratio)}
+      sizes={sizes}
+      alt={beschreibung}
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : undefined}
+      decoding={eager ? undefined : "async"}
+      style={lqip
+        ? `background-image:url(${lqip});background-size:cover;background-position:center`
+        : undefined}
+    />
+  ) : (
+    <img
+      {...rest}
+      src={quelle as string}
+      alt={beschreibung}
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : undefined}
+      decoding={eager ? undefined : "async"}
+    />
+  )
+}

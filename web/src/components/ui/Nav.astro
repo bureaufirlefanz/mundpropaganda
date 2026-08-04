@@ -1,0 +1,358 @@
+---
+/**
+ * Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie
+ * Services-Tabelle und Footer. Die vierte Spalte („Direkt") sind Sprungmarken
+ * auf dieser Seite und bleibt deshalb ausgeschrieben.
+ */
+import Button from "./Button.astro";
+import { ladeLeistungsliste, fuerGruppe, pfad, GRUPPEN } from "../../lib/leistungsliste";
+
+const liste = await ladeLeistungsliste();
+const spalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(liste, g.wert) }));
+
+/* Das Mobil-Menü zeigt weniger: die erste Spalte und die Sprungmarken. */
+
+---
+
+<header class="c-nav" data-nav data-hidden="false" data-scrolled="false">
+  <div class="c-nav__inner">
+    <a class="c-nav__logo" href="/" aria-label="Mundpropaganda - zur Startseite">
+      <svg aria-hidden="true"><use href="#i-logo" /></svg>
+      <span>Mundpropaganda</span>
+    </a>
+
+    <nav class="c-nav__menu" aria-label="Hauptnavigation">
+      <div class="c-nav__item" data-nav-item="leistungen" data-open="false">
+        <a class="c-nav__link" href="#leistungen">Leistungen</a>
+
+      </div>
+
+      <div class="c-nav__item" data-nav-item>
+        <a class="c-nav__link" href="#experten">Praxis</a>
+      </div>
+      <div class="c-nav__item" data-nav-item>
+        <a class="c-nav__link" href="#magazin">Magazin</a>
+      </div>
+      <div class="c-nav__item" data-nav-item>
+        <a class="c-nav__link" href="#kontakt">Kontakt</a>
+      </div>
+    </nav>
+
+    <div class="c-nav__actions">
+      <Button label="Termin buchen" href="#kontakt" />
+
+      <button
+        class="c-nav__burger"
+        data-burger
+        type="button"
+        aria-expanded="false"
+        aria-label="Menü öffnen"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="c-megamenu" data-megamenu="leistungen">
+    <div class="c-megamenu__inner">
+      {spalten.map((spalte) => (
+        <div data-megamenu-item>
+          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          {spalte.eintraege.map((l) => (
+            <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
+          ))}
+        </div>
+      ))}
+
+      <div data-megamenu-item>
+        <p class="c-megamenu__col-title">Direkt</p>
+        <a class="c-megamenu__link" href="#kontakt">Termin buchen</a>
+        <a class="c-megamenu__link" href="#kosten">Kosten &amp; Ablauf</a>
+        <a class="c-megamenu__link" href="#faq">Häufige Fragen</a>
+        <a class="c-megamenu__link" href="#standorte">Standorte</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-megamenu" data-mobile-menu>
+    <div class="c-megamenu__inner">
+      {/* Alle Gruppen, nicht nur die erste. Vorher stand hier `spalten[0]` —
+          das Menü zeigte damit vier von elf Leistungen, und welche vier war
+          reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt
+          dieselbe Auswahl wie am Schreibtisch. */}
+      {spalten.map((spalte) => (
+        <div data-megamenu-item>
+          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          {spalte.eintraege.map((l) => (
+            <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
+          ))}
+        </div>
+      ))}
+      <div data-megamenu-item>
+        <p class="c-megamenu__col-title">Praxis</p>
+        <a class="c-megamenu__link" href="#experten">Team</a>
+        <a class="c-megamenu__link" href="#standorte">Standorte</a>
+        <a class="c-megamenu__link" href="#magazin">Magazin</a>
+        <a class="c-megamenu__link" href="#kontakt">Kontakt</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Fixed, mischt sich in den Hintergrund. Blendet beim Runterscrollen aus
+     und beim Hochscrollen wieder ein (Steuerung in js/modules/nav.js).
+
+     Schwebende Leiste statt vollflächigem Balken: sie sitzt mit Abstand vom
+     Rand und ist gerundet wie die übrigen Flächen der Seite. Position, Größe
+     und Milchglas-Grund sind über die ganze Seite hinweg konstant. */
+  .c-nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: var(--z-nav);
+    padding: var(--sp-4) var(--site-margin);
+    color: var(--c-dark);
+    pointer-events: none;
+  }
+
+  .c-nav > * {
+    pointer-events: auto;
+  }
+
+  /* Die eigentliche Fläche. Als eigenes Element, damit sie unabhängig vom
+     Außenabstand gerundet und gefärbt werden kann. */
+  .c-nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    max-width: var(--site-max);
+    margin-inline: auto;
+    padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+    border-radius: var(--r-round);
+
+    /* Milchglas: deckend genug, dass die Wortmarke darunter nicht stört,
+       aber durchlässig genug, dass die Seite in Bewegung bleibt. Nur
+       Unschärfe und Fläche — Glaskanten und Innenlicht standen hier schon
+       und trugen zu dick auf. */
+    background: color-mix(in srgb, var(--c-white) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: 0 8px 32px -14px rgb(64 50 41 / 0.16);
+  }
+
+  /* Die Leiste fährt als Teil der Hero-Choreografie von oben herein
+     (modules/hero.js). Ihren Startzustand setzt GSAP erst, wenn die Module
+     laufen — das ist nach dem ersten Bild. Bis dahin stand sie fertig da und
+     sprang dann nach oben weg. Deshalb hier verbergen und in hero.js
+     freigeben, sobald der Startwert gesetzt ist.
+
+     Nur `visibility`: Versatz und Deckkraft bleiben in GSAPs Hand, damit
+     Startwert und Animation an einer Stelle stehen. */
+  html.js .c-nav__inner {
+    visibility: hidden;
+  }
+
+  /* Ohne Bewegung gibt es keinen Auftritt, der freigeben würde. */
+  @media (prefers-reduced-motion: reduce) {
+    html.js .c-nav__inner {
+      visibility: visible;
+    }
+  }
+
+  .c-nav__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .c-nav__logo svg {
+    width: 22px;
+    height: 30px;
+    flex: 0 0 auto;
+  }
+
+  .c-nav__menu {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .c-nav__link {
+    position: relative;
+    padding: 7px 10px;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: var(--r-sm);
+    transition: color var(--d-fast) var(--e-swift);
+  }
+
+  /* Gleiche Wischbewegung wie bei .c-link — ein Verhalten für alle Links. */
+  .c-nav__link::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform var(--d-base) var(--e-out);
+  }
+
+  @media (hover: hover) {
+    .c-nav__link:hover::after,
+    .c-nav__item[data-open="true"] .c-nav__link::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+  }
+
+  .c-nav__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  /* --- Mega-Menu ------------------------------------------------------- */
+
+  /* Schwebendes Panel unter der Leiste, auf derselben Breite und mit
+     derselben Rundung — kein durchgehender Balken.
+
+     Liegt als Geschwister der Leiste, nicht darin: ein backdrop-filter
+     erzeugt einen eigenen Backdrop-Root, und ein Panel innerhalb der Leiste
+     hätte nur deren bereits gefilterte Fläche abgetastet statt der Seite.
+     Bezugsrahmen ist damit .c-nav — der Seitenrand muss hier wieder
+     ausgeschrieben werden. */
+  .c-megamenu {
+    position: absolute;
+    top: calc(100% - var(--sp-2));
+    left: var(--site-margin);
+    right: var(--site-margin);
+    max-width: var(--site-max);
+    margin-inline: auto;
+    /* Dasselbe Milchglas wie die Leiste darüber — beide sollen als eine
+       Fläche gelesen werden. */
+    background: color-mix(in srgb, var(--c-white) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-radius: var(--r-lg);
+    box-shadow: 0 24px 56px -24px rgb(64 50 41 / 0.22);
+    overflow: hidden;
+    visibility: hidden;
+    height: 0;
+  }
+
+  /* Das Mobile-Panel hängt direkt an .c-nav, nicht an der Leiste — dort ist
+     der Seitenrand noch nicht abgezogen. */
+  [data-mobile-menu] {
+    left: var(--site-margin);
+    right: var(--site-margin);
+    top: calc(100% - var(--sp-2));
+    /* Vier Gruppen passen nicht mehr sicher auf jedes Telefon — deshalb
+       darf das Panel scrollen statt über den unteren Rand zu laufen. Die
+       Höhe lässt Platz für Leiste und Sicherheitsabstände. */
+    max-height: calc(100svh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .c-megamenu[data-open="true"] {
+    visibility: visible;
+  }
+
+  .c-megamenu__inner {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--site-gutter);
+    padding-inline: clamp(24px, 3vw, 48px);
+    padding-block: var(--sp-6) var(--sp-8);
+  }
+
+  .c-megamenu__col-title {
+    margin-bottom: var(--sp-4);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .c-megamenu__link {
+    display: block;
+    padding-block: var(--sp-2);
+    border-bottom: var(--bw) solid var(--c-line);
+    font-size: var(--fs-text-main);
+    transition: padding-left var(--d-base) var(--e-out),
+      color var(--d-fast) var(--e-swift);
+  }
+
+  @media (hover: hover) {
+    .c-megamenu__link:hover {
+      padding-left: var(--sp-2);
+      color: var(--c-brand);
+    }
+  }
+
+  /* --- Mobile-Menu ----------------------------------------------------- */
+
+  .c-nav__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 32px;
+    padding: 0 8px;
+  }
+
+  .c-nav__burger span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--d-base) var(--e-out),
+      opacity var(--d-fast) var(--e-swift);
+  }
+
+  .c-nav__burger[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+
+  .c-nav__burger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .c-nav__burger[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  @media (max-width: 1024px) {
+    .c-nav__menu,
+    /* Der Button kommt aus Button.astro und trägt deshalb nicht das
+       Scope-Attribut dieser Datei — ohne :global() ginge die Regel ins
+       Leere und die Pille stünde neben dem Burger. */
+    .c-nav__actions :global(.c-btn) {
+      display: none;
+    }
+
+    .c-nav__burger {
+      display: flex;
+    }
+
+    .c-megamenu__inner {
+      grid-template-columns: 1fr;
+      gap: var(--sp-6);
+    }
+  }
+</style>
+

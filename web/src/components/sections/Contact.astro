@@ -1,0 +1,283 @@
+---
+/**
+ * Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des
+ * Akkordeons ein Formular.
+ *
+ * Geprüft wird clientseitig in modules/ui.js über `data-form`; versendet wird
+ * nichts — das ist im Prototyp so und bleibt es hier.
+ */
+import Button from "../ui/Button.astro";
+import Panel from "../ui/Panel.astro";
+
+interface Props {
+  titel?: string;
+  text?: string;
+  /** Vorauswahl im Feld „Leistung". */
+  leistung?: string;
+}
+
+const {
+  titel = "Unverbindliches Angebot",
+  text = "Schicken Sie uns ein Foto Ihrer Zähne - wir melden uns mit einer ersten Einschätzung und einem Kostenrahmen.",
+  leistung,
+} = Astro.props;
+
+const LEISTUNGEN = ["Veneers", "Zahnimplantate", "Keramik Inlays", "Bleaching", "Aligner"];
+---
+
+<Panel id="kontakt" topline="Kontakt" titel={titel} text={text}>
+  <form class="c-form" data-form novalidate data-reveal-stagger="0.06">
+    <div class="c-field" data-field data-reveal-child>
+      <label class="c-field__label" for="f-name">Name <span>*</span></label>
+      <div class="c-field__control">
+        <input id="f-name" name="name" type="text" placeholder="Dein Name" required />
+        <span class="c-field__error" aria-hidden="true">!</span>
+      </div>
+    </div>
+
+    <div class="c-field" data-field data-reveal-child>
+      <label class="c-field__label" for="f-photo">Foto deiner Zähne</label>
+      <div class="c-field__control c-file" data-file>
+        <input id="f-photo" name="photo" type="file" accept="image/*" />
+        <span class="c-file__face">
+          <span data-file-name>Foto auswählen</span>
+          <svg aria-hidden="true"><use href="#i-upload" /></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="c-field" data-field data-reveal-child>
+      <label class="c-field__label" for="f-mail">E-Mail-Adresse <span>*</span></label>
+      <div class="c-field__control">
+        <input id="f-mail" name="email" type="email" placeholder="hello@veneers.de" required />
+        <span class="c-field__error" aria-hidden="true">!</span>
+      </div>
+    </div>
+
+    <div class="c-field c-field--tall" data-field data-reveal-child>
+      <label class="c-field__label" for="f-msg">Nachricht <span>*</span></label>
+      <div class="c-field__control">
+        <textarea id="f-msg" name="message" placeholder="Hi Mundpropaganda" required></textarea>
+        <span class="c-field__error" aria-hidden="true">!</span>
+      </div>
+    </div>
+
+    <div class="c-field" data-field data-reveal-child>
+      <label class="c-field__label" for="f-service">Leistung <span>*</span></label>
+      <div class="c-field__control">
+        <select id="f-service" name="service" required>
+          <option value="">Leistung auswählen</option>
+          {LEISTUNGEN.map((l) => <option selected={l === leistung}>{l}</option>)}
+        </select>
+      </div>
+    </div>
+
+    <div class="c-field c-field--full" data-reveal-child>
+      <label class="c-checkbox">
+        <input type="checkbox" name="privacy" required />
+        <span>Privacy Policy bestätigen</span>
+      </label>
+    </div>
+
+    <div class="c-field c-field--full" data-reveal-child>
+      <Button label="Unverbindliches Angebot anfordern" type="submit" variant="block" />
+    </div>
+  </form>
+</Panel>
+
+<style>
+  /* Der Panel-Rahmen selbst liegt in Panel.astro. Hier steht nur, was der
+     Kontaktbereich zusätzlich braucht — das Formular. */
+
+  .c-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-5) var(--site-gutter);
+  }
+
+  .c-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .c-field--full {
+    grid-column: 1 / -1;
+  }
+
+  /* Das Nachrichtenfeld ist doppelt so hoch wie die einzeiligen daneben.
+     Im Prototyp stand das als style-Attribut am Element. */
+  .c-field--tall {
+    grid-row: span 2;
+  }
+
+  .c-field__label {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-neutral-800);
+  }
+
+  /* Der Pflichtstern trägt die Farbe der Beschriftung, nicht die Marke.
+     Pink misst auf hellem Grund 1.54:1 bzw. 2.03:1 — er ist Text und muss
+     deshalb 4.5:1 erreichen (WCAG 1.4.3); bei dieser Größe ist das mit Pink
+     auf Hell nicht zu haben. Der pinke Akzent trägt hier ohnehin schon den
+     Absenden-Knopf.
+
+     Zurück auf Pink: `color: var(--c-brand)` — dann meldet es der Prüflauf
+     wieder. */
+  .c-field__label span {
+    color: inherit;
+  }
+
+  .c-field__control {
+    position: relative;
+  }
+
+  .c-field input,
+  .c-field select,
+  .c-field textarea {
+    width: 100%;
+    padding: var(--sp-3) var(--sp-4);
+    border: var(--bw) solid transparent;
+    border-radius: var(--r-sm);
+    background: var(--c-neutral-200);
+    color: var(--c-neutral-800);
+    font-size: var(--fs-text-main);
+    transition: border-color var(--d-fast) var(--e-swift),
+      background var(--d-fast) var(--e-swift);
+  }
+
+  .c-field textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+
+  .c-field input::placeholder,
+  .c-field textarea::placeholder {
+    /* Auf --c-neutral-200 ergaben 45 % nur 2.77:1. 62 % erreicht 4.56:1. */
+    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+  }
+
+  .c-field input:focus,
+  .c-field select:focus,
+  .c-field textarea:focus {
+    outline: none;
+    border-color: var(--c-brand);
+  }
+
+  .c-field[data-invalid="true"] input,
+  .c-field[data-invalid="true"] textarea {
+    border-color: var(--c-brand);
+    background: color-mix(in srgb, var(--c-brand) 12%, var(--c-neutral-200));
+  }
+
+  .c-field__error {
+    position: absolute;
+    top: 50%;
+    right: var(--sp-3);
+    translate: 0 -50%;
+    display: none;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-white);
+    font-size: 0.6875rem;
+  }
+
+  .c-field[data-invalid="true"] .c-field__error {
+    display: grid;
+  }
+
+  .c-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    cursor: pointer;
+    font-size: var(--fs-text-main);
+    color: var(--c-neutral-800);
+  }
+
+  /* Padding muss ausgeschrieben zurückgesetzt werden — sonst greift die
+     generische Feld-Regel weiter oben und bläst das Kästchen auf. */
+  .c-checkbox input {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    flex: 0 0 auto;
+    border: 1.5px solid var(--c-neutral-800);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--d-fast) var(--e-swift),
+      border-color var(--d-fast) var(--e-swift);
+  }
+
+  .c-checkbox input:checked {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' stroke='%23403229' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* --- Datei-Upload ------------------------------------------------------
+     Der native Datei-Knopf lässt sich nicht gestalten, also wird er versteckt
+     und ein Label übernimmt die Darstellung. */
+
+  .c-file input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .c-file__face {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border: var(--bw) solid transparent;
+    border-radius: var(--r-sm);
+    background: var(--c-neutral-200);
+    /* Auf --c-neutral-200 ergaben 45 % nur 2.77:1. 62 % erreicht 4.56:1. */
+    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+    font-size: var(--fs-text-main);
+    pointer-events: none;
+  }
+
+  .c-file__face svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    color: var(--c-neutral-800);
+  }
+
+  .c-file input:focus-visible + .c-file__face {
+    border-color: var(--c-brand);
+  }
+
+  .c-file[data-filled="true"] .c-file__face {
+    color: var(--c-neutral-800);
+  }
+
+  @media (max-width: 700px) {
+    .c-form {
+      grid-template-columns: 1fr;
+    }
+
+    /* Auf einer Spalte gibt es keine Nachbarzeile, über die sich das
+       Nachrichtenfeld strecken könnte. */
+    .c-field--tall {
+      grid-row: auto;
+    }
+  }
+</style>

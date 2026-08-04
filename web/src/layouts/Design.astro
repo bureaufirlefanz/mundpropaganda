@@ -1,0 +1,273 @@
+---
+/**
+ * Rahmen für die beiden Design-Seiten (Styleguide und Komponenten).
+ *
+ * Bewusst nicht Base.astro: dort stecken Navigation, Fuß, Übergangsschicht
+ * und Hintergrundebenen. Auf einer Dokumentationsseite wären das drei
+ * Bausteine, die man zeigen will, gleichzeitig aber als Rahmen um alles
+ * andere liegen hätte — Nav ist fixiert und läge über jedem Beispiel.
+ *
+ * Dieselben Grundlagen wie überall (tokens.css, base.css, shared.css), damit
+ * hier nichts zu sehen ist, was auf der Seite selbst anders aussähe. Das ist
+ * der ganze Zweck: Wer hier etwas ändert sieht, hat es nicht dokumentiert,
+ * sondern zwei Wahrheiten geschaffen.
+ *
+ * Das Skriptbündel läuft mit — die Beispiele sollen sich bewegen wie im
+ * Einsatz, nicht als tote Bilder dastehen.
+ */
+import "../../../src/styles/tokens.css";
+import "../../../src/styles/base.css";
+import "../styles/shared.css";
+import Icons from "../components/ui/Icons.astro";
+
+interface Props {
+  title: string;
+  aktiv: "styleguide" | "komponenten";
+}
+const { title, aktiv } = Astro.props;
+
+const SEITEN = [
+  { pfad: "/design/styleguide", name: "Styleguide", hinweis: "Farben, Typografie, Abstände, Bausteine" },
+  { pfad: "/design/komponenten", name: "Komponenten", hinweis: "Jeder Baustein mit Beschreibung" },
+] as const;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d6d6d6" />
+    <title>{title} - Mundpropaganda Design</title>
+    {/* Interne Seite: gehört nicht in den Index einer Suchmaschine. */}
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+  </head>
+
+  <body class="d-body">
+    <Icons />
+
+    <header class="d-kopf">
+      <a class="d-kopf__marke" href="/">Mundpropaganda</a>
+      <nav class="d-kopf__nav" aria-label="Design">
+        {SEITEN.map((s) => (
+          <a href={s.pfad} aria-current={s.name.toLowerCase().startsWith(aktiv.slice(0, 4)) ? "page" : undefined}>
+            {s.name}
+          </a>
+        ))}
+      </nav>
+    </header>
+
+    <main class="d-haupt"><slot /></main>
+
+    <script>
+      import { init } from "../../../src/js/init.js";
+      init();
+    </script>
+
+    <style is:global>
+      /* --- Rahmen der Dokumentationsseiten -----------------------------
+         Alles hier trägt das Präfix `d-` und beschreibt ausschließlich das
+         Drumherum: Kopfzeile, Abschnitte, Beschriftungen. Kein `d-`-Stil darf
+         je in ein Beispiel hineinwirken — sonst zeigte die Seite etwas
+         anderes, als sie behauptet.
+         ---------------------------------------------------------------- */
+
+      .d-body {
+        background: var(--c-bg);
+        color: var(--c-text);
+      }
+
+      .d-kopf {
+        position: sticky;
+        top: 0;
+        z-index: var(--z-nav);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--sp-3) var(--sp-6);
+        padding: var(--sp-3) var(--site-margin);
+        background: var(--c-dark);
+        color: var(--c-grey);
+        font-family: var(--f-mono);
+        font-size: var(--fs-text-small);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .d-kopf__marke {
+        font-weight: 500;
+      }
+
+      .d-kopf__nav {
+        display: flex;
+        gap: var(--sp-5);
+      }
+
+      /* Der aktuelle Eintrag ist unterstrichen, nicht nur farbig — Farbe
+         allein wäre kein Unterschied für alle, die sie nicht sehen (WCAG
+         1.4.1). */
+      .d-kopf__nav a[aria-current="page"] {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+
+      .d-haupt {
+        padding-bottom: var(--sp-16);
+      }
+
+      /* Ein Kapitel. Die Beispiele darin laufen über die volle Breite, der
+         beschreibende Text bleibt schmal — lange Zeilen liest niemand. */
+      /* Enger als auf der Seite selbst. --section-space ist für eine Seite
+         gedacht, die man durchscrollt; hier stünde pro Bildschirm eine
+         Überschrift und sonst nichts. */
+      .d-teil {
+        padding-block: var(--sp-10);
+        border-top: var(--bw) solid var(--c-line);
+      }
+
+      .d-teil:first-child {
+        border-top: 0;
+      }
+
+      .d-teil__kopf {
+        max-width: 62ch;
+        margin-bottom: var(--sp-6);
+        padding-inline: var(--site-margin);
+      }
+
+      .d-teil__nummer {
+        display: block;
+        margin-bottom: var(--sp-2);
+        font-family: var(--f-mono);
+        font-size: var(--fs-text-small);
+        letter-spacing: 0.08em;
+        color: var(--c-text-muted);
+      }
+
+      .d-teil__titel {
+        font-size: var(--fs-h2);
+        font-weight: 400;
+        line-height: 1.15;
+      }
+
+      .d-teil__text {
+        margin-top: var(--sp-3);
+        font-size: var(--fs-text-main);
+        line-height: 1.5;
+        color: var(--c-text-muted);
+      }
+
+      /* Eine einzelne Probe: Beschriftung darüber, Beispiel darunter. */
+      .d-probe {
+        padding-inline: var(--site-margin);
+        margin-bottom: var(--sp-8);
+      }
+
+      .d-probe__kopf {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--sp-2) var(--sp-4);
+        margin-bottom: var(--sp-3);
+        padding-bottom: var(--sp-2);
+        border-bottom: var(--bw) solid var(--c-line);
+      }
+
+      .d-probe__name {
+        font-family: var(--f-mono);
+        font-size: var(--fs-text-small);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      /* Der Quellpfad. Damit findet man die Datei, ohne suchen zu müssen —
+         der häufigste Grund, eine solche Seite überhaupt aufzuschlagen. */
+      .d-probe__pfad {
+        font-family: var(--f-mono);
+        font-size: var(--fs-label);
+        letter-spacing: 0.04em;
+        color: var(--c-text-muted);
+      }
+
+      .d-probe__text {
+        max-width: 68ch;
+        margin-bottom: var(--sp-4);
+        font-size: var(--fs-text-main);
+        line-height: 1.5;
+        color: var(--c-text-muted);
+      }
+
+      /* Die Bühne, auf der ein Beispiel steht. Heller Grund, damit man die
+         Kante des Bausteins sieht — auf dem Seitengrau verschwämme sie. */
+      .d-buehne {
+        padding: var(--sp-5);
+        border: var(--bw) solid var(--c-line);
+        border-radius: var(--r-md);
+        background: var(--c-surface);
+      }
+
+      .d-buehne--dunkel {
+        background: var(--c-dark);
+        color: var(--c-bg);
+      }
+
+      .d-buehne--randlos {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .d-buehne--reihe {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--sp-4);
+      }
+
+      /* Raster für Farb- und Wertkacheln. */
+      .d-raster {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--sp-4);
+      }
+
+      .d-notiz {
+        padding: var(--sp-4);
+        border: var(--bw) dashed var(--c-line);
+        border-radius: var(--r-md);
+        font-size: var(--fs-text-main);
+        line-height: 1.5;
+        color: var(--c-text-muted);
+      }
+
+      code {
+        font-family: var(--f-mono);
+        font-size: 0.9em;
+      }
+
+      /* Links im beschreibenden Text. Die Klasse .c-link gibt es hier nicht:
+         sie ist in den Komponenten abgegrenzt, die sie benutzen, und wirkt
+         außerhalb davon nicht. Deshalb über die Textklassen — und niemals
+         über einen allgemeinen a-Selektor, der auch in die eingebetteten
+         Beispiele hineinschlüge. */
+      .d-teil__text a,
+      .d-probe__text a,
+      .d-notiz a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+
+      .d-teil__text a:hover,
+      .d-probe__text a:hover,
+      .d-notiz a:hover {
+        color: var(--c-text);
+        text-decoration-color: var(--c-brand);
+        text-decoration-thickness: 2px;
+      }
+    </style>
+  </body>
+</html>

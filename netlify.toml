@@ -1,0 +1,19 @@
+# Veröffentlichung des Astro-Stands als statische Seite.
+#
+# Der Prototyp in `src/` bleibt außen vor — live geht `web/`. Beide teilen
+# sich CSS und JS über `vite.server.fs.allow`, deshalb muss der Build vom
+# Projektstamm aus laufen und nicht aus `web/` heraus: Sonst liegt `src/`
+# außerhalb des Wurzelverzeichnisses und die Einbindungen brechen.
+
+[build]
+  command = "npm --prefix web run build"
+  publish = "web/dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Keine eigene Regel für die Verzeichnis-URLs. Astro legt jede Seite als
+# `pfad/index.html` ab, und Netlifys „Pretty URLs" leiten /karriere per 301
+# auf /karriere/ um — gemessen, nicht vermutet. Eine zusätzliche
+# Rewrite-Regel darüber wäre wirkungslos und würde nur den Eindruck
+# erwecken, sie täte etwas. Die 404-Seite blendet sie im Zweifel sogar aus.

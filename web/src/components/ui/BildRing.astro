@@ -1,0 +1,289 @@
+---
+/**
+ * Bild-Ring — die Motive sitzen auf einem Zylinder, der um den Betrachter
+ * kreist. Alternative Darstellung zur laufenden Bildreihe.
+ *
+ * Die Geometrie rechnet modules/ring.js zur Laufzeit aus der gemessenen
+ * Kartenbreite. Hier steht nur, wie eine Karte aussieht und wie viel Luft
+ * zwischen zweien liegt (--ring-luft) — der Radius folgt daraus.
+ *
+ * Ein Ring braucht genug Karten, sonst wird aus dem Zylinder ein Dreieck.
+ * Reichen die Motive nicht, werden sie wiederholt, bis MINDESTENS voll ist.
+ * Die Wiederholungen sind für Vorlesegeräte ausgeblendet — derselbe Raum
+ * zweimal angesagt wäre nur Lärm.
+ */
+import Picture from "./Picture.astro";
+
+export interface RingBild {
+  name: string;
+  widths: string;
+  alt?: string;
+  caption?: string;
+}
+
+interface Props {
+  bilder: RingBild[];
+  label: string;
+  mindestens?: number;
+}
+
+/* Die Anzahl steuert, wie stark sich der Ring krümmt. Der Radius wächst mit
+   ihr (siehe ring.js), und ein großer Radius macht den Bogen flach, weil je
+   zwei Karten dann in einem kleineren Winkel zueinander stehen:
+
+     10 Karten → 36° Schritt → die Ränder kippen stark, deutlicher Zylinder
+     20 Karten → 18° Schritt → fast flach, mit einer Andeutung von Kurve
+
+   Gewollt ist das Zweite. */
+const { bilder, label, mindestens = 20 } = Astro.props;
+
+/* Auffüllen bis der Zylinder rund wird — aber auf ein VIELFACHES der
+   Motivzahl. Sonst stößt am Ring-Schluss die letzte Wiederholung auf ihr
+   eigenes Original und zwei gleiche Bilder stehen nebeneinander. Bei 5
+   Motiven und mindestens 16 werden daraus 20.
+
+   Der Index sagt später, ob es sich um ein Original oder eine
+   Wiederholung handelt. */
+const anzahl =
+  Math.ceil(Math.max(mindestens, bilder.length) / bilder.length) * bilder.length;
+
+const karten = Array.from({ length: anzahl }, (_, i) => ({
+  bild: bilder[i % bilder.length],
+  wiederholung: i >= bilder.length,
+}));
+---
+
+<div class="c-ring" data-ring>
+  {/* tabindex, damit der Ring den Fokus annehmen und auf die Pfeiltasten
+      hören kann. Die beiden Knöpfe darunter tun dasselbe für alle, die
+      lieber klicken. */}
+  <div
+    class="c-ring__stage"
+    data-ring-stage
+    role="group"
+    aria-label={label}
+    aria-roledescription="Bildkarussell"
+    tabindex="0"
+  >
+    <div class="c-ring__rotor" data-ring-rotor>
+      {karten.map(({ bild, wiederholung }) => (
+        <figure class="c-ring__card" data-ring-card aria-hidden={wiederholung ? "true" : undefined}>
+          <Picture
+            name={bild.name}
+            widths={bild.widths}
+            alt={wiederholung ? "" : (bild.alt ?? "")}
+            sizes="(max-width: 700px) 80vw, 38vw"
+          />
+          {bild.caption && !wiederholung && (
+            <figcaption class="c-ring__caption">{bild.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  </div>
+
+  <div class="container c-ring__nav" data-reveal="fade">
+    <div class="c-ring__arrows">
+      <button class="s-gallery__arrow" data-ring-prev type="button" aria-label={`${label}: zurück`}>
+        <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+      </button>
+      <button class="s-gallery__arrow" data-ring-next type="button" aria-label={`${label}: weiter`}>
+        <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Der Abstand zwischen zwei Karten. Steht als Custom Property, weil
+     ring.js ihn für den Radius braucht — eine zweite, fest verdrahtete Zahl
+     im Skript würde beim nächsten Feinschliff auseinanderlaufen. */
+  .c-ring {
+    --ring-luft: 20px;
+
+    /* Kartenmaß an einer Stelle, damit die Bühne daraus rechnen kann. */
+    --karte-breite: clamp(260px, 34vw, 500px);
+    --karte-hoehe: clamp(360px, 45vw, 660px);
+
+    /* Die Perspektive verkleinert jede Karte um einen FESTEN Faktor. Er ist
+       fest, weil der Radius mit der Kartenbreite wächst (siehe ring.js) und
+       sich die Verhältnisse dadurch nie ändern:
+
+         Perspektive   2.20 R          (ring.js)
+         Karte bei     −1.00 R
+         Rotor bei     +0.22 R
+         → Abstand      0.78 R
+         → Maßstab      2.20 / (2.20 + 0.78) = 0.738
+
+       Ändert sich einer der beiden Faktoren in ring.js, muss dieser Wert
+       mitgehen. */
+    --karte-sicht: 0.738;
+
+    /* Rand über und unter den Karten. Mehr braucht die Bühne nicht — sie
+       schneidet nur seitlich ab. */
+    --buehne-luft: 24px;
+  }
+
+  /* Die Bühne trägt die Perspektive (setzt ring.js aus dem Radius) und fängt
+     das Ziehen ab.
+
+     Beschnitten am Fensterrand: Der Ring ist breiter als das Fenster — auf
+     390px spannte er 850px und erzeugte waagerechten Überlauf. Am Rand
+     abgeschnitten ist zugleich das gewollte Bild: die Karten laufen aus
+     dem Sichtfeld, statt an einer Kante zu enden.
+
+     overflow steht hier und nicht am Rotor: dort würde es preserve-3d
+     aufheben und den Zylinder flachdrücken. Die Bühne trägt nur die
+     Perspektive, sie darf beschneiden. */
+  /* Höhe aus der Karte gerechnet, nicht geschätzt. Vorher stand hier ein
+     eigener clamp-Wert, der die UNGESCHRUMPFTE Kartenhöhe abdeckte: Bei
+     1728px maß die Bühne 680px, die Karte erschien aber nur 487px hoch —
+     193px tote Fläche, die über und unter den Bildern als Lücke zur
+     Überschrift und zu den Pfeilen wirkte. */
+  .c-ring__stage {
+    position: relative;
+    height: calc(var(--karte-hoehe) * var(--karte-sicht) + 2 * var(--buehne-luft));
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .c-ring[data-ring-zieht] .c-ring__stage {
+    cursor: grabbing;
+  }
+
+  /* Sichtbarer Fokus — der Ring ist über die Pfeiltasten bedienbar, also
+     muss man auch sehen, wann er den Fokus hat (WCAG 2.4.7). */
+  .c-ring__stage:focus-visible {
+    outline: var(--bw) solid var(--c-text);
+    outline-offset: 6px;
+    border-radius: var(--r-md);
+  }
+
+  .c-ring__rotor {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* Jede Karte hängt in der Mitte der Bühne und wird von dort auf ihren
+     Platz im Zylinder gedreht — das erledigt ring.js.
+
+     backface-visibility blendet die abgewandte Hälfte aus: Karten hinter der
+     Achse zeigen uns ihre Rückseite. Ohne das schienen sie durch die Lücken
+     der vorderen und der Ring wirkte wirr. */
+  .c-ring__card {
+    /* Wie viel Bildmaterial links und rechts über den Rahmen hinaussteht.
+       ring.js liest den Wert nicht, braucht ihn aber als Obergrenze für den
+       Parallax-Ausschlag — er steht deshalb hier oben bei den übrigen
+       Maßen der Karte und nicht in einem zweiten Block weiter unten. */
+    --bild-vorrat: 19%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Deutlich größer als eine Karte der laufenden Bildreihe. Der Radius
+       folgt der Kartenbreite (siehe ring.js), also wächst der ganze Ring
+       mit — die Motive rücken näher und laufen weiter über den Rand hinaus,
+       statt nur in der Mitte größer zu werden. */
+    width: var(--karte-breite);
+    height: var(--karte-hoehe);
+    margin: 0;
+    /* Zentriert über `translate`, nicht über negative Ränder: die Ränder
+       müssten die geklammerten Maße oben spiegeln und liefen beim nächsten
+       Feinschliff auseinander. `translate` ist eine eigene Eigenschaft und
+       kommt der Transform, die ring.js schreibt, nicht in die Quere. */
+    translate: -50% -50%;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    backface-visibility: hidden;
+    /* Rundung plus 3D-Transform: derselbe Kantenfehler wie beim Bildfeld in
+       Split — clip-path schneidet zuverlässiger als overflow allein. */
+    clip-path: inset(0 round var(--r-md));
+  }
+
+  /* Überbreite und nach links versetzt: In Ruhe sitzt das Motiv damit mittig
+     im Rahmen, und es bleibt nach beiden Seiten Material übrig, das
+     modules/ring.js beim Drehen hereinschieben kann. Ohne diesen Vorrat
+     liefe an einer Kante der Grund durch.
+
+     `position: absolute` ist dabei nicht Kosmetik, sondern die Bedingung:
+     Picture.astro liefert das Bild in einem <picture>, und das ist ein
+     Inline-Element, das auf seinen Inhalt schrumpft. Ein `width: 115%` am
+     Bild bezog sich damit auf eine Breite, die das Bild selbst bestimmt —
+     die Angabe fiel in sich zusammen und blieb wirkungslos. Absolut gesetzt
+     ist der Bezug die Karte, und die Rechnung stimmt. */
+  .c-ring__card :global(img) {
+    position: absolute;
+    top: 0;
+    left: calc(-1 * var(--bild-vorrat));
+    width: calc(100% + 2 * var(--bild-vorrat));
+    /* base.css deckelt jedes Bild mit `max-width: 100%` — eine sinnvolle
+       Grundregel, die hier aber genau das abschneidet, was den Vorrat
+       ausmacht. Ohne diese Zeile blieb das Bild rahmenbreit, und beim
+       Verschieben fehlte an einer Kante ein Streifen. */
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+    /* Das Ziehen darf nicht als Bild-Drag im Browser enden. */
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  .c-ring__caption {
+    position: absolute;
+    right: var(--sp-2);
+    bottom: var(--sp-2);
+    left: var(--sp-2);
+    padding: 0.35em 0.7em;
+    border-radius: var(--r-sm);
+    /* Eigener Grund statt Text direkt aufs Foto: über einem Bild ist kein
+       Kontrast garantiert. Braun auf Pink misst 5.50:1. */
+    background: var(--c-brand);
+    color: var(--c-dark);
+    font-family: var(--f-mono);
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .c-ring__nav {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--sp-4);
+  }
+
+  .c-ring__arrows {
+    display: flex;
+    gap: var(--sp-3);
+  }
+
+  /* --- Telefon ----------------------------------------------------------
+     Auf 390px war der Ring zu klein, um als Ring zu lesen: Die Karte maß
+     260px, die Perspektive verkleinert sie auf das 0.74-fache (der Faktor
+     ist fest, weil der Radius mit der Kartenbreite wächst) — es blieben
+     192px auf 390px Fensterbreite. Drei halbe Bilder in Briefmarkengröße,
+     dazu 67px tote Fläche über und unter jeder Karte, weil die Bühne für
+     die ungeschrumpfte Höhe ausgelegt war.
+
+     Die Karte ist deshalb in vw angegeben und absichtlich BREITER als das
+     Fenster: 92vw ergeben gerendert rund 68vw. Die Bühne folgt derselben
+     Rechnung, damit oben und unten nur noch ein Rand bleibt.
+     -------------------------------------------------------------------- */
+  @media (max-width: 700px) {
+    .c-ring {
+      --ring-luft: 10px;
+      --karte-breite: 92vw;
+      --karte-hoehe: 115vw;
+      --buehne-luft: 12px;
+    }
+
+    .c-ring__nav {
+      margin-top: var(--sp-3);
+    }
+  }
+</style>

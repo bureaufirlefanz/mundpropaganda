@@ -1,0 +1,113 @@
+---
+/**
+ * Zahlenleiste — vier überprüfbare Angaben über die Praxis, die beim
+ * Hereinscrollen hochzählen.
+ *
+ * Neuer Baustein, aber aus vorhandenen Mitteln: großer Grad in der
+ * Auszeichnungsschrift, Mono-Beschriftung darunter, dünne Trennlinien —
+ * dieselbe Sprache wie Preise und Standorte.
+ *
+ * Der Zielwert steht im Markup, nicht im Skript. Ohne JavaScript und ohne
+ * Bewegung steht die richtige Zahl da; das Hochzählen ist die Zugabe, nicht
+ * die Voraussetzung.
+ */
+import type { Zahl } from "../../lib/karriere";
+
+interface Props {
+  topline: string;
+  headline: string;
+  zahlen: Zahl[];
+}
+const { topline, headline, zahlen } = Astro.props;
+---
+
+<section class="s-facts container">
+  <div class="s-facts__head">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-facts__title" data-split="lines">{headline}</h2>
+  </div>
+
+  <dl class="s-facts__grid" data-reveal-stagger="0.08">
+    {zahlen.map((z) => (
+      <div class="s-facts__item" data-reveal-child>
+        {/* <dt>/<dd> statt zweier <p>: Zahl und Erklärung gehören zusammen,
+            und Vorlesegeräte geben das Paar auch als Paar aus. */}
+        <dt class="s-facts__wert">
+          {/* Der Zielwert steht als Text da — facts.js zählt ihn nur hoch.
+              aria-hidden am Zähler wäre falsch: die Zahl IST die Angabe. */}
+          <span data-zaehler={z.wert}>{z.wert}</span>{z.einheit}
+        </dt>
+        <dd class="s-facts__text">{z.text}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .s-facts {
+    padding-block: var(--section-space);
+  }
+
+  .s-facts__head {
+    max-width: 32ch;
+    margin-bottom: var(--sp-10);
+  }
+
+  .s-facts__head .c-topline {
+    margin-bottom: var(--sp-4);
+  }
+
+  .s-facts__title {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-facts__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--site-gutter);
+    margin: 0;
+  }
+
+  /* Die Trennlinie sitzt oben an jeder Spalte — wie in der Leistungstabelle.
+     Das bindet die vier Angaben zu einer Reihe, ohne einen Kasten zu bauen. */
+  .s-facts__item {
+    padding-top: var(--sp-4);
+    border-top: var(--bw) solid var(--c-line);
+  }
+
+  /* Bewusst OHNE `tabular-nums`. Tabellenziffern hielten die Breite beim
+     Hochzählen konstant — in dieser Schrift sind sie aber deutlich breiter,
+     „24" las sich als „2 4". Gebraucht werden sie hier ohnehin nicht: Die
+     Zahlen stehen linksbündig in je eigener Rasterzelle, beim Zählen wandert
+     also nur die rechte Kante, und die grenzt an nichts. */
+  .s-facts__wert {
+    font-size: clamp(3rem, 6vw, 6.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .s-facts__text {
+    max-width: 26ch;
+    margin: var(--sp-3) 0 0;
+    font-size: var(--fs-text-main);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .s-facts__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-6) var(--site-gutter);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .s-facts__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

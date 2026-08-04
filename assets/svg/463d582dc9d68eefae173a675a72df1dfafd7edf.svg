@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="617" height="1" viewBox="0 0 617 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="divider" opacity="0.5">
+<path id="progress" d="M0 0.5H308.5" stroke="var(--stroke-0, #D6D6D6)"/>
+<path id="progress_2" d="M308.5 0.5H617" stroke="var(--stroke-0, #D6D6D6)"/>
+</g>
+</svg>

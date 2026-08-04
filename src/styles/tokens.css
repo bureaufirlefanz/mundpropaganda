@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Design Tokens — 1:1 aus Figma-Variablen (Mundpropaganda Design)
+   Alles was hier steht ist die einzige Quelle der Wahrheit.
+   Webflow-Mapping: jede Custom Property wird später eine Webflow-Variable.
+   ========================================================================== */
+
+:root {
+  /* --- Farben --------------------------------------------------------- */
+  --c-brand: #ff84c8;          /* brand */
+  --c-dark: #403229;           /* dark / Brown */
+  --c-taupe: #d0bec3;          /* taupe */
+  --c-grey: #d6d6d6;           /* grey — Standard-Seitenhintergrund */
+  --c-neutral-800: #201d1d;
+  --c-neutral-200: #f4f4f4;
+  --c-white: #ffffff;
+  --c-black: #000000;
+
+  /* Semantisch */
+  --c-bg: var(--c-grey);
+  --c-text: var(--c-dark);
+  /* 75 %, nicht 55 %. Gemessen ergab 55 % auf --c-grey ein Verhältnis von
+     2.83:1 — WCAG 1.4.3 verlangt für Fließtext 4.5:1. 75 % ist der Wert, ab
+     dem es erreicht ist (gerechnet, nicht geschätzt). Der Ton bleibt sichtbar
+     zurückgenommen, er ist nur nicht mehr zu blass zum Lesen. */
+  --c-text-muted: color-mix(in srgb, var(--c-dark) 75%, transparent);
+  --c-line: color-mix(in srgb, var(--c-dark) 28%, transparent);
+  --c-surface: var(--c-neutral-200);
+
+  /* --- Schriften ------------------------------------------------------ */
+  --f-sans: "PP Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "GT Pressura Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --f-mono-alt: "PP Neue Montreal Mono", var(--f-mono);
+
+  /* --- Typo-Skala -----------------------------------------------------
+     Figma-Referenz bei 1728px Viewport. Fluid via clamp(), damit sich das
+     Design bis 1920+ weiterträgt statt zu zerreißen.
+     -------------------------------------------------------------------- */
+  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem);   /* 250px @1728 */
+  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem);    /* 125px */
+  --fs-h1: clamp(2.5rem, 4.05vw, 4.375rem);          /* 70px  */
+  --fs-h2: clamp(1.75rem, 2.31vw, 2.5rem);           /* 40px  */
+  --fs-h3: var(--fs-h2);
+  --fs-h5: clamp(1.125rem, 1.39vw, 1.5rem);          /* 24px  */
+  --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem);/* 20px  */
+  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem);     /* 18px  */
+  --fs-text-small: 1rem;                             /* 16px  */
+  --fs-label: 0.75rem;                               /* 12px — Micro-Labels */
+
+  --lh-display: 0.92;
+  --lh-tight: 1;
+  --lh-heading: 1.1;
+  --lh-body: 1.5;
+
+  --tracking-mono: 0.04em;
+  --tracking-display: -0.02em;
+
+  /* --- Spacing -------------------------------------------------------- */
+  --sp-1: 8px;
+  --sp-2: 12px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
+  --sp-6: 40px;
+  --sp-8: 64px;
+  --sp-10: 80px;
+  --sp-12: 112px;   /* section-space/main */
+  --sp-16: 160px;
+
+  /* Der Entwurf setzt 112px an. Etwas großzügiger, weil die Seite mit
+     ihren großen Graden sonst gedrängt wirkt. */
+  --section-space: clamp(80px, 8.1vw, 140px);
+  /* Knapper Abschluss, wenn direkt darunter eine Farbfläche anschließt — die
+     Fläche bringt ihren eigenen Innenabstand mit, zwei volle Abstände
+     hintereinander reißen die Seite auseinander. */
+  --section-space-sm: clamp(48px, 4.8vw, 84px);
+  --section-space-lg: clamp(120px, 11.6vw, 200px);
+
+  /* --- Layout --------------------------------------------------------- */
+  --site-margin: clamp(16px, 2.78vw, 48px);
+  --site-gutter: clamp(16px, 1.85vw, 32px);
+  --site-max: 1728px;
+  --grid-cols: 12;
+
+  /* --- Radius --------------------------------------------------------- */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 32px;
+  --r-round: 99999px;
+
+  /* --- Border --------------------------------------------------------- */
+  --bw: 1px;
+
+  /* --- Motion ---------------------------------------------------------
+     Eine gemeinsame Sprache für CSS und GSAP. Die Kurven sind bewusst
+     langsam-auslaufend (kein Bounce) — passt zum ruhigen, teuren Look.
+     -------------------------------------------------------------------- */
+  --e-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --e-swift: cubic-bezier(0.4, 0, 0.2, 1);
+  --d-fast: 0.25s;
+  --d-base: 0.45s;
+  --d-slow: 0.8s;
+
+  /* --- Z-Index -------------------------------------------------------- */
+  --z-base: 1;
+  --z-sticky: 50;
+  --z-nav: 100;
+  --z-overlay: 200;
+  --z-cursor: 300;
+}
+
+/* Sektionen können ihr Farbschema lokal umschalten. */
+[data-theme="dark"] {
+  --c-bg: var(--c-dark);
+  --c-text: var(--c-grey);
+  /* Auf Braun braucht es 65 % für 4.5:1 — bei 60 % waren es 4.13:1. */
+  --c-text-muted: color-mix(in srgb, var(--c-grey) 65%, transparent);
+  --c-line: color-mix(in srgb, var(--c-grey) 30%, transparent);
+}
+
+[data-theme="taupe"] {
+  --c-bg: var(--c-taupe);
+  --c-text: var(--c-dark);
+  /* Taupe ist dunkler als Grau, deshalb ein eigener Wert: 81 % für 4.5:1. */
+  --c-text-muted: color-mix(in srgb, var(--c-dark) 82%, transparent);
+  --c-line: color-mix(in srgb, var(--c-dark) 30%, transparent);
+}
+
+[data-theme="light"] {
+  --c-bg: var(--c-neutral-200);
+  --c-text: var(--c-neutral-800);
+}

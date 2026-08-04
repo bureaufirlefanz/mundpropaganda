@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Was mehr als eine Komponente benutzt und keiner allein gehört.
+
+   Bewusst kurz gehalten: alles, was ein einziger Baustein rendert, liegt in
+   dessen .astro-Datei. Hier steht nur, was zwei oder mehr Bausteine
+   gemeinsam ausschreiben — dort wäre eine scoped Regel schlicht wirkungslos.
+
+   Wächst diese Datei, ist das das Zeichen, dass der betreffende Baustein
+   eine eigene Komponente werden sollte — nicht, dass hier Platz ist.
+   ========================================================================== */
+
+/* --- Startzustände der Hero-Choreografie --------------------------------
+   Was modules/hero.js einblendet, muss schon im ersten Bild verborgen sein —
+   ein `gsap.set` im Modul kommt dafür zu spät (siehe STRUKTUR.md).
+
+   Der Selektor hängt am selben data-Attribut, an dem auch das Modul greift,
+   und nicht an einer Klasse. Dadurch gilt er für beide Heroes: die Startseite
+   setzt `.s-hero__word`, die Leistungsseiten `.s-shero__title` — angesprochen
+   werden sie über `[data-hero-word]`. Ein Baustein, der das Attribut mitbringt,
+   ist damit automatisch abgedeckt.
+
+   Deshalb hier und nicht in einer Komponente: zwei Bausteine schreiben sie aus.
+   -------------------------------------------------------------------- */
+
+html.js [data-hero-word],
+html.js [data-hero-foot],
+html.js [data-hero-scroll] {
+  visibility: hidden;
+}
+
+/* Ohne Bewegung läuft keine Choreografie, die freigeben würde. */
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-hero-word],
+  html.js [data-hero-foot],
+  html.js [data-hero-scroll] {
+    visibility: visible;
+  }
+}
+
+/* --- Topline / Label mit Punkt ------------------------------------------
+   Steht in Split, Magazine, Panel, Benefits und auf den Leistungsseiten.
+   Die Abstände darum setzt jeweils die Section, die sie einbindet.
+   -------------------------------------------------------------------- */
+
+.c-topline {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  /* Keine eigene Farbe: die Topline erbt sie von ihrer Section.
+     Vorher stand hier `var(--c-text)` — auf dem braunen Benefits-Band ergab
+     das dunkle Schrift auf dunklem Grund, gemessen 1:1. Sie war schlicht
+     unsichtbar. Geerbt stimmt sie auf hellem wie auf dunklem Grund. */
+}
+
+/* --- Slider-Steuerung ---------------------------------------------------
+   Pfeile und Punkte teilen sich Standorte-Gallery und Magazin — im Markup
+   beider Sections stehen dieselben Klassen, gesteuert über eigene
+   data-Attribute. Die Punkte legt gallery.js zur Laufzeit an; eine scoped
+   Regel würde sie nicht erreichen.
+
+   Der Name trägt noch das Gallery-Präfix, obwohl die Steuerung längst
+   beiden gehört. Umbenennen hieße Markup und gallery.js anfassen — das ist
+   eine eigene Aufgabe.
+   -------------------------------------------------------------------- */
+
+.s-gallery__arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--c-text);
+  transition: color var(--d-fast) var(--e-swift),
+    transform var(--d-base) var(--e-out);
+}
+
+.s-gallery__arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+.s-gallery__arrow[data-gallery-prev] svg,
+.s-gallery__arrow[data-magazine-prev] svg,
+.s-gallery__arrow[data-ring-prev] svg {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .s-gallery__arrow:hover {
+    color: var(--c-brand);
+  }
+
+  .s-gallery__arrow[data-gallery-next]:hover,
+  .s-gallery__arrow[data-magazine-next]:hover,
+  .s-gallery__arrow[data-ring-next]:hover {
+    transform: translateX(3px);
+  }
+
+  .s-gallery__arrow[data-gallery-prev]:hover,
+  .s-gallery__arrow[data-magazine-prev]:hover,
+  .s-gallery__arrow[data-ring-prev]:hover {
+    transform: translateX(-3px);
+  }
+}
+
+.s-gallery__dots {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.s-gallery__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-round);
+  background: color-mix(in srgb, var(--c-dark) 28%, transparent);
+  transition: background var(--d-fast) var(--e-swift),
+    transform var(--d-base) var(--e-out);
+}
+
+.s-gallery__dot[aria-selected="true"] {
+  background: var(--c-dark);
+  transform: scale(1.25);
+}

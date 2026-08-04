@@ -1,0 +1,405 @@
+---
+import Button from "../ui/Button.astro";
+import Picture from "../ui/Picture.astro";
+
+/**
+ * Dieselben Beiträge überall, nur der Einstieg wechselt: auf der Startseite
+ * allgemein, auf einer Leistungsseite auf sie bezogen.
+ */
+interface Props {
+  topline?: string;
+  titel?: string;
+  text?: string;
+}
+
+const {
+  topline = "Guides",
+  text = "Was wir sonst am Stuhl erklären, steht hier zum Nachlesen: Behandlungen, Materialien und die Fragen, die uns am häufigsten gestellt werden - ohne Fachjargon und ohne Verkaufsabsicht.",
+} = Astro.props;
+---
+
+<!-- ==================================================================
+           MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
+           darunter ein Karussell aus Bild + überlappender weißer Karte
+           ================================================================== -->
+      <section class="s-magazine" id="magazin" data-magazine>
+        <div class="container">
+          <span class="c-topline" data-reveal="fade">{topline}</span>
+
+          <div class="s-magazine__head">
+            <!-- Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
+                 Leicht gegeneinander gedreht, das „ZU" liegt als weiße
+                 Plakette dazwischen. -->
+            <div class="s-magazine__type" data-reveal="up">
+              <span class="s-magazine__bar">Mund</span>
+              <span class="s-magazine__chip">zu</span>
+              <span class="s-magazine__bar s-magazine__bar--lower">Mund</span>
+            </div>
+
+            <div class="s-magazine__intro">
+              <h2 class="s-magazine__title" data-split="lines">Magazin</h2>
+              <p data-reveal="up" data-reveal-delay="0.08">{text}</p>
+            </div>
+          </div>
+
+          <div class="s-magazine__track" data-magazine-track>
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                <Picture name="motion-04" widths="640,1024" alt="" sizes="24vw" parallax="9" />
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Zahngesundheit<br />&amp; Fitness</a>
+                </h3>
+                <p class="c-post__text">
+                  Warum Sportlerinnen und Sportler häufiger Karies haben - und
+                  was dagegen hilft.
+                </p>
+              </div>
+              <Button label="Beitrag lesen" static />
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                <Picture name="teeth-macro" widths="640,1024,1600,2048" alt="" sizes="24vw" parallax="9" />
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Bleaching<br />für Zuhause</a>
+                </h3>
+                <p class="c-post__text">
+                  Was die Schienen aus der Drogerie können, wo sie aufhören und
+                  wann es schadet.
+                </p>
+              </div>
+              <Button label="Beitrag lesen" static />
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                <Picture name="lab-veneers" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" />
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Der Weg zur<br />Hygiene</a>
+                </h3>
+                <p class="c-post__text">
+                  Zahnseide, Bürstchen, Spülung - was davon wirklich etwas
+                  bringt und in welcher Reihenfolge.
+                </p>
+              </div>
+              <Button label="Beitrag lesen" static />
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                <Picture name="treatment-03" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" />
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Veneers aus<br />der Türkei</a>
+                </h3>
+                <p class="c-post__text">
+                  Eine ehrliche Rechnung - inklusive der Kosten, die erst später
+                  anfallen.
+                </p>
+              </div>
+              <Button label="Beitrag lesen" static />
+            </article>
+          </div>
+
+          <div class="s-magazine__nav">
+            <div class="s-magazine__arrows">
+              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+            <div class="s-gallery__dots" data-magazine-dots role="tablist" aria-label="Beiträge"></div>
+            <Button label="Alle Beiträge" href="#" variant="dark" />
+          </div>
+        </div>
+      </section>
+
+<style>
+  /* Wortmarke auf zwei Markerbalken, daneben der Einstiegstext, darunter ein
+     Karussell. Die Karten bestehen aus Bild und einer weißen Karte, die es
+     nach rechts unten versetzt überlappt — im Entwurf sitzt das Bild bei
+     x=81 (326 breit), die Karte bei x=319 (316 breit).
+     Pfeile und Punkte liegen in shared.css — die Standorte nutzen dieselben. */
+  .s-magazine {
+    padding-block: var(--section-space-lg);
+    overflow: hidden;
+  }
+
+  /* Die erste Spur ist so breit wie der Schriftzug und nicht breiter. Als
+     `1fr` nahm sie allen übrigen Platz und drückte den Einstieg an den
+     rechten Rand — gemessen lagen rund 800px leer dazwischen, und die beiden
+     lasen sich wie zwei Sachen statt wie eine.
+
+     Die Fuge steht eigens da und nicht auf der Rinne des Seitenrasters: Die
+     Balken sind gedreht, ihre rechte Kante steht dadurch etwas über, und mit
+     32px stieße der Text beinahe daran. */
+  .s-magazine__head {
+    display: grid;
+    grid-template-columns: max-content 316px;
+    gap: var(--sp-10) clamp(var(--sp-6), 5vw, 96px);
+    align-items: start;
+    margin-top: var(--sp-10);
+    margin-bottom: clamp(64px, 8vw, 140px);
+  }
+
+  /* Die Balken sind Flächen hinter der Schrift, keine Textfarbe. */
+  .s-magazine__type {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(4px, 0.9vw, 16px);
+  }
+
+  .s-magazine__bar {
+    display: inline-block;
+    padding: 0.06em 0.05em 0.14em;
+    border-radius: var(--r-sm);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    font-family: var(--f-sans);
+    font-weight: 500;
+    font-size: clamp(3rem, 11.6vw, 12.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    rotate: 1.8deg;
+  }
+
+  .s-magazine__bar--lower {
+    margin-left: clamp(12px, 3.2vw, 56px);
+    rotate: -1.4deg;
+  }
+
+  /* Liegt als weiße Plakette zwischen den Balken. */
+  .s-magazine__chip {
+    position: absolute;
+    top: 50%;
+    left: clamp(120px, 27vw, 460px);
+    translate: 0 -50%;
+    z-index: 2;
+    padding: 0.1em 0.42em 0.16em;
+    border-radius: var(--r-md);
+    background: var(--c-white);
+    color: var(--c-dark);
+    font-family: var(--f-sans);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 5.2vw, 5.625rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    rotate: -3deg;
+  }
+
+  .s-magazine__intro {
+    padding-top: clamp(24px, 4vw, 72px);
+  }
+
+  .s-magazine__title {
+    margin-bottom: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  .s-magazine__intro p {
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  /* --- Karussell --------------------------------------------------------- */
+
+  .s-magazine__track {
+    display: flex;
+    gap: clamp(40px, 5.5vw, 96px);
+    will-change: transform;
+  }
+
+  .s-magazine__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    margin-top: var(--sp-8);
+  }
+
+  .s-magazine__arrows {
+    display: flex;
+    gap: var(--sp-4);
+  }
+
+  /* Die Punkte in die Mitte, der Button ganz nach rechts. */
+  .s-magazine__nav .s-gallery__dots {
+    margin-inline: auto;
+  }
+
+  /* --- Beitragskarte ----------------------------------------------------- */
+
+  .c-post {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(420px, 36vw, 554px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .c-post__media {
+    width: 59%;
+    aspect-ratio: 326 / 431;
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro kommt. */
+  .c-post__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Überlappt das Bild nach rechts unten — die Versetzung ist der Kern der
+     Komposition. */
+  .c-post__card {
+    position: absolute;
+    top: 27%;
+    right: 0;
+    width: 57%;
+    min-height: 62%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--c-white);
+    color: var(--c-neutral-800);
+  }
+
+  .c-post__kicker {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+  }
+
+  .c-post__title {
+    margin-top: var(--sp-2);
+    font-size: clamp(1.375rem, 1.85vw, 2rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ganze Karte klickbar, ohne verschachtelte Links. */
+  .c-post__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .c-post__text {
+    margin-top: auto;
+    padding-top: var(--sp-6);
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
+  }
+
+  /* :global(.c-btn), weil der Button aus Button.astro kommt. */
+  .c-post :global(.c-btn) {
+    margin-top: var(--sp-4);
+  }
+
+  @media (max-width: 900px) {
+    .s-magazine__head {
+      grid-template-columns: 1fr;
+    }
+
+    .c-post {
+      width: min(78vw, 420px);
+    }
+  }
+
+  /* --- Telefon ----------------------------------------------------------
+     Die versetzte Überlappung ist auf 390px nicht zu retten. Sie rechnet in
+     Anteilen der Kartenbreite: Bild 59 %, weiße Karte 57 % — auf 554px sind
+     das 327 und 316px, auf 304px noch 180 und 173. In 173px Breite braucht
+     derselbe Text die dreifache Höhe, die Karte wächst über ihren Rahmen
+     hinaus, verdeckt den Knopf darunter und schiebt sich in die Navigation.
+     Genau das war zu sehen.
+
+     Also gestapelt statt überlappt — aber nicht als schlichte Reihe: Das
+     Bild nimmt die volle Breite, die Karte sitzt etwas schmaler rechts und
+     zieht sich über die Bildkante herauf. Der Versatz bleibt damit als Idee
+     erhalten, ohne dass etwas gegeneinander gedrückt wird.
+     -------------------------------------------------------------------- */
+  @media (max-width: 700px) {
+    .c-post {
+      width: min(84vw, 380px);
+    }
+
+    /* Breiter und flacher: Hochformat auf voller Breite nähme allein zwei
+       Drittel der Bildschirmhöhe, bevor der Text beginnt. */
+    .c-post__media {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+    }
+
+    /* `position: relative` mit z-index, nicht `static`: Das Bild trägt einen
+       Parallax-Transform, und ein transformiertes Element wird über allen
+       nicht positionierten Kästen gezeichnet — unabhängig von der Reihenfolge
+       im Markup. Die Karte lag dadurch UNTER dem Bild, und ihre obersten
+       64px (Kicker und die erste Titelzeile) waren verdeckt. */
+    .c-post__card {
+      position: relative;
+      z-index: 1;
+      /* `inset: auto` MUSS mit: `top: 27%` und `right: 0` aus der Regel für
+         breite Fenster gelten bei `relative` weiter — nur eben als
+         Verschiebung statt als Lage. Gemessen schob das die Karte um 120px
+         nach unten, über den Knopf hinweg und aus ihrem Beitrag heraus. */
+      inset: auto;
+      align-self: flex-end;
+      width: 92%;
+      min-height: 0;
+      margin-top: calc(-1 * var(--sp-8));
+    }
+
+    /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
+       deren Unterkante. Ohne feste Höhe gibt es nichts mehr zu schieben —
+       der Abstand steht jetzt einfach da. */
+    .c-post__text {
+      margin-top: 0;
+      padding-top: var(--sp-3);
+    }
+
+    /* Umbrechend: Pfeile, Punkte und Knopf brauchen zusammen mehr als die
+       358px Satzbreite — der Knopf lief rechts aus dem Bild. */
+    .s-magazine__nav {
+      flex-wrap: wrap;
+      gap: var(--sp-4);
+      margin-top: var(--sp-6);
+    }
+
+    .s-magazine__nav .s-gallery__dots {
+      margin-inline: 0 auto;
+    }
+  }
+</style>

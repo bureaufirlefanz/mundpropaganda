@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    {{> head }}
+    <title>Mundpropaganda — Zahnarzt Prenzlauer Berg Berlin</title>
+    <meta
+      name="description"
+      content="Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg."
+    />
+  </head>
+
+  <body>
+    {{> icons }}
+    {{> backdrop }}
+    {{> transition }}
+
+
+    {{> nav }}
+
+    <main>
+      <!-- ==================================================================
+           HERO — Wortmarke mit dem Zahn zwischen den Zeilen
+           ================================================================== -->
+      <section class="s-hero" data-hero>
+        {{> tooth-lines }}
+
+        <div class="container s-hero__inner">
+          <div class="s-hero__wordmark">
+            <span class="s-hero__word" data-hero-word>Mund</span>
+
+            <!-- Sitzt in der Wortmarke, nicht in der Section: dadurch hält
+                 der Block seinen Abstand zur Schrift in jeder Fenstergröße. -->
+            <div class="s-hero__meta">
+              <p data-hero-meta data-highlight-marker-reveal data-marker-theme="brand" data-marker-stagger="90" data-marker-delay="1.1">
+                Praxis für ästhetische<br />
+                &amp; allgemeine Zahnmedizin<br />
+                auf höchstem Niveau
+              </p>
+              <p data-hero-meta data-highlight-marker-reveal data-marker-theme="brand" data-marker-stagger="90" data-marker-delay="1.1">
+                Zahnarzt<br />
+                Prenzlauer Berg<br />
+                Berlin
+              </p>
+            </div>
+
+            <!-- Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
+                 Beide schreiben sonst dieselbe Transform und überschreiben
+                 sich gegenseitig, sobald man während des Intros scrollt. -->
+            <div class="s-hero__tooth" data-hero-tooth>
+              <!-- Dritte Ebene für die Zeigernähe: Auftritt (innen) und
+                   Scroll-Parallax (außen) schreiben beide transform, eine
+                   gemeinsame Ebene würde sich gegenseitig überschreiben. -->
+              <div class="s-hero__tooth-drift" data-hero-tooth-drift>
+              <div class="s-hero__tooth-inner" data-hero-tooth-inner>
+                <!-- Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
+                     Alphamaske wie der Zahn, dadurch wird nur das milchglasig,
+                     was tatsächlich hinter dem Objekt liegt. -->
+                <span class="s-hero__tooth-glass"></span>
+                {{> picture name="tooth-3d" widths="640,961" alt="" sizes="(max-width: 900px) 60vw, 29vw" eager="true" }}
+              </div>
+              </div>
+            </div>
+
+            <span class="s-hero__word s-hero__word--wide" data-hero-word>Propaganda</span>
+          </div>
+
+          <a class="s-hero__scroll" href="#leistungen" aria-label="Weiter zum Inhalt" data-hero-scroll>
+            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+          </a>
+
+          <div class="s-hero__foot" data-hero-foot>
+            {{> reviews }}
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           FORM & FUNKTION — Split mit organischer brauner Fläche
+           ================================================================== -->
+      <section class="s-split">
+        <!-- Bild von rechts, braune Fläche von links: die beiden fahren
+             gegeneinander ein und schließen die Komposition. -->
+        <div class="s-split__media" data-reveal="right" data-reveal-trigger=".s-split">
+          {{> picture name="portrait-hero" widths="640,1024,1600,2200" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" }}
+        </div>
+
+        <div class="s-split__head">
+          <span class="c-topline" data-reveal="fade">Form &amp; Funktion</span>
+          <h2 class="s-split__title" data-split="lines" data-split-delay="0.1">
+            Ästhetik &amp; Gesundheit — für ein besseres Wohlbefinden und dein
+            perfektes Lächeln
+          </h2>
+        </div>
+
+        <div class="s-split__panel" data-reveal="left" data-reveal-trigger=".s-split">
+          <p data-reveal="up" data-reveal-delay="0.3" data-reveal-trigger=".s-split">
+            Unser Schwerpunkt sind Veneers und Keramikimplantate. Beides
+            Behandlungen, die wir täglich machen und in denen wir richtig gut
+            sind. Unser Team übernimmt alles andere, was du brauchst:
+            Prophylaxe, Inlays, Wurzelbehandlungen, Weisheitszähne.
+          </p>
+          <p data-reveal="up" data-reveal-delay="0.42" data-reveal-trigger=".s-split">
+            Was bleibt: dasselbe Niveau, egal was wir an deinen Zähnen gerade
+            machen. Kein Behandlungszimmer zweiter Klasse, keine
+            Standardlösung von der Stange.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           UNSERE SERVICES — Tabelle mit Cursor-Preview
+           ================================================================== -->
+      <section class="s-services" id="leistungen" data-services>
+        <div class="container">
+          <h2 class="s-services__title" data-split="lines">Unsere Services</h2>
+
+          <div class="s-services__head" data-reveal="fade">
+            <span>Leistung</span>
+            <span>Praxis</span>
+          </div>
+
+          <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/teeth-macro-640.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Veneers</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/lab-veneers-640.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Zahnimplantate</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/treatment-02-640.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Keramik Inlays</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/treatment-01-640.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Zahnersatz / Prothetik</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/smile-portrait-563.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Bleaching</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+
+            <a
+              class="s-services__row"
+              href="/leistungen/veneers.html"
+              data-service-row
+              data-reveal-child
+              data-preview="/img/treatment-03-640.webp"
+              data-preview-label="Mehr Info"
+            >
+              <span class="s-services__name">Aligner</span>
+              <span class="s-services__tag">P25</span>
+            </a>
+          </div>
+
+          <div class="s-services__more" data-reveal-stagger="0.06">
+            <div class="s-services__more-col" data-reveal-child>
+              <a href="/leistungen/veneers.html">Parodontitis-Behandlung</a>
+              <a href="/leistungen/veneers.html">CMD mit Botoxbehandlung</a>
+            </div>
+            <div class="s-services__more-col" data-reveal-child>
+              <a href="/leistungen/veneers.html">Wurzelbehandlung</a>
+              <a href="/leistungen/veneers.html">Weisheitszahnentfernung</a>
+            </div>
+            <div class="s-services__more-col" data-reveal-child>
+              <a href="/leistungen/veneers.html">Prophylaxe</a>
+              <a href="/leistungen/veneers.html">Kinderzahnheilkunde</a>
+            </div>
+          </div>
+
+          <div class="s-services__foot" data-reveal="up">
+            {{> button label="Termin buchen" href="#kontakt" }}
+          </div>
+        </div>
+
+        <div class="s-services__preview" data-services-preview aria-hidden="true">
+          <img src="/img/teeth-macro-640.webp" alt="" />
+          <span class="s-services__preview-label" data-preview-label>Mehr Info</span>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           WIR SETZEN NEUE STANDARDS
+           ================================================================== -->
+      <section class="s-standards" data-standards>
+        {{> thread }}
+
+        <div class="s-standards__figure" aria-hidden="true">
+          <!-- Zwei Ebenen mit derselben Zahnmaske: die hintere ist minimal
+               größer und liefert dadurch den weichen Rand. Alle Motive
+               liegen übereinander, aktiv ist immer genau eines. -->
+          <div class="s-standards__stage" data-standards-stage>
+            <img src="/img/treatment-01-1024.webp" alt="" data-standards-img />
+            <img src="/img/lab-veneers-1024.webp" alt="" data-standards-img />
+            <img src="/img/teeth-macro-1024.webp" alt="" data-standards-img />
+            <img src="/img/praxis-03-1024.webp" alt="" data-standards-img />
+            <img src="/img/abstract-02-1024.webp" alt="" data-standards-img />
+          </div>
+          {{> tooth-rings }}
+        </div>
+
+        <div class="container">
+          <h2 class="s-standards__title" data-split="lines">Wir setzen neue Standards</h2>
+
+          <div class="s-standards__list" data-standards-list>
+          <div class="s-standards__row" data-standards-row data-active="true">
+            <span class="s-standards__num">01</span>
+            <h3 class="s-standards__name">Modernste<br />Technik</h3>
+            <p class="s-standards__text">
+              Digitale Abformung, 3D-Planung und ein eigenes Praxislabor. Wir
+              sehen das Ergebnis, bevor wir den ersten Schliff machen.
+            </p>
+            <span class="s-standards__bar" data-standards-bar><i></i></span>
+          </div>
+
+          <div class="s-standards__row" data-standards-row>
+            <span class="s-standards__num">02</span>
+            <h3 class="s-standards__name">Individuelle<br />Beratung</h3>
+            <p class="s-standards__text">
+              Kein Katalog, keine Pauschale. Wir hören zu, analysieren Form und
+              Farbe und entwickeln daraus deinen Plan.
+            </p>
+            <span class="s-standards__bar" data-standards-bar><i></i></span>
+          </div>
+
+          <div class="s-standards__row" data-standards-row>
+            <span class="s-standards__num">03</span>
+            <h3 class="s-standards__name">Kompromisslose<br />Qualität</h3>
+            <p class="s-standards__text">
+              Wir arbeiten nur mit Materialien und Laboren, die wir selbst
+              geprüft haben. Auch wenn es länger dauert.
+            </p>
+            <span class="s-standards__bar" data-standards-bar><i></i></span>
+          </div>
+
+          <div class="s-standards__row" data-standards-row>
+            <span class="s-standards__num">04</span>
+            <h3 class="s-standards__name">Spürbar angenehme<br />Atmosphäre</h3>
+            <p class="s-standards__text">
+              Räume, in denen man gerne wartet. Kein Praxisgeruch, kein
+              Neonlicht, keine Hektik am Empfang.
+            </p>
+            <span class="s-standards__bar" data-standards-bar><i></i></span>
+          </div>
+
+          <div class="s-standards__row" data-standards-row>
+            <span class="s-standards__num">05</span>
+            <h3 class="s-standards__name">Nachhaltig auf<br />allen Ebenen</h3>
+            <p class="s-standards__text">
+              Maximaler Zahnerhalt, langlebige Materialien, kurze Wege zu unseren
+              Partnerlaboren in Berlin.
+            </p>
+            <span class="s-standards__bar" data-standards-bar><i></i></span>
+          </div>
+          </div>
+
+          <div class="s-standards__foot">
+            {{> button label="Termin buchen" href="#kontakt" variant="dark" }}
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           UNSERE STANDORTE — horizontal laufende Bildreihe
+           ================================================================== -->
+      <section class="s-gallery" id="standorte" data-gallery>
+        <h2 class="s-gallery__title" data-split="lines">Unsere Standorte</h2>
+
+        <div class="s-gallery__track" data-gallery-track>
+          <figure class="s-gallery__item s-gallery__item--sm">
+            {{> picture name="abstract-02" widths="640,1024" alt="" sizes="10vw" parallax="9" }}
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--md">
+            {{> picture name="praxis-01" widths="640" alt="Empfangsbereich Prenzlauer Berg" sizes="20vw" parallax="9" }}
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--lg">
+            {{> picture name="praxis-03" widths="640,1024,1600,2200" alt="Behandlungsräume mit Tageslicht" sizes="45vw" parallax="9" }}
+            <figcaption class="s-gallery__caption">Prenzlauer Berg</figcaption>
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--md">
+            {{> picture name="praxis-02" widths="640" alt="Wartebereich Christburger Straße" sizes="20vw" parallax="9" }}
+            <figcaption class="s-gallery__caption">Christburger Straße</figcaption>
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--sm">
+            {{> picture name="abstract-01" widths="640,1024" alt="" sizes="10vw" parallax="9" }}
+          </figure>
+        </div>
+
+        <!-- Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. -->
+        <div class="container s-gallery__nav" data-reveal="fade">
+          <div class="s-gallery__arrows">
+            <button class="s-gallery__arrow" data-gallery-prev type="button" aria-label="Vorheriger Standort">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+            <button class="s-gallery__arrow" data-gallery-next type="button" aria-label="Nächster Standort">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+          </div>
+          <div class="s-gallery__dots" data-gallery-dots role="tablist" aria-label="Standorte"></div>
+        </div>
+
+        <div class="container s-cols">
+          <div class="s-cols__item">
+            <!-- Outline-Typo: im Entwurf 284px, transparent mit Kontur. -->
+            <p class="s-cols__display" data-reveal="up" aria-hidden="true">P25</p>
+            <h3 data-reveal="up" data-reveal-delay="0.06" data-reveal-trigger=".s-experts">Praxis Prenzlauer Berg</h3>
+            <p data-reveal="up" data-reveal-delay="0.12" data-reveal-trigger=".s-experts">
+              Sechs Behandlungsräume, eigenes Meisterlabor im Haus, direkter
+              Zugang über den Innenhof. Termine Mo–Fr, 8–19 Uhr.
+            </p>
+          </div>
+          <div class="s-cols__item">
+            <p class="s-cols__display" data-reveal="up" data-reveal-delay="0.08" aria-hidden="true">C37</p>
+            <h3 data-reveal="up" data-reveal-delay="0.14">Praxis Christburger Straße</h3>
+            <p data-reveal="up" data-reveal-delay="0.2">
+              Unser Standort für Prophylaxe und Aligner-Kontrollen. Barrierefrei,
+              fünf Minuten vom Kollwitzplatz.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           UNSERE EXPERTEN
+           ================================================================== -->
+      <section class="s-experts" id="experten">
+        <!-- Bild sitzt links und läuft über den Seitenrand hinaus, der Text
+             steht rechts auf einer schmalen Spalte — so im Entwurf. -->
+        <div class="s-experts__media" data-reveal="fade">
+          {{> picture name="treatment-02" widths="640,1024,1600,1920" alt="Dr. Hannes Schulte-Ostermann und Dr. Kerrin Gratecap" sizes="(max-width: 900px) 100vw, 62vw" parallax="9" }}
+        </div>
+
+        <div class="container grid">
+          <div class="s-experts__body">
+            <h2 class="s-experts__title" data-split="lines">Unsere Experten</h2>
+            <p class="s-experts__names" data-reveal="up" data-reveal-trigger=".s-experts">
+              Dr. Hannes Schulte-Ostermann &amp;<br />Dr. Kerrin Gratecap
+            </p>
+            <p data-reveal="up" data-reveal-delay="0.06" data-reveal-trigger=".s-experts">
+              Beide seit über fünfzehn Jahren auf ästhetische Zahnmedizin
+              spezialisiert, beide mit eigener Laborausbildung. Das ist der
+              Grund, warum bei uns Planung und Umsetzung nicht auseinanderfallen.
+            </p>
+            <p data-reveal="up" data-reveal-delay="0.12" data-reveal-trigger=".s-experts">
+              Dazu ein Team aus vierzehn Kolleginnen und Kollegen, das denselben
+              Anspruch teilt — von der Prophylaxe bis zur Nachsorge.
+            </p>
+            <div class="s-experts__actions" data-reveal="up" data-reveal-delay="0.18" data-reveal-trigger=".s-experts">
+              {{> button label="Zum Team" href="#" variant="dark" }}
+              {{> button label="Karriere" href="#" variant="dark" }}
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ==================================================================
+           TRANSFORMATION STORIES
+           ================================================================== -->
+      <section class="s-stories" data-stories>
+        <!-- Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
+             Scroll — dadurch läuft der Schriftzug am oberen Rand entlang,
+             ohne dass er als Marquee gebaut werden muss. -->
+        <div class="s-stories__ring" data-stories-ring aria-hidden="true">
+          <svg viewBox="0 0 1000 1000">
+            <defs>
+              <path
+                id="storiesCircle"
+                d="M 500,500 m -430,0 a 430,430 0 1,1 860,0 a 430,430 0 1,1 -860,0"
+                fill="none"
+              />
+            </defs>
+            <text>
+              <textPath href="#storiesCircle" startOffset="0%">
+                Transformation Stories — Transformation Stories — Transformation
+                Stories — Transformation Stories —
+              </textPath>
+            </text>
+          </svg>
+        </div>
+        <p class="sr-only">Transformation Stories</p>
+
+        <div class="s-stories__deck" data-deck>
+          <div class="s-stories__stack" data-deck-stack>
+            <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
+                 dahinter durchscheinen lassen. -->
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="smile-portrait" widths="563" alt="Karolina — Veneers" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Karolina</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-01" widths="640,1024" alt="Jonas — Keramikimplantate" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Jonas</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-02" widths="640,1024" alt="Alina — Aligner" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Alina</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-03" widths="640,1024" alt="Mo — Bleaching" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Mo</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-04" widths="640,1024" alt="Thea — Veneers" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Thea</figcaption>
+            </figure>
+          </div>
+
+          <div class="s-stories__controls" data-reveal="up">
+            <button class="s-stories__nav" data-deck-prev type="button" aria-label="Vorherige Geschichte">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+            <span class="s-stories__count" data-deck-count>1 / 5</span>
+            <button class="s-stories__nav" data-deck-next type="button" aria-label="Nächste Geschichte">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="s-quote">
+        <div class="s-quote__inner">
+          <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
+
+          <!-- Wechselt mit der vordersten Karte oben. Alle Zitate liegen
+               übereinander, sichtbar ist immer genau eines. -->
+          <div class="s-quote__stage" data-deck-quotes>
+            <blockquote class="s-quote__text" data-deck-quote data-active="true">
+              Ich hatte vorher bei drei Praxen einen Kostenvoranschlag geholt und überall dasselbe Gefühl: Man verkauft mir ein Produkt. Hier hat mir zum ersten Mal jemand erklärt, warum weniger abschleifen mehr ist — und warum das bei mir länger dauert und trotzdem die bessere Entscheidung war. Nach acht Monaten würde ich es genauso wieder machen. Ich lache wieder auf Fotos, ohne vorher zu überlegen.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Nach dem Implantat hatte ich mit Wochen Schonung gerechnet. Am zweiten Tag war ich wieder im Büro. Was mir am meisten geblieben ist: Man hat mir vorher genau gesagt, was passiert, wie lange es dauert und was danach kommt — und dann ist genau das passiert. Keine Überraschung, keine Nachforderung, kein Termin, der plötzlich doch noch nötig war.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Achtzehn Monate Aligner, alle sechs Wochen ein Termin. Nie das Gefühl gehabt, dass jemand nur die Schiene wechselt und weiterwill. Zwischendurch gab es zwei Stellen, die nicht so liefen wie geplant — das wurde offen angesprochen und nachjustiert, statt es auszusitzen. Am Ende sah es aus wie im Mock-up vom ersten Tag.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Ich wollte eigentlich nur zwei Nuancen heller. Herausgekommen ist ein Gespräch darüber, warum meine Zähne überhaupt nachgedunkelt sind und was ich daran ändern kann, bevor überhaupt gebleicht wird. Das Bleaching kam danach — und hält bis heute, weil die Ursache mit behandelt wurde und nicht nur das Ergebnis.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Ich habe zehn Jahre nicht auf Fotos gelächelt. Das Mock-up zum Probetragen hat mir die Entscheidung abgenommen: Ich konnte sehen, wohin es geht, im Spiegel, im Tageslicht und auf Fotos, bevor irgendetwas endgültig war. Diese eine Stunde hat mehr gebracht als alle Beratungsgespräche davor zusammen.
+            </blockquote>
+          </div>
+
+          <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
+        </div>
+
+        <div class="s-quote__foot">
+          {{> button label="Ganze Story lesen" href="#" }}
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
+           darunter ein Karussell aus Bild + überlappender weißer Karte
+           ================================================================== -->
+      <section class="s-magazine" id="magazin" data-magazine>
+        <div class="container">
+          <span class="c-topline" data-reveal="fade">Guides</span>
+
+          <div class="s-magazine__head">
+            <!-- Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
+                 Leicht gegeneinander gedreht, das „ZU" liegt als weiße
+                 Plakette dazwischen. -->
+            <div class="s-magazine__type" data-reveal="up">
+              <span class="s-magazine__bar">Mund</span>
+              <span class="s-magazine__chip">zu</span>
+              <span class="s-magazine__bar s-magazine__bar--lower">Mund</span>
+            </div>
+
+            <div class="s-magazine__intro">
+              <h2 class="s-magazine__title" data-split="lines">Magazin</h2>
+              <p data-reveal="up" data-reveal-delay="0.08">
+                Was wir sonst am Stuhl erklären, steht hier zum Nachlesen:
+                Behandlungen, Materialien und die Fragen, die uns am häufigsten
+                gestellt werden — ohne Fachjargon und ohne Verkaufsabsicht.
+              </p>
+            </div>
+          </div>
+
+          <div class="s-magazine__track" data-magazine-track>
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="motion-04" widths="640,1024" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Zahngesundheit<br />&amp; Fitness</a>
+                </h3>
+                <p class="c-post__text">
+                  Warum Sportlerinnen und Sportler häufiger Karies haben — und
+                  was dagegen hilft.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="teeth-macro" widths="640,1024,1600,2048" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Bleaching<br />für Zuhause</a>
+                </h3>
+                <p class="c-post__text">
+                  Was die Schienen aus der Drogerie können, wo sie aufhören und
+                  wann es schadet.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="lab-veneers" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Der Weg zur<br />Hygiene</a>
+                </h3>
+                <p class="c-post__text">
+                  Zahnseide, Bürstchen, Spülung — was davon wirklich etwas
+                  bringt und in welcher Reihenfolge.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="treatment-03" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Veneers aus<br />der Türkei</a>
+                </h3>
+                <p class="c-post__text">
+                  Eine ehrliche Rechnung — inklusive der Kosten, die erst später
+                  anfallen.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+          </div>
+
+          <div class="s-magazine__nav">
+            <div class="s-magazine__arrows">
+              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+            <div class="s-gallery__dots" data-magazine-dots role="tablist" aria-label="Beiträge"></div>
+            {{> button label="Alle Beiträge" href="#" variant="dark" }}
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           FAQ — gleiche Bausteine wie auf den Leistungsseiten,
+           hier mit allgemeinen Fragen zur Praxis
+           ================================================================== -->
+      <section class="container s-panel" id="faq">
+        <div class="s-panel__head">
+          <span class="c-topline">FAQ</span>
+          <h2 class="s-panel__title" data-split="lines">Häufige Fragen</h2>
+          <p class="t-body t-muted">
+            Nichts dabei? Schreiben Sie uns — wir antworten in der Regel am
+            selben Werktag.
+          </p>
+        </div>
+
+        <div class="c-accordion" data-accordion="single" data-reveal-stagger="0.07">
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Wie bekomme ich einen Termin?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Über das Formular auf dieser Seite, telefonisch oder per Mail.
+                Für Erstberatungen planen wir eine volle Stunde ein — die
+                bekommen Sie in der Regel innerhalb von zehn Tagen.
+                Schmerzpatientinnen und -patienten nehmen wir am selben Tag.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Behandeln Sie gesetzlich Versicherte?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Ja. Die Regelleistungen rechnen wir über die Kasse ab. Alles,
+                was darüber hinausgeht — Veneers, Keramikimplantate, hochwertige
+                Füllungen — ist eine Privatleistung. Sie bekommen vorher einen
+                schriftlichen Kostenvoranschlag, ohne Ausnahme.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Was kostet die Erstberatung?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Das Erstgespräch mit Befund ist Kassenleistung. Kommt eine
+                digitale Planung mit Mock-up dazu, kostet die 190 € — bei
+                anschließender Behandlung wird sie vollständig angerechnet.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Ich habe Angst vor dem Zahnarzt. Was tun Sie dagegen?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Sagen Sie es uns beim ersten Kontakt. Wir planen dann mehr Zeit
+                ein, erklären jeden Schritt vorab und arbeiten auf Wunsch mit
+                Lachgas oder in Sedierung. Niemand muss sich hier zusammenreißen.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Wie oft sollte ich zur Prophylaxe?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Zweimal im Jahr reicht bei gesundem Zahnfleisch. Nach einer
+                Parodontitis-Behandlung oder mit Implantaten und Veneers
+                empfehlen wir drei bis vier Termine — das ist der günstigste
+                Weg, teure Nacharbeiten zu vermeiden.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Gibt es Parkplätze und ist die Praxis barrierefrei?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                In der Christburger Straße gibt es Parkplätze im Hof und einen
+                stufenlosen Zugang. Der Standort P25 liegt im Hochparterre —
+                sagen Sie kurz Bescheid, dann holen wir Sie am Eingang ab.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    {{> footer }}
+
+    <script type="module" src="/src/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+---
+/**
+ * Stimmen aus dem Team — Zitate, versetzt statt in einer Reihe.
+ *
+ * Drei gleich hohe Karten nebeneinander läsen sich wie ein Formular. Hier
+ * hängen sie auf verschiedenen Höhen und in verschiedenen Breiten, und das
+ * Zitat trägt die Karte, nicht das Foto: Das Bild ist klein und rund,
+ * daneben der Name — die Ordnung eines Zitats, nicht die eines Profils.
+ *
+ * Der Versatz steckt in den Daten (`versatz`), nicht in `:nth-child`. Bei
+ * vier statt drei Stimmen bräuchte eine Regel nach Position sonst eine neue
+ * Ausnahme; so bringt jede Stimme ihre Lage selbst mit.
+ */
+import Picture from "../ui/Picture.astro";
+
+export interface Stimme {
+  zitat: string;
+  name: string;
+  rolle: string;
+  dabeiSeit: string;
+  /** Bildname aus der Bildpipeline (public/img), ohne Größe und Endung. */
+  bild: string;
+  /** Wie tief die Karte hängt: 0 = oben bündig, 1 = ganz abgesenkt. */
+  versatz?: number;
+}
+
+interface Props {
+  topline: string;
+  headline: string;
+  stimmen: Stimme[];
+}
+const { topline, headline, stimmen } = Astro.props;
+---
+
+<section class="s-voices container">
+  <div class="s-voices__head">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-voices__title" data-split="lines">{headline}</h2>
+  </div>
+
+  <div class="s-voices__feld">
+    {stimmen.map((s, i) => (
+      <figure
+        class="s-voices__karte"
+        style={`--versatz: ${s.versatz ?? 0}`}
+        data-reveal="up"
+        data-reveal-delay={i * 0.1}
+      >
+        {/* <blockquote> im <figure>, Name in der <figcaption>: So gehört das
+            Zitat der Person, und Vorlesegeräte geben beides zusammen aus.
+            Ein <p> mit Anführungszeichen täte das nicht. */}
+        <blockquote class="s-voices__zitat">
+          <p>{s.zitat}</p>
+        </blockquote>
+
+        <figcaption class="s-voices__person">
+          <span class="s-voices__bild">
+            <Picture name={s.bild} widths="640" alt="" sizes="72px" />
+          </span>
+          <span class="s-voices__daten">
+            <span class="s-voices__name">{s.name}</span>
+            <span class="s-voices__rolle">{s.rolle}</span>
+            <span class="s-voices__seit">{s.dabeiSeit}</span>
+          </span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  .s-voices {
+    padding-block: var(--section-space);
+  }
+
+  .s-voices__head {
+    max-width: 34ch;
+    margin-bottom: var(--sp-10);
+  }
+
+  .s-voices__head .c-topline {
+    margin-bottom: var(--sp-4);
+  }
+
+  .s-voices__title {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* `align-items: start`, damit die Karten NICHT gleich hoch werden — sie
+     sollen unterschiedlich lang sein dürfen. Genau das nimmt der Reihe das
+     Formularhafte. */
+  .s-voices__feld {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--site-gutter);
+    align-items: start;
+  }
+
+  /* Der Versatz kommt aus den Daten und wird hier in einen Abstand
+     übersetzt. Der Höchstwert hängt am Fenster, damit die Staffelung auf
+     kleinen Schirmen nicht zur Treppe wird. */
+  .s-voices__karte {
+    margin: 0;
+    margin-top: calc(var(--versatz, 0) * clamp(24px, 6vw, 96px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+    padding: var(--sp-5);
+    border-radius: var(--r-md);
+    background: var(--c-surface);
+    color: var(--c-neutral-800);
+  }
+
+  .s-voices__zitat {
+    margin: 0;
+    font-size: var(--fs-text-large);
+    line-height: 1.4;
+  }
+
+  /* Die Anführungszeichen stehen im Satz, nicht als Schmuckzeichen darüber.
+     Der erste Entwurf setzte ein großes „ auf eine eigene Zeile und zog den
+     Text mit einem negativen Abstand darunter — das Zeichen lag dann über
+     dem ersten Wort. Ein Schmuckzeichen, das man erst per Hand aus dem Weg
+     räumen muss, ist an der falschen Stelle.
+
+     Gesetzt statt getippt, damit im CMS reiner Text stehen kann. Nur die
+     Zeichen sind farbig, nicht das Zitat. */
+  .s-voices__zitat p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .s-voices__zitat p::before {
+    content: "„";
+    color: var(--c-brand);
+  }
+
+  .s-voices__zitat p::after {
+    content: "“";
+    color: var(--c-brand);
+  }
+
+  /* `margin-top: auto` schiebt die Person an die Unterkante — bei
+     unterschiedlich langen Zitaten sitzt sie dadurch immer unten. */
+  .s-voices__person {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: auto;
+    padding-top: var(--sp-4);
+    border-top: var(--bw) solid color-mix(in srgb, var(--c-neutral-800) 15%, transparent);
+  }
+
+  .s-voices__bild {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--r-round);
+    overflow: hidden;
+    /* Rundung plus Bild: clip-path schneidet zuverlässiger als overflow —
+       dieselbe Kantenfrage wie beim Bildfeld in Split. */
+    clip-path: inset(0 round var(--r-round));
+  }
+
+  .s-voices__bild :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .s-voices__daten {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+  }
+
+  .s-voices__name {
+    font-size: var(--fs-text-main);
+    line-height: 1.2;
+  }
+
+  .s-voices__rolle,
+  .s-voices__seit {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--c-neutral-800) 70%, transparent);
+  }
+
+  @media (max-width: 900px) {
+    .s-voices__feld {
+      grid-template-columns: 1fr;
+      gap: var(--sp-5);
+    }
+
+    /* Gestapelt ergibt der Versatz keinen Sinn mehr — er würde nur Lücken
+       zwischen die Karten reißen. */
+    .s-voices__karte {
+      margin-top: 0;
+    }
+  }
+</style>

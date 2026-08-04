@@ -1,0 +1,476 @@
+/* ==========================================================================
+   Fonts, Reset, Typografie-Basis, Layout-Primitives
+   ========================================================================== */
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("/fonts/PPNeueMontreal-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("/fonts/PPNeueMontreal-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PP Neue Montreal Mono";
+  src: url("/fonts/PPNeueMontrealMono-Book.woff2") format("woff2");
+  font-weight: 350;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GT Pressura Mono";
+  src: url("/fonts/GT-Pressura-Mono-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Reset ---------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Auch auf html, nicht nur auf body: Elemente, die bewusst über den Rand
+   laufen (Zahnfigur, Reveal-Transforms), erzeugen sonst eine waagerechte
+   Bildlaufleiste — body allein hält das nicht auf. */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* Lenis übernimmt */
+  overflow-x: clip;
+}
+
+body {
+  min-height: 100svh;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--f-sans);
+  font-size: var(--fs-text-main);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* <picture> verschwindet aus dem Layout, damit das <img> direktes Kind
+   seines Containers bleibt. Sonst greifen height:100% und object-fit
+   gegen die auto-hohe <picture>-Box statt gegen den Bildrahmen. */
+picture {
+  display: contents;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 500;
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--c-brand);
+  color: var(--c-dark);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* --- Typo-Utilities -------------------------------------------------- */
+
+.t-display {
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.t-display-2 {
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: var(--fs-display-2);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.t-h1 {
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  line-height: var(--lh-heading);
+}
+
+.t-h2 {
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.t-h3 {
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.t-h5 {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-h5);
+  line-height: 1.22;
+  letter-spacing: var(--tracking-mono);
+}
+
+.t-large {
+  font-size: var(--fs-text-large);
+  line-height: 1.35;
+}
+
+.t-body {
+  font-size: var(--fs-text-main);
+  line-height: 1.45;
+}
+
+/* Das Mono-Micro-Label — Signature-Element der Marke. */
+.t-label {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.t-mono {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  line-height: 1.5;
+  letter-spacing: var(--tracking-mono);
+}
+
+.t-muted {
+  color: var(--c-text-muted);
+}
+
+/* --- Layout-Primitives ------------------------------------------------ */
+
+/* Kein eigener Hintergrund: der Grundton kommt vom body. Deckte die
+   Section ihn selbst, übermalte sie das Korn — das liegt als fixe Ebene
+   hinter `main` (z-index 0 gegen 1). Sichtbar wurde das als harte Kante
+   zwischen deckenden und transparenten Sections. Sections mit eigener
+   Farbe setzen sie weiterhin selbst. */
+.section {
+  position: relative;
+  color: var(--c-text);
+  padding-block: var(--section-space);
+}
+
+.section--flush {
+  padding-block: 0;
+}
+
+.section--lg {
+  padding-block: var(--section-space-lg);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--site-max);
+  margin-inline: auto;
+  padding-inline: var(--site-margin);
+}
+
+.container--wide {
+  max-width: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  gap: var(--site-gutter);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    --grid-cols: 6;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    --grid-cols: 4;
+  }
+}
+
+.stack > * + * {
+  margin-top: var(--stack-space, var(--sp-3));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Bild-Wrapper mit Ratio + Cover — überall wiederverwendet. */
+.media {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+}
+
+/* Ein per transform bewegtes Bild in einem gerundeten, überlaufversteckten
+   Rahmen wird vom Compositor auf eine eigene Ebene gelegt. Die Rundung
+   wird dann pro Frame neu gegen die Bildkante gerechnet — an der Ecke
+   entsteht dadurch eine flackernde Haarlinie.
+   Der Rahmen bekommt hier selbst eine Ebene, damit die Maske einmal
+   gerastert wird und stehen bleibt.
+
+   Achtung: Rahmen mit [data-reveal] bekommen von GSAP ein inline
+   `transform` gesetzt, das dieses translateZ(0) ersetzt. Die Ebene hängt
+   dort an `will-change` aus der Reveal-Regel. */
+.media,
+.s-split__media,
+.s-shero__media,
+.s-experts__media,
+.s-feature__media,
+.s-gallery__item,
+.s-stories__card,
+.s-ba__frame {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Nachfahren-Selektor, nicht `>`: das <img> steckt in einem <picture>,
+   und display:contents ändert nur die Box-Erzeugung, nicht den DOM-Baum
+   gegen den Selektoren matchen. */
+.media img,
+.media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Motion-Basis -----------------------------------------------------
+   Elemente mit [data-reveal] starten unsichtbar. Falls JS nicht lädt,
+   macht die no-js-Regel sie wieder sichtbar — kein leeres Layout.
+   -------------------------------------------------------------------- */
+
+[data-reveal],
+[data-reveal-child] {
+  will-change: transform, opacity;
+}
+
+/* Kinder eines Stagger-Containers gehören mit in die Regel: sie tragen kein
+   [data-reveal], werden aber genauso erst von GSAP eingeblendet. Ohne das
+   stehen sie im ersten Bild fertig da und springen zurück, sobald das Modul
+   sie übernimmt — sichtbar vor allem bei Preis- und FAQ-Karten. */
+.js [data-reveal],
+.js [data-reveal-child] {
+  opacity: 0;
+}
+
+/* Headlines bleiben verborgen, bis SplitText sie in Zeilen zerlegt hat —
+   sonst blitzt der ungeteilte Satz auf, bevor die Maske greift. Sichtbar
+   gesetzt wird in onSplit. */
+.js [data-split] {
+  visibility: hidden;
+}
+
+/* --- Highlight-Marker-Reveal -------------------------------------------
+   Balken verdecken die Zeilen und skalieren zur Seite weg. Die drei
+   negativen Werte (Zeilenhöhe, margin, inset) bestimmen zusammen, ob die
+   Balken sich überlappen, bündig anstoßen oder Luft lassen.
+   -------------------------------------------------------------------- */
+
+[data-highlight-marker-reveal] {
+  visibility: hidden;
+}
+
+/* display: table statt inline-block.
+   Der Balken liegt absolut mit inset: 0 und braucht deshalb eine Box auf
+   Textbreite — inline-block liefert die, stellt kurze Zeilen aber
+   nebeneinander, sobald SplitText die <br> verbraucht hat
+   ("ZahnarztPrenzlauer BergBerlin"). table schrumpft genauso auf den
+   Inhalt, ist aber Block-Level und belegt damit eine eigene Zeile.
+
+   Kein Flex am Absatz: SplitText misst zuerst die Wortpositionen, und in
+   einer Flex-Spalte wird jedes Wort zur eigenen Zeile. */
+[data-highlight-marker-reveal] .highlight-marker-line {
+  width: auto;
+  display: table !important;
+  margin: -0.055em 0px;
+}
+
+.highlight-marker-bar {
+  position: absolute;
+  inset: -0.055em 0px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+  .js [data-reveal-child] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .js [data-split] {
+    visibility: visible !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Klick-Rückmeldung ---------------------------------------------------
+   Jedes Bedienelement quittiert den Klick mit einem kurzen Einsinken — bisher
+   tat das nur .c-btn.
+
+   Über die Eigenschaft `scale`, nicht über `transform`: Pfeile, Karten und
+   Ringkarten tragen bereits eigene Transforms (Hover-Versatz, 3D-Drehung,
+   GSAP). Eine zweite transform-Regel würde die ersetzen statt sie zu
+   ergänzen — `scale` ist eine eigene Eigenschaft und legt sich darüber.
+
+   Die Stärke ist ein Regler, keine feste Zahl. Sie muss es sein: derselbe
+   Faktor wirkt je nach Größe völlig verschieden. 0.98 sind auf einer breiten
+   Akkordeonzeile rund 24px und deutlich zu sehen, auf einem 48px-Kreis knapp
+   ein Pixel und praktisch unsichtbar. Kleine Bedienelemente setzen deshalb
+   einen kräftigeren Wert, und wer gar nicht einsinken soll, setzt 1.
+
+   Ohne Übergang: das Einsinken soll im selben Moment geschehen wie der Druck.
+   -------------------------------------------------------------------- */
+
+button,
+.c-btn,
+[role="button"],
+label.c-file {
+  --klick-druck: 0.98;
+}
+
+/* Runde Symbolknöpfe sind klein — sie brauchen mehr, um überhaupt zu wirken. */
+.s-gallery__arrow,
+.s-stories__nav {
+  --klick-druck: 0.88;
+}
+
+/* Akkordeons sinken NIE ein. Eine ganze Zeile, die beim Aufklappen
+   zusammenzuckt, wirkt wie ein Ruckeln, nicht wie ein Druck.
+
+   Die Regel hängt am data-Attribut, also am Verhalten, nicht an einer
+   Klasse: Sie gilt damit auch für die Stellenliste, die dasselbe Modul
+   benutzt, und für jedes Akkordeon, das noch dazukommt. */
+[data-accordion-trigger] {
+  --klick-druck: 1;
+}
+
+button:active,
+.c-btn:active,
+[role="button"]:active,
+label.c-file:active {
+  scale: var(--klick-druck, 0.98);
+}
+
+/* Ohne Bewegung keine Skalierung. */
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  .c-btn:active,
+  [role="button"]:active,
+  label.c-file:active {
+    scale: 1;
+  }
+}
+
+/* --- Wörter der Hero-Choreografie ---------------------------------------
+   hero.js zerlegt die Überschrift in Wörter und darin in Zeichen. Beide
+   Ebenen sind inline-block — und ein inline-block bricht seinen INHALT um,
+   sobald der breiter ist als die Zeile. Auf den Leistungsseiten stand
+   dadurch „CMD MIT BOTOXBEH / ANDLUNG“: mitten im Wort, ohne Trennstrich.
+
+   `nowrap` hält die Zeichen eines Wortes zusammen. Umbrochen wird dann nur
+   noch zwischen Wörtern — und dass ein einzelnes langes Wort in seine Spalte
+   passt, stellt der gerechnete Gradmaximalwert in ServiceHero.astro sicher.
+
+   Steht hier und nicht in der Komponente: die Klasse entsteht zur Laufzeit,
+   eine abgegrenzte Regel würde sie nicht erreichen — und beide Heroes
+   (Startseite wie Leistungsseiten) benutzen dasselbe Modul.
+   -------------------------------------------------------------------- */
+
+.hero-wort {
+  white-space: nowrap;
+}

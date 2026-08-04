@@ -1,0 +1,22 @@
+# Netlify liest diese Datei aus dem Auslieferungsverzeichnis.
+#
+# `noindex` als Kopfzeile statt nur als Meta-Tag: So gilt es auch für PDFs,
+# Bilder und alles andere, was kein <head> hat. `nofollow` verhindert, dass
+# ein Crawler von hier aus weiterläuft.
+#
+# Gehört zusammen mit robots.txt entfernt, wenn die Seite echt live geht.
+/*
+  X-Robots-Tag: noindex, nofollow
+
+# Bilder, Schriften und die gehashten Astro-Bundles ändern sich nie unter
+# demselben Namen — die dürfen dauerhaft im Cache bleiben. Die HTML-Dateien
+# bewusst nicht: Sonst sieht der Kunde nach einer Neuveröffentlichung noch
+# den alten Stand und meldet Fehler, die längst behoben sind.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/img/*
+  Cache-Control: public, max-age=604800

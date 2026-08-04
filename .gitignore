@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.env
+.DS_Store
+*.log
+.shots/
+studio/dist/
+
+# Ganzseiten-Aufnahmen. 373 MB in 15 Dateien, erzeugt von
+# scripts/aufnahmen.mjs — eine Aufnahme der Startseite misst allein
+# 3456 × 25228 Pixel. Wiederherstellbar mit `node scripts/aufnahmen.mjs`,
+# und damit nichts, was dauerhaft in der Versionsgeschichte liegen sollte.
+# Dieselbe Überlegung wie bei .shots/ eine Zeile darüber.
+aufnahmen/

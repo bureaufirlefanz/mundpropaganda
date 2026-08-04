@@ -1,0 +1,693 @@
+---
+/**
+ * Styleguide — die Grundlagen: Farben, Typografie, Abstände, Radien,
+ * Bewegung und die kleinen Bausteine, aus denen alles Übrige besteht.
+ *
+ * Alle Werte kommen aus tokens.css und werden hier NICHT wiederholt, sondern
+ * über die Custom Property gezogen. Eine Seite, die Farben als Hex-Werte
+ * abschreibt, ist nach der ersten Änderung eine Lüge.
+ *
+ * Die Kontrastwerte daneben sind gerechnet, nicht abgetippt: dieselbe Formel
+ * wie in scripts/lib/wcag.mjs, damit hier nichts als „AA“ dasteht, was der
+ * Prüflauf beanstanden würde.
+ */
+import Design from "../../layouts/Design.astro";
+import Button from "../../components/ui/Button.astro";
+import Accordion from "../../components/ui/Accordion.astro";
+
+/* --- Kontrast ---------------------------------------------------------
+   Zur Bauzeit gerechnet. Die Farben stehen hier als Hex, weil sich clamp()
+   und color-mix() nicht in Node auswerten lassen — sie sind aus tokens.css
+   übernommen und über den Prüflauf abgesichert, nicht frei gewählt. */
+const HEX = {
+  brand: "#ff84c8",
+  dark: "#403229",
+  taupe: "#d0bec3",
+  grey: "#d6d6d6",
+  "neutral-800": "#201d1d",
+  "neutral-200": "#f4f4f4",
+  white: "#ffffff",
+  black: "#000000",
+} as const;
+
+const kanal = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+
+function leuchtdichte(hex: string) {
+  const k = kanal(hex).map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+}
+
+function kontrast(a: string, b: string) {
+  const [x, y] = [leuchtdichte(a), leuchtdichte(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/* Jede Farbe gegen den Grund, auf dem sie tatsächlich vorkommt. */
+const FARBEN = [
+  { name: "--c-brand", hex: HEX.brand, rolle: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-dark", hex: HEX.dark, rolle: "Schrift, dunkle Bänder, Knopffüllung", gegen: HEX.grey, gegenName: "--c-grey" },
+  { name: "--c-taupe", hex: HEX.taupe, rolle: "Grund der Leistungs- und Geschichten-Section", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-grey", hex: HEX.grey, rolle: "Seitengrund", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-neutral-800", hex: HEX["neutral-800"], rolle: "Schrift auf hellen Flächen (Formular, Magazin)", gegen: HEX["neutral-200"], gegenName: "--c-neutral-200" },
+  { name: "--c-neutral-200", hex: HEX["neutral-200"], rolle: "Flächen: Karten, Eingabefelder", gegen: HEX["neutral-800"], gegenName: "--c-neutral-800" },
+];
+
+/* Abgeleitete Töne. Die Deckungswerte sind gerechnet — siehe tokens.css. */
+const ABGELEITET = [
+  { name: "--c-text-muted", regel: "--c-dark auf 75 %", zweck: "Nebentext auf Grau", wert: 4.53 },
+  { name: "--c-text-muted (Taupe)", regel: "--c-dark auf 82 %", zweck: "Nebentext auf Taupe", wert: 4.55 },
+  { name: "--c-text-muted (dunkel)", regel: "--c-grey auf 65 %", zweck: "Nebentext auf Braun", wert: 4.62 },
+  { name: "--c-line", regel: "--c-dark auf 28 %", zweck: "Trennlinien - Schmuck, kein Bedienelement", wert: null },
+];
+
+const GRADE = [
+  { token: "--fs-display", figma: "250 px", zweck: "Wortmarke im Hero", text: "Mund" },
+  { token: "--fs-display-2", figma: "125 px", zweck: "Konturzahlen der Standorte", text: "P25" },
+  { token: "--fs-h1", figma: "70 px", zweck: "Seitentitel der Leistungsseiten", text: "Veneers" },
+  { token: "--fs-h2", figma: "40 px", zweck: "Überschrift einer Section", text: "Unsere Standorte" },
+  { token: "--fs-h5", figma: "24 px", zweck: "Meta-Zeilen im Hero", text: "Zahnarzt Prenzlauer Berg" },
+  { token: "--fs-text-large", figma: "20 px", zweck: "Einleitungstexte", text: "Wir nehmen uns eine volle Stunde." },
+  { token: "--fs-text-main", figma: "18 px", zweck: "Fließtext", text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus." },
+  { token: "--fs-text-small", figma: "16 px", zweck: "Toplines, Beschriftungen", text: "Prenzlauer Berg" },
+  { token: "--fs-label", figma: "12 px", zweck: "Kleinstbeschriftungen", text: "Ab 690 € je Zahn" },
+];
+
+const ABSTAENDE = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-8", "--sp-10", "--sp-12", "--sp-16"];
+const RADIEN = ["--r-sm", "--r-md", "--r-lg", "--r-round"];
+const KURVEN = [
+  { token: "--e-out", zweck: "Standard. Schnell los, lange auslaufend." },
+  { token: "--e-in-out", zweck: "Wenn Anfang und Ende gleich wiegen - Aufklappen." },
+  { token: "--e-swift", zweck: "Kurze Zustandswechsel: Farbe, Deckkraft." },
+];
+const DAUERN = [
+  { token: "--d-fast", wert: "0.25 s", zweck: "Farbwechsel beim Überfahren" },
+  { token: "--d-base", wert: "0.45 s", zweck: "Standard für Bewegung" },
+  { token: "--d-slow", wert: "0.8 s", zweck: "Aufklappen, Umblenden" },
+];
+
+const SYMBOLE = ["i-arrow", "i-chevron", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
+
+const BEISPIEL_FRAGEN = [
+  { frage: "Wie bekomme ich einen Termin?", antwort: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
+  { frage: "Behandeln Sie gesetzlich Versicherte?", antwort: "Ja. Die Regelleistungen rechnen wir über die Kasse ab." },
+];
+
+const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+---
+
+<Design title="Styleguide" aktiv="styleguide">
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">00</span>
+      <h1 class="d-teil__titel">Styleguide</h1>
+      <p class="d-teil__text">
+        Die Grundlagen der Seite: Farben, Typografie, Abstände, Radien und
+        Bewegung - dazu die kleinen Bausteine, aus denen alles Übrige
+        zusammengesetzt ist. Jeder Wert kommt aus <code>src/styles/tokens.css</code>
+        und wird hier gezogen, nicht abgeschrieben. Die zusammengesetzten
+        Bausteine stehen auf der <a class="c-link" href="/design/komponenten">Komponenten-Seite</a>.
+      </p>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">01</span>
+      <h2 class="d-teil__titel">Farben</h2>
+      <p class="d-teil__text">
+        Sechs Farben, mehr nicht. Daneben steht das gemessene Kontrastverhältnis
+        gegen den Grund, auf dem die Farbe tatsächlich vorkommt - WCAG&nbsp;AA
+        verlangt 4,5:1 für Fließtext, 3:1 für große Schrift und für
+        Bedienelemente.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-raster">
+        {FARBEN.map((f) => {
+          const v = kontrast(f.hex, f.gegen);
+          return (
+            <div class="d-farbe">
+              <div class="d-farbe__feld" style={`background: ${f.hex}`}></div>
+              <p class="d-farbe__name">{f.name}</p>
+              <p class="d-farbe__hex">{f.hex}</p>
+              <p class="d-farbe__rolle">{f.rolle}</p>
+              <p class="d-farbe__wert">
+                {zahl(v)}:1 auf <code>{f.gegenName}</code>
+                {" "}
+                <span class={v >= 4.5 ? "d-marke d-marke--gut" : v >= 3 ? "d-marke d-marke--teils" : "d-marke d-marke--schwach"}>
+                  {v >= 4.5 ? "Fließtext" : v >= 3 ? "nur groß" : "nur Fläche"}
+                </span>
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Abgeleitete Töne</span>
+        <span class="d-probe__pfad">src/styles/tokens.css</span>
+      </div>
+      <p class="d-probe__text">
+        Nebentext entsteht nicht aus einer eigenen Farbe, sondern aus der
+        Schriftfarbe mit verringerter Deckung. Die Deckungswerte sind gerechnet:
+        Taupe ist dunkler als Grau und braucht deshalb mehr.
+      </p>
+      <table class="d-tabelle">
+        <thead>
+          <tr><th>Token</th><th>Regel</th><th>Zweck</th><th>Kontrast</th></tr>
+        </thead>
+        <tbody>
+          {ABGELEITET.map((a) => (
+            <tr>
+              <td><code>{a.name}</code></td>
+              <td>{a.regel}</td>
+              <td>{a.zweck}</td>
+              <td>{a.wert ? `${zahl(a.wert)}:1` : "-"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">02</span>
+      <h2 class="d-teil__titel">Typografie</h2>
+      <p class="d-teil__text">
+        Zwei Schriften. PP Neue Montreal trägt alles Gesetzte, GT Pressura Mono
+        alles Beschriftende - Toplines, Preise, Kleinstangaben. Die Skala ist
+        fluid: die Figma-Werte gelten bei 1728&nbsp;px Fensterbreite, darunter
+        und darüber rechnet <code>clamp()</code> weiter.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Schriften</span></div>
+      <div class="d-raster">
+        <div class="d-buehne">
+          <p class="d-schrift-name">--f-sans · PP Neue Montreal</p>
+          <p class="d-schrift-probe" style="font-family: var(--f-sans)">AaBbCc 0123</p>
+          <p class="d-schrift-probe" style="font-family: var(--f-sans); font-weight: 500">Medium 500</p>
+        </div>
+        <div class="d-buehne">
+          <p class="d-schrift-name">--f-mono · GT Pressura Mono</p>
+          <p class="d-schrift-probe" style="font-family: var(--f-mono); font-weight: 300">AaBbCc 0123</p>
+          <p class="d-schrift-probe" style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em">Light 300 gesperrt</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Skala</span></div>
+      {GRADE.map((g) => (
+        <div class="d-grad">
+          <div class="d-grad__meta">
+            <code>{g.token}</code>
+            <span>{g.figma}</span>
+            <span class="d-grad__zweck">{g.zweck}</span>
+          </div>
+          <p class="d-grad__probe" style={`font-size: var(${g.token})`}>{g.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">03</span>
+      <h2 class="d-teil__titel">Abstände, Radien, Rahmen</h2>
+      <p class="d-teil__text">
+        Die Abstandsskala wächst nicht linear - unten in Achterschritten, oben
+        in Sprüngen. Abstände zwischen Sections haben eigene Token, weil sie
+        mit der Fensterbreite mitwachsen müssen.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Abstände</span></div>
+      {ABSTAENDE.map((t) => (
+        <div class="d-mass">
+          <code class="d-mass__name">{t}</code>
+          <div class="d-mass__balken" style={`width: var(${t})`}></div>
+        </div>
+      ))}
+      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+        Dazu drei fluide Werte für den Abstand zwischen Sections:
+        <code>--section-space</code> als Regelfall,
+        <code>--section-space-sm</code> wenn direkt darunter eine Farbfläche
+        anschließt, und <code>--section-space-lg</code> für den großen Absatz.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Radien</span></div>
+      <div class="d-buehne d-buehne--reihe">
+        {RADIEN.map((r) => (
+          <div class="d-radius">
+            <div class="d-radius__feld" style={`border-radius: var(${r})`}></div>
+            <code>{r}</code>
+          </div>
+        ))}
+      </div>
+      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+        Rahmenstärke ist überall <code>--bw</code> (1&nbsp;px). Es gibt keine
+        zweite - eine Seite mit drei Linienstärken wirkt unentschieden.
+      </p>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">04</span>
+      <h2 class="d-teil__titel">Bewegung</h2>
+      <p class="d-teil__text">
+        Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus
+        und federn nie zurück. Zum Ausprobieren die Felder überfahren.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Kurven</span></div>
+      {KURVEN.map((k) => (
+        <div class="d-kurve">
+          <div class="d-kurve__meta">
+            <code>{k.token}</code>
+            <span class="d-grad__zweck">{k.zweck}</span>
+          </div>
+          <div class="d-kurve__bahn">
+            <span class="d-kurve__ball" style={`transition-timing-function: var(${k.token})`}></span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Dauern</span></div>
+      <table class="d-tabelle">
+        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
+        <tbody>
+          {DAUERN.map((d) => (
+            <tr><td><code>{d.token}</code></td><td>{d.wert}</td><td>{d.zweck}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">05</span>
+      <h2 class="d-teil__titel">Knöpfe und Links</h2>
+      <p class="d-teil__text">
+        Der Knopf ist zweiteilig: Pille mit Beschriftung, abgesetzt daneben der
+        runde Pfeil. Beim Überfahren wandert der Pfeil nach rechts und beide
+        Teile kehren ihre Farben um - der Knopf öffnet sich in Leserichtung.
+        Jedes Bedienelement sinkt beim Klick leicht ein.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Varianten</span>
+        <span class="d-probe__pfad">components/ui/Button.astro</span>
+      </div>
+      <div class="d-buehne d-buehne--reihe">
+        <Button label="Termin buchen" href="#" />
+        <Button label="Dunkel" href="#" variant="dark" />
+        <Button label="Absenden" type="submit" />
+      </div>
+      <div class="d-buehne d-buehne--dunkel" style="margin-top: var(--sp-4)">
+        <div class="d-buehne--reihe" style="display:flex; flex-wrap:wrap; gap: var(--sp-4)">
+          <Button label="Auf dunklem Grund" href="#" />
+          <Button label="Block" href="#" variant="block" />
+        </div>
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Textlink und Topline</span></div>
+      <div class="d-buehne">
+        <p style="margin-bottom: var(--sp-4)"><a class="c-link" href="#">Ein Textlink</a> im Fließtext.</p>
+        <span class="c-topline">Vorher &amp; Nachher</span>
+      </div>
+      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+        Die Topline erbt ihre Farbe von der Section, sie setzt keine eigene -
+        sonst stünde sie auf dem braunen Band dunkel auf dunkel.
+      </p>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">06</span>
+      <h2 class="d-teil__titel">Flächen und Formularelemente</h2>
+      <p class="d-teil__text">
+        Alles, was Inhalt trägt oder Eingaben entgegennimmt.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Akkordeon</span>
+        <span class="d-probe__pfad">components/ui/Accordion.astro</span>
+      </div>
+      <div class="d-buehne">
+        <Accordion fragen={BEISPIEL_FRAGEN} />
+      </div>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf"><span class="d-probe__name">Eingabefelder</span></div>
+      <div class="d-buehne d-formular">
+        <div class="c-field">
+          <label class="c-field__label" for="sg-name">Name <span>*</span></label>
+          <div class="c-field__control">
+            <input id="sg-name" type="text" placeholder="Ihr Name" />
+          </div>
+        </div>
+        <div class="c-field">
+          <label class="c-field__label" for="sg-mail">E-Mail-Adresse <span>*</span></label>
+          <div class="c-field__control">
+            <input id="sg-mail" type="email" placeholder="name@beispiel.de" />
+          </div>
+        </div>
+        <div class="c-field c-field--tall">
+          <label class="c-field__label" for="sg-msg">Nachricht</label>
+          <div class="c-field__control">
+            <textarea id="sg-msg" rows="4" placeholder="Worum geht es?"></textarea>
+          </div>
+        </div>
+      </div>
+      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+        Die Beschriftung steht über dem Feld und ist über <code>for</code> mit
+        ihm verbunden - ein Platzhalter allein ist keine Beschriftung, er
+        verschwindet beim Tippen.
+      </p>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-teil">
+    <div class="d-teil__kopf">
+      <span class="d-teil__nummer">07</span>
+      <h2 class="d-teil__titel">Symbole</h2>
+      <p class="d-teil__text">
+        Ein einziges SVG-Sprite, einmal im Dokument, überall per
+        <code>&lt;use href="#i-…"&gt;</code> aufgerufen. Die Symbole erben
+        <code>currentColor</code>, sie tragen keine eigene Farbe.
+      </p>
+    </div>
+
+    <div class="d-probe">
+      <div class="d-probe__kopf">
+        <span class="d-probe__name">Sprite</span>
+        <span class="d-probe__pfad">components/ui/Icons.astro</span>
+      </div>
+      <div class="d-raster">
+        {SYMBOLE.map((s) => (
+          <div class="d-symbol">
+            <svg aria-hidden="true"><use href={`#${s}`} /></svg>
+            <code>{s}</code>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* --- Farbkacheln --- */
+    .d-farbe__feld {
+      height: 96px;
+      margin-bottom: var(--sp-3);
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-sm);
+    }
+
+    .d-farbe__name {
+      font-family: var(--f-mono);
+      font-size: var(--fs-text-small);
+    }
+
+    .d-farbe__hex,
+    .d-farbe__rolle,
+    .d-farbe__wert {
+      font-size: var(--fs-text-small);
+      line-height: 1.45;
+      color: var(--c-text-muted);
+    }
+
+    .d-farbe__rolle {
+      margin-block: var(--sp-1);
+    }
+
+    /* Nicht nur farbig, sondern beschriftet: eine Ampel allein sagt denen
+       nichts, die die Farbe nicht unterscheiden (WCAG 1.4.1). */
+    .d-marke {
+      display: inline-block;
+      padding: 0.1em 0.5em;
+      border-radius: var(--r-sm);
+      font-family: var(--f-mono);
+      font-size: var(--fs-label);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .d-marke--gut { background: var(--c-dark); color: var(--c-grey); }
+    .d-marke--teils { background: var(--c-brand); color: var(--c-dark); }
+    .d-marke--schwach { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
+
+    /* --- Tabellen --- */
+    .d-tabelle {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fs-text-small);
+      text-align: left;
+    }
+
+    .d-tabelle th,
+    .d-tabelle td {
+      padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+      border-bottom: var(--bw) solid var(--c-line);
+      vertical-align: top;
+    }
+
+    .d-tabelle th {
+      font-family: var(--f-mono);
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .d-tabelle td:not(:first-child) {
+      color: var(--c-text-muted);
+    }
+
+    /* --- Schrift- und Gradproben --- */
+    .d-schrift-name {
+      margin-bottom: var(--sp-3);
+      font-family: var(--f-mono);
+      font-size: var(--fs-label);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--c-text-muted);
+    }
+
+    .d-schrift-probe {
+      font-size: var(--fs-h2);
+      line-height: 1.2;
+    }
+
+    .d-grad {
+      padding-block: var(--sp-4);
+      border-top: var(--bw) solid var(--c-line);
+    }
+
+    .d-grad__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2) var(--sp-4);
+      margin-bottom: var(--sp-2);
+      font-family: var(--f-mono);
+      font-size: var(--fs-label);
+      letter-spacing: 0.04em;
+      color: var(--c-text-muted);
+    }
+
+    .d-grad__zweck {
+      text-transform: none;
+    }
+
+    /* Überlauf erlaubt: die großen Grade sind breiter als das Fenster, und
+       genau das sollen sie zeigen. Abgeschnitten wären sie eine Lüge über
+       ihre Größe — deshalb scrollt die Zeile für sich. */
+    .d-grad__probe {
+      overflow-x: auto;
+      font-weight: 500;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+
+    /* --- Abstände und Radien --- */
+    .d-mass {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      padding-block: var(--sp-1);
+    }
+
+    .d-mass__name {
+      flex: 0 0 7ch;
+      font-size: var(--fs-label);
+      color: var(--c-text-muted);
+    }
+
+    .d-mass__balken {
+      height: 14px;
+      border-radius: var(--r-sm);
+      background: var(--c-dark);
+    }
+
+    .d-radius {
+      text-align: center;
+      font-size: var(--fs-label);
+    }
+
+    .d-radius__feld {
+      width: 88px;
+      height: 88px;
+      margin-bottom: var(--sp-2);
+      border: var(--bw) solid var(--c-line);
+      background: var(--c-dark);
+    }
+
+    /* --- Bewegungskurven --- */
+    .d-kurve {
+      padding-block: var(--sp-4);
+      border-top: var(--bw) solid var(--c-line);
+    }
+
+    .d-kurve__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2) var(--sp-4);
+      margin-bottom: var(--sp-3);
+      font-family: var(--f-mono);
+      font-size: var(--fs-label);
+      color: var(--c-text-muted);
+    }
+
+    .d-kurve__bahn {
+      position: relative;
+      height: 32px;
+      border-radius: var(--r-round);
+      background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+    }
+
+    .d-kurve__ball {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--r-round);
+      background: var(--c-brand);
+      transition-property: translate;
+      transition-duration: var(--d-slow);
+    }
+
+    .d-kurve:hover .d-kurve__ball,
+    .d-kurve:focus-within .d-kurve__ball {
+      translate: calc(100cqw - 32px) 0;
+    }
+
+    .d-kurve__bahn {
+      container-type: inline-size;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .d-kurve__ball {
+        transition-duration: 0s;
+      }
+    }
+
+    /* --- Formular --- */
+    .d-formular {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+
+    @media (max-width: 700px) {
+      .d-formular {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Die Feldregeln liegen in Contact.astro und sind dort abgegrenzt — auf
+       dieser Seite gibt es sie nicht. Hier stehen deshalb nur die nötigsten,
+       bewusst als Nachbau gekennzeichnet. */
+    .d-formular .c-field__label {
+      display: block;
+      margin-bottom: var(--sp-1);
+      font-family: var(--f-mono);
+      font-weight: 300;
+      font-size: var(--fs-text-small);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--c-neutral-800);
+    }
+
+    /* Wie in Contact.astro: der Pflichtstern trägt die Farbe der
+       Beschriftung. Pink erreicht bei dieser Größe auf hellem Grund keine
+       4.5:1 und wäre als Text unzulässig. */
+    .d-formular .c-field__label span {
+      color: inherit;
+    }
+
+    .d-formular input,
+    .d-formular textarea {
+      width: 100%;
+      padding: var(--sp-3) var(--sp-4);
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-sm);
+      background: var(--c-white);
+      font-family: var(--f-sans);
+      font-size: var(--fs-text-main);
+      color: var(--c-neutral-800);
+    }
+
+    .d-formular .c-field--tall {
+      grid-column: 1 / -1;
+    }
+
+    /* --- Symbole --- */
+    .d-symbol {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: var(--sp-3);
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-sm);
+      font-size: var(--fs-label);
+    }
+
+    .d-symbol svg {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+  </style>
+</Design>

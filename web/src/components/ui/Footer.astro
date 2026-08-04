@@ -1,0 +1,360 @@
+---
+import Button from "./Button.astro";
+import { ladeLeistungsliste, fuerTabelle, pfad } from "../../lib/leistungsliste";
+import { ladeEinstellungen, telLink } from "../../lib/einstellungen";
+
+// Dieselbe Quelle wie Services-Tabelle und Menü. Gezeigt werden die
+// Hauptleistungen; die Zusatzlinks der Startseite bleiben dort.
+const leistungen = fuerTabelle(await ladeLeistungsliste());
+const e = await ladeEinstellungen();
+
+// Nur Netzwerke zeigen, die gepflegt sind — ein Symbol ohne Ziel führt nirgends
+// hin und sieht trotzdem nach Angebot aus.
+const PROFILE = [
+  { schluessel: "facebook", titel: "Facebook", symbol: "#i-facebook" },
+  { schluessel: "instagram", titel: "Instagram", symbol: "#i-instagram" },
+  { schluessel: "linkedin", titel: "LinkedIn", symbol: "#i-linkedin" },
+  { schluessel: "youtube", titel: "YouTube", symbol: "#i-youtube" },
+] as const;
+const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filter((p) => p.url);
+
+// Jahreszahl zur Bauzeit — die Seite ist statisch, ein Skript dafür wäre
+// unnötiges Gewicht.
+const jahr = new Date().getFullYear();
+---
+
+<footer class="c-footer">
+  <!-- Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
+       der Seite. -->
+  <a class="c-footer__wordmark" href="/" data-reveal="up">Mundpropaganda</a>
+
+  <div class="c-footer__top">
+    <div class="c-footer__contact">
+      <div class="c-footer__social">
+        {profile.map((p) => (
+          <a href={p.url} aria-label={p.titel}><svg><use href={p.symbol} /></svg></a>
+        ))}
+      </div>
+
+      <div class="c-footer__lines">
+        <a class="c-link" href={telLink(e.telefon)}>{e.telefon}</a>
+        <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>
+      </div>
+
+      <Button label="Termin buchen" href="#kontakt" />
+
+      {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
+          Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
+          breit genug für zwei nebeneinander. Quelle sind dieselben
+          Einstellungen wie in der Standorte-Section. */}
+      <div class="c-footer__standorte">
+        {e.standorte.map((o) => (
+          <div>
+            {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
+                ohnehin die Straße, und „Praxis Prenzlauer Allee /
+                Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
+                Halbgeviertstrich wie sonst auch auf der Seite. */}
+            <p class="c-footer__standort-name">Praxis – {o.kuerzel}</p>
+            {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
+                solche an. Der Browser setzt das Element kursiv, das wird
+                unten zurückgenommen. */}
+            <address>{o.strasse}<br />{o.ort}</address>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <nav class="c-footer__nav" aria-label="Leistungen">
+      <p class="c-footer__nav-title">Services</p>
+      {leistungen.map((l) => (
+        <a class="c-link" href={pfad(l)}>{l.name}</a>
+      ))}
+    </nav>
+
+    {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
+        Zeile höher als die anderen — drei Spalten, von denen eine ohne
+        Anlass aus der Reihe fällt. */}
+    <nav class="c-footer__nav" aria-label="Praxis">
+      <p class="c-footer__nav-title">Praxis</p>
+      <a class="c-link" href="#experten">About</a>
+      <a class="c-link" href="#magazin">Guides</a>
+      <a class="c-link" href="/karriere">Karriere</a>
+      <a class="c-link" href="#experten">Team</a>
+      <a class="c-link" href="#standorte">Standorte</a>
+      <a class="c-link" href="#kontakt">Kontakt</a>
+    </nav>
+  </div>
+
+  <div class="c-footer__bottom">
+    <p>© {jahr} Copyright. All rights reserved.</p>
+    <div class="c-footer__legal">
+      <a class="c-link" href="#">Impressum</a>
+      <a class="c-link" href="#">Datenschutz</a>
+      <a class="c-link" href="#">AGB</a>
+      <a class="c-link" href="#">Barrierefreiheit</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Wortmarke über die volle Panelbreite, darunter drei Spalten, unten die
+     Rechtszeile. Maße aus dem Entwurf (Panel 1693 von 1728 Seitenbreite).
+
+     Auf --site-max gedeckelt wie alle übrigen Blöcke. Ohne das läuft das
+     Panel auf breiten Schirmen weiter, während die Wortmarke bei ihrem
+     Höchstgrad stehenbleibt — rechts entsteht dann eine Lücke.
+
+     z-index wie bei main im Rahmen: der Footer liegt über den
+     Hintergrundebenen. */
+  .c-footer {
+    --footer-gap: clamp(12px, 1.04vw, 18px);
+
+    /* Bezugsgröße für die Wortmarke. Sie soll den Satzspiegel des Panels
+       ausfüllen, und der ist nicht das Fenster: Innenabstand und Außenfuge
+       nehmen bei 1728px zusammen 7 % der Fensterbreite, bei 390px aber
+       18,5 %. Eine in vw gerechnete Schrift muss dabei überlaufen. */
+    container-type: inline-size;
+
+    position: relative;
+    z-index: 1;
+    width: min(var(--site-max), calc(100% - var(--footer-gap) * 2));
+    margin: 0 auto var(--footer-gap);
+    padding: clamp(24px, 2.4vw, 42px) clamp(24px, 2.8vw, 48px) 0;
+    border-radius: var(--r-md);
+    background: var(--c-dark);
+    color: var(--c-grey);
+    overflow: hidden;
+  }
+
+  /* GT Pressura Mono wie im Entwurf, und der Grad ist gerechnet, nicht
+     geschätzt: Ein Zeichen dieser Schrift misst 0.5398 em (gemessen, in drei
+     Fenstergrößen gleich), „Mundpropaganda" hat 14 davon, macht 7.557 em für
+     das ganze Wort. Der Satzspiegel ist 100cqw — also 100 / 7.557 = 13.23cqw
+     je Zeichenbreite. 13.2 lässt ein Haar Luft.
+
+     `cqw` statt `vw`: Die Einheit bezieht sich auf den Inhaltskasten des
+     Fußes, nicht auf das Fenster. Mit 12.22vw stand die Wortmarke bei 1728px
+     genau im Satzspiegel, lief bei 900px schon 5px über und bei 390px 42px —
+     dort schnitt sie der Rahmen ab, und aus MUNDPROPAGANDA wurde
+     MUNDPROPAGAND.
+
+     Kein clamp mehr: Der Fuß ist auf --site-max gedeckelt, damit auch die
+     Bezugsgröße — der Grad kann gar nicht über den Entwurfswert hinaus
+     wachsen. */
+  .c-footer__wordmark {
+    display: block;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 13.2cqw;
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--c-grey);
+  }
+
+  /* Der Knopf bleibt hier beim Überfahren pink. Die Umkehrung ins Braune
+     (siehe Button.astro) ließe ihn im dunklen Fuß verschwinden. Gemessen ist
+     das die einzige dunkle Fläche der Seite, die einen Knopf trägt — der
+     Regler steht trotzdem allgemein da, damit die nächste ihn hat. */
+  .c-footer {
+    --knopf-hover-grund: var(--c-brand);
+    --knopf-hover-schrift: var(--c-dark);
+  }
+
+  /* Kontakt links, die beiden Linkspalten am rechten Rand.
+
+     Die Linkspalten sind schmal und liegen rechts: Der Kontakt bekommt mit
+     `1fr` alles, was übrig bleibt, und drückt sie dorthin. Als gleich große
+     Anteile maßen sie 464px für Wörter von höchstens 172px und schoben sich
+     dadurch in die Mitte, statt rechts abzuschließen.
+
+     12rem als Untergrenze, damit sie nicht auf ihre Tinte schrumpfen — mit
+     reinem `fit-content` maß „Praxis" nur 77px und stand als schmaler
+     Streifen neben der doppelt so breiten Nachbarin. So sind beide 192px
+     breit und gleich.
+
+     `max-content` und nicht `fit-content()` als Obergrenze: `fit-content()`
+     ist innerhalb von `minmax()` nicht zulässig. Die Zeile war damit
+     ungültig, das ganze `grid-template-columns` fiel weg und alle drei
+     Spalten standen über die volle Breite untereinander. */
+  .c-footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(2, minmax(12rem, max-content));
+    /* Eigener Wert für die Fugen zwischen den Spalten, nicht die Rinne des
+       Seitenrasters: Zwei schmale Linkspalten in 32px Abstand lesen sich als
+       ein Block mit einem Knick darin. Mit 72px sind es zwei Spalten. Die
+       Kontaktspalte gibt den Platz her — sie ist `1fr`. */
+    column-gap: clamp(var(--sp-6), 4vw, 72px);
+    row-gap: var(--site-gutter);
+    padding-top: clamp(56px, 6.5vw, 112px);
+    padding-bottom: clamp(56px, 6.5vw, 112px);
+  }
+
+  .c-footer__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-6);
+  }
+
+  .c-footer__social {
+    display: flex;
+    gap: var(--sp-3);
+  }
+
+  .c-footer__social a {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    transition: color var(--d-fast) var(--e-swift),
+      transform var(--d-base) var(--e-out);
+  }
+
+  .c-footer__social svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (hover: hover) {
+    .c-footer__social a:hover {
+      color: var(--c-brand);
+      transform: translateY(-3px);
+    }
+  }
+
+  .c-footer__lines {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  /* Zwei Anschriften nebeneinander, solange Platz ist. Unter 560px stapeln
+     sie — zwei Adressen in halber Spaltenbreite brächen sonst nach jedem
+     zweiten Wort um. */
+  .c-footer__standorte {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4) var(--site-gutter);
+    margin-top: var(--sp-6);
+  }
+
+  @media (max-width: 560px) {
+    .c-footer__standorte {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .c-footer__standort-name {
+    margin-bottom: var(--sp-1);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-grey);
+  }
+
+  .c-footer__standorte address {
+    font-style: normal;
+    line-height: 1.5;
+  }
+
+  /* 12px statt 24px. Mit dem doppelten Abstand fiel eine Spalte aus sechs
+     Links auf 420px Höhe auseinander und las sich als sechs einzelne
+     Angaben statt als eine Liste. Mit der Zeilenhöhe zusammen bleibt jeder
+     Link über 24px hoch und damit ein brauchbares Tippziel. */
+  .c-footer__nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .c-footer__nav-title {
+    margin-bottom: var(--sp-1);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-grey);
+  }
+
+  .c-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    padding: var(--sp-5) 0;
+    border-top: var(--bw) solid color-mix(in srgb, var(--c-grey) 22%, transparent);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .c-footer__legal {
+    display: flex;
+    gap: clamp(var(--sp-4), 3vw, 56px);
+  }
+
+  @media (max-width: 900px) {
+    .c-footer__top {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-8) var(--site-gutter);
+    }
+
+    /* Kontakt über die volle Breite, darunter die beiden Linkspalten
+       nebeneinander. Drei schmale Spalten wären hier drei Wörter breit. */
+    .c-footer__contact {
+      grid-column: 1 / -1;
+    }
+
+    .c-footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--sp-4);
+    }
+
+    .c-footer__legal {
+      flex-wrap: wrap;
+      gap: var(--sp-4);
+    }
+  }
+
+  /* --- Textlink ---------------------------------------------------------
+     Die Unterstreichung wischt beim Betreten von links herein und beim
+     Verlassen nach rechts wieder hinaus. Zwei Transform-Origins, ein
+     Pseudo-Element — die Richtung bleibt dadurch immer nachvollziehbar.
+
+     Steht hier, weil .c-link derzeit nur im Footer vorkommt. Kommt er in
+     einer zweiten Komponente dazu, gehört er nach shared.css. */
+  .c-link {
+    position: relative;
+    display: inline-block;
+    transition: color var(--d-fast) var(--e-swift);
+  }
+
+  .c-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.15em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform var(--d-base) var(--e-out);
+  }
+
+  @media (hover: hover) {
+    .c-link:hover::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+  }
+</style>
+

@@ -1,0 +1,134 @@
+---
+/**
+ * Dokumentrahmen. Entspricht head.hbs plus body-Gerüst.
+ *
+ * Global sind nur die beiden Grundlagen — Werte und Rahmen. Sie kommen
+ * unverändert aus dem Prototyp nebenan, nicht kopiert, damit es weiterhin
+ * genau eine Quelle für Farben, Typo-Skala und Abstände gibt.
+ *
+ * components.css und sections.css sind hier bewusst NICHT eingebunden: die
+ * Regeln der Bausteine liegen im <style>-Block der jeweiligen .astro-Datei.
+ * Astro grenzt sie dort ab, dadurch kann keine Section mehr in eine andere
+ * hineinschreiben. Wer eine Regel sucht, findet sie neben ihrem Markup.
+ */
+import "../../../src/styles/tokens.css";
+import "../../../src/styles/base.css";
+import "../styles/shared.css";
+
+import Icons from "../components/ui/Icons.astro";
+import Backdrop from "../components/ui/Backdrop.astro";
+import Transition from "../components/ui/Transition.astro";
+import Nav from "../components/ui/Nav.astro";
+import Footer from "../components/ui/Footer.astro";
+import { ClientRouter } from "astro:transitions";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de" data-astro-router>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d6d6d6" />
+
+    {/*
+      Muss synchron und vor dem ersten Bild laufen. Am Attribut `js` hängen
+      alle Regeln, die Elemente bis zu ihrer Animation verbergen
+      (`html.js [data-reveal]`, `html.js .s-hero__word` …).
+
+      init.js setzt dieselbe Klasse, aber zu spät: das Bundle ist ein
+      Modul-Skript und läuft erst nach dem Parsen des Dokuments. Das
+      Stylesheet steht da längst, der Browser hat den Hero also fertig
+      gezeichnet — Wortmarke, Leiste und Reveals waren einen Moment in ihrer
+      Endlage zu sehen und sprangen dann in den Startzustand zurück.
+
+      Beim ersten Aufruf fiel das nicht auf: solange die Schrift noch lädt,
+      zeichnet der Browser den Text ohnehin nicht. Mit warmem Cache entfällt
+      diese Sperre — und genau dann stand die Headline sofort komplett da.
+
+      Beim Seitenwechsel über den Router geht die Klasse allerdings verloren —
+      sie wird unten in `astro:after-swap` nachgesetzt.
+    */}
+    <script is:inline>
+      document.documentElement.classList.add("js");
+    </script>
+
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+
+    <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
+         blitzt die Fallback-Schrift im Hero auf. -->
+    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/svg/tooth-3d-mask.png" as="image" />
+    <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+
+    <!-- Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
+         modules/transition.js: er tauscht nur den geänderten Teil des
+         Dokuments aus, statt die Seite neu zu laden. -->
+    <ClientRouter />
+
+  </head>
+
+  <body>
+    <Icons />
+    <Backdrop transition:persist />
+    <Transition />
+    <Nav transition:persist />
+
+    <main><slot /></main>
+
+    <Footer />
+
+    <script>
+      import { init } from "../../../src/js/init.js";
+      import { gsap, ScrollTrigger } from "../../../src/js/lib/gsap.js";
+
+      /* Bei einem Seitenwechsel tauscht der Router nur den Inhalt aus — die
+         Module müssen danach erneut anlaufen, sonst sind Reveals, Kartendeck
+         und der durchlaufende Pfad auf der neuen Seite tot.
+         `astro:page-load` feuert beim ersten Aufruf und nach jedem Wechsel. */
+      /* Der Router übernimmt beim Wechsel die Attribute des eingehenden
+         <html>-Elements — und weil der Server die Klasse `js` nicht
+         mitrendert, ist sie danach weg. Damit galt auf jeder über den Router
+         erreichten Seite keine einzige Startregel: Reveals und Headlines
+         standen sofort sichtbar da und sprangen erst zurück, wenn `init` sie
+         übernahm.
+
+         `astro:after-swap` läuft unmittelbar nach dem Austausch und noch vor
+         dem ersten Bild der neuen Seite — früh genug, dass niemand die
+         Endlage sieht. Der Listener hängt am document und wird deshalb nur
+         einmal registriert, nicht bei jedem Wechsel neu. */
+      document.addEventListener("astro:after-swap", () =>
+        document.documentElement.classList.add("js")
+      );
+
+      document.addEventListener("astro:page-load", () => init());
+
+      /* Vor dem Austausch aufräumen. Ohne das behalten die ScrollTrigger ihre
+         Verweise auf Elemente, die es gleich nicht mehr gibt — sie messen dann
+         gegen Leichen und stapeln sich bei jedem Wechsel weiter auf. */
+      document.addEventListener("astro:before-swap", () => {
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+        gsap.globalTimeline.clear();
+      });
+    </script>
+
+    <style>
+      /* Der Inhalt liegt über den Hintergrundebenen. Die Navigation bleibt
+         außen vor — sie trägt bereits --z-nav; ein zweiter Wert hier hätte
+         sie auf dieselbe Ebene wie den Inhalt gesetzt, der im DOM später
+         kommt und sie damit überdeckt.
+         Den Gegenwert für den Footer setzt Footer.astro selbst. */
+      main {
+        position: relative;
+        z-index: 1;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+---
+/**
+ * Alternierende Bild/Text-Zeilen. Jede zweite Zeile dreht die Reihenfolge um,
+ * dadurch wandert das Bild im Wechsel von links nach rechts.
+ */
+import Picture from "../ui/Picture.astro";
+
+import type { FeatureZeile } from "../../lib/fixtures";
+
+interface Props {
+  zeilen: FeatureZeile[];
+}
+
+const { zeilen } = Astro.props;
+---
+
+<section class="section section--flush">
+  <div class="container">
+    {zeilen.map((z, i) => (
+      <div class:list={["s-feature", i % 2 === 1 && "s-feature--reverse"]}>
+        <div class="s-feature__media" data-reveal="scale">
+          <Picture
+            name={z.bild}
+            widths="640,1024,1600,2200"
+            alt={z.alt ?? ""}
+            sizes="(max-width: 900px) 100vw, 50vw"
+            parallax="8"
+          />
+        </div>
+        <div class="s-feature__body" data-reveal="up">
+          <span class="c-topline">{z.topline}</span>
+          <h3 class="s-feature__title" data-split="lines">{z.titel}</h3>
+          <p>{z.text}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .s-feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--site-gutter);
+    align-items: center;
+    padding-block: var(--sp-10);
+  }
+
+  .s-feature + .s-feature {
+    padding-top: 0;
+  }
+
+  .s-feature__media {
+    aspect-ratio: 800 / 706;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    /* Eigene Ebene, damit die Rundung bei bewegtem Bild nicht pro Frame neu
+       gegen die Bildkante gerechnet wird. */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro kommt. */
+  .s-feature__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  .s-feature__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    max-width: 42ch;
+    padding-inline: var(--sp-5);
+  }
+
+  .s-feature__title {
+    font-size: clamp(1.75rem, 2.8vw, 3rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .s-feature__body p {
+    font-size: var(--fs-text-main);
+    color: var(--c-text-muted);
+    line-height: 1.45;
+  }
+
+  .s-feature--reverse .s-feature__media {
+    order: 2;
+  }
+
+  @media (max-width: 900px) {
+    .s-feature {
+      grid-template-columns: 1fr;
+    }
+
+    /* Auf einer Spalte steht das Bild immer oben — sonst führte die
+       umgekehrte Zeile mit dem Text und der Wechsel ginge verloren. */
+    .s-feature--reverse .s-feature__media {
+      order: -1;
+    }
+
+    .s-feature__body {
+      padding-inline: 0;
+    }
+  }
+</style>

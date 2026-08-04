@@ -1,0 +1,15 @@
+{{!--
+  Column-Wipe für den Seitenwechsel.
+
+  Die Spalten sitzen über dem Viewport (top: -100 %) und wandern in drei
+  Zuständen: 0 = über dem Bild, 100 = deckt ab, 200 = darunter durch.
+  Beim Verlassen läuft der Versatz von rechts nach links, beim Ankommen
+  von links nach rechts — daraus entsteht das Hin und Her.
+
+  Die data-Attribute sind Ankerpunkte für js/modules/transition.js.
+--}}
+<div data-transition-wrap class="c-transition" aria-hidden="true">
+  <div class="c-transition__panels">
+    {{#times 5}}<div data-transition-column class="c-transition__panel"></div>{{/times}}
+  </div>
+</div>

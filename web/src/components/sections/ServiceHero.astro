@@ -1,0 +1,206 @@
+---
+/**
+ * Hero einer Leistungsseite: Text links, randabfallendes Bild rechts.
+ *
+ * Fährt dieselbe Choreografie wie der Hero der Startseite, nur ohne Zahn —
+ * über die data-Attribute, nicht über eigenen Code.
+ */
+import Button from "../ui/Button.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import Reviews from "../ui/Reviews.astro";
+import ToothLines from "../ui/ToothLines.astro";
+import type { Bildquelle } from "../../lib/bilder";
+
+interface Props {
+  topline: string;
+  titel: string;
+  text: string;
+  bild: Bildquelle;
+  alt?: string;
+  /** Beschriftung des Knopfs. */
+  aktion?: string;
+  aktionZiel?: string;
+}
+
+const {
+  topline,
+  titel,
+  text,
+  bild,
+  alt = "",
+  aktion = "Termin buchen",
+  aktionZiel = "#kontakt",
+} = Astro.props;
+
+/* Das längste Wort — und zwar so, wie die Hero-Choreografie es abgrenzt:
+   SplitText trennt ausschließlich an Leerzeichen, und die Wort-Container
+   tragen `white-space: nowrap` (siehe base.css). Ein Bindestrich ist damit
+   KEINE Trennstelle mehr. „Parodontitis-Behandlung" zählt deshalb als 23
+   Zeichen, nicht als 12 — genau daran lief die Überschrift zuletzt noch ins
+   Bild, als ich den Bindestrich mitgezählt hatte. */
+const laengsteEinheit =
+  titel
+    .split(/\s+/)
+    .filter(Boolean)
+    .reduce((a, b) => (b.length > a.length ? b : a), "").length || 1;
+
+/* Gemessen, nicht geschätzt: In dieser Schrift belegt ein Versalzeichen
+   zwischen 0.562 em („PARODONTITIS“) und 0.639 em („WURZELBEHANDLUNG“) —
+   breite Rundungen wie O, B, D, G ziehen den Wert nach oben. Maßgeblich ist
+   das Maximum, nicht der Mittelwert: mit 0.62 liefen genau die drei
+   breitesten Namen weiter ins Bild. 0.67 sind das Maximum plus 5 % Reserve.
+
+   Daraus der Höchstgrad in Prozent der Spaltenbreite: Bei welchem Grad füllt
+   das längste Wort die Spalte gerade aus? Darüber liefe es hinaus — und zwar
+   ins Bild rechts daneben, weil nowrap es nicht umbrechen ließ. */
+const gradDeckel = (100 / (0.67 * laengsteEinheit)).toFixed(2);
+---
+
+<section class="s-shero container" data-hero>
+  <ToothLines />
+
+  <div class="s-shero__body">
+    {/* Topline und Fließtext tragen `data-hero-meta`, die Überschrift
+        `data-hero-word` — damit greift die Hero-Choreografie: der
+        Leistungsname steigt zeichenweise hinter seiner Maske auf. */}
+    <p class="s-shero__topline" data-hero-meta>{topline}</p>
+    <h1 class="s-shero__title" style={`--shero-deckel: ${gradDeckel}cqw`} data-hero-word>{titel}</h1>
+    <p data-hero-meta>{text}</p>
+
+    <div class="s-shero__actions" data-hero-foot>
+      <Button label={aktion} href={aktionZiel} />
+    </div>
+
+    <div class="s-shero__reviews" data-hero-foot>
+      <Reviews />
+    </div>
+  </div>
+
+  <div class="s-shero__media">
+    {/* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
+        unter 900px die ganze. */}
+    <CmsImage
+      quelle={bild}
+      alt={alt}
+      widths={[640, 1024, 1600, 2200]}
+      sizes="(max-width: 900px) 100vw, 50vw"
+      eager
+    />
+  </div>
+</section>
+
+<style>
+  .s-shero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--site-gutter);
+    align-items: center;
+    padding-top: clamp(100px, 12vh, 160px);
+    padding-bottom: var(--sp-8);
+    overflow: hidden;
+  }
+
+  /* Maßbezug für den Grad der Überschrift: `cqw` rechnet gegen die Breite
+     dieser Spalte, nicht gegen das Fenster. Nur so lässt sich der Grad so
+     deckeln, dass das längste Wort hineinpasst.
+
+     Ohne `max-width: 46ch`: die Fessel galt für die ganze Spalte und damit
+     auch für die Überschrift, obwohl das Zeilenmaß nur den Fließtext angeht.
+     Der hat seine eigene Begrenzung. Der Überschrift standen dadurch 530px
+     statt der vollen 900px zur Verfügung — und je enger die Spalte, desto
+     kleiner muss der Grad ausfallen. */
+  .s-shero__body {
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+
+  .s-shero__topline {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-h5);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .s-shero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-5);
+    margin-top: var(--sp-3);
+  }
+
+  .s-shero__reviews {
+    margin-top: var(--sp-8);
+  }
+
+  /* Mehrzeilig, wenn nötig — vorher stand hier `white-space: nowrap`. Das
+     hielt den Namen zwar auf einer Zeile, ließ ihn aber aus seiner Spalte
+     laufen: gemessen bis zu 901px weit ins Bild daneben, bei zehn von
+     vierzehn Leistungen. Eine Box wird von nowrap nicht breiter, der Text
+     läuft einfach darüber hinaus — deshalb fiel es in keiner Prüfung auf,
+     die Elementkanten misst.
+
+     Der dritte Wert im min() ist der im Frontmatter gerechnete Deckel: er
+     hält den Grad dort, wo das längste Wort gerade noch in die Spalte passt.
+     Mehrwortige Namen brechen um und behalten ihren Grad, einwortige werden
+     kleiner — umbrechen können sie ja nicht. */
+  .s-shero__title {
+    font-size: min(var(--fs-display-2), 13vw, var(--shero-deckel, 100cqw));
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .s-shero__body p {
+    max-width: 42ch;
+    font-size: var(--fs-text-main);
+    line-height: 1.45;
+  }
+
+  /* Läuft nach rechts aus der Section heraus, steht senkrecht aber mittig —
+     an der Unterkante verankert wirkte es auf großen Schirmen abgeschnitten
+     und saß zu tief. Die Höhe folgt dem Fenster, damit das Feld auf großen
+     Schirmen mitwächst statt bei 780px stehenzubleiben. */
+  .s-shero__media {
+    position: relative;
+    height: min(78vh, 1100px);
+    margin-right: calc(var(--site-margin) * -1);
+    /* Der Hero hat oben mehr Innenabstand als unten (Platz für die Leiste).
+       Zentriert würde das Feld dadurch um die halbe Differenz zu tief
+       sitzen — der negative obere Rand holt es auf die Sectionmitte. */
+    margin-top: calc((var(--sp-8) - clamp(100px, 12vh, 160px)) / 2);
+    border-radius: 120px 0 0 var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
+  .s-shero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  @media (max-width: 900px) {
+    .s-shero {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .s-shero__media {
+      order: -1;
+      height: 60vh;
+      margin-inline: calc(var(--site-margin) * -1);
+      border-radius: var(--r-md);
+    }
+  }
+</style>

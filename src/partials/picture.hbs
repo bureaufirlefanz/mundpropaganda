@@ -1,0 +1,30 @@
+{{!--
+  Responsives Bild — Parameter:
+    name     Dateiname ohne Breite/Endung, z.B. "portrait-hero"
+    widths   Kommaliste der erzeugten Breiten, z.B. "640,1024,1600,2200"
+    alt      Alternativtext ("" für dekorative Bilder)
+    sizes    CSS-sizes-Angabe, Default 100vw
+    eager    "true" für das LCP-Bild — alles andere lädt lazy
+    parallax Wert für den Scroll-Parallax (z.B. "10"), optional
+
+  AVIF zuerst, WebP als Rückfall: der Browser nimmt das erste Format,
+  das er versteht.
+--}}
+<picture>
+  <source
+    type="image/avif"
+    srcset="{{srcset name 'avif' widths}}"
+    sizes="{{#if sizes}}{{sizes}}{{else}}100vw{{/if}}"
+  />
+  <source
+    type="image/webp"
+    srcset="{{srcset name 'webp' widths}}"
+    sizes="{{#if sizes}}{{sizes}}{{else}}100vw{{/if}}"
+  />
+  <img
+    src="{{fallback name widths}}"
+    alt="{{alt}}"
+    {{#if eager}}loading="eager" fetchpriority="high"{{else}}loading="lazy" decoding="async"{{/if}}
+    {{#if parallax}}data-parallax="{{parallax}}"{{/if}}
+  />
+</picture>

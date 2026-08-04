@@ -1,0 +1,88 @@
+---
+/**
+ * Akkordeon. Immer nur ein Eintrag offen (`data-accordion="single"`),
+ * gesteuert von modules/ui.js.
+ */
+import type { Frage } from "../../lib/fixtures";
+
+interface Props {
+  fragen: Frage[];
+}
+
+const { fragen } = Astro.props;
+---
+
+<div class="c-accordion" data-accordion="single" data-reveal-stagger="0.07">
+  {fragen.map((f) => (
+    <div class="c-accordion__item" data-accordion-item data-reveal-child>
+      <button class="c-accordion__trigger" data-accordion-trigger>
+        <span>{f.frage}</span>
+        <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+      </button>
+      <div class="c-accordion__panel" data-accordion-panel>
+        <div class="c-accordion__panel-inner">{f.antwort}</div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .c-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .c-accordion__item {
+    border-radius: var(--r-md);
+    background: var(--c-neutral-200);
+    overflow: hidden;
+  }
+
+  .c-accordion__trigger {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    width: 100%;
+    padding: var(--sp-4) var(--sp-5);
+    text-align: left;
+    font-size: var(--fs-text-large);
+    color: var(--c-neutral-800);
+  }
+
+  .c-accordion__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    transition: transform var(--d-base) var(--e-out);
+  }
+
+  .c-accordion__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .c-accordion__item[data-open="true"] .c-accordion__icon {
+    transform: rotate(180deg);
+  }
+
+  /* Höhe 0 statt display:none — sonst gäbe es keinen Übergang zum Aufklappen. */
+  .c-accordion__panel {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .c-accordion__panel-inner {
+    padding: 0 var(--sp-5) var(--sp-5);
+    max-width: 68ch;
+    color: color-mix(in srgb, var(--c-neutral-800) 78%, transparent);
+    line-height: 1.5;
+  }
+</style>

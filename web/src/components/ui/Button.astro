@@ -1,0 +1,177 @@
+---
+/**
+ * Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil.
+ * Entspricht button.hbs.
+ *
+ * `static` rendert ein <span> statt <a> — nötig, wo der Button innerhalb
+ * eines bereits verlinkten Bereichs sitzt. Verschachtelte <a> lässt der
+ * Parser nicht zu, er schließt das äußere vorzeitig und zerlegt das Layout.
+ *
+ * `type` rendert ein <button> statt <a> — für Formulare. Ein Link mit
+ * `href="#"` würde dort die Seite nach oben springen lassen, statt abzusenden.
+ */
+interface Props {
+  label: string;
+  href?: string;
+  variant?: "dark" | "block";
+  static?: boolean;
+  type?: "submit" | "button";
+  /**
+   * Attribute für die Beschriftung. Gebraucht, wo ein Modul den Text zur
+   * Laufzeit austauscht und dafür das Label finden muss — die Bildvorschau
+   * der Services-Tabelle setzt so `data-preview-label`.
+   */
+  labelAttrs?: Record<string, unknown>;
+}
+const {
+  label,
+  href,
+  variant,
+  static: statisch = false,
+  type,
+  labelAttrs = {},
+} = Astro.props;
+
+const klasse = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" ");
+---
+
+{statisch ? (
+  <span class={klasse} aria-hidden="true">
+    <span class="c-btn__label" {...labelAttrs}>{label}</span>
+    <span class="c-btn__icon"><svg><use href="#i-arrow" /></svg></span>
+  </span>
+) : type ? (
+  <button class={klasse} type={type}>
+    <span class="c-btn__label" {...labelAttrs}>{label}</span>
+    <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+  </button>
+) : (
+  <a class={klasse} href={href ?? "#"}>
+    <span class="c-btn__label" {...labelAttrs}>{label}</span>
+    <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+  </a>
+)}
+
+<style>
+  /* Figma: zweiteilig — Pille mit Label plus separater runder Pfeil-Knopf,
+     getrennt durch 1px Lücke. */
+  .c-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .c-btn__label {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding-inline: var(--sp-2);
+    border-radius: 9px;
+    background: var(--c-brand);
+    color: var(--c-dark);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: background var(--d-fast) var(--e-swift),
+      color var(--d-fast) var(--e-swift);
+  }
+
+  .c-btn__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    transition: background var(--d-fast) var(--e-swift),
+      color var(--d-fast) var(--e-swift),
+      transform var(--d-base) var(--e-out);
+  }
+
+  .c-btn__icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Die Umkehrung beim Überfahren — braune Fläche, pinkes Zeichen — ist auf
+     hellem Grund der Kontrast. Auf einer dunklen Fläche verschwände der Knopf
+     genau darin. Deshalb sind die beiden Farben Regler statt fester Werte:
+     Eine dunkle Section setzt `--knopf-hover-grund` und
+     `--knopf-hover-schrift` auf ihre eigenen Werte, und der Knopf bleibt
+     pink. Die Rückmeldung trägt dort der Pfeil, der abrückt.
+
+     Beim Hover löst sich der Kreis vom Rechteck und rückt ein Stück ab —
+     der Button „öffnet" sich in Leserichtung. Das ersetzt den früheren
+     Magneteffekt: die Bewegung gehört zum Element, nicht zum Zeiger.
+     Der Pfeil im Kreis bleibt dabei ruhig — sonst rutschen zwei Dinge
+     gegeneinander und die Geste wird unklar. */
+  @media (hover: hover) {
+    .c-btn:hover .c-btn__icon {
+      transform: translateX(5px);
+    }
+
+    .c-btn:hover .c-btn__label,
+    .c-btn:hover .c-btn__icon {
+      background: var(--knopf-hover-grund, var(--c-dark));
+      color: var(--knopf-hover-schrift, var(--c-brand));
+    }
+  }
+
+  /* Das Einsinken beim Klick steht jetzt in styles/shared.css und gilt für
+     alle Bedienelemente. Hier stand es als transform — das hätte den
+     Hover-Versatz des Pfeils überschrieben. */
+
+  /* Variante dunkel/sekundär — Label transparent, nur der Pfeil ist gefüllt. */
+  .c-btn--dark .c-btn__label {
+    background: transparent;
+    padding-inline: 0 var(--sp-2);
+    color: var(--c-text);
+  }
+
+  .c-btn--dark .c-btn__icon {
+    background: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+  @media (hover: hover) {
+    .c-btn--dark:hover .c-btn__label {
+      background: transparent;
+      color: var(--c-text);
+    }
+
+    .c-btn--dark:hover .c-btn__icon {
+      background: var(--c-brand);
+      color: var(--c-dark);
+    }
+  }
+
+  /* Variante volle Breite, für den Absenden-Knopf im Formular. Ein
+     durchgehender Balken — der abgesetzte Pfeil-Knopf entfällt hier. */
+  .c-btn--block {
+    display: flex;
+    width: 100%;
+  }
+
+  .c-btn--block .c-btn__label {
+    justify-content: center;
+    width: 100%;
+    height: 56px;
+    border-radius: var(--r-sm);
+    font-family: var(--f-sans);
+    font-size: var(--fs-text-main);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .c-btn--block .c-btn__icon {
+    display: none;
+  }
+</style>

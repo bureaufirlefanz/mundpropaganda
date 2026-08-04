@@ -1,0 +1,246 @@
+---
+/**
+ * Alle Texte sind wahlfrei. Was die Seite nicht übergibt, steht als Vorgabe
+ * hier — dadurch ist der Baustein für sich lauffähig und die Seite bleibt
+ * heil, solange im CMS noch nichts gepflegt ist.
+ *
+ * Die Vorgaben stehen bewusst HIER und nicht in der Datenschicht: Sonst
+ * gäbe es sie zweimal, und beim nächsten Textwechsel pflegte jemand nur
+ * eine der beiden Stellen.
+ */
+import Picture from "../ui/Picture.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+
+interface Props {
+  topline?: string;
+  titel?: string;
+  absaetze?: string[];
+  bild?: Bildquelle;
+}
+
+const {
+  topline = "Form & Funktion",
+  titel = "Ästhetik & Gesundheit - für ein besseres Wohlbefinden und dein perfektes Lächeln",
+  absaetze = [
+    "Unser Schwerpunkt sind Veneers und Keramikimplantate. Beides Behandlungen, die wir täglich machen und in denen wir richtig gut sind. Unser Team übernimmt alles andere, was du brauchst: Prophylaxe, Inlays, Wurzelbehandlungen, Weisheitszähne.",
+    "Was bleibt: dasselbe Niveau, egal was wir an deinen Zähnen gerade machen. Kein Behandlungszimmer zweiter Klasse, keine Standardlösung von der Stange.",
+  ],
+  bild,
+} = Astro.props;
+---
+
+<!-- ==================================================================
+           FORM & FUNKTION — Split mit organischer brauner Fläche
+           ================================================================== -->
+      <section class="s-split">
+        <!-- Bild von rechts, braune Fläche von links: die beiden fahren
+             gegeneinander ein und schließen die Komposition. -->
+        <div class="s-split__media" data-reveal="right" data-reveal-trigger=".s-split">
+          {istCmsBild(bild) ? (
+            <CmsImage quelle={bild} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
+          ) : (
+            <Picture name="portrait-hero" widths="640,1024,1600,2200" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
+          )}
+        </div>
+
+        <div class="s-split__head">
+          <span class="c-topline" data-reveal="fade">{topline}</span>
+          <h2 class="s-split__title" data-split="lines" data-split-delay="0.1">{titel}</h2>
+        </div>
+
+        <div class="s-split__panel" data-reveal="left" data-reveal-trigger=".s-split">
+          {absaetze.map((t, i) => (
+            <p data-reveal="up" data-reveal-delay={0.3 + i * 0.12} data-reveal-trigger=".s-split">{t}</p>
+          ))}
+        </div>
+      </section>
+
+<style>
+  /* Links Text auf organischer brauner Fläche, rechts randabfallendes Bild
+     mit großem Eckradius oben links.
+
+     Alle Maße als Anteil der Entwurfsbreite (1728) bzw. -höhe (988):
+     Bild 740→Rand, braune Fläche 48→879. Die 139px Überlappung sind der
+     Kern der Komposition — die Fläche liegt VOR dem Bild. */
+  .s-split {
+    position: relative;
+    min-height: clamp(620px, 57.2vw, 988px);
+    margin-top: var(--section-space);
+  }
+
+  /* Die Ecke steht als eigene Größe da, weil sie an zwei Stellen gebraucht
+     wird — und dadurch nicht auseinanderlaufen kann. */
+  .s-split__media {
+    --ecke: clamp(80px, 11.6vw, 200px);
+    /* Welche Ecken gerundet sind, steht ebenfalls an einer Stelle: Radius und
+       clip-path müssen dieselbe Form beschreiben, sonst schneidet das eine
+       anders als das andere rundet. Auf schmalen Fenstern wird nur diese
+       Zeile ersetzt. */
+    --ecken: var(--ecke) 0 0 0;
+
+    position: absolute;
+    top: 6.2%;
+    left: 42.8%;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    border-radius: var(--ecken);
+    overflow: hidden;
+
+    /* Zusätzlich zur gerundeten Überlaufsperre, nicht statt ihr.
+       `overflow: hidden` mit Radius wird auf eine zusammengesetzte Kindebene
+       nicht überall verlässlich angewandt — das Bild trägt hier `will-change`
+       und einen Parallax-Transform, liegt also auf einer eigenen Ebene. Wo die
+       Maschine die Rundung dann pro Ebene getrennt rastert, bleibt an der
+       Rundung eine helle Haarlinie stehen.
+       `clip-path` beschneidet den ganzen Teilbaum in einem Schritt und wird
+       antialiasiert — dieselbe Form, nur zuverlässiger angewandt. */
+    clip-path: inset(0 round var(--ecken));
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro kommt und deshalb das
+     Scope-Attribut dieser Datei nicht trägt. */
+  .s-split__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  .s-split__head {
+    position: absolute;
+    z-index: 3;
+    top: 6.2%;
+    left: var(--site-margin);
+    width: min(530px, 34%);
+  }
+
+  .s-split__head .c-topline {
+    margin-bottom: var(--sp-6);
+  }
+
+  .s-split__title {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* Elliptische Ecke oben rechts: 43.5 % der Breite × 85 % der Höhe. */
+  .s-split__panel {
+    position: absolute;
+    z-index: 2;
+    left: var(--site-margin);
+    top: 36.6%;
+    bottom: 0;
+    width: min(831px, 48.1%);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(32px, 5.5vh, 54px);
+    padding: clamp(48px, 8.2%, 81px) clamp(24px, 4%, 40px) clamp(40px, 6%, 64px)
+      clamp(24px, 7.8%, 65px);
+    /* Oben rechts die große elliptische Ecke, oben links nur eine leichte
+       Rundung — die Fläche soll dort nicht scharfkantig ansetzen. */
+    border-radius: var(--r-md) 43.5% 0 0 / var(--r-md) 85% 0 0;
+    background: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+  .s-split__panel p {
+    max-width: 353px;
+    font-size: var(--fs-text-main);
+    line-height: 1.22;
+  }
+
+  /* Unter 900px trägt die überlappende Komposition nicht mehr — dort
+     stapeln sich die drei Blöcke im normalen Fluss. */
+  @media (max-width: 900px) {
+    .s-split {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding-block: var(--section-space) 0;
+    }
+
+    .s-split__head,
+    .s-split__panel,
+    .s-split__media {
+      position: static;
+      width: auto;
+      inset: auto;
+    }
+
+    /* Topline und Überschrift stehen MIT im braunen Feld, nicht darüber.
+       Dafür trägt der Kopf denselben Grund wie das Panel darunter und stößt
+       ohne Fuge daran — zwei Elemente, eine Fläche.
+
+       Nach oben zieht er sich über das Foto: um ein Drittel von dessen Höhe,
+       sodass die Fläche bis auf zwei Drittel des Fotos heraufreicht. Das Maß
+       ist aus dem Seitenverhältnis gerechnet (4:3 auf die Satzbreite), nicht
+       geschätzt — sonst stimmte es bei genau einer Fensterbreite. */
+    .s-split__head {
+      --foto-hoehe: calc((100vw - 2 * var(--site-margin)) * 3 / 4);
+      --ueberlappung: calc(var(--foto-hoehe) / 3);
+
+      /* z-index 0, das Foto trägt 1: Die Fläche schiebt sich HINTER das Bild,
+         nicht darüber. Sie reicht damit bis auf zwei Drittel des Fotos herauf
+         und lässt es trotzdem ganz stehen.
+
+         Der obere Innenabstand nimmt die Überlappung wieder auf und legt
+         Luft dazu — sonst begänne die Topline auf dem Foto. */
+      position: relative;
+      z-index: 0;
+      max-width: none;
+      margin-top: calc(-1 * var(--ueberlappung));
+      padding: calc(var(--ueberlappung) + var(--sp-8)) var(--site-margin) var(--sp-6);
+      background: var(--c-dark);
+      color: var(--c-bg);
+    }
+
+    /* Beide oberen Ecken, nicht nur die linke. Auf dem großen Schirm läuft
+       das Bild rechts randabfallend aus der Section heraus — dort GIBT es
+       keine rechte obere Ecke, die man runden könnte. Eingerückt steht sie
+       im Satzspiegel, und eine einzeln gerundete Ecke sieht dann nicht nach
+       Absicht aus, sondern nach vergessen.
+
+       Eingerückt statt randfüllend: Ein Bild, das die ganze Breite nimmt,
+       macht aus der Section einen Banner. */
+    .s-split__media {
+      --ecke: var(--r-lg);
+      --ecken: var(--ecke) var(--ecke) 0 0;
+
+      order: -1;
+      /* Über der braunen Fläche, die von unten dahinter heraufreicht. */
+      position: relative;
+      z-index: 1;
+      aspect-ratio: 4 / 3;
+      margin-inline: var(--site-margin);
+      /* Kein Abstand nach unten: Das braune Feld schiebt sich von dort über
+         das Foto, eine Fuge dazwischen gäbe es ohnehin nicht zu sehen. */
+      margin-bottom: 0;
+    }
+
+    /* Kein negativer Abstand nach oben mehr. Er zog den Textblock über die
+       Überschrift — auf 390px lag die Beschreibung buchstäblich auf der
+       Headline. Auf dem großen Schirm überlappen sich Bild und Panel
+       absichtlich; hier stehen sie untereinander, und dann ist Überlappung
+       nur Kollision. */
+    /* Umgekehrt zum Bild: die braune Fläche läuft randlos über die volle
+       Breite und ohne Rundung. Sie ist der Grund, auf dem der Text steht,
+       kein Objekt darauf — eine gerundete Ecke mitten am Fensterrand sähe
+       aus wie ein Fehler. */
+    /* Schließt ohne Fuge an den Kopf an — zusammen ergeben sie die eine
+       durchgehende Fläche. */
+    .s-split__panel {
+      margin-top: 0;
+      margin-right: 0;
+      padding: 0 var(--site-margin) var(--sp-10);
+      border-radius: 0;
+    }
+
+    .s-split__panel p {
+      max-width: 42ch;
+    }
+  }
+</style>

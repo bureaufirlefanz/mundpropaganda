@@ -1,0 +1,35 @@
+---
+/**
+ * Seitengrund: nur ein feines Korn. Farbige Lichtfelder standen hier schon —
+ * sie haben der Fläche nicht gutgetan und sind wieder raus. Das Korn allein
+ * nimmt dem Grund das rein Digitale, ohne ihn einzufärben.
+ */
+---
+
+<div class="c-backdrop" aria-hidden="true">
+  <div class="c-backdrop__grain"></div>
+</div>
+
+<style>
+  .c-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Korn als eingebettetes SVG: kein zusätzlicher Request, und die Körnung
+     bleibt auf jeder Auflösung gleich fein.
+
+     Ein Versuch mit zusätzlicher grober Faserlage sollte daraus eine
+     Papierstruktur machen — das Ergebnis sah aber nach Schmutz aus, nicht
+     nach Papier. Geblieben ist die feine Lage, nur kräftiger als zuvor,
+     damit sie überhaupt wahrnehmbar ist. */
+  .c-backdrop__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.34;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+</style>

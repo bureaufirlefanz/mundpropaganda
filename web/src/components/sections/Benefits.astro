@@ -1,0 +1,258 @@
+---
+/**
+ * Dieselbe Section wie im Prototyp — Markup und Klassen unverändert, nur
+ * die Inhalte kommen jetzt aus der Datenschicht. Die data-Attribute bleiben
+ * erhalten, dadurch greift standards.js ohne Anpassung.
+ */
+import type { Eintrag } from "../../lib/fixtures";
+import CmsImage from "../ui/CmsImage.astro";
+interface Props { topline: string; headline: string; eintraege: Eintrag[] }
+const { topline, headline, eintraege } = Astro.props;
+---
+
+<section class="s-benefits" data-standards>
+  <div class="container s-benefits__inner">
+    <div class="s-benefits__head">
+      <span class="c-topline" data-reveal="fade">{topline}</span>
+      <h2 class="s-benefits__title" data-split="lines" data-split-delay="0.1">{headline}</h2>
+    </div>
+
+    <div class="s-benefits__list" data-standards-list>
+      {eintraege.map((e, i) => (
+        <div class="s-benefits__row" data-standards-row data-active={i === 0 ? "true" : undefined}>
+          <span class="s-benefits__num">{i + 1}</span>
+          <div class="s-benefits__body">
+            <h3 class="s-benefits__name">{e.name}</h3>
+            <div class="s-benefits__text"><p>{e.text}</p></div>
+          </div>
+          <span class="s-benefits__bar" data-standards-bar><i></i></span>
+        </div>
+      ))}
+    </div>
+
+    <div class="s-benefits__media" data-reveal="right" data-reveal-trigger=".s-benefits">
+      <div class="s-benefits__stage" data-standards-stage>
+        {/* Alle Motive liegen übereinander, sichtbar ist immer genau eines —
+            das Modul blendet um. Deshalb ohne Alternativtext: die Bühne
+            trägt keine eigene Information, der Text steht in der Liste. */}
+        {eintraege.map((e) => (
+          <CmsImage quelle={e.bild} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Dunkles Vollbreiten-Band mit Auswahlliste links und Bild rechts.
+     Verhalten und data-Attribute teilt sie sich mit .s-standards — nur das
+     Erscheinungsbild ist ein anderes: keine Zahnmaske, sondern ein
+     gerundetes Bildfeld, und Ziffern statt zweistelliger Nummern.
+
+     Randlos über die volle Fensterbreite und ohne Rundung — im Entwurf ein
+     durchgehendes Band, das die Seite teilt. Die 50vw-Konstruktion bricht
+     aus dem zentrierten Raster aus, ohne dass die Section aus dem Fluss
+     genommen werden muss. */
+  .s-benefits {
+    position: relative;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    /* Unten kein Abstand: das braune Band stößt direkt an das Taupe-Band
+       von Vorher/Nachher, die beiden Farbflächen laufen ineinander. */
+    margin-block: var(--section-space) 0;
+    padding-block: clamp(120px, 13vw, 220px);
+    background: var(--c-dark);
+    color: var(--c-bg);
+  }
+
+  .s-benefits__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--site-gutter);
+    align-items: start;
+  }
+
+  .s-benefits__head {
+    grid-column: 1;
+    margin-bottom: clamp(48px, 7vw, 120px);
+  }
+
+  .s-benefits__title {
+    max-width: 14ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  /* Feste Höhe, nicht Mindesthöhe.
+     Die Liste klappt immer genau einen Eintrag auf, und die Texte sind
+     verschieden lang — mit `min-height` trug der längste Eintrag die Liste
+     über das Maß hinaus und das ganze Band sprang beim Durchlaufen.
+     Gemessen waren das 23px auf 390px Breite und 3px auf 1600px; bei 1440px
+     fiel es nicht auf, weil die Mindesthöhe dort gerade reichte.
+
+     Die Werte sind gemessen, nicht geschätzt: der offene Eintrag braucht
+     354px bei 1600, 341 bei 1440, 329 darunter — und 375 unter 600px, weil
+     dort am meisten umbricht. Darüber liegt etwas Luft.
+
+     Wächst der Text im CMS deutlich, muss die Höhe mit. Abgeschnitten wird
+     nichts, sonst verschwände Inhalt lautlos — er liefe stattdessen über. */
+  .s-benefits__list {
+    grid-column: 1;
+    height: 23rem;
+  }
+
+  @media (max-width: 600px) {
+    .s-benefits__list {
+      height: 24rem;
+    }
+  }
+
+  /* Die Trennlinie sitzt unten an jeder Zeile — die erste bekommt zusätzlich
+     eine obere, damit der Block oben abschließt. */
+  .s-benefits__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding-block: var(--sp-4);
+    border-bottom: var(--bw) solid
+      color-mix(in srgb, var(--c-bg) 22%, transparent);
+    cursor: default;
+  }
+
+  .s-benefits__row:first-child {
+    border-top: var(--bw) solid
+      color-mix(in srgb, var(--c-bg) 22%, transparent);
+  }
+
+  /* Ziffer im Kreis. Der inaktive Zustand ist nur gedimmt, nicht
+     ausgeblendet — die Liste soll als Ganzes lesbar bleiben. */
+  .s-benefits__num {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: var(--bw) solid color-mix(in srgb, var(--c-bg) 45%, transparent);
+    border-radius: var(--r-round);
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    opacity: 0.55;
+    transition: opacity var(--d-base) var(--e-out),
+      border-color var(--d-base) var(--e-out);
+  }
+
+  /* Deutlich größer als der Fließtext darunter — im Entwurf trägt der Name
+     die Zeile, der Text ordnet sich unter. */
+  .s-benefits__name {
+    font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    opacity: 0.55;
+    transition: opacity var(--d-base) var(--e-out);
+  }
+
+  /* Zusammengeklappt über die Rasterzeile, nicht über display: none —
+     sonst gäbe es keinen Übergang. */
+  .s-benefits__text {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    max-width: 46ch;
+    font-size: var(--fs-text-main);
+    line-height: 1.45;
+    opacity: 0;
+    transition: grid-template-rows var(--d-slow) var(--e-out),
+      opacity var(--d-base) var(--e-out), margin-top var(--d-slow) var(--e-out);
+  }
+
+  /* Der Inhalt braucht ein eigenes, überlaufverstecktes Element — reiner
+     Text im Absatz wird zu einem anonymen Rasterelement, das sich weder
+     ansprechen noch auf Null zusammenziehen lässt (blieb bei 46 px stehen).
+     Deshalb steht im Markup ein <p> innerhalb des Wrappers. */
+  .s-benefits__text > * {
+    overflow: hidden;
+    margin: 0;
+  }
+
+  .s-benefits__row[data-active="true"] .s-benefits__num {
+    opacity: 1;
+    border-color: var(--c-brand);
+  }
+
+  .s-benefits__row[data-active="true"] .s-benefits__name {
+    opacity: 1;
+  }
+
+  .s-benefits__row[data-active="true"] .s-benefits__text {
+    grid-template-rows: 1fr;
+    margin-top: var(--sp-2);
+    opacity: 0.75;
+  }
+
+  /* Fortschritt der aktiven Zeile — liegt auf der unteren Trennlinie. */
+  .s-benefits__bar {
+    position: absolute;
+    right: 0;
+    bottom: calc(-1 * var(--bw));
+    left: 0;
+    height: var(--bw);
+    overflow: hidden;
+  }
+
+  .s-benefits__bar i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--c-brand);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  /* Das Bildfeld läuft über die volle Höhe der rechten Spalte und beginnt
+     auf Höhe der Headline. */
+  .s-benefits__media {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+  }
+
+  .s-benefits__stage {
+    position: relative;
+    height: 100%;
+    min-height: clamp(360px, 40vw, 560px);
+    overflow: hidden;
+    border-radius: var(--r-md);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Alle Motive liegen übereinander, sichtbar ist immer genau eines. Das
+     Modul blendet über Deckkraft und einen leichten Zoom um. */
+  .s-benefits__stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .s-benefits__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .s-benefits__head,
+    .s-benefits__list,
+    .s-benefits__media {
+      grid-column: 1;
+    }
+
+    .s-benefits__media {
+      grid-row: auto;
+      margin-top: var(--sp-6);
+    }
+  }
+</style>

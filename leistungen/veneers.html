@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    {{> head }}
+    <title>Veneers in Berlin — Mundpropaganda</title>
+    <meta
+      name="description"
+      content="Veneers in Berlin Prenzlauer Berg: minimalinvasiv, digital geplant, im eigenen Praxislabor gefertigt. Ablauf, Kosten und Antworten auf die häufigsten Fragen."
+    />
+  </head>
+
+  <body>
+    {{> icons }}
+    {{> backdrop }}
+    {{> transition }}
+
+    {{> nav }}
+
+    <main>
+      <!-- ==================================================================
+           SERVICE-HERO
+           ================================================================== -->
+      <section class="s-shero container" data-hero>
+        {{> tooth-lines }}
+
+        <div class="s-shero__body">
+          <p class="s-shero__topline" data-hero-meta>Veneers in Berlin</p>
+          <h1 class="s-shero__title" data-hero-word>Veneers</h1>
+          <p data-hero-meta>
+            Unser Schwerpunkt sind Veneers und Keramikimplantate. Beides
+            Behandlungen, die wir täglich machen und in denen wir richtig gut
+            sind. Unser Team übernimmt alles andere, was du brauchst:
+            Prophylaxe, Inlays, Wurzelbehandlungen, Weisheitszähne.
+          </p>
+
+          <div class="s-shero__actions" data-hero-foot>
+            {{> button label="Termin buchen" href="#kontakt" }}
+          </div>
+
+          <div class="s-shero__reviews" data-hero-foot>
+            {{> reviews }}
+          </div>
+        </div>
+
+        <div class="s-shero__media">
+          {{> picture name="portrait-hero" widths="640,1024,1600,2200" alt="Patientin mit Veneers" sizes="(max-width: 900px) 100vw, 50vw" eager="true" parallax="9" }}
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           INTRO
+           ================================================================== -->
+      <section class="container s-intro">
+        <div class="s-intro__head">
+          <span class="c-topline" data-reveal="fade">Was Veneers leisten</span>
+          <h2 class="s-intro__title" data-split="lines">
+            Kleine Korrektur, großer Unterschied
+          </h2>
+        </div>
+
+        <p data-reveal="up">
+          Manchmal sorgen schon kleine Details dafür, dass man sich mit seinem
+          Lächeln nicht rundum wohlfühlt. Verfärbungen, leichte Fehlstellungen
+          oder eine ungleichmäßige Zahnform können den Gesamteindruck trüben,
+          auch wenn die Zähne eigentlich gesund sind. In solchen Fällen bieten
+          Veneers eine schonende und ästhetisch überzeugende Lösung.
+        </p>
+
+        <p data-reveal="up" data-reveal-delay="0.08">
+          Je nach Veneer-Art entstehen diese entweder in unserem Praxislabor im
+          Prenzlauer Berg oder in Zusammenarbeit mit spezialisierten
+          Partnerlaboren. Wir passen jeden Zahnersatz millimetergenau an Ihre
+          Zahnform, Ihren Hautton und Ihre persönlichen Wünsche an.
+        </p>
+      </section>
+
+      <!-- ==================================================================
+           BENEFITS — dunkles Band, Auswahlliste links, Bild rechts
+           Im Entwurf (Figma 18:2647) sitzt hier eine nummerierte Liste, bei
+           der immer genau ein Eintrag aufgeklappt ist. Das ist dieselbe
+           Mechanik wie „Wir setzen neue Standards" auf der Startseite —
+           deshalb dieselben data-Attribute und dasselbe Modul, nur ein
+           anderes Erscheinungsbild.
+           ================================================================== -->
+      <section class="s-benefits" data-standards>
+        <div class="container s-benefits__inner">
+          <div class="s-benefits__head">
+            <span class="c-topline" data-reveal="fade">Benefits</span>
+            <h2 class="s-benefits__title" data-split="lines" data-split-delay="0.1">
+              Merkmale und Vorteile von Veneers
+            </h2>
+          </div>
+
+          <div class="s-benefits__list" data-standards-list>
+            <div class="s-benefits__row" data-standards-row data-active="true">
+              <span class="s-benefits__num">1</span>
+              <div class="s-benefits__body">
+                <h3 class="s-benefits__name">Keramikveneers</h3>
+                <div class="s-benefits__text">
+                  <p>Keramikveneers gelten als die gebräuchlichste Form unter den
+                  Verblendschalen. Sie bestehen aus Keramikschalen, die in
+                  Farbe, Form und Oberflächenstruktur genau an Ihre natürlichen
+                  Zähne angepasst werden.</p>
+                </div>
+              </div>
+              <span class="s-benefits__bar" data-standards-bar><i></i></span>
+            </div>
+
+            <div class="s-benefits__row" data-standards-row>
+              <span class="s-benefits__num">2</span>
+              <div class="s-benefits__body">
+                <h3 class="s-benefits__name">Komposit-Veneers</h3>
+                <div class="s-benefits__text">
+                  <p>Direkt auf dem Zahn modelliert und in einer Sitzung fertig.
+                  Die günstigere Variante, wenn es schnell gehen soll — und
+                  jederzeit wieder rückgängig zu machen.</p>
+                </div>
+              </div>
+              <span class="s-benefits__bar" data-standards-bar><i></i></span>
+            </div>
+
+            <div class="s-benefits__row" data-standards-row>
+              <span class="s-benefits__num">3</span>
+              <div class="s-benefits__body">
+                <h3 class="s-benefits__name">Non-Prep-Veneers</h3>
+                <div class="s-benefits__text">
+                  <p>Hauchdünn und ohne Abtrag der Zahnhartsubstanz. Wo die
+                  Ausgangsform es zulässt, bleibt der Zahn vollständig
+                  erhalten.</p>
+                </div>
+              </div>
+              <span class="s-benefits__bar" data-standards-bar><i></i></span>
+            </div>
+          </div>
+
+          <div class="s-benefits__media" data-reveal="right" data-reveal-trigger=".s-benefits">
+            <div class="s-benefits__stage" data-standards-stage>
+              <img src="/img/treatment-01-1600.webp" alt="" data-standards-img />
+              <img src="/img/lab-veneers-1024.webp" alt="" data-standards-img />
+              <img src="/img/teeth-macro-1024.webp" alt="" data-standards-img />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           BEFORE / AFTER
+           ================================================================== -->
+      <section class="s-ba">
+        <div class="container">
+          <span class="c-topline" data-reveal="fade" style="margin-bottom: var(--sp-6); display: inline-flex">
+            Vorher &amp; Nachher
+          </span>
+
+          <div class="s-ba__frame" data-ba data-reveal="scale">
+            {{> picture name="teeth-macro" widths="640,1024,1600,2048" alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" }}
+            <div class="s-ba__after">
+              {{> picture name="teeth-macro-after" widths="640,1024,1600,2048" alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" }}
+            </div>
+            <div class="s-ba__handle"></div>
+          </div>
+
+          <div class="s-ba__labels" data-reveal="fade">
+            <span>Vorher</span>
+            <span>Ziehen zum Vergleichen</span>
+            <span>Nachher</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           MINIMALINVASIV — Feature-Aussage über volle Breite
+           ================================================================== -->
+      <section class="section">
+        <div class="container">
+          <span class="c-topline" data-reveal="fade">Zahnerhalt</span>
+          <p class="s-statement" data-reveal="up">
+            Wir tragen nur so viel Zahnhartsubstanz ab, wie für Passform und
+            Ästhetik unbedingt nötig ist. Durch präzise digitale Planung und die
+            Zusammenarbeit mit unserem Praxislabor entstehen natürliche
+            Ergebnisse bei maximalem Zahnerhalt. Bei guter Pflege können unsere
+            Veneers ein Leben lang halten.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           IN VIER SCHRITTEN
+           ================================================================== -->
+      <section class="s-steps">
+        <div class="container">
+          <h2 class="s-steps__title" data-split="lines">
+            In vier Schritten zu neuen Veneers
+          </h2>
+
+          <div class="s-steps__grid" data-reveal-stagger="0.08">
+            <article class="c-step" data-reveal-child>
+              <span class="c-step__num">1</span>
+              <h3 class="c-step__title">Vorbereitung und Beratung.</h3>
+              <p class="c-step__text">
+                Wir besprechen Ihre Wünsche, prüfen Zahn- und
+                Zahnfleischzustand, analysieren Form, Farbe und Stellung und
+                nehmen Fotos auf. Vor der Behandlung erfolgt eine professionelle
+                Zahnreinigung.
+              </p>
+            </article>
+
+            <article class="c-step" data-reveal-child>
+              <span class="c-step__num">2</span>
+              <h3 class="c-step__title">Digitales Mock-up.</h3>
+              <p class="c-step__text">
+                Aus dem Intraoralscan entsteht ein Entwurf, den Sie vorab im
+                Mund tragen können. Erst wenn das Ergebnis überzeugt, gehen wir
+                weiter — vorher wird kein Zahn berührt.
+              </p>
+            </article>
+
+            <article class="c-step" data-reveal-child>
+              <span class="c-step__num">3</span>
+              <h3 class="c-step__title">Fertigung im Labor.</h3>
+              <p class="c-step__text">
+                Unsere Zahntechnikerinnen schichten jedes Veneer einzeln auf.
+                Farbe und Transluzenz werden am Behandlungsstuhl abgestimmt,
+                nicht nach Farbring aus dem Katalog.
+              </p>
+            </article>
+
+            <article class="c-step" data-reveal-child>
+              <span class="c-step__num">4</span>
+              <h3 class="c-step__title">Einsetzen und Nachsorge.</h3>
+              <p class="c-step__text">
+                Die Veneers werden adhäsiv befestigt und final poliert. Nach
+                zwei Wochen sehen wir uns wieder, danach genügt die reguläre
+                Prophylaxe.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           TRANSFORMATION STORIES (identisch zur Startseite)
+           ================================================================== -->
+      <section class="s-stories" data-stories>
+        <!-- Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
+             Scroll — dadurch läuft der Schriftzug am oberen Rand entlang,
+             ohne dass er als Marquee gebaut werden muss. -->
+        <div class="s-stories__ring" data-stories-ring aria-hidden="true">
+          <svg viewBox="0 0 1000 1000">
+            <defs>
+              <path
+                id="storiesCircle"
+                d="M 500,500 m -430,0 a 430,430 0 1,1 860,0 a 430,430 0 1,1 -860,0"
+                fill="none"
+              />
+            </defs>
+            <text>
+              <textPath href="#storiesCircle" startOffset="0%">
+                Transformation Stories — Transformation Stories — Transformation
+                Stories — Transformation Stories —
+              </textPath>
+            </text>
+          </svg>
+        </div>
+        <p class="sr-only">Transformation Stories</p>
+
+        <div class="s-stories__deck" data-deck>
+          <div class="s-stories__stack" data-deck-stack>
+            <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
+                 dahinter durchscheinen lassen. -->
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="smile-portrait" widths="563" alt="Karolina — Veneers" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Karolina</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-01" widths="640,1024" alt="Jonas — Keramikimplantate" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Jonas</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-02" widths="640,1024" alt="Alina — Aligner" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Alina</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-03" widths="640,1024" alt="Mo — Bleaching" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Mo</figcaption>
+            </figure>
+            <figure class="s-stories__card" data-deck-card>
+              {{> picture name="motion-04" widths="640,1024" alt="Thea — Veneers" sizes="(max-width: 700px) 70vw, 30vw" parallax="9" }}
+              <figcaption class="s-stories__name">Thea</figcaption>
+            </figure>
+          </div>
+
+          <div class="s-stories__controls" data-reveal="up">
+            <button class="s-stories__nav" data-deck-prev type="button" aria-label="Vorherige Geschichte">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+            <span class="s-stories__count" data-deck-count>1 / 5</span>
+            <button class="s-stories__nav" data-deck-next type="button" aria-label="Nächste Geschichte">
+              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="s-quote">
+        <div class="s-quote__inner">
+          <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
+
+          <!-- Wechselt mit der vordersten Karte oben. Alle Zitate liegen
+               übereinander, sichtbar ist immer genau eines. -->
+          <div class="s-quote__stage" data-deck-quotes>
+            <blockquote class="s-quote__text" data-deck-quote data-active="true">
+              Ich hatte vorher bei drei Praxen einen Kostenvoranschlag geholt und überall dasselbe Gefühl: Man verkauft mir ein Produkt. Hier hat mir zum ersten Mal jemand erklärt, warum weniger abschleifen mehr ist — und warum das bei mir länger dauert und trotzdem die bessere Entscheidung war. Nach acht Monaten würde ich es genauso wieder machen. Ich lache wieder auf Fotos, ohne vorher zu überlegen.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Nach dem Implantat hatte ich mit Wochen Schonung gerechnet. Am zweiten Tag war ich wieder im Büro. Was mir am meisten geblieben ist: Man hat mir vorher genau gesagt, was passiert, wie lange es dauert und was danach kommt — und dann ist genau das passiert. Keine Überraschung, keine Nachforderung, kein Termin, der plötzlich doch noch nötig war.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Achtzehn Monate Aligner, alle sechs Wochen ein Termin. Nie das Gefühl gehabt, dass jemand nur die Schiene wechselt und weiterwill. Zwischendurch gab es zwei Stellen, die nicht so liefen wie geplant — das wurde offen angesprochen und nachjustiert, statt es auszusitzen. Am Ende sah es aus wie im Mock-up vom ersten Tag.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Ich wollte eigentlich nur zwei Nuancen heller. Herausgekommen ist ein Gespräch darüber, warum meine Zähne überhaupt nachgedunkelt sind und was ich daran ändern kann, bevor überhaupt gebleicht wird. Das Bleaching kam danach — und hält bis heute, weil die Ursache mit behandelt wurde und nicht nur das Ergebnis.
+            </blockquote>
+            <blockquote class="s-quote__text" data-deck-quote>
+              Ich habe zehn Jahre nicht auf Fotos gelächelt. Das Mock-up zum Probetragen hat mir die Entscheidung abgenommen: Ich konnte sehen, wohin es geht, im Spiegel, im Tageslicht und auf Fotos, bevor irgendetwas endgültig war. Diese eine Stunde hat mehr gebracht als alle Beratungsgespräche davor zusammen.
+            </blockquote>
+          </div>
+
+          <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
+        </div>
+
+        <div class="s-quote__foot">
+          {{> button label="Ganze Story lesen" href="#" }}
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           KOSTEN
+           ================================================================== -->
+      <section class="s-prices" id="kosten">
+        <div class="container">
+          <h2 class="s-prices__title" data-split="lines">Kosten</h2>
+
+          <div class="s-prices__grid" data-reveal-stagger="0.08">
+            <article class="c-price" data-reveal-child>
+              <h3 class="c-price__name">Komposit-Veneers</h3>
+              <span class="c-price__tag">€ 450,– / Zahn</span>
+            </article>
+            <article class="c-price" data-reveal-child>
+              <h3 class="c-price__name">Keramikveneers</h3>
+              <span class="c-price__tag">€ 890,– / Zahn</span>
+            </article>
+            <article class="c-price" data-reveal-child>
+              <h3 class="c-price__name">Non-Prep-Veneers</h3>
+              <span class="c-price__tag">€ 950,– / Zahn</span>
+            </article>
+            <article class="c-price" data-reveal-child>
+              <h3 class="c-price__name">Digitale Planung</h3>
+              <span class="c-price__tag">€ 190,– pauschal</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           FEATURE-ROWS
+           ================================================================== -->
+      <section class="section section--flush">
+        <div class="container">
+          <div class="s-feature">
+            <div class="s-feature__media" data-reveal="scale">
+              {{> picture name="treatment-02" widths="640,1024,1600,1920" alt="Beratungsgespräch" sizes="(max-width: 900px) 100vw, 50vw" parallax="8" }}
+            </div>
+            <div class="s-feature__body" data-reveal="up">
+              <span class="c-topline">Schritt 01</span>
+              <h3 class="s-feature__title" data-split="lines">Vorbereitung und Beratung</h3>
+              <p>
+                Wir nehmen uns eine volle Stunde. Erst danach reden wir über
+                Material und Preis — nicht umgekehrt. Wer nach dem Gespräch
+                merkt, dass Veneers nicht die richtige Antwort sind, bekommt das
+                auch so gesagt.
+              </p>
+            </div>
+          </div>
+
+          <div class="s-feature s-feature--reverse">
+            <div class="s-feature__media" data-reveal="scale">
+              {{> picture name="lab-veneers" widths="640,1024,1600,2200" alt="Veneers im Praxislabor" sizes="(max-width: 900px) 100vw, 50vw" parallax="8" }}
+            </div>
+            <div class="s-feature__body" data-reveal="up">
+              <span class="c-topline">Schritt 02</span>
+              <h3 class="s-feature__title" data-split="lines">Mock-up</h3>
+              <p>
+                Ein Entwurf zum Probetragen, direkt auf den unbehandelten
+                Zähnen. Sie sehen das Ergebnis im Spiegel, im Tageslicht und auf
+                Fotos, bevor irgendetwas endgültig ist.
+              </p>
+            </div>
+          </div>
+
+          <div class="s-feature">
+            <div class="s-feature__media" data-reveal="scale">
+              {{> picture name="treatment-03" widths="640,1024,1600,2200" alt="Einsetzen der Veneers" sizes="(max-width: 900px) 100vw, 50vw" parallax="8" }}
+            </div>
+            <div class="s-feature__body" data-reveal="up">
+              <span class="c-topline">Schritt 03</span>
+              <h3 class="s-feature__title" data-split="lines">Einsetzung Veneers</h3>
+              <p>
+                Adhäsiv befestigt, Rand für Rand poliert. Der Termin dauert
+                länger als anderswo, weil wir jede Kante einzeln kontrollieren.
+                Das merkt man später an der Zunge.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           FAQ
+           ================================================================== -->
+      <!-- ==================================================================
+           MAGAZIN — dieselbe Komponente wie auf der Startseite, nur mit
+           auf die Leistung bezogenem Einstieg.
+           ================================================================== -->
+      <section class="s-magazine" data-magazine>
+        <div class="container">
+          <span class="c-topline" data-reveal="fade">Passend zum Thema</span>
+
+          <div class="s-magazine__head">
+            <!-- Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
+                 Leicht gegeneinander gedreht, das „ZU" liegt als weiße
+                 Plakette dazwischen. -->
+            <div class="s-magazine__type" data-reveal="up">
+              <span class="s-magazine__bar">Mund</span>
+              <span class="s-magazine__chip">zu</span>
+              <span class="s-magazine__bar s-magazine__bar--lower">Mund</span>
+            </div>
+
+            <div class="s-magazine__intro">
+              <h2 class="s-magazine__title" data-split="lines">Magazin</h2>
+              <p data-reveal="up" data-reveal-delay="0.08">
+                Weiterlesen zu Veneers und allem, was damit zusammenhängt:
+                Materialien, Haltbarkeit und die Fragen, die uns dazu am
+                häufigsten gestellt werden.
+              </p>
+            </div>
+          </div>
+
+          <div class="s-magazine__track" data-magazine-track>
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="motion-04" widths="640,1024" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Zahngesundheit<br />&amp; Fitness</a>
+                </h3>
+                <p class="c-post__text">
+                  Warum Sportlerinnen und Sportler häufiger Karies haben — und
+                  was dagegen hilft.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="teeth-macro" widths="640,1024,1600,2048" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Bleaching<br />für Zuhause</a>
+                </h3>
+                <p class="c-post__text">
+                  Was die Schienen aus der Drogerie können, wo sie aufhören und
+                  wann es schadet.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="lab-veneers" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Tipps &amp; Tricks</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Der Weg zur<br />Hygiene</a>
+                </h3>
+                <p class="c-post__text">
+                  Zahnseide, Bürstchen, Spülung — was davon wirklich etwas
+                  bringt und in welcher Reihenfolge.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+
+            <article class="c-post" data-magazine-item>
+              <div class="c-post__media">
+                {{> picture name="treatment-03" widths="640,1024,1600,2200" alt="" sizes="24vw" parallax="9" }}
+              </div>
+              <div class="c-post__card">
+                <span class="c-post__kicker">Knowhow</span>
+                <h3 class="c-post__title">
+                  <a class="c-post__link" href="#">Veneers aus<br />der Türkei</a>
+                </h3>
+                <p class="c-post__text">
+                  Eine ehrliche Rechnung — inklusive der Kosten, die erst später
+                  anfallen.
+                </p>
+              </div>
+              {{> button label="Beitrag lesen" static="true" }}
+            </article>
+          </div>
+
+          <div class="s-magazine__nav">
+            <div class="s-magazine__arrows">
+              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+            <div class="s-gallery__dots" data-magazine-dots role="tablist" aria-label="Beiträge"></div>
+            {{> button label="Alle Beiträge" href="#" variant="dark" }}
+          </div>
+        </div>
+      </section>
+
+      <section class="container s-panel" id="faq">
+        <div class="s-panel__head">
+          <span class="c-topline">FAQ</span>
+          <h2 class="s-panel__title" data-split="lines">Häufige Fragen zu Veneers</h2>
+          <p class="t-body t-muted">
+            Nichts dabei? Schreiben Sie uns — wir antworten in der Regel am
+            selben Werktag.
+          </p>
+        </div>
+
+        <div class="c-accordion" data-accordion="single" data-reveal-stagger="0.07">
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Was sind Veneers?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Veneers sind hauchdünne Verblendschalen aus Keramik oder
+                Komposit, die dauerhaft auf die sichtbare Zahnoberfläche
+                aufgeklebt werden. Sie dienen dazu, Form, Farbe oder Stellung
+                der Zähne optisch zu korrigieren — ohne große Eingriffe und bei
+                maximaler Schonung der Zahnhartsubstanz.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Wie läuft eine Behandlung mit Veneers ab?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                In vier Terminen: Beratung mit Analyse, digitales Mock-up zum
+                Probetragen, Fertigung im Labor und schließlich das Einsetzen.
+                Zwischen Abformung und Einsetzen liegen je nach Veneer-Art zehn
+                bis vierzehn Tage.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Wie lange halten Veneers?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Keramik-Veneers halten bei guter Pflege fünfzehn Jahre und
+                länger, oft ein Leben lang. Entscheidend sind Mundhygiene,
+                regelmäßige Prophylaxe und der Verzicht auf nächtliches
+                Knirschen — dafür gibt es bei Bedarf eine Schiene.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Was muss ich bei Veneers beachten?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Wenig. Keine harten Gegenstände öffnen, keine Nägel kauen, sonst
+                normal essen und putzen. Bleaching wirkt auf Keramik nicht —
+                deshalb bestimmen wir die Zielfarbe vor der Fertigung.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Welche Veneers gibt es?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Composite-Veneers werden direkt am Stuhl modelliert,
+                Keramik-Veneers im Labor geschichtet, Non-Prep-Veneers kommen
+                ganz ohne Beschleifen aus. Welche Variante passt, zeigt sich in
+                der Analyse — nicht am Preis.
+              </div>
+            </div>
+          </div>
+
+          <div class="c-accordion__item" data-accordion-item data-reveal-child>
+            <button class="c-accordion__trigger" data-accordion-trigger>
+              <span>Warum sind Veneers in der Türkei so viel günstiger?</span>
+              <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
+            </button>
+            <div class="c-accordion__panel" data-accordion-panel>
+              <div class="c-accordion__panel-inner">
+                Weil dort häufig Kronen statt Veneers gesetzt werden, wofür
+                deutlich mehr Zahnsubstanz abgetragen wird. Der Preisunterschied
+                entsteht am Zahn, nicht am Wechselkurs. Nachbesserungen und
+                Folgekosten fallen dann hier an.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           KONTAKT
+           ================================================================== -->
+      <section class="container s-panel" id="kontakt">
+        <div class="s-panel__head">
+          <span class="c-topline">Kontakt</span>
+          <h2 class="s-panel__title" data-split="lines">Unverbindliches Angebot</h2>
+          <p class="t-body t-muted">
+            Schicken Sie uns ein Foto Ihrer Zähne — wir melden uns mit einer
+            ersten Einschätzung und einem Kostenrahmen.
+          </p>
+        </div>
+
+        <form class="c-form" data-form novalidate data-reveal-stagger="0.06">
+          <div class="c-field" data-field data-reveal-child>
+            <label class="c-field__label" for="f-name">Name <span>*</span></label>
+            <div class="c-field__control">
+              <input id="f-name" name="name" type="text" placeholder="Dein Name" required />
+              <span class="c-field__error" aria-hidden="true">!</span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field data-reveal-child>
+            <label class="c-field__label" for="f-photo">Foto deiner Zähne</label>
+            <div class="c-field__control c-file" data-file>
+              <input id="f-photo" name="photo" type="file" accept="image/*" />
+              <span class="c-file__face">
+                <span data-file-name>Foto auswählen</span>
+                <svg aria-hidden="true"><use href="#i-upload" /></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field data-reveal-child>
+            <label class="c-field__label" for="f-mail">E-Mail-Adresse <span>*</span></label>
+            <div class="c-field__control">
+              <input id="f-mail" name="email" type="email" placeholder="hello@veneers.de" required />
+              <span class="c-field__error" aria-hidden="true">!</span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field style="grid-row: span 2" data-reveal-child>
+            <label class="c-field__label" for="f-msg">Nachricht <span>*</span></label>
+            <div class="c-field__control">
+              <textarea id="f-msg" name="message" placeholder="Hi Mundpropaganda" required></textarea>
+              <span class="c-field__error" aria-hidden="true">!</span>
+            </div>
+          </div>
+
+          <div class="c-field" data-field data-reveal-child>
+            <label class="c-field__label" for="f-service">Leistung <span>*</span></label>
+            <div class="c-field__control">
+              <select id="f-service" name="service" required>
+                <option value="">Leistung auswählen</option>
+                <option>Veneers</option>
+                <option>Zahnimplantate</option>
+                <option>Keramik Inlays</option>
+                <option>Bleaching</option>
+                <option>Aligner</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="c-field c-field--full" data-reveal-child>
+            <label class="c-checkbox">
+              <input type="checkbox" name="privacy" required />
+              <span>Privacy Policy bestätigen</span>
+            </label>
+          </div>
+
+          <div class="c-field c-field--full" data-reveal-child>
+            {{> button label="Unverbindliches Angebot anfordern" type="submit" variant="block" }}
+          </div>
+        </form>
+      </section>
+
+          </main>
+
+    {{> footer }}
+
+    <script type="module" src="/src/js/main.js"></script>
+  </body>
+</html>

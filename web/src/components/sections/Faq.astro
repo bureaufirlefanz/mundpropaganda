@@ -1,0 +1,22 @@
+---
+/**
+ * FAQ: Panel-Rahmen plus Akkordeon. Startseite und Leistungsseiten benutzen
+ * denselben Baustein, nur mit anderen Fragen.
+ */
+import Panel from "../ui/Panel.astro";
+import Accordion from "../ui/Accordion.astro";
+import type { Frage } from "../../lib/fixtures";
+
+interface Props {
+  titel: string;
+  fragen: Frage[];
+  topline?: string;
+  text?: string;
+}
+
+const { titel, fragen, topline = "FAQ", text } = Astro.props;
+---
+
+<Panel id="faq" topline={topline} titel={titel} text={text}>
+  <Accordion fragen={fragen} />
+</Panel>

@@ -1,0 +1,272 @@
+---
+/**
+ * Texte wahlfrei; die Vorgaben stehen hier, damit der Baustein ohne CMS
+ * lauffähig bleibt.
+ *
+ * Die Bilder in der Zahnmaske bleiben vorerst fest verdrahtet: Sie sind
+ * fünf Motive, die zu den fünf Punkten gehören und beim Wechsel überblenden.
+ * Damit die Redaktion sie tauschen kann, müssten sie eins zu eins an den
+ * Punkten hängen — das ist ein eigener Schritt und keine Nebensache.
+ */
+import Button from "../ui/Button.astro";
+import Thread from "../ui/Thread.astro";
+import ToothRings from "../ui/ToothRings.astro";
+
+interface Props {
+  titel?: string;
+  eintraege?: { name: string; text?: string }[];
+}
+
+const {
+  titel = "Wir setzen neue Standards",
+  eintraege = [
+    { name: "Modernste Technik", text: "Digitale Abformung, 3D-Planung und ein eigenes Praxislabor. Wir sehen das Ergebnis, bevor wir den ersten Schliff machen." },
+    { name: "Individuelle Beratung", text: "Kein Katalog, keine Pauschale. Wir hören zu, analysieren Form und Farbe und entwickeln daraus deinen Plan." },
+    { name: "Kompromisslose Qualität", text: "Wir arbeiten nur mit Materialien und Laboren, die wir selbst geprüft haben. Auch wenn es länger dauert." },
+    { name: "Spürbar angenehme Atmosphäre", text: "Räume, in denen man gerne wartet. Kein Praxisgeruch, kein Neonlicht, keine Hektik am Empfang." },
+    { name: "Nachhaltig auf allen Ebenen", text: "Maximaler Zahnerhalt, langlebige Materialien, kurze Wege zu unseren Partnerlaboren in Berlin." },
+  ],
+} = Astro.props;
+---
+
+<!-- ==================================================================
+           WIR SETZEN NEUE STANDARDS
+           ================================================================== -->
+      <section class="s-standards" data-standards>
+        <Thread />
+
+        <div class="s-standards__figure" aria-hidden="true">
+          <!-- Zwei Ebenen mit derselben Zahnmaske: die hintere ist minimal
+               größer und liefert dadurch den weichen Rand. Alle Motive
+               liegen übereinander, aktiv ist immer genau eines. -->
+          <div class="s-standards__stage" data-standards-stage>
+            <img src="/img/treatment-01-1024.webp" alt="" data-standards-img />
+            <img src="/img/lab-veneers-1024.webp" alt="" data-standards-img />
+            <img src="/img/teeth-macro-1024.webp" alt="" data-standards-img />
+            <img src="/img/praxis-03-1024.webp" alt="" data-standards-img />
+            <img src="/img/abstract-02-1024.webp" alt="" data-standards-img />
+          </div>
+          <ToothRings />
+        </div>
+
+        <div class="container">
+          <h2 class="s-standards__title" data-split="lines">{titel}</h2>
+
+          <div class="s-standards__list" data-standards-list>
+          {eintraege.map((e, i) => (
+            <div class="s-standards__row" data-standards-row data-active={i === 0 ? "true" : undefined}>
+              <span class="s-standards__num">{String(i + 1).padStart(2, "0")}</span>
+              <h3 class="s-standards__name">{e.name}</h3>
+              <p class="s-standards__text">{e.text}</p>
+              <span class="s-standards__bar" data-standards-bar><i></i></span>
+            </div>
+          ))}
+          </div>
+
+          <div class="s-standards__foot">
+            <Button label="Termin buchen" href="#kontakt" variant="dark" />
+          </div>
+        </div>
+      </section>
+
+<style>
+  /* Nummerierte Zeilen; die aktive Zeile ist voll deckend, der Rest gedimmt.
+     Aktivierung per ScrollTrigger.
+
+     clip statt hidden, und nur waagerecht: die Zahnfigur läuft rechts aus
+     dem Bild und muss beschnitten werden, der Pfad (s-thread) ist aber ein
+     Kind dieser Section und reicht bis in die Stories hinunter. Mit
+     `overflow: hidden` endete er an der Sectionkante — sichtbar war nur das
+     Stück in den Standards.
+     `clip` ist hier das richtige Werkzeug: nur es lässt sich mit `visible`
+     auf der anderen Achse kombinieren, `hidden` erzwingt dort `auto`. */
+  .s-standards {
+    position: relative;
+    padding-block: var(--section-space);
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  /* Display-2-Grad (125px @1728) auf Zeilenhöhe 1 — im Entwurf ergeben die
+     zwei Zeilen exakt 250px. */
+  .s-standards__title {
+    max-width: 12ch;
+    margin-bottom: clamp(64px, 8.7vw, 150px);
+    font-size: var(--fs-display-2);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  /* Zeilenraster 150px: Inhalt max. 124px plus 26px Innenabstand.
+     Spalten 88 / 1fr / 1fr entsprechen den Entwurfsbreiten. */
+  .s-standards__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: clamp(48px, 5.1vw, 88px) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--site-gutter);
+    align-items: start;
+    padding-block: clamp(18px, 1.5vw, 26px);
+    border-bottom: var(--bw) solid var(--c-line);
+    opacity: 0.42;
+    cursor: default;
+    transition: opacity var(--d-base) var(--e-swift);
+  }
+
+  .s-standards__row[data-active="true"] {
+    opacity: 1;
+  }
+
+  /* Fortschrittsbalken auf der Trennlinie der aktiven Zeile. Er ersetzt sie
+     optisch, statt eine zweite Linie danebenzusetzen. */
+  .s-standards__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .s-standards__bar i {
+    display: block;
+    height: 100%;
+    background: var(--c-brand);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  /* Der Balken wird 2px stark, sobald die Zeile aktiv ist — sonst wäre er
+     auf der Haarlinie kaum zu sehen. */
+  .s-standards__row[data-active="true"] .s-standards__bar {
+    height: 2px;
+    bottom: -1.5px;
+  }
+
+  .s-standards__num {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-h5);
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+  }
+
+  /* Die Umbrüche stehen im Markup als <br>: kein Wert für max-width teilt
+     alle fünf Namen gleichmäßig auf zwei Zeilen — die kurzen bräuchten eine
+     schmale Spalte, die langen eine breite. text-wrap: balance bleibt als
+     Rückfall für später ergänzte Einträge. */
+  .s-standards__name {
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  /* Schmaler gesetzt, damit zwischen Textspalte und Zahnmaske rechts Luft
+     bleibt. */
+  .s-standards__text {
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+
+  .s-standards__foot {
+    margin-top: clamp(64px, 8.7vw, 150px);
+  }
+
+  /* Die Zahn-Silhouette rechts: ein zahnförmig maskiertes Foto, darüber die
+     konzentrischen Pink-Konturen (ToothRings.astro). Ragt bewusst über den
+     Rand hinaus.
+     Im Entwurf reicht die Figur über die gesamte Sectionhöhe — deshalb über
+     die Höhe bemaßt, die Breite ergibt sich aus dem Seitenverhältnis. Weit
+     nach rechts geschoben und stärker angeschnitten: die Textspalten
+     brauchen die Breite, die Figur trägt allein über ihre Silhouette. */
+  .s-standards__figure {
+    position: absolute;
+    right: -21vw;
+    top: 7%;
+    height: 80%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Hinweis zur Maske: tooth-shape.svg ist eine einzige, sich nach innen
+     windende Spirale. Gefüllt ergibt sie die Zahnfläche — genau das brauchen
+     wir. Gestrichen ergäbe sie dagegen die komplette Spirale, weshalb hier
+     bewusst nur mit Flächen und nicht mit Konturen gearbeitet wird. */
+  .s-standards__stage {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1946 / 2611;
+    mask-image: url("/svg/tooth-silhouette.png");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("/svg/tooth-silhouette.png");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+
+  .s-standards__stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  .s-standards__stage img:first-child {
+    opacity: 1;
+  }
+
+  /* Der Textblock liegt über der Figur. Die Zeilen enden vorher, damit sie
+     nicht in die Zahnkontur hineinlaufen — so ist es auch im Entwurf. */
+  .s-standards .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Die Liste endet vor der Zahnfigur — im Entwurf 937px von 1632px
+     Containerbreite. */
+  .s-standards__list {
+    max-width: 66%;
+  }
+
+  @media (max-width: 900px) {
+    .s-standards__list {
+      max-width: none;
+    }
+
+    .s-standards__row {
+      grid-template-columns: 40px 1fr;
+    }
+
+    .s-standards__text {
+      grid-column: 2;
+    }
+
+    .s-standards__figure {
+      display: none;
+    }
+  }
+
+  /* Gestapelt braucht jede Zeile mehr Luft als nebeneinander. Auf dem großen
+     Schirm stehen Titel und Text in zwei Spalten und die Zeile ist zwei bis
+     drei Zeilen hoch — 18px oben und unten reichen, um sie zu trennen. Hier
+     steht der Text UNTER dem Titel, die Zeile wird fünf bis sechs Zeilen
+     hoch, und derselbe Innenabstand lässt die Blöcke aneinanderstoßen: Der
+     Abstand innerhalb einer Zeile ist dann größer als der zwischen zweien.
+     Genau das führt der Gliederung zuwider. */
+  @media (max-width: 700px) {
+    .s-standards__row {
+      padding-block: var(--sp-6);
+      row-gap: var(--sp-3);
+    }
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+/** Bewertungsbalken. Zahlen und Quelle kommen aus den Einstellungen. */
+import { ladeEinstellungen, schnittText } from "../../lib/einstellungen";
+
+const e = await ladeEinstellungen();
+const sterne = Math.round(e.bewertungenSchnitt);
+---
+
+<div class="c-reviews">
+  <div class="c-reviews__meta">
+    <span>{e.bewertungenAnbieter}</span>
+    <span>{e.bewertungenAnzahl} Bewertungen</span>
+    <span>{schnittText(e.bewertungenSchnitt)}</span>
+  </div>
+  <div class="c-reviews__stars" aria-label={`${schnittText(e.bewertungenSchnitt)} Sternen`}>
+    {Array.from({ length: sterne }).map(() => (
+      <svg aria-hidden="true"><use href="#i-star" /></svg>
+    ))}
+  </div>
+</div>
+
+<style>
+  .c-reviews {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: var(--r-sm);
+    background: color-mix(in srgb, var(--c-white) 70%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-family: var(--f-sans);
+    font-size: 0.8125rem;
+    line-height: 1;
+    color: var(--c-dark);
+  }
+
+  .c-reviews__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .c-reviews__meta span + span {
+    padding-left: var(--sp-2);
+    border-left: var(--bw) solid color-mix(in srgb, var(--c-dark) 25%, transparent);
+  }
+
+  .c-reviews__stars {
+    display: flex;
+    gap: 4px;
+    color: var(--c-brand);
+  }
+
+  .c-reviews__stars svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Auf schmalen Schirmen würde der Badge in drei Zeilen umbrechen. Er
+     schrumpft stattdessen und bleibt einzeilig. */
+  @media (max-width: 520px) {
+    .c-reviews {
+      gap: var(--sp-1);
+      font-size: 0.6875rem;
+    }
+
+    .c-reviews__meta {
+      gap: var(--sp-1);
+    }
+
+    .c-reviews__meta span {
+      white-space: nowrap;
+    }
+
+    .c-reviews__meta span + span {
+      padding-left: var(--sp-1);
+    }
+
+    .c-reviews__stars svg {
+      width: 11px;
+      height: 11px;
+    }
+  }
+</style>

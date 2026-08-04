@@ -1,0 +1,89 @@
+---
+/**
+ * Startseite. Jede Section ist ein eigener Baustein — damit lässt sich eine
+ * neue Seite aus denselben Teilen zusammenstecken, statt Markup zu kopieren.
+ */
+import Base from "../layouts/Base.astro";
+import Hero from "../components/sections/Hero.astro";
+import Split from "../components/sections/Split.astro";
+import Services from "../components/sections/Services.astro";
+import Standards from "../components/sections/Standards.astro";
+import Gallery from "../components/sections/Gallery.astro";
+import Experts from "../components/sections/Experts.astro";
+import Stories from "../components/sections/Stories.astro";
+import Magazine from "../components/sections/Magazine.astro";
+import Faq from "../components/sections/Faq.astro";
+import { ladeStartseite } from "../lib/startseite";
+
+/* Ein Dokument, alle Abschnitte. Was darin fehlt, bleibt undefined — die
+   Bausteine setzen dann ihren eingebauten Text ein. Deshalb steht hier
+   nirgends ein `??`: Das Weglassen IST der Rückfall. */
+const inhalt = await ladeStartseite();
+
+// Allgemeine Fragen zur Praxis — Inhalt dieser Seite. Die Leistungsseiten
+// bringen ihre eigenen aus dem CMS mit, das Panel selbst ist derselbe.
+const FRAGEN = [
+  {
+    frage: "Wie bekomme ich einen Termin?",
+    antwort:
+      "Über das Formular auf dieser Seite, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein - die bekommen Sie in der Regel innerhalb von zehn Tagen. Schmerzpatientinnen und -patienten nehmen wir am selben Tag.",
+  },
+  {
+    frage: "Behandeln Sie gesetzlich Versicherte?",
+    antwort:
+      "Ja. Die Regelleistungen rechnen wir über die Kasse ab. Alles, was darüber hinausgeht - Veneers, Keramikimplantate, hochwertige Füllungen - ist eine Privatleistung. Sie bekommen vorher einen schriftlichen Kostenvoranschlag, ohne Ausnahme.",
+  },
+  {
+    frage: "Was kostet die Erstberatung?",
+    antwort:
+      "Das Erstgespräch mit Befund ist Kassenleistung. Kommt eine digitale Planung mit Mock-up dazu, kostet die 190 € - bei anschließender Behandlung wird sie vollständig angerechnet.",
+  },
+  {
+    frage: "Ich habe Angst vor dem Zahnarzt. Was tun Sie dagegen?",
+    antwort:
+      "Sagen Sie es uns beim ersten Kontakt. Wir planen dann mehr Zeit ein, erklären jeden Schritt vorab und arbeiten auf Wunsch mit Lachgas oder in Sedierung. Niemand muss sich hier zusammenreißen.",
+  },
+  {
+    frage: "Wie oft sollte ich zur Prophylaxe?",
+    antwort:
+      "Zweimal im Jahr reicht bei gesundem Zahnfleisch. Nach einer Parodontitis-Behandlung oder mit Implantaten und Veneers empfehlen wir drei bis vier Termine - das ist der günstigste Weg, teure Nacharbeiten zu vermeiden.",
+  },
+  {
+    frage: "Gibt es Parkplätze und ist die Praxis barrierefrei?",
+    antwort:
+      "In der Christburger Straße gibt es Parkplätze im Hof und einen stufenlosen Zugang. Der Standort P25 liegt im Hochparterre - sagen Sie kurz Bescheid, dann holen wir Sie am Eingang ab.",
+  },
+];
+---
+
+<Base
+  title="Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin"
+  description="Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg."
+>
+  <Hero zeilen={inhalt.heroZeilen} />
+  <Split
+    topline={inhalt.splitTopline}
+    titel={inhalt.splitTitel}
+    absaetze={inhalt.splitAbsaetze}
+    bild={inhalt.splitBild}
+  />
+  <Services titel={inhalt.servicesTitel} />
+  <Standards titel={inhalt.standardsTitel} eintraege={inhalt.standardsEintraege} />
+  <Gallery variante="ring" titel={inhalt.standorteTitel} />
+  <Experts
+    titel={inhalt.expertenTitel}
+    namen={inhalt.expertenNamen}
+    bild={inhalt.expertenBild}
+  />
+  <Stories eintraege={inhalt.storiesEintraege} />
+  <Magazine
+    topline={inhalt.magazinTopline}
+    titel={inhalt.magazinTitel}
+    text={inhalt.magazinText}
+  />
+  <Faq
+    titel={inhalt.faqTitel ?? "Häufige Fragen"}
+    text={inhalt.faqText ?? "Nichts dabei? Schreiben Sie uns - wir antworten in der Regel am selben Werktag."}
+    fragen={inhalt.faq ?? FRAGEN}
+  />
+</Base>

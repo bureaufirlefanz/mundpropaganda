@@ -1,0 +1,618 @@
+---
+import Button from "../ui/Button.astro";
+import Picture from "../ui/Picture.astro";
+import Reviews from "../ui/Reviews.astro";
+
+interface Props {
+  /** Die beiden kleinen Blöcke unter der Wortmarke. Zeilenumbrüche zählen. */
+  zeilen?: string[];
+}
+
+const {
+  zeilen = [
+    "Praxis für ästhetische\n& allgemeine Zahnmedizin\nauf höchstem Niveau",
+    "Zahnarzt\nPrenzlauer Berg\nBerlin",
+  ],
+} = Astro.props;
+import ToothLines from "../ui/ToothLines.astro";
+---
+
+<!-- ==================================================================
+           HERO — Wortmarke mit dem Zahn zwischen den Zeilen
+           ================================================================== -->
+      <section class="s-hero" data-hero>
+        <ToothLines />
+
+        <div class="container s-hero__inner">
+          {/* Wortmarke, Meta-Zeilen und Zahn liegen zusammen in einem Block:
+              Er ist der Bezugsrahmen, an dem die beiden absolut gesetzten
+              Teile hängen.
+
+              Vorher steckten sie IN der <h1>. Das war ungültig — eine
+              Überschrift darf nur Text und Auszeichnung enthalten, keine
+              <div> und <p>. Und es stand dem Mobil-Aufbau im Weg: Was in der
+              Überschrift steckt, lässt sich nicht hinter sie sortieren. */}
+          <div class="s-hero__block">
+            {/* Die Wortmarke ist die Hauptüberschrift der Seite — ohne sie
+                hätte die Startseite gar keine h1. */}
+            <h1 class="s-hero__wordmark">
+              <span class="s-hero__word" data-hero-word>Mund</span>
+
+              <!-- Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
+                   Beide schreiben sonst dieselbe Transform und überschreiben
+                   sich gegenseitig, sobald man während des Intros scrollt. -->
+              <span class="s-hero__tooth" data-hero-tooth>
+                <!-- Dritte Ebene für die Zeigernähe: Auftritt (innen) und
+                     Scroll-Parallax (außen) schreiben beide transform, eine
+                     gemeinsame Ebene würde sich gegenseitig überschreiben. -->
+                <span class="s-hero__tooth-drift" data-hero-tooth-drift>
+                <span class="s-hero__tooth-inner" data-hero-tooth-inner>
+                  <!-- Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
+                       Alphamaske wie der Zahn, dadurch wird nur das milchglasig,
+                       was tatsächlich hinter dem Objekt liegt. -->
+                  <span class="s-hero__tooth-glass"></span>
+                  <Picture name="tooth-3d" widths="640,961" alt="" sizes="(max-width: 900px) 60vw, 29vw" eager />
+                </span>
+                </span>
+              </span>
+
+              {/* Der Zahn liegt mit z-index 2 vor beiden Zeilen — so steht es
+                  im Entwurf. Diese Zeile trägt trotzdem z-index 1, damit sie
+                  über der Hintergrundzeichnung der Section liegt. */}
+              <span class="s-hero__word s-hero__word--wide" data-hero-word>Propaganda</span>
+            </h1>
+
+            <div class="s-hero__meta">
+              {/* set:html, weil die Umbrüche aus dem Text kommen: Die
+                  Redaktion schreibt drei Zeilen, und drei Zeilen sollen es
+                  bleiben. Nur \n wird zu <br /> — sonst nichts. */}
+              {zeilen.map((z) => (
+                <p data-hero-meta data-highlight-marker-reveal data-marker-theme="brand" data-marker-stagger="90" data-marker-delay="1.1" set:html={z.split("\n").join("<br />")} />
+              ))}
+            </div>
+
+          </div>
+
+          <a class="s-hero__scroll" href="#leistungen" aria-label="Weiter zum Inhalt" data-hero-scroll>
+            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+          </a>
+
+          <div class="s-hero__foot" data-hero-foot>
+            <Reviews />
+          </div>
+
+          {/* Nur auf schmalen Fenstern sichtbar. Dort endet der Hero mit
+              einer Handlung statt mit einem Scroll-Pfeil — auf dem Telefon
+              scrollt man ohnehin, ein Pfeil dafür ist verschenkte Fläche. */}
+          <div class="s-hero__cta" data-hero-foot>
+            <Button label="Termin buchen" href="#kontakt" />
+          </div>
+        </div>
+      </section>
+
+<style>
+  /* Der Zahn steckt zwischen den beiden Wortzeilen: „MUND" liegt dahinter,
+     „PROPAGANDA" davor. Das ergibt die Tiefe aus dem Entwurf.
+
+     Kein overflow: hidden — Zahn und Linien dürfen aus der Section laufen. */
+  .s-hero {
+    position: relative;
+    min-height: 100svh;
+    /* Nur so viel, dass die Leiste frei steht — die Meta-Zeilen hängen nicht
+       am Innenabstand, sondern sitzen absolut. */
+    padding-top: clamp(100px, 11vh, 150px);
+    padding-bottom: var(--sp-5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Flex-Spalte über die volle Höhe, damit `margin-top: auto` am Fuß greift
+     und der Reviews-Badge unten sitzt statt direkt unter der Wortmarke. */
+  .s-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+  }
+
+  /* Sitzt unterhalb der Wortmarke und bleibt links bzw. rechts außen —
+     bezogen auf die Wortmarke, nicht auf die Section, damit der Abstand zur
+     Schrift in jeder Fenstergröße gleich bleibt. */
+  .s-hero__meta {
+    position: absolute;
+    z-index: 4;
+    top: calc(100% + clamp(24px, 3vw, 56px));
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-5);
+  }
+
+  .s-hero__meta p {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-h5);
+    line-height: 1.55;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    max-width: 30ch;
+  }
+
+  .s-hero__meta p:last-child {
+    text-align: right;
+  }
+
+  /* Die Zeilen sind schrumpfbreite Block-Boxen (siehe Marker-Regel in
+     base.css) — text-align des Absatzes greift auf sie nicht. Rechts
+     ausgerichtet wird über den Rand.
+     :global(), weil modules/marker.js diese Zeilen erst zur Laufzeit anlegt:
+     sie tragen das Scope-Attribut dieser Datei nicht. */
+  .s-hero__meta p:last-child :global(.highlight-marker-line) {
+    margin-inline: auto 0;
+  }
+
+  /* Die Balken, die die Zeilen verdecken und beim Auftritt zur Seite
+     wegskalieren. Leicht gerundet wie die übrigen Flächen der Seite.
+
+     :global(), weil modules/marker.js sie erst zur Laufzeit anlegt — sie
+     tragen das Scope-Attribut dieser Datei nicht.
+
+     Die Rundung sitzt am Balken, nicht an der Zeile: der Balken wird während
+     der Bewegung waagerecht gestaucht, die Ecken laufen dabei mit. Genau das
+     ist gewollt — die Kante bleibt weich, solange etwas zu sehen ist. */
+  .s-hero__meta :global(.highlight-marker-bar) {
+    border-radius: var(--r-sm);
+  }
+
+  /* Die Wortmarke: zwei Zeilen, randlos, optisch auf Seitenbreite gezogen.
+     Der Zahn reicht 0.86 × Wortmarkenhöhe unter deren Unterkante
+     (55 % Versatz + 131 % Höhe − 100 %). Genau dieser Abstand steht unter
+     dem Block, damit die Zahnspitze mit dem Hero-Ende abschließt — so wie
+     im Entwurf. `margin-top: auto` schiebt den Block dorthin.
+     Wortmarkenhöhe = 2 × 0.92 × 14.2vw = 26.1vw → Abstand 22.5vw. */
+  /* Der Bezugsrahmen für Meta-Zeilen und Zahn. Seine Box ist die der
+     Wortmarke — dadurch stimmt `top: 100%` an den Meta-Zeilen weiterhin auf
+     deren Unterkante, ohne dass hier eine zweite Rechnung nötig wäre. */
+  .s-hero__block {
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 25vw;
+  }
+
+  .s-hero__wordmark {
+    /* Als h1 gälten sonst die Reset-Werte aus base.css. */
+    margin: 0;
+
+    /* Bezugsrahmen für den Zahn. Ohne das bezöge er seine Maße auf die
+       Section — `height: 124%` ergäbe dann 124 % der Heroshöhe statt der
+       Wortmarkenhöhe, und er füllte den halben Bildschirm. Genau das war
+       nach dem Umbau der Fall. */
+    position: relative;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-wrap: nowrap;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 0.92;
+  }
+
+  /* Beide Zeilen laufen im selben Grad (Figma: 250px bei 1728px Breite).
+     „PROPAGANDA" füllt damit die Zeile fast randlos aus — genau der Effekt
+     aus dem Entwurf. Zeilenhöhe 0.92 — im Entwurf 230px auf 250px Grad. */
+  .s-hero__word {
+    display: block;
+    font-family: var(--f-sans);
+    font-weight: 500;
+    font-size: clamp(3.25rem, 14.2vw, 15.625rem);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    color: var(--c-dark);
+    white-space: nowrap;
+  }
+
+  /* Wortmarke, Bewertungsleiste und Scroll-Knopf starten verborgen. Die Regel
+     dafür steht in styles/shared.css und hängt an den data-Attributen, weil
+     die Leistungsseiten dieselbe Choreografie mit anderen Klassen fahren. */
+
+  /* Gemessen statt geschätzt: bei 14.38vw sitzt die Tinte von „Propaganda"
+     exakt auf dem Satzspiegel. Der Höchstwert ist auf die gedeckelte
+     Containerbreite (--site-max) abgestimmt — ab dort wächst der Satzspiegel
+     nicht mehr mit, der Grad darf es also auch nicht. */
+  .s-hero__word--wide {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(3.29rem, 14.38vw, 15.5rem);
+    letter-spacing: -0.03em;
+  }
+
+  /* Maße relativ zur Wortmarke, nicht zum Viewport: im Entwurf beginnt der
+     Zahn bei 55 % der Wortmarkenhöhe und ist 131 % davon hoch. So bleibt
+     das Verhältnis Typo↔Zahn in jeder Fensterbreite gleich.
+     Er liegt VOR der Schrift und wirft keinen Schatten — die Plastizität
+     kommt allein aus dem Rendering des Objekts. */
+  /* <span> statt <div>, damit der Zahn in der Überschrift stehen darf: Eine
+     h1 nimmt nur Text und Auszeichnung auf, kein Fließelement. Er MUSS aber
+     darin stehen — nur so liegt er zwischen den beiden Wortzeilen, und nur
+     so bezieht er seine Lage auf die Wortmarke statt auf die Section.
+     Blockverhalten holen die drei Ebenen sich hier zurück. */
+  .s-hero__tooth,
+  .s-hero__tooth-drift,
+  .s-hero__tooth-inner {
+    display: block;
+  }
+
+  .s-hero__tooth {
+    position: absolute;
+    left: 50%;
+    top: 67%;
+    translate: -50% 0;
+    z-index: 2;
+    height: 124%;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Die Hero-Timeline startet erst nach dem Font-Load. Bis dahin gälten die
+     Ruhewerte weiter unten — also volles Milchglas bei noch unsichtbarem
+     Zahn. Deshalb bleibt die Gruppe verborgen, bis die Choreografie sie
+     übernimmt. visibility statt opacity: Deckkraft unter 1 würde den
+     backdrop-filter der Glasebene isolieren.
+     Ohne JS greift die Regel nicht, dann ist alles sofort sichtbar.
+
+     `html.js` und nicht `.js`: Astro hängt sein Scope-Attribut an jeden
+     Selektorteil, außer der Teil nennt html oder body. Ein bloßes `.js`
+     würde zu `.js[data-astro-cid-…]` und träfe das <html> nie — der Zahn
+     bliebe dauerhaft unsichtbar. */
+  html.js .s-hero__tooth {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js .s-hero__tooth {
+      visibility: visible;
+    }
+  }
+
+  /* Trägt die Zeigernähe. Zusammen mit dem Rahmen (Scroll-Parallax) und der
+     inneren Ebene (Auftritt) sind es drei Transforms auf drei Ebenen. */
+  .s-hero__tooth-drift {
+    height: 100%;
+    will-change: transform;
+  }
+
+  /* Trägt den Auftritt, während der Rahmen darüber den Scroll-Parallax
+     trägt. Drei Ebenen, drei Transforms — kein gegenseitiges Überschreiben. */
+  .s-hero__tooth-inner {
+    position: relative;
+    height: 100%;
+    will-change: transform;
+  }
+
+  /* Transluzent: die Schrift schimmert durch, der Zahn wirkt dadurch wie
+     Keramik statt wie ein aufgeklebtes Objekt. Weil das Glas darunter jetzt
+     selbst trägt, darf das Objekt durchlässiger sein.
+     :global(img), weil das Bild aus Picture.astro kommt. */
+  .s-hero__tooth :global(img) {
+    position: relative;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    opacity: 0.72;
+  }
+
+  /* Milchglas hinter dem Zahn. Die Alphamaske stammt aus demselben PNG,
+     deshalb deckt sich der geblurrte Bereich exakt mit dem Objekt.
+     Für den Glaseindruck reicht Unschärfe allein nicht — dazu kommen
+     angehobene Sättigung und Helligkeit sowie ein Lichtverlauf. */
+  .s-hero__tooth-glass {
+    /* Alle drei Filteranteile hängen an Variablen. Sättigung und Helligkeit
+       waren vorher feste Werte — sie standen damit ab dem Sichtbarwerden
+       sofort auf voller Stärke und erzeugten ein Aufblitzen, während die
+       Unschärfe noch bei null lag. */
+    --glass-blur: 16px;
+    --glass-sat: 1.55;
+    --glass-bright: 1.04;
+    --glass-sheen: 1;
+
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+      brightness(var(--glass-bright));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+      brightness(var(--glass-bright));
+    mask-image: url("/svg/tooth-3d-mask.png");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("/svg/tooth-3d-mask.png");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+
+  /* Lichtkante: heller Anlauf oben links, Abriss unten rechts. Liegt in der
+     Maske des Elternelements und folgt daher der Zahnkontur. */
+  .s-hero__tooth-glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: var(--glass-sheen);
+    background: linear-gradient(
+        148deg,
+        rgb(255 255 255 / 0.2) 0%,
+        rgb(255 255 255 / 0.05) 32%,
+        rgb(255 255 255 / 0) 58%
+      ),
+      radial-gradient(
+        120% 80% at 30% 8%,
+        rgb(255 255 255 / 0.14) 0%,
+        rgb(255 255 255 / 0) 60%
+      );
+  }
+
+  /* Scroll-Hinweis unten links — im Entwurf der Pfeil-Knopf des Buttons,
+     nach unten gedreht. */
+  .s-hero__scroll {
+    position: absolute;
+    z-index: 4;
+    left: var(--site-margin);
+    bottom: var(--sp-5);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    transition: transform var(--d-base) var(--e-out);
+  }
+
+  .s-hero__scroll svg {
+    width: 22px;
+    height: 22px;
+    transform: rotate(90deg);
+  }
+
+  @media (hover: hover) {
+    .s-hero__scroll:hover {
+      transform: translateY(4px);
+    }
+  }
+
+  /* Sitzt unten rechts über dem Zahn — im Entwurf überlagern sich die
+     beiden ebenfalls. Absolut, damit der Badge die Position der Wortmarke
+     nicht beeinflusst. */
+  .s-hero__foot {
+    position: absolute;
+    z-index: 4;
+    right: var(--site-margin);
+    bottom: var(--sp-5);
+  }
+
+  /* Auf breiten Fenstern endet der Hero mit dem Scroll-Pfeil. */
+  .s-hero__cta {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .s-hero__meta {
+      position: static;
+      flex-direction: column;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-8);
+    }
+
+    .s-hero__meta p:last-child {
+      text-align: left;
+    }
+
+    .s-hero__foot {
+      left: var(--site-margin);
+      right: auto;
+    }
+  }
+
+  /* --- Schmale Fenster ---------------------------------------------------
+     Aufbau auf dem Telefon:
+
+       Wortmarke + Zahn + Meta-Zeilen   als EIN Block, mittig im Fenster
+       Termin buchen                    unmittelbar darunter
+       Bewertungen                      ganz unten am Rand
+
+     Der Block bleibt ein Block. Eine frühere Fassung löste ihn mit
+     `display: contents` auf und verteilte seine Teile einzeln über die Höhe;
+     die Wortmarke klebte dann oben und der Zusammenhang zum Text ging
+     verloren. Wortmarke, Zahn und Meta-Zeilen gehören zusammen — sie werden
+     als Gruppe zentriert, nicht einzeln verteilt.
+
+     Die Bewertungsleiste steht dafür absolut am Fuß: Als Element im Fluss
+     zöge sie die Mitte der Gruppe nach oben, und die Gruppe säße dann nur
+     rechnerisch, nicht sichtbar in der Mitte. Der untere Innenabstand hält
+     ihr den Platz frei.
+
+     Der Zahn hängt weiterhin an der Wortmarke und liegt hinter allem.
+     -------------------------------------------------------------------- */
+  @media (max-width: 700px) {
+    .s-hero {
+      /* Steht als Größe da, weil die Lage des Blocks weiter unten damit
+         rechnet — zwei getrennte Werte liefen beim nächsten Eingriff
+         auseinander. */
+      --hero-kopf: clamp(88px, 22vw, 120px);
+
+      min-height: 100svh;
+      padding-top: var(--hero-kopf);
+      /* Knapp: Die Bewertungsleiste soll unten stehen, nicht darüber
+         schweben. Den Platz für sie hält der Innenabstand am Innenblock
+         frei, nicht dieser hier. */
+      padding-bottom: var(--sp-4);
+    }
+
+    /* Nur zwei Elemente im Fluss: die Gruppe und der Knopf.
+
+       Der untere Innenabstand hält der Bewertungsleiste ihren Platz frei. Sie
+       ist absolut gesetzt und zählt nicht mit — ohne diese Reserve stieße der
+       Knopf direkt an sie. */
+    .s-hero__inner {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      /* Klein: Der Knopf gehört unmittelbar unter den Text, nicht in eine
+         eigene Zone dazwischen. */
+      gap: var(--sp-5);
+      padding-bottom: calc(44px + var(--sp-5));
+    }
+
+    /* Der Zahn soll auf der Fenstermitte sitzen — er ist das Auge des Heros,
+       und wenn er mittig hängt, sitzt der Rest richtig.
+
+       Seine Lage hängt an der Wortmarke: Er beginnt bei 67 % ihrer Höhe und
+       ist selbst 190 % davon hoch, seine Mitte liegt also 1.62
+       Wortmarkenhöhen unter deren Oberkante (0.67 + 0.95). Die Wortmarke ist
+       zwei Zeilen zu 0.92 × 14.4vw, macht 26.5vw — und 1.62 × 26.5 = 42.9vw.
+
+       Daraus die Oberkante: halbe Fensterhöhe minus 42.9vw minus dem
+       Kopfabstand der Section, den der Innenblock schon mitbringt.
+
+       Vorher stand hier `flex-end` am Innenblock, das den ganzen Satz an die
+       Bewertungsleiste heranschob; die Höhe des Zahns fiel dabei aus der
+       Rechnung, und er saß gemessen 57px unter der Mitte. */
+    .s-hero__block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Die große Fuge sitzt INNERHALB der Gruppe: Sie schiebt den Text von
+         der Wortmarke weg nach unten und gibt zugleich dem Zahn den Raum, in
+         dem er hängt. */
+      gap: clamp(var(--sp-8), 25vh, 240px);
+      width: 100%;
+      margin-top: max(0px, calc(50vh - 42.9vw - var(--hero-kopf)));
+      margin-inline: 0;
+      margin-bottom: 0;
+    }
+
+    .s-hero__wordmark {
+      align-self: center;
+      align-items: center;
+      margin: 0;
+      font-size: 0;
+    }
+
+    /* Randfüllend, gerechnet statt geschätzt: „PROPAGANDA" ist in dieser
+       Schrift 6.35 em breit (gemessen, mit dem Sperrsatz von −0.025em). Der
+       Satzspiegel misst auf 390px genau 358px — 358 / 6.35 = 56.4px Grad,
+       also 14.45vw. 14.4vw lässt ein Haar Luft an beiden Rändern.
+
+       „MUND" behält denselben Grad und bleibt dadurch schmaler; die beiden
+       Zeilen auf gleiche Breite zu zwingen hieße zwei verschiedene Grade,
+       und die Wortmarke sähe nicht mehr aus wie sie selbst. */
+    .s-hero__word,
+    .s-hero__word--wide {
+      font-size: 14.4vw;
+    }
+
+    .s-hero__meta {
+      position: static;
+      display: grid;
+      /* `auto auto` mit Verteilung nach außen statt `1fr auto`: Bei fester
+         erster Spalte blieben links nur 168px, und „AUF HÖCHSTEM NIVEAU"
+         braucht bei 18px Grad 182px — die linke Zeile brach dadurch auf
+         sechs Zeilen um, die rechte auf drei. So nimmt sich jede Spalte,
+         was sie braucht, und der Rest wird zwischen ihnen verteilt. */
+      grid-template-columns: auto auto;
+      justify-content: space-between;
+      align-items: start;
+      gap: var(--sp-4);
+      width: 100%;
+      margin: 0;
+
+      /* Über den Zahn. Er hängt an der Wortmarke und reicht mit 190 % Höhe
+         bis hierher; ohne eigene Ebene läge der Text unter ihm. Dass er
+         durchscheint, ist kein Ersatz dafür. */
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Kleiner als auf dem großen Schirm: 18px auf 358px Satzbreite lassen
+       für zwei Spalten keinen Platz. */
+    .s-hero__meta p {
+      max-width: none;
+      font-size: 0.8125rem;
+    }
+
+    /* Die rechte Spalte bleibt rechtsbündig — sie ist der Gegenpol zur
+       linken, genau wie auf dem großen Schirm. */
+    .s-hero__meta p:last-child {
+      text-align: right;
+    }
+
+    .s-hero__meta p:last-child :global(.highlight-marker-line) {
+      margin-inline: auto 0;
+    }
+
+    .s-hero__cta {
+      display: block;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Am unteren Rand und aus dem Fluss genommen: Stünde sie darin, zählte
+       ihre Höhe zur zentrierten Gruppe und schöbe diese nach oben. Der
+       untere Innenabstand der Section hält ihr den Platz frei. */
+    /* Mittig über `left/right: 0` plus selbsttätige Seitenränder, NICHT über
+       `translate: -50%`. Die Leiste trägt `data-hero-foot`, und die
+       Auftrittschoreografie räumt am Ende mit `clearProps: "all"` auf —
+       dabei landet `translate: none` inline auf dem Element und schlägt die
+       Regel hier. Live stand die Leiste dadurch bei 188px statt mittig und
+       lief rechts aus dem Bild; lokal fiel es nicht auf, weil die Aufnahme
+       vor dem Aufräumen entstand.
+
+       `margin-inline: auto` ist Layout, keine Transformation — daran kommt
+       die Choreografie nicht heran. `width: max-content` ist trotzdem nötig,
+       sonst schrumpfte die Leiste auf die Breite zwischen den beiden
+       Nullpunkten und verlöre die Sterne; `max-width` fängt sehr schmale
+       Fenster ab. */
+    .s-hero__foot {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: max-content;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Auf dem Telefon scrollt man ohnehin — der Pfeil dafür ist Fläche
+       ohne Nutzen, und der Knopf darüber sagt mehr. */
+    .s-hero__scroll {
+      display: none;
+    }
+
+    /* <span> statt <div>, damit der Zahn in der Überschrift stehen darf: Eine
+     h1 nimmt nur Text und Auszeichnung auf, kein Fließelement. Er MUSS aber
+     darin stehen — nur so liegt er zwischen den beiden Wortzeilen, und nur
+     so bezieht er seine Lage auf die Wortmarke statt auf die Section.
+     Blockverhalten holen die drei Ebenen sich hier zurück. */
+  .s-hero__tooth,
+  .s-hero__tooth-drift,
+  .s-hero__tooth-inner {
+    display: block;
+  }
+
+    /* Nur die Größe: Lage und Staffelung stimmen schon, sie kommen aus der
+       Regel weiter oben und beziehen sich auf die Wortmarke. Auf 390px ist
+       die zwei Zeilen hoch — 124 % davon wären zu wenig, um den Zahn als
+       Objekt zu lesen. */
+    .s-hero__tooth {
+      height: 190%;
+    }
+  }
+</style>

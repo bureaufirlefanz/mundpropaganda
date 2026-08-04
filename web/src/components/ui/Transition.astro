@@ -1,0 +1,170 @@
+---
+/**
+ * Spaltenvorhang für den Seitenwechsel.
+ *
+ * Getrieben von Astros Router, nicht von eigener Navigation: der Vorhang
+ * deckt ab, während der Router den Inhalt austauscht, und gibt danach wieder
+ * frei. Die Spalten laufen versetzt — beim Verlassen von rechts nach links,
+ * beim Ankommen von links nach rechts. Daraus entsteht das Hin und Her.
+ *
+ * `transition:persist` hält das Element über den Wechsel hinweg am Leben,
+ * sonst würde es mitten in der eigenen Bewegung ausgetauscht.
+ */
+const SPALTEN = 5;
+
+/* Die mittlere Spalte trägt das Zeichen. Gerechnet, nicht als 2 notiert:
+   Bei einer geraden Spaltenzahl gäbe es keine Mitte, und der Wert wanderte
+   still auf die falsche Spalte. */
+const MITTE = Math.floor(SPALTEN / 2);
+---
+
+<div class="c-transition" data-transition aria-hidden="true" transition:persist>
+  <div class="c-transition__panels">
+    {Array.from({ length: SPALTEN }).map((_, i) => (
+      <div class="c-transition__panel">
+        {/* Das Zeichen sitzt IM Block, nicht darüber: So läuft es mit der
+            Spalte herein und wieder hinaus, statt über einer Bewegung zu
+            schweben, zu der es nicht gehört. */}
+        {i === MITTE && (
+          <span class="c-transition__mark">
+            {/* Die Kontur steht hier ausgeschrieben statt als <use> aus dem
+                Sprite. Zwei Gründe: Sie ist keine Bedienoberflächen-Ikone,
+                sondern eine gezeichnete Marke mit eigenem Seitenverhältnis
+                und Strichlogik — und dieses Element überlebt dank
+                `transition:persist` den Seitenwechsel, das Sprite dagegen
+                wird mit dem Dokument getauscht. Ein Verweis darauf zeigte
+                genau während des Wechsels für einen Moment ins Leere.
+
+                `stroke="currentColor"` statt des weißen Strichs aus der
+                Vorlage: So erbt die Marke ihre Farbe aus dem CSS und stimmt
+                auch, wenn der Vorhang einmal eine andere Farbe bekommt. */}
+            <svg viewBox="0 0 158.1 231.4" fill="none" aria-hidden="true">
+              <path
+                d="M71.8,87.8c1.4-4,3.7-8,7.9-9.5,6-2.3,13.6,0,15.5,6.2,2.5,11.2-1.7,24.2-8.5,32.8-5.7,7.4-16.5,8.2-23.4,2-11.5-9.7-19.5-30.8-19.5-45.3,0-11.2,7.7-19.8,19.3-18.8,4.6.1,9.2.9,13.8.8,7.4,0,14.8-2.2,22-1,14.9,2.6,18.6,16.2,18.1,29.8,0,10.7-1.1,22.7-2.4,32.9-.6,4.9-1.4,9.6-2.3,14.4-1.6,9.5-5.3,19.3-16.3,17.7-6-.8-11.5-4.8-17.6-4.9-7.6-.6-13.5,6-20.5,7.7-6.6,1.7-12.9-2-16.1-7.9-7.2-14.5-11.1-30.5-14.2-46.2-3-14.6-5.7-29.9-4.4-45,1.1-11.8,9.4-24.2,22-24.5,7-.6,13.6,1.7,20.5,2.7,5.3.8,10.8.7,16-.2,13.9-2.9,29.8-5.9,42.1,2.5,9.8,6.2,12.5,18.6,12.4,29.6.3,13.9-.6,27.7-1.6,41.7-2.7,25.7-5.7,53.5-8.2,78.2-1.6,10.8-.7,27.5-9.6,34.1-5.3,3.8-12.6,1.4-15.8-4-6.9-10.5-7-32.5-16.3-40.6-6.5-5.3-14.5-.1-16.2,7.1-3.3,12.6-3,26.1-6.8,38.7-5.7,15.3-21.4,16-28.2.8-2.6-5.8-4-12.1-5.6-18.2-4.1-14.9-7.7-30.3-10.8-45.6-6.5-28.6-11.1-57.8-14.6-87C-.2,51.8-1.7,32.9,8.3,17.7,15.1,7.8,27.4,2.1,39.4,3.2c7.2.5,13.2,2.9,20.4,4.1,10.4,2,21.3,1.2,31.4-1.8,7.3-1.9,14.6-5.2,22-5,20.4.9,40.6,15.2,43.7,36.3,1.5,9.9.4,19.9,0,29.9-.5,8.8-1,17.7-1.8,26.4-2.2,19.2-3.9,38.6-6.3,57.6"
+                stroke="currentColor"
+                stroke-miterlimit="10"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          </span>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* Bewegt wird ausschließlich per transform. */
+  .c-transition {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    pointer-events: none;
+    overflow: clip;
+  }
+
+  .c-transition__panels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* top: -100 % ist der Ruhepunkt: die Spalte hängt über dem Viewport.
+     yPercent 100 deckt ab, 200 gibt wieder frei. */
+  .c-transition__panel {
+    position: relative;
+    top: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--c-dark);
+    will-change: transform;
+  }
+
+  /* Die Spalte ist genau fensterhoch und deckt im Ruhepunkt der Bewegung
+     das Fenster deckungsgleich ab. Mittig in der Spalte heißt damit auch
+     mittig im Bild — ohne dass hier eine zweite Rechnung nötig wäre. */
+  .c-transition__mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: block;
+    color: var(--c-bg);
+  }
+
+  .c-transition__mark svg {
+    display: block;
+    /* Höhe statt Breite: Das Zeichen ist hochformatig, über die Breite
+       gedeckelt fiele es je nach Fenster unterschiedlich groß aus. Die
+       Breite folgt über das Seitenverhältnis der Zeichenfläche. */
+    height: clamp(48px, 6.5vw, 100px);
+    width: auto;
+    aspect-ratio: 158.1 / 231.4;
+
+    /* `vector-effect: non-scaling-stroke` am Pfad hält den Strich bei jeder
+       Größe gleich dick — deshalb steht die Stärke hier in Pixeln und nicht
+       in Zeichenflächen-Einheiten.
+
+       Die Vorlage bringt keine Strichstärke mit, gilt also als 1. Auf 100px
+       Höhe skaliert wären das 0.43px: eine Haarlinie, die auf dem dunklen
+       Grund verschwände. 2.25px gibt der Zeichnung Gewicht; die Windungen im
+       Inneren liegen bei dieser Größe rund 4px auseinander, dicker liefe
+       dort ineinander. */
+    stroke-width: 2.25px;
+    stroke-linecap: round;
+  }
+
+  /* Die Trennlinien sitzen auf den Spalten selbst, nicht auf einer eigenen
+     Ebene darüber. Als eigene Ebene lägen sie dauerhaft über der ganzen
+     Seite — sichtbar auch dann, wenn gar kein Wechsel läuft. */
+  .c-transition__panel + .c-transition__panel {
+    border-left: var(--bw) solid color-mix(in srgb, var(--c-white) 10%, transparent);
+  }
+</style>
+
+<script>
+  import { gsap } from "../../../../src/js/lib/gsap.js";
+
+  const wrap = document.querySelector("[data-transition]");
+  const spalten = wrap ? [...wrap.querySelectorAll(".c-transition__panel")] : [];
+  const AUS = 0.55;
+  const EIN = 0.6;
+
+  if (spalten.length) {
+    /* Der Router hält an, bis das übergebene Versprechen erfüllt ist —
+       dadurch deckt der Vorhang wirklich ab, bevor getauscht wird, statt
+       parallel zum Austausch zu laufen. */
+    document.addEventListener("astro:before-preparation", (e) => {
+      const ereignis = e as any;
+      const weiter = ereignis.loader;
+      ereignis.loader = async () => {
+        await gsap
+          .timeline()
+          .set(spalten, { yPercent: 0 })
+          .to(spalten, {
+            yPercent: 100,
+            duration: AUS,
+            ease: "power3.inOut",
+            stagger: { each: 0.05, from: "end" },
+          })
+          .then();
+        await weiter();
+      };
+    });
+
+    // Nach dem Austausch nach unten durchlaufen lassen — nicht zurück nach
+    // oben. Sonst liefe die Bewegung sichtbar rückwärts.
+    document.addEventListener("astro:after-swap", () => {
+      gsap.to(spalten, {
+        yPercent: 200,
+        duration: EIN,
+        ease: "power3.inOut",
+        stagger: { each: 0.05, from: "start" },
+        onComplete: () => gsap.set(spalten, { yPercent: 0 }),
+      });
+    });
+  }
+</script>

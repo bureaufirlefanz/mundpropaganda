@@ -1,0 +1,32 @@
+---
+/**
+ * Ein einzelner Absatz über die halbe Seitenbreite, größer gesetzt als
+ * Fließtext. Trägt eine Kernaussage, ohne eine Headline zu sein.
+ */
+interface Props {
+  topline: string;
+  text: string;
+}
+
+const { topline, text } = Astro.props;
+---
+
+<section class="section">
+  <div class="container">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <p class="s-statement" data-reveal="up">{text}</p>
+  </div>
+</section>
+
+<style>
+  .s-statement {
+    max-width: 46ch;
+    margin-top: var(--sp-6);
+    margin-inline: auto;
+    font-size: clamp(1.375rem, 2.08vw, 2.25rem);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+</style>

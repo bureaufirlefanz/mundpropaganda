@@ -1,0 +1,35 @@
+{{!--
+  Button — Parameter:
+    label     Beschriftung
+    href      Ziel (ohne href wird ein <button> gerendert)
+    variant   "dark" für die sekundäre Variante
+    magnetic  "true" für den Magnet-Effekt am Cursor
+    static    "true" rendert ein <span> statt eines Links. Nötig, wenn der
+              Button innerhalb eines anderen Links sitzt (z.B. in einer
+              anklickbaren Card) — verschachtelte <a> sind ungültig und
+              werden vom Parser aufgebrochen.
+--}}
+{{#if static}}
+<span class="c-btn {{#if variant}}c-btn--{{variant}}{{/if}}" aria-hidden="true">
+  <span class="c-btn__label">{{label}}</span>
+  <span class="c-btn__icon"><svg><use href="#i-arrow" /></svg></span>
+</span>
+{{else if href}}
+<a
+  class="c-btn {{#if variant}}c-btn--{{variant}}{{/if}}"
+  href="{{href}}"
+  {{#if magnetic}}data-magnetic="0.3"{{/if}}
+>
+  <span class="c-btn__label">{{label}}</span>
+  <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+</a>
+{{else}}
+<button
+  class="c-btn {{#if variant}}c-btn--{{variant}}{{/if}}"
+  type="{{#if type}}{{type}}{{else}}button{{/if}}"
+  {{#if magnetic}}data-magnetic="0.3"{{/if}}
+>
+  <span class="c-btn__label">{{label}}</span>
+  <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+</button>
+{{/if}}

@@ -1,0 +1,279 @@
+---
+/**
+ * Unsere Standorte. Zwei Darstellungen derselben Motive:
+ *
+ *   "reihe" — die Bildreihe läuft beim Scrollen waagerecht durch (Bestand)
+ *   "ring"  — die Motive sitzen auf einem Zylinder, der um den Betrachter
+ *             kreist und sich ziehen lässt
+ *
+ * Umschalten heißt: das Attribut an <Gallery /> in der Seite ändern. Der
+ * Textteil darunter bleibt in beiden Fällen derselbe.
+ */
+import Picture from "../ui/Picture.astro";
+import BildRing from "../ui/BildRing.astro";
+import { ladeEinstellungen } from "../../lib/einstellungen";
+import type { RingBild } from "../ui/BildRing.astro";
+
+interface Props {
+  variante?: "reihe" | "ring";
+  titel?: string;
+}
+const { variante = "reihe", titel = "Unsere Standorte" } = Astro.props;
+
+/* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
+const { standorte } = await ladeEinstellungen();
+
+/* Für den Ring dieselben Motive, aber ohne die schmalen Abstraktionen —
+   auf dem Zylinder haben alle Karten dasselbe Maß. */
+const ringBilder: RingBild[] = [
+  { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
+  { name: "praxis-01", widths: "640", alt: "Empfangsbereich Prenzlauer Allee" },
+  { name: "praxis-02", widths: "640", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
+  { name: "abstract-01", widths: "640,1024" },
+  { name: "abstract-02", widths: "640,1024" },
+];
+---
+
+<!-- ==================================================================
+           UNSERE STANDORTE — horizontal laufende Bildreihe
+           ================================================================== -->
+      <section class="s-gallery" id="standorte" data-gallery>
+        <h2 class="s-gallery__title" data-split="lines">{titel}</h2>
+
+        {variante === "ring" ? (
+          <BildRing bilder={ringBilder} label="Unsere Standorte" />
+        ) : (
+          <Fragment>
+          <div class="s-gallery__track" data-gallery-track>
+            <figure class="s-gallery__item s-gallery__item--sm">
+              <Picture name="abstract-02" widths="640,1024" alt="" sizes="10vw" parallax="9" />
+            </figure>
+            <figure class="s-gallery__item s-gallery__item--md">
+              <Picture name="praxis-01" widths="640" alt="Empfangsbereich Prenzlauer Allee" sizes="20vw" parallax="9" />
+            </figure>
+            <figure class="s-gallery__item s-gallery__item--lg">
+              <Picture name="praxis-03" widths="640,1024,1600,2200" alt="Behandlungsräume mit Tageslicht" sizes="45vw" parallax="9" />
+              <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
+            </figure>
+            <figure class="s-gallery__item s-gallery__item--md">
+              <Picture name="praxis-02" widths="640" alt="Wartebereich Christburger Straße" sizes="20vw" parallax="9" />
+              <figcaption class="s-gallery__caption">Christburger Straße</figcaption>
+            </figure>
+            <figure class="s-gallery__item s-gallery__item--sm">
+              <Picture name="abstract-01" widths="640,1024" alt="" sizes="10vw" parallax="9" />
+            </figure>
+          </div>
+
+          <!-- Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. -->
+          <div class="container s-gallery__nav" data-reveal="fade">
+            <div class="s-gallery__arrows">
+              <button class="s-gallery__arrow" data-gallery-prev type="button" aria-label="Vorheriger Standort">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+              <button class="s-gallery__arrow" data-gallery-next type="button" aria-label="Nächster Standort">
+                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+            <div class="s-gallery__dots" data-gallery-dots role="tablist" aria-label="Standorte"></div>
+          </div>
+          </Fragment>
+        )}
+
+        <div class="container s-cols">
+          {standorte.map((o, i) => (
+            <div class="s-cols__item">
+              {/* Konturzahl: rein grafisch, deshalb für Vorlesegeräte
+                  ausgeblendet — die Anschrift steht darunter im Klartext. */}
+              <p class="s-cols__display" data-reveal="up" data-reveal-delay={i * 0.08} aria-hidden="true">{o.kuerzel}</p>
+              <h3 data-reveal="up" data-reveal-delay={0.06 + i * 0.08} data-reveal-trigger=".s-experts">{o.name}</h3>
+              {/* <address> statt <p>: das ist die Anschrift der Praxis, und
+                  Vorlesegeräte kündigen sie als solche an. */}
+              <address class="s-cols__adresse" data-reveal="up" data-reveal-delay={0.1 + i * 0.08} data-reveal-trigger=".s-experts">
+                {o.strasse}<br />{o.ort}
+              </address>
+              <p data-reveal="up" data-reveal-delay={0.14 + i * 0.08} data-reveal-trigger=".s-experts">{o.beschreibung}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+<style>
+  /* Horizontale Bildreihe, die beim Scrollen seitwärts läuft. Das mittlere
+     Panel ist breit, die äußeren sind schmale Teaser.
+     Pfeile und Punkte liegen in shared.css — das Magazin nutzt dieselben. */
+  .s-gallery {
+    position: relative;
+    padding-block: var(--section-space);
+    overflow: hidden;
+  }
+
+  .s-gallery__title {
+    text-align: center;
+    margin-bottom: var(--sp-6);
+    font-size: clamp(2rem, 3.2vw, 3.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .s-gallery__track {
+    display: flex;
+    gap: var(--sp-1);
+    padding-inline: var(--site-margin);
+    will-change: transform;
+  }
+
+  .s-gallery__item {
+    position: relative;
+    flex: 0 0 auto;
+    height: clamp(320px, 42vw, 620px);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil die Bilder aus Picture.astro kommen. */
+  .s-gallery__item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .s-gallery__item--sm {
+    width: clamp(80px, 8vw, 130px);
+  }
+
+  .s-gallery__item--md {
+    width: clamp(160px, 17vw, 290px);
+  }
+
+  .s-gallery__item--lg {
+    width: clamp(300px, 44vw, 760px);
+  }
+
+  .s-gallery__caption {
+    position: absolute;
+    left: var(--sp-4);
+    bottom: var(--sp-4);
+    padding: 6px 12px;
+    border-radius: var(--r-round);
+    background: color-mix(in srgb, var(--c-white) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-dark);
+  }
+
+  /* --- Slider-Steuerung: nur die Hülle, die es hier allein gibt ---------- */
+
+  .s-gallery__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-5);
+    margin-top: var(--sp-6);
+  }
+
+  .s-gallery__arrows {
+    display: flex;
+    gap: var(--sp-4);
+  }
+
+  /* --- Zweispalten-Textblock (Standort-Details) -------------------------- */
+
+  /* Der obere Innenabstand trennt die Standort-Blöcke von den Pfeilen
+     darüber. 112px waren dafür zu viel — die Section zerfiel dadurch in
+     Galerie und Text, statt eins zu sein. */
+  .s-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-10) var(--site-gutter);
+    padding-block: var(--sp-8) var(--sp-10);
+  }
+
+  /* Der Standortname als Outline-Typo — im Entwurf 284px, transparent mit
+     Kontur, sehr eng gesetzt. Selektor bewusst mit Elternklasse: sonst
+     gewinnt `.s-cols__item p` bei Schriftgrad und Farbe.
+     Zeilenhöhe 1 plus negative Außenabstände statt einer gestauchten
+     Zeilenhöhe: der Entwurf setzt 168px auf 284px Grad (0.59), dabei ragen
+     die Buchstaben oben und unten aus ihrer Zeilenbox heraus und wurden vom
+     überlaufversteckten Rahmen der Section beschnitten. So bleibt der enge
+     Satz erhalten, ohne dass etwas aus der Box läuft. */
+  /* Die Anschrift trägt die Zeile über der Beschreibung: gleicher Grad,
+     aber in der Auszeichnungsschrift und etwas kräftiger, damit sie sich
+     vom Fließtext löst, ohne eine eigene Überschrift zu sein.
+     `font-style: normal`, weil <address> vom Browser kursiv gesetzt wird. */
+  .s-cols__adresse {
+    margin-bottom: var(--sp-3);
+    font-family: var(--f-mono);
+    font-style: normal;
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .s-cols__item .s-cols__display {
+    margin-top: -0.205em;
+    margin-bottom: calc(var(--sp-8) - 0.205em);
+    font-family: var(--f-sans);
+    font-weight: 500;
+    font-size: clamp(3.5rem, 16.4vw, 17.75rem);
+    line-height: 1;
+    letter-spacing: -0.019em;
+    color: transparent;
+    -webkit-text-stroke: 0.6px var(--c-dark);
+    white-space: nowrap;
+  }
+
+  .s-cols__item h3 {
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-cols__item p {
+    max-width: 44ch;
+    font-size: var(--fs-text-main);
+    color: var(--c-text-muted);
+    line-height: 1.45;
+  }
+
+  /* Auf breiten Fenstern laufen die beiden Spalten zum jeweils äußeren
+     Rand — der zweite Standort steht deshalb rechtsbündig. Untereinander
+     gestapelt ergibt das keinen Sinn mehr: dort stünde eine Adresse links
+     und die nächste rechts. */
+  @media (min-width: 701px) {
+    .s-cols__item:last-child {
+      text-align: right;
+    }
+
+    .s-cols__item:last-child p {
+      margin-left: auto;
+    }
+  }
+
+  @media (max-width: 700px) {
+    /* Die Abstände waren aus der breiten Fassung übernommen und dort auf
+       Spalten nebeneinander berechnet: 80px unter der Überschrift, 112px
+       über dem ersten Standort. Untereinander gestapelt fällt die Section
+       damit in vier weit auseinanderliegende Teile, zwischen denen jeweils
+       eine halbe Bildschirmhöhe leer bleibt. */
+    .s-gallery__title {
+      margin-bottom: var(--sp-5);
+    }
+
+    .s-cols {
+      grid-template-columns: 1fr;
+      gap: var(--sp-8);
+      padding-block: var(--sp-8);
+    }
+
+    .s-cols__item .s-cols__display {
+      font-size: clamp(3.5rem, 24vw, 8rem);
+    }
+  }
+</style>

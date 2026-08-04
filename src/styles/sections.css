@@ -1,0 +1,2311 @@
+/* ==========================================================================
+   Sections — Seitenbausteine. Jede Section ist unabhängig einsetzbar,
+   damit sich daraus neue Seitentypen zusammenstecken lassen.
+   ========================================================================== */
+
+/* --- Tooth-Lines-Hintergrund -------------------------------------------
+   Die konzentrischen Linien aus dem Figma-Hero. Liegen hinter allem und
+   scrollen leicht versetzt mit (Parallax via GSAP).
+   -------------------------------------------------------------------- */
+
+/* Nicht geclippt: die Linien sind im Entwurf 2341px hoch bei 1117px
+   Hero — sie laufen bewusst in die folgenden Sections weiter. */
+.s-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Leichte Unschärfe nimmt der Kontur die Härte — sie liest sich dadurch
+   als Lichtspur statt als gezeichnete Linie. Nebeneffekt: das Flimmern
+   beim Parallax verschwindet vollständig. */
+/* Skaliert über Minuten kaum merklich herunter — die Fläche steht dadurch
+   nie ganz still, ohne dass eine Bewegung erkennbar wäre. */
+.s-lines svg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 96vw;
+  height: auto;
+  filter: blur(1.2px);
+  transform-origin: 50% 30%;
+  animation: hero-lines-breathe 18s cubic-bezier(0.32, 0.14, 0.68, 0.86) infinite
+    alternate;
+}
+
+/* Spanne und Dauer so gewählt, dass die Bewegung tatsächlich zu sehen ist.
+   Vorher lief sie über 96 s mit 9 % Spanne — messbar, aber unsichtbar.
+
+   Die Kurve liegt bewusst nah an der Geraden: ease-in-out war in der Mitte
+   deutlich schneller als an den Rändern, wodurch die Skalierung schubweise
+   wirkte. So läuft sie gleichmäßig und wird nur an der Umkehr weich. */
+@keyframes hero-lines-breathe {
+  from {
+    scale: 1.17;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-lines svg {
+    animation: none;
+  }
+}
+
+/* Weiß auf 50 % — die Linien liegen heller als der Seitengrund, nicht
+   dunkler. So steht es im Entwurf. */
+.s-lines .tooth-line {
+  fill: none;
+  stroke: var(--c-white);
+  stroke-opacity: 0.62;
+  stroke-width: 1.6;
+}
+
+/* --- Seitengrund --------------------------------------------------------
+   Nur ein feines Korn. Farbige Lichtfelder standen hier schon — sie
+   haben der Fläche nicht gutgetan und sind wieder raus. Das Korn allein
+   nimmt dem Grund das rein Digitale, ohne ihn einzufärben.
+   -------------------------------------------------------------------- */
+
+.c-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Feines Korn als eingebettetes SVG: kein zusätzlicher Request, und die
+   Körnung bleibt auf jeder Auflösung gleich fein.
+
+   Ein Versuch mit zusätzlicher grober Faserlage sollte daraus eine
+   Papierstruktur machen — das Ergebnis sah aber nach Schmutz aus, nicht
+   nach Papier. Geblieben ist die feine Lage, nur kräftiger als zuvor,
+   damit sie überhaupt wahrnehmbar ist. */
+.c-backdrop__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.34;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Inhalt liegt über den Hintergrundebenen. Die Navigation bleibt außen
+   vor — sie trägt bereits --z-nav; ein zweiter Wert hier hätte sie auf
+   dieselbe Ebene wie den Inhalt gesetzt, der im DOM später kommt und sie
+   damit überdeckt. */
+main,
+.c-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Durchlaufender Pfad ------------------------------------------------
+   Zieht sich ab der Standards-Section durch die restliche Seite. Gleiche
+   Anmutung wie die Linien im Hero: weiß, leicht unscharf, sehr ruhig.
+
+   Liegt absolut in der Section, die ihn startet, und reicht weit darüber
+   hinaus. preserveAspectRatio="none" streckt ihn auf die volle Länge,
+   ohne dass die Kurven ihre Form verlieren.
+   -------------------------------------------------------------------- */
+
+.s-thread {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 0;
+  width: min(92vw, 1200px);
+  height: 420vh;
+  pointer-events: none;
+}
+
+/* overflow sichtbar, damit die Schwünge in den Standards links aus dem
+   viewBox laufen dürfen. Gegen waagerechten Seitenüberlauf schützt jetzt
+   `overflow-x: clip` auf .s-standards — früher musste das die SVG selbst
+   übernehmen. */
+/* Sehr langsames seitliches Driften. Der Weg bleibt klein gegenüber der
+   Lücke, durch die der Pfad bei den Standards läuft (29px zwischen Namens-
+   und Textspalte) — die Führung zwischen den Spalten bleibt also erhalten.
+
+   Dieselbe Kurve wie bei den Hero-Linien: nahezu konstante Geschwindigkeit,
+   weich nur an den Wendepunkten. Ein ease-in-out würde in der Mitte
+   davonziehen und an den Rändern stehenbleiben — man sähe das Pendeln
+   statt der Bewegung. */
+.s-thread svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: blur(1.2px);
+  animation: thread-sway 26s cubic-bezier(0.32, 0.14, 0.68, 0.86) infinite
+    alternate;
+}
+
+@keyframes thread-sway {
+  from {
+    transform: translate3d(-5px, 0, 0);
+  }
+  to {
+    transform: translate3d(5px, 0, 0);
+  }
+}
+
+/* Eigene, teilerfremde Periode: fielen Drift und Deckkraft zusammen,
+   läse sich das als ein einziger Puls statt als ruhiges Eigenleben. */
+.s-thread__line {
+  fill: none;
+  stroke: var(--c-white);
+  stroke-opacity: 0.62;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  animation: thread-breathe 19s ease-in-out infinite alternate;
+}
+
+/* Verdeckt starten: die Strichlänge steht erst fest, wenn JS sie im
+   Bildschirmraum gemessen hat. Ohne das blitzte die fertige Linie einen
+   Frame lang auf. modules/thread.js deckt sie wieder auf.
+   pathLength im Markup wäre der elegantere Weg gewesen — mit
+   vector-effect: non-scaling-stroke wird es aber nicht angewandt. */
+.js .s-thread {
+  visibility: hidden;
+}
+
+@keyframes thread-breathe {
+  from {
+    stroke-opacity: 0.48;
+  }
+  to {
+    stroke-opacity: 0.72;
+  }
+}
+
+
+/* --- Hero (Home) -------------------------------------------------------
+   Der Zahn steckt zwischen den beiden Wortzeilen: "MUND" liegt dahinter,
+   "PROPAGANDA" davor. Das ergibt die Tiefe aus dem Entwurf.
+   -------------------------------------------------------------------- */
+
+/* Kein overflow:hidden — Zahn und Linien dürfen aus der Section laufen. */
+.s-hero {
+  position: relative;
+  min-height: 100svh;
+  /* Nur so viel, dass die Leiste frei steht — die Meta-Zeilen hängen nicht
+     mehr am Innenabstand, sondern sitzen absolut. */
+  padding-top: clamp(100px, 11vh, 150px);
+  padding-bottom: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Flex-Spalte über die volle Höhe, damit `margin-top: auto` am Fuß greift
+   und der Reviews-Badge unten sitzt statt direkt unter der Wortmarke. */
+.s-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+}
+
+/* Sitzt unterhalb der Wortmarke und bleibt links bzw. rechts außen —
+   bezogen auf die Wortmarke, nicht auf die Section, damit der Abstand zur
+   Schrift in jeder Fenstergröße gleich bleibt. */
+.s-hero__meta {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + clamp(24px, 3vw, 56px));
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+
+.s-hero__meta p {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-h5);
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: 30ch;
+}
+
+.s-hero__meta p:last-child {
+  text-align: right;
+}
+
+/* Die Zeilen sind schrumpfbreite Block-Boxen (siehe Marker-Regel in
+   base.css) — text-align des Absatzes greift auf sie nicht. Rechts
+   ausgerichtet wird über den Rand. */
+.s-hero__meta p:last-child .highlight-marker-line {
+  margin-inline: auto 0;
+}
+
+/* Die Wortmarke: zwei Zeilen, randlos, optisch auf Seitenbreite gezogen. */
+/* Der Zahn reicht 0.86 × Wortmarkenhöhe unter deren Unterkante
+   (55 % Versatz + 131 % Höhe − 100 %). Genau dieser Abstand steht unter
+   dem Block, damit die Zahnspitze mit dem Hero-Ende abschließt — so wie
+   im Entwurf. `margin-top: auto` schiebt den Block dorthin.
+   Wortmarkenhöhe = 2 × 0.92 × 14.2vw = 26.1vw → Abstand 22.5vw. */
+.s-hero__wordmark {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 25vw;
+  line-height: 0.92;
+}
+
+/* Beide Zeilen laufen im selben Grad (Figma: 250px bei 1728px Breite).
+   "PROPAGANDA" füllt damit die Zeile fast randlos aus — genau der Effekt
+   aus dem Entwurf. */
+/* Zeilenhöhe 0.92 — im Entwurf 230px auf 250px Schriftgrad. */
+.s-hero__word {
+  display: block;
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(3.25rem, 14.2vw, 15.625rem);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--c-dark);
+  white-space: nowrap;
+}
+
+/* Gemessen statt geschätzt: bei 14.38vw sitzt die Tinte von „Propaganda"
+   exakt auf dem Satzspiegel. Der Höchstwert ist auf die gedeckelte
+   Containerbreite (--site-max) abgestimmt — ab dort wächst der Satzspiegel
+   nicht mehr mit, der Grad darf es also auch nicht. */
+.s-hero__word--wide {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(3.29rem, 14.38vw, 15.5rem);
+  letter-spacing: -0.03em;
+}
+
+/* Maße relativ zur Wortmarke, nicht zum Viewport: im Entwurf beginnt der
+   Zahn bei 55 % der Wortmarkenhöhe und ist 131 % davon hoch. So bleibt
+   das Verhältnis Typo↔Zahn in jeder Fensterbreite gleich.
+   Er liegt VOR der Schrift und wirft keinen Schatten — die Plastizität
+   kommt allein aus dem Rendering des Objekts. */
+.s-hero__tooth {
+  position: absolute;
+  left: 50%;
+  top: 67%;
+  translate: -50% 0;
+  z-index: 2;
+  height: 124%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Die Hero-Timeline startet erst nach dem Font-Load. Bis dahin gälten die
+   Ruhewerte weiter unten — also volles Milchglas bei noch unsichtbarem
+   Zahn. Deshalb bleibt die Gruppe verborgen, bis die Choreografie sie
+   übernimmt. visibility statt opacity: Deckkraft unter 1 würde den
+   backdrop-filter der Glasebene isolieren.
+   Ohne JS greift die Regel nicht, dann ist alles sofort sichtbar. */
+.js .s-hero__tooth {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .s-hero__tooth {
+    visibility: visible;
+  }
+}
+
+/* Trägt die Zeigernähe. Zusammen mit dem Rahmen (Scroll-Parallax) und der
+   inneren Ebene (Auftritt) sind es drei Transforms auf drei Ebenen. */
+.s-hero__tooth-drift {
+  height: 100%;
+  will-change: transform;
+}
+
+/* Trägt den Auftritt, während der Rahmen darüber den Scroll-Parallax
+   trägt. Drei Ebenen, drei Transforms — kein gegenseitiges Überschreiben. */
+.s-hero__tooth-inner {
+  position: relative;
+  height: 100%;
+  will-change: transform;
+}
+
+/* Transluzent: die Schrift schimmert durch, der Zahn wirkt dadurch wie
+   Keramik statt wie ein aufgeklebtes Objekt. Weil das Glas darunter jetzt
+   selbst trägt, darf das Objekt durchlässiger sein. */
+.s-hero__tooth img {
+  position: relative;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  opacity: 0.72;
+}
+
+/* Milchglas hinter dem Zahn. Die Alphamaske stammt aus demselben PNG,
+   deshalb deckt sich der geblurrte Bereich exakt mit dem Objekt.
+   Für den Glaseindruck reicht Unschärfe allein nicht — dazu kommen
+   angehobene Sättigung und Helligkeit sowie ein Lichtverlauf. */
+.s-hero__tooth-glass {
+  /* Alle drei Filteranteile hängen an Variablen. Sättigung und Helligkeit
+     waren vorher feste Werte — sie standen damit ab dem Sichtbarwerden
+     sofort auf voller Stärke und erzeugten ein Aufblitzen, während die
+     Unschärfe noch bei null lag. */
+  --glass-blur: 16px;
+  --glass-sat: 1.55;
+  --glass-bright: 1.04;
+  --glass-sheen: 1;
+
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+  mask-image: url("/svg/tooth-3d-mask.png");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url("/svg/tooth-3d-mask.png");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* Lichtkante: heller Anlauf oben links, Abriss unten rechts. Liegt in der
+   Maske des Elternelements und folgt daher der Zahnkontur. */
+.s-hero__tooth-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: var(--glass-sheen);
+  background: linear-gradient(
+      148deg,
+      rgb(255 255 255 / 0.2) 0%,
+      rgb(255 255 255 / 0.05) 32%,
+      rgb(255 255 255 / 0) 58%
+    ),
+    radial-gradient(
+      120% 80% at 30% 8%,
+      rgb(255 255 255 / 0.14) 0%,
+      rgb(255 255 255 / 0) 60%
+    );
+}
+
+/* Scroll-Hinweis unten links — im Entwurf der Pfeil-Knopf des Buttons,
+   nach unten gedreht. */
+.s-hero__scroll {
+  position: absolute;
+  z-index: 4;
+  left: var(--site-margin);
+  bottom: var(--sp-5);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-round);
+  background: var(--c-brand);
+  color: var(--c-dark);
+  transition: transform var(--d-base) var(--e-out);
+}
+
+.s-hero__scroll svg {
+  width: 22px;
+  height: 22px;
+  transform: rotate(90deg);
+}
+
+@media (hover: hover) {
+  .s-hero__scroll:hover {
+    transform: translateY(4px);
+  }
+}
+
+/* Sitzt unten rechts über dem Zahn — im Entwurf überlagern sich die
+   beiden ebenfalls. Absolut, damit der Badge die Position der Wortmarke
+   nicht beeinflusst. */
+.s-hero__foot {
+  position: absolute;
+  z-index: 4;
+  right: var(--site-margin);
+  bottom: var(--sp-5);
+}
+
+@media (max-width: 900px) {
+  .s-hero__meta {
+    position: static;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-8);
+  }
+
+  .s-hero__meta p:last-child {
+    text-align: left;
+  }
+
+  .s-hero__foot {
+    left: var(--site-margin);
+    right: auto;
+  }
+}
+
+/* --- Split-Section (Form & Funktion) ------------------------------------
+   Links Text auf organischer brauner Fläche, rechts randabfallendes Bild
+   mit großem Eckradius oben links.
+   -------------------------------------------------------------------- */
+
+/* Alle Maße als Anteil der Entwurfsbreite (1728) bzw. -höhe (988):
+   Bild 740→Rand, braune Fläche 48→879. Die 139px Überlappung sind der
+   Kern der Komposition — die Fläche liegt VOR dem Bild. */
+.s-split {
+  position: relative;
+  min-height: clamp(620px, 57.2vw, 988px);
+  margin-top: var(--section-space);
+}
+
+.s-split__media {
+  position: absolute;
+  top: 6.2%;
+  left: 42.8%;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  border-radius: clamp(80px, 11.6vw, 200px) 0 0 0;
+  overflow: hidden;
+}
+
+.s-split__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.s-split__head {
+  position: absolute;
+  z-index: 3;
+  top: 6.2%;
+  left: var(--site-margin);
+  width: min(530px, 34%);
+}
+
+.s-split__head .c-topline {
+  margin-bottom: var(--sp-6);
+}
+
+.s-split__title {
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Elliptische Ecke oben rechts: 43.5 % der Breite × 85 % der Höhe. */
+.s-split__panel {
+  position: absolute;
+  z-index: 2;
+  left: var(--site-margin);
+  top: 36.6%;
+  bottom: 0;
+  width: min(831px, 48.1%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5.5vh, 54px);
+  padding: clamp(48px, 8.2%, 81px) clamp(24px, 4%, 40px) clamp(40px, 6%, 64px)
+    clamp(24px, 7.8%, 65px);
+  /* Oben rechts die große elliptische Ecke, oben links nur eine leichte
+     Rundung — die Fläche soll dort nicht scharfkantig ansetzen. */
+  border-radius: var(--r-md) 43.5% 0 0 / var(--r-md) 85% 0 0;
+  background: var(--c-dark);
+  color: var(--c-grey);
+}
+
+.s-split__panel p {
+  max-width: 353px;
+  font-size: var(--fs-text-main);
+  line-height: 1.22;
+}
+
+/* Unter 900px trägt die überlappende Komposition nicht mehr — dort
+   stapeln sich die drei Blöcke im normalen Fluss. */
+@media (max-width: 900px) {
+  .s-split {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--section-space) 0;
+  }
+
+  .s-split__head,
+  .s-split__panel,
+  .s-split__media {
+    position: static;
+    width: auto;
+    inset: auto;
+  }
+
+  .s-split__head {
+    padding-inline: var(--site-margin);
+    max-width: 46ch;
+  }
+
+  .s-split__media {
+    order: -1;
+    aspect-ratio: 4 / 3;
+    margin-bottom: var(--sp-8);
+    border-radius: var(--r-lg) 0 0 0;
+  }
+
+  .s-split__panel {
+    margin-top: calc(var(--sp-8) * -1);
+    margin-right: var(--sp-8);
+    padding: var(--sp-8) var(--sp-6) var(--sp-8) var(--site-margin);
+    border-radius: 0 var(--r-lg) 0 0 / 0 120px 0 0;
+  }
+
+  .s-split__panel p {
+    max-width: 42ch;
+  }
+}
+
+/* --- Services-Tabelle ---------------------------------------------------
+   Zeilen mit Hover-Highlight in Brand-Pink; ein Bild folgt dem Cursor.
+   -------------------------------------------------------------------- */
+
+.s-services {
+  position: relative;
+  background: var(--c-taupe);
+  color: var(--c-dark);
+  padding-block: var(--section-space);
+}
+
+/* H1-Grad (70px @1728), zentriert — wie im Entwurf. */
+.s-services__title {
+  text-align: center;
+  margin-bottom: var(--sp-10);
+  font-size: var(--fs-h1);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.s-services__head {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--sp-2) var(--sp-2);
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--c-dark) 60%, transparent);
+}
+
+.s-services__list {
+  border-top: var(--bw) solid var(--c-line);
+}
+
+/* Zeilenraster 103px: Name 40px auf 1.2 (=48px) plus 27px Innenabstand
+   oben und unten. Vorher standen die Zeilen zu dicht. */
+/* Kein Radius auf der Zeile selbst — sonst werden die Trennlinien an den
+   Enden mitgerundet. Der Radius sitzt allein auf der Pink-Füllung. */
+.s-services__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  padding: clamp(18px, 1.56vw, 27px) var(--sp-2);
+  border-bottom: var(--bw) solid var(--c-line);
+  color: color-mix(in srgb, var(--c-dark) 62%, transparent);
+  transition: color var(--d-fast) var(--e-swift),
+    padding-left var(--d-base) var(--e-out);
+}
+
+/* Die Füllung blendet auf, statt von links einzuwachsen — ruhiger und
+   ohne Richtung. Ohne Radius: die Zeilen sollen als Tabelle lesen, nicht
+   als Pillen. */
+.s-services__row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--c-brand);
+  opacity: 0;
+  transition: opacity var(--d-base) var(--e-swift);
+  z-index: 0;
+}
+
+.s-services__row > * {
+  position: relative;
+  z-index: 1;
+}
+
+.s-services__name {
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.s-services__tag {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+}
+
+@media (hover: hover) {
+  .s-services__row:hover {
+    color: var(--c-dark);
+    padding-left: var(--sp-4);
+  }
+
+  .s-services__row:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Das Preview-Bild, das am Cursor hängt. */
+/* Entwurfsmaß: 300 × 340 bei 1728px Seitenbreite. */
+.s-services__preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-overlay);
+  width: clamp(200px, 17.4vw, 300px);
+  aspect-ratio: 300 / 341;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.s-services__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.s-services__preview-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--c-white);
+  color: var(--c-dark);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.s-services__more {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--site-gutter);
+  margin-top: var(--sp-10);
+}
+
+.s-services__more-col a {
+  display: block;
+  padding-block: var(--sp-2);
+  border-bottom: var(--bw) solid var(--c-line);
+  font-size: var(--fs-text-main);
+  transition: padding-left var(--d-base) var(--e-out),
+    color var(--d-fast) var(--e-swift);
+}
+
+/* Rückt beim Hover ein Stück nach rechts — dieselbe Geste wie in der
+   Haupttabelle darüber, nur kleiner. */
+@media (hover: hover) {
+  .s-services__more-col a:hover {
+    padding-left: var(--sp-3);
+    color: var(--c-dark);
+  }
+}
+
+.s-services__foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-6);
+}
+
+@media (max-width: 700px) {
+  .s-services__more {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+}
+
+/* --- Standards-Liste ----------------------------------------------------
+   Nummerierte Zeilen; die aktive Zeile ist voll deckend, der Rest gedimmt.
+   Aktivierung per ScrollTrigger.
+   -------------------------------------------------------------------- */
+
+/* clip statt hidden, und nur waagerecht: die Zahnfigur läuft rechts aus
+   dem Bild und muss beschnitten werden, der Pfad (s-thread) ist aber ein
+   Kind dieser Section und reicht bis in die Stories hinunter. Mit
+   `overflow: hidden` endete er an der Sectionkante — sichtbar war nur das
+   Stück in den Standards.
+   `clip` ist hier das richtige Werkzeug: nur es lässt sich mit
+   `visible` auf der anderen Achse kombinieren, `hidden` erzwingt dort
+   `auto`. */
+.s-standards {
+  position: relative;
+  padding-block: var(--section-space);
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Display-2-Grad (125px @1728) auf Zeilenhöhe 1 — im Entwurf ergeben die
+   zwei Zeilen exakt 250px. */
+.s-standards__title {
+  max-width: 12ch;
+  margin-bottom: clamp(64px, 8.7vw, 150px);
+  font-size: var(--fs-display-2);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Zeilenraster 150px: Inhalt max. 124px plus 26px Innenabstand.
+   Spalten 88 / 1fr / 1fr entsprechen den Entwurfsbreiten. */
+.s-standards__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(48px, 5.1vw, 88px) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--site-gutter);
+  align-items: start;
+  padding-block: clamp(18px, 1.5vw, 26px);
+  border-bottom: var(--bw) solid var(--c-line);
+  opacity: 0.42;
+  cursor: default;
+  transition: opacity var(--d-base) var(--e-swift);
+}
+
+.s-standards__row[data-active="true"] {
+  opacity: 1;
+}
+
+/* Fortschrittsbalken auf der Trennlinie der aktiven Zeile. Er ersetzt sie
+   optisch, statt eine zweite Linie danebenzusetzen. */
+.s-standards__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.s-standards__bar i {
+  display: block;
+  height: 100%;
+  background: var(--c-brand);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* Der Balken wird 2px stark, sobald die Zeile aktiv ist — sonst wäre er
+   auf der Haarlinie kaum zu sehen. */
+.s-standards__row[data-active="true"] .s-standards__bar {
+  height: 2px;
+  bottom: -1.5px;
+}
+
+.s-standards__num {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-h5);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+/* Die Umbrüche stehen im Markup als <br>: kein Wert für max-width teilt
+   alle fünf Namen gleichmäßig auf zwei Zeilen — die kurzen bräuchten eine
+   schmale Spalte, die langen eine breite. text-wrap: balance bleibt als
+   Rückfall für später ergänzte Einträge. */
+.s-standards__name {
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+/* Schmaler gesetzt, damit zwischen Textspalte und Zahnmaske rechts Luft
+   bleibt. */
+.s-standards__text {
+  font-size: var(--fs-text-small);
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+.s-standards__foot {
+  margin-top: clamp(64px, 8.7vw, 150px);
+}
+
+/* Die Zahn-Silhouette rechts: ein zahnförmig maskiertes Foto, darüber
+   die konzentrischen Pink-Konturen. Ragt bewusst über den Rand hinaus. */
+/* Im Entwurf reicht die Figur über die gesamte Sectionhöhe und ragt weit
+   über den rechten Rand hinaus. Deshalb über die Höhe bemaßt — die Breite
+   ergibt sich aus dem Seitenverhältnis. */
+/* Weit nach rechts geschoben und stärker angeschnitten — die Textspalten
+   brauchen die Breite, die Figur trägt allein über ihre Silhouette. */
+.s-standards__figure {
+  position: absolute;
+  right: -21vw;
+  top: 7%;
+  height: 80%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hinweis zur Maske: tooth-shape.svg ist eine einzige, sich nach innen
+   windende Spirale. Gefüllt ergibt sie die Zahnfläche — genau das brauchen
+   wir. Gestrichen ergäbe sie dagegen die komplette Spirale, weshalb hier
+   bewusst nur mit Flächen und nicht mit Konturen gearbeitet wird. */
+.s-standards__stage {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1946 / 2611;
+  mask-image: url("/svg/tooth-silhouette.png");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url("/svg/tooth-silhouette.png");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* Kontur-Overlay. Dieselbe Zeichnung, aus der auch die Maske stammt —
+   beide Grafiken haben dasselbe Seitenverhältnis, dadurch liegt die
+   Linienzeichnung deckungsgleich auf dem maskierten Bild. */
+.tooth-rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tooth-ring {
+  fill: none;
+  stroke: var(--c-brand);
+  stroke-width: 1.1;
+  opacity: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.s-standards__stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.s-standards__stage img:first-child {
+  opacity: 1;
+}
+
+/* Der Textblock liegt über der Figur. Die Zeilen enden vorher, damit sie
+   nicht in die Zahnkontur hineinlaufen — so ist es auch im Entwurf. */
+.s-standards .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Die Liste endet vor der Zahnfigur — im Entwurf 937px von 1632px
+   Containerbreite. */
+.s-standards__list {
+  max-width: 66%;
+}
+
+@media (max-width: 900px) {
+  .s-standards__list {
+    max-width: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .s-standards__row {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .s-standards__text {
+    grid-column: 2;
+  }
+
+  .s-standards__figure {
+    display: none;
+  }
+}
+
+/* --- Standorte-Gallery --------------------------------------------------
+   Horizontale Bildreihe, die beim Scrollen seitwärts läuft. Das mittlere
+   Panel ist breit, die äußeren sind schmale Teaser.
+   -------------------------------------------------------------------- */
+
+.s-gallery {
+  position: relative;
+  padding-block: var(--section-space);
+  overflow: hidden;
+}
+
+.s-gallery__title {
+  text-align: center;
+  margin-bottom: var(--sp-8);
+  font-size: clamp(2rem, 3.2vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.s-gallery__track {
+  display: flex;
+  gap: var(--sp-1);
+  padding-inline: var(--site-margin);
+  will-change: transform;
+}
+
+.s-gallery__item {
+  position: relative;
+  flex: 0 0 auto;
+  height: clamp(320px, 42vw, 620px);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.s-gallery__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.s-gallery__item--sm {
+  width: clamp(80px, 8vw, 130px);
+}
+
+.s-gallery__item--md {
+  width: clamp(160px, 17vw, 290px);
+}
+
+.s-gallery__item--lg {
+  width: clamp(300px, 44vw, 760px);
+}
+
+.s-gallery__caption {
+  position: absolute;
+  left: var(--sp-4);
+  bottom: var(--sp-4);
+  padding: 6px 12px;
+  border-radius: var(--r-round);
+  background: color-mix(in srgb, var(--c-white) 80%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-dark);
+}
+
+/* --- Slider-Steuerung --------------------------------------------------- */
+
+.s-gallery__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  margin-top: var(--sp-6);
+}
+
+.s-gallery__arrows {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.s-gallery__arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--c-text);
+  transition: color var(--d-fast) var(--e-swift),
+    transform var(--d-base) var(--e-out);
+}
+
+.s-gallery__arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Gilt für jeden Zurück-Pfeil, nicht nur den der Standorte — das Magazin
+   nutzt dieselbe Komponente mit eigenen Attributen. */
+.s-gallery__arrow[data-gallery-prev] svg,
+.s-gallery__arrow[data-magazine-prev] svg {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .s-gallery__arrow:hover {
+    color: var(--c-brand);
+  }
+
+  .s-gallery__arrow[data-gallery-next]:hover,
+  .s-gallery__arrow[data-magazine-next]:hover {
+    transform: translateX(3px);
+  }
+
+  .s-gallery__arrow[data-gallery-prev]:hover,
+  .s-gallery__arrow[data-magazine-prev]:hover {
+    transform: translateX(-3px);
+  }
+}
+
+.s-gallery__dots {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.s-gallery__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-round);
+  background: color-mix(in srgb, var(--c-dark) 28%, transparent);
+  transition: background var(--d-fast) var(--e-swift),
+    transform var(--d-base) var(--e-out);
+}
+
+.s-gallery__dot[aria-selected="true"] {
+  background: var(--c-dark);
+  transform: scale(1.25);
+}
+
+/* --- Zweispalten-Textblock (Standort-Details) --------------------------- */
+
+.s-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-10) var(--site-gutter);
+  padding-block: var(--sp-12) var(--sp-10);
+}
+
+/* Der Standortname als Outline-Typo — im Entwurf 284px, transparent mit
+   Kontur, sehr eng gesetzt. Selektor bewusst mit Elternklasse: sonst
+   gewinnt `.s-cols__item p` bei Schriftgrad und Farbe. */
+/* Zeilenhöhe 1 plus negative Außenabstände statt einer gestauchten
+   Zeilenhöhe: der Entwurf setzt 168px auf 284px Grad (0.59), dabei ragen
+   die Buchstaben oben und unten aus ihrer Zeilenbox heraus und wurden vom
+   überlaufversteckten Rahmen der Section beschnitten. So bleibt der enge
+   Satz erhalten, ohne dass etwas aus der Box läuft. */
+.s-cols__item .s-cols__display {
+  margin-top: -0.205em;
+  margin-bottom: calc(var(--sp-8) - 0.205em);
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(3.5rem, 16.4vw, 17.75rem);
+  line-height: 1;
+  letter-spacing: -0.019em;
+  color: transparent;
+  -webkit-text-stroke: 0.6px var(--c-dark);
+  white-space: nowrap;
+}
+
+.s-cols__item h3 {
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.s-cols__item p {
+  max-width: 44ch;
+  font-size: var(--fs-text-main);
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+/* Der zweite Standort steht rechtsbündig — beide Spalten laufen dadurch
+   zum jeweils äußeren Rand statt zur Mitte. */
+.s-cols__item:last-child {
+  text-align: right;
+}
+
+.s-cols__item:last-child p {
+  margin-left: auto;
+}
+
+@media (max-width: 700px) {
+  .s-cols {
+    grid-template-columns: 1fr;
+    gap: var(--sp-8);
+  }
+
+  .s-cols__item .s-cols__display {
+    font-size: clamp(3.5rem, 24vw, 8rem);
+  }
+}
+
+/* --- Experten -----------------------------------------------------------
+   Großes Teamfoto links, Text rechts.
+   -------------------------------------------------------------------- */
+
+/* Entwurfsmaße: Bild x=-47…1017 (läuft links über den Rand), Textspalte
+   ab x=1154 mit 386px Breite. Deshalb kein Grid, sondern ein absolut
+   gesetztes Bild und eine Textspalte, die im Container rechts andockt. */
+.s-experts {
+  position: relative;
+  min-height: clamp(560px, 53vw, 916px);
+  padding-block: var(--section-space);
+}
+
+.s-experts__media {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2.7%;
+  width: 61.6%;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  overflow: hidden;
+}
+
+.s-experts__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Spalte 9 bis 11 des Zwölfer-Rasters — im Entwurf beginnt der Text bei
+   x=1154 und endet bei 1541, also drei Spalten breit mit einer freien
+   Spalte zum rechten Rand. Vorher stand er per margin-left:auto bündig am
+   Rand und lag damit neben dem Raster. */
+.s-experts__body {
+  position: relative;
+  z-index: 1;
+  grid-column: 9 / 12;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding-top: var(--sp-6);
+}
+
+.s-experts__title {
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.s-experts__names {
+  font-size: var(--fs-text-large);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.s-experts__body p {
+  font-size: var(--fs-text-main);
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+.s-experts__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+@media (max-width: 900px) {
+  .s-experts {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-8);
+  }
+
+  .s-experts__media {
+    position: static;
+    width: auto;
+    aspect-ratio: 4 / 3;
+    margin-right: var(--site-margin);
+  }
+
+  .s-experts__body {
+    grid-column: 1 / -1;
+    max-width: 46ch;
+    padding-inline: var(--site-margin);
+  }
+}
+
+/* --- Transformation Stories ---------------------------------------------
+   Gebogener Lauftext auf einem Kreisbogen + gestapelte Vorher/Nachher-
+   Karten, die beim Scrollen auffächern.
+   -------------------------------------------------------------------- */
+
+/* Über der Taupe-Fläche, die von unten heraufreicht — sonst verschwänden
+   Karten und Steuerung darunter. */
+.s-stories {
+  position: relative;
+  z-index: 1;
+  padding-block: calc(var(--section-space-lg) * 1.7) 0;
+  overflow: hidden;
+}
+
+/* Voller Kreis, 135vw breit — die Schrift läuft oben durchs Bild und
+   verschwindet seitlich aus dem Viewport. Gedreht wird das ganze SVG. */
+.s-stories__ring {
+  position: absolute;
+  top: clamp(48px, 7vw, 130px);
+  left: 50%;
+  translate: -50% 0;
+  width: 135vw;
+  aspect-ratio: 1;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+.s-stories__ring svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Angabe in viewBox-Einheiten: das SVG wird auf 135vw gestreckt, ein Wert
+   von 48 landet dadurch bei rund 110px auf dem Schirm. */
+.s-stories__ring text {
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: 48px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  fill: var(--c-dark);
+}
+
+/* --- Kartendeck ---------------------------------------------------------
+   Die Karten liegen gestapelt, nicht nebeneinander. Die vorderste ist
+   groß und gerade, dahinter staffeln sich die nächsten leicht versetzt.
+   Bedienung per Wischen, Buttons oder Pfeiltasten.
+   -------------------------------------------------------------------- */
+
+.s-stories__deck {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(40px, 5vw, 88px);
+  margin-top: clamp(40px, 5vw, 96px);
+  padding-bottom: clamp(32px, 4vw, 72px);
+}
+
+.s-stories__stack {
+  position: relative;
+  width: clamp(220px, 30vw, 420px);
+  aspect-ratio: 3 / 4;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.s-stories__stack:active {
+  cursor: grabbing;
+}
+
+.s-stories__card {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  box-shadow: 0 24px 60px -20px rgb(64 50 41 / 0.28);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.s-stories__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.s-stories__name {
+  position: absolute;
+  left: 50%;
+  bottom: var(--sp-4);
+  translate: -50% 0;
+  padding: 6px 16px;
+  border-radius: var(--r-round);
+  background: var(--c-brand);
+  color: var(--c-dark);
+  font-family: var(--f-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.s-stories__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+.s-stories__nav {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-round);
+  background: transparent;
+  border: var(--bw) solid var(--c-line);
+  color: var(--c-dark);
+  transition: background var(--d-fast) var(--e-swift),
+    color var(--d-fast) var(--e-swift),
+    border-color var(--d-fast) var(--e-swift);
+}
+
+.s-stories__nav svg {
+  width: 16px;
+  height: 16px;
+}
+
+.s-stories__nav[data-deck-prev] svg {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .s-stories__nav:hover {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+  }
+}
+
+.s-stories__count {
+  min-width: 5ch;
+  text-align: center;
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  letter-spacing: 0.08em;
+  color: var(--c-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Das Zitatband darunter. */
+/* Die Fläche reicht bis auf zwei Drittel der Kartenhöhe hinauf — die
+   Karten stehen dadurch halb im Taupe und halb im Seitengrund.
+
+   Der negative Außenabstand zieht nur die Fläche hoch; der gleich große
+   Innenabstand hält den Text an seinem Platz. Ohne ihn wanderte das Zitat
+   mit nach oben und lag unter den Karten. */
+.s-quote {
+  --quote-lift: clamp(240px, 27vw, 400px);
+
+  position: relative;
+  z-index: 0;
+  margin-top: calc(-1 * var(--quote-lift));
+  /* Nur ein knapper Abstand über den Hub hinaus: das Zitat soll dicht
+     unter der Steuerung stehen und mit ihr als ein Block lesen. */
+  padding: calc(var(--quote-lift) + var(--sp-2)) var(--site-margin) var(--sp-12);
+  background: var(--c-taupe);
+  color: var(--c-dark);
+}
+
+.s-quote__inner {
+  position: relative;
+  display: flex;
+  gap: clamp(24px, 3vw, 56px);
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.s-quote__mark {
+  font-size: clamp(4rem, 9vw, 9rem);
+  line-height: 0.7;
+  font-weight: 500;
+  color: var(--c-dark);
+  flex: 0 0 auto;
+}
+
+/* Alle Zitate liegen übereinander, sichtbar ist immer genau eines. Die
+   Bühne behält die Höhe des längsten — so springt der Abschnitt beim
+   Wechsel nicht. */
+.s-quote__stage {
+  position: relative;
+  display: grid;
+  flex: 1;
+}
+
+.s-quote__text {
+  grid-area: 1 / 1;
+  columns: 2;
+  column-gap: clamp(32px, 4vw, 72px);
+  font-size: var(--fs-text-large);
+  line-height: 1.4;
+  opacity: 0;
+}
+
+.s-quote__text[data-active="true"] {
+  opacity: 1;
+}
+
+.s-quote__foot {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(32px, 4vw, 64px);
+}
+
+
+
+@media (max-width: 800px) {
+  .s-quote__text {
+    columns: 1;
+  }
+
+  .s-quote__inner {
+    gap: var(--sp-4);
+  }
+}
+
+/* --- Magazin -----------------------------------------------------------
+   Wortmarke auf zwei Markerbalken, daneben der Einstiegstext, darunter ein
+   Karussell. Die Karten bestehen aus Bild und einer weißen Karte, die es
+   nach rechts unten versetzt überlappt — im Entwurf sitzt das Bild bei
+   x=81 (326 breit), die Karte bei x=319 (316 breit).
+   -------------------------------------------------------------------- */
+
+.s-magazine {
+  padding-block: var(--section-space-lg);
+  overflow: hidden;
+}
+
+.s-magazine__head {
+  display: grid;
+  grid-template-columns: 1fr 316px;
+  gap: var(--sp-10) var(--site-gutter);
+  align-items: start;
+  margin-top: var(--sp-10);
+  margin-bottom: clamp(64px, 8vw, 140px);
+}
+
+/* Die Balken sind Flächen hinter der Schrift, keine Textfarbe. */
+.s-magazine__type {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(4px, 0.9vw, 16px);
+}
+
+.s-magazine__bar {
+  display: inline-block;
+  padding: 0.06em 0.05em 0.14em;
+  border-radius: var(--r-sm);
+  background: var(--c-brand);
+  color: var(--c-dark);
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(3rem, 11.6vw, 12.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: 1.8deg;
+}
+
+.s-magazine__bar--lower {
+  margin-left: clamp(12px, 3.2vw, 56px);
+  rotate: -1.4deg;
+}
+
+/* Liegt als weiße Plakette zwischen den Balken. */
+.s-magazine__chip {
+  position: absolute;
+  top: 50%;
+  left: clamp(120px, 27vw, 460px);
+  translate: 0 -50%;
+  z-index: 2;
+  padding: 0.1em 0.42em 0.16em;
+  border-radius: var(--r-md);
+  background: var(--c-white);
+  color: var(--c-dark);
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 5.2vw, 5.625rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  rotate: -3deg;
+}
+
+.s-magazine__intro {
+  padding-top: clamp(24px, 4vw, 72px);
+}
+
+.s-magazine__title {
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.s-magazine__intro p {
+  font-size: var(--fs-text-small);
+  line-height: 1.5;
+  color: var(--c-text-muted);
+}
+
+/* --- Karussell ---------------------------------------------------------- */
+
+.s-magazine__track {
+  display: flex;
+  gap: clamp(40px, 5.5vw, 96px);
+  will-change: transform;
+}
+
+.s-magazine__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  margin-top: var(--sp-8);
+}
+
+.s-magazine__arrows {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+/* Die Punkte in die Mitte, der Button ganz nach rechts. */
+.s-magazine__nav .s-gallery__dots {
+  margin-inline: auto;
+}
+
+/* --- Beitragskarte ------------------------------------------------------ */
+
+.c-post {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(420px, 36vw, 554px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.c-post__media {
+  width: 59%;
+  aspect-ratio: 326 / 431;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.c-post__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Überlappt das Bild nach rechts unten — die Versetzung ist der Kern der
+   Komposition. */
+.c-post__card {
+  position: absolute;
+  top: 27%;
+  right: 0;
+  width: 57%;
+  min-height: 62%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-white);
+  color: var(--c-neutral-800);
+}
+
+.c-post__kicker {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+}
+
+.c-post__title {
+  margin-top: var(--sp-2);
+  font-size: clamp(1.375rem, 1.85vw, 2rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+/* Ganze Karte klickbar, ohne verschachtelte Links. */
+.c-post__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.c-post__text {
+  margin-top: auto;
+  padding-top: var(--sp-6);
+  font-size: var(--fs-text-small);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
+}
+
+.c-post .c-btn {
+  margin-top: var(--sp-4);
+}
+
+@media (max-width: 900px) {
+  .s-magazine__head {
+    grid-template-columns: 1fr;
+  }
+
+  .c-post {
+    width: min(78vw, 420px);
+  }
+}
+
+/* ==========================================================================
+   Service-Page-spezifische Sections
+   ========================================================================== */
+
+/* --- Service-Hero ------------------------------------------------------- */
+
+.s-shero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--site-gutter);
+  align-items: center;
+  padding-top: clamp(100px, 12vh, 160px);
+  padding-bottom: var(--sp-8);
+  overflow: hidden;
+}
+
+.s-shero__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  max-width: 46ch;
+}
+
+.s-shero__topline {
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-h5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Display-2-Grad (125px bei 1728px). Größer bricht "Veneers" in der
+   halbbreiten Spalte um. */
+/* Einzeilig, immer. Der Leistungsname steht in der halben Spaltenbreite,
+   und --fs-display-2 wächst mit dem Fenster — ab einer gewissen Breite
+   brach das Wort um. `nowrap` hält es zusammen, die Größe deckelt es so,
+   dass es auch in der schmalen Spalte passt. */
+.s-shero__title {
+  font-size: min(var(--fs-display-2), 13vw);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.s-shero__body p {
+  max-width: 42ch;
+  font-size: var(--fs-text-main);
+  line-height: 1.45;
+}
+
+.s-shero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-5);
+  margin-top: var(--sp-3);
+}
+
+/* Läuft nach rechts aus der Section heraus, steht senkrecht aber mittig —
+   an der Unterkante verankert wirkte es auf großen Schirmen abgeschnitten
+   und saß zu tief. Die Höhe folgt dem Fenster, damit das Feld auf großen
+   Schirmen mitwächst statt bei 780px stehenzubleiben. */
+.s-shero__media {
+  position: relative;
+  height: min(78vh, 1100px);
+  margin-right: calc(var(--site-margin) * -1);
+  /* Der Hero hat oben mehr Innenabstand als unten (Platz für die Leiste).
+     Zentriert würde das Feld dadurch um die halbe Differenz zu tief
+     sitzen — der negative obere Rand holt es auf die Sectionmitte. */
+  margin-top: calc((var(--sp-8) - clamp(100px, 12vh, 160px)) / 2);
+  border-radius: 120px 0 0 var(--r-md);
+  overflow: hidden;
+}
+
+.s-shero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.s-shero__reviews {
+  margin-top: var(--sp-8);
+}
+
+@media (max-width: 900px) {
+  .s-shero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .s-shero__media {
+    order: -1;
+    height: 60vh;
+    margin-inline: calc(var(--site-margin) * -1);
+    border-radius: var(--r-md);
+  }
+}
+
+/* --- Intro-Textblock (zwei Spalten neben Headline) ---------------------- */
+
+.s-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--sp-8) var(--site-gutter);
+  padding-block: var(--section-space);
+}
+
+.s-intro__head {
+  max-width: 32ch;
+}
+
+.s-intro__head .c-topline {
+  margin-bottom: var(--sp-4);
+}
+
+.s-intro__title {
+  font-size: clamp(1.5rem, 2.08vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.s-intro p {
+  max-width: 40ch;
+  font-size: var(--fs-text-main);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .s-intro {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Before/After-Band --------------------------------------------------
+   Voller Taupe-Streifen mit Bild und Slider-Griff.
+   -------------------------------------------------------------------- */
+
+/* Das Band endet auf halber Bildhöhe, der Vergleich ragt darunter heraus —
+   so steht es im Entwurf. Als eigene Ebene gelöst und nicht über einen
+   negativen Rand am Rahmen: der zöge die folgende Section mit hoch. */
+.s-ba {
+  position: relative;
+  color: var(--c-dark);
+  padding-block: var(--section-space);
+}
+
+.s-ba::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 68%;
+  background: var(--c-taupe);
+  z-index: -1;
+}
+
+.s-ba__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 1100px;
+  margin-inline: auto;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  cursor: ew-resize;
+  user-select: none;
+}
+
+.s-ba__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Muss selbst eine Box aufspannen, sonst hat clip-path nichts zu clippen
+   (das Bild darin ist absolut zum Rahmen positioniert). */
+.s-ba__after {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 var(--ba-pos, 50%));
+}
+
+.s-ba__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--ba-pos, 50%);
+  width: 2px;
+  background: var(--c-white);
+  pointer-events: none;
+}
+
+.s-ba__handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-round);
+  background: var(--c-brand);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.15);
+}
+
+.s-ba__labels {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: var(--sp-3) auto 0;
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --- Statement ---------------------------------------------------------
+   Ein einzelner Absatz über die halbe Seitenbreite, größer gesetzt als
+   Fließtext. Trägt eine Kernaussage, ohne eine Headline zu sein.
+   -------------------------------------------------------------------- */
+
+.s-statement {
+  max-width: 46ch;
+  margin-top: var(--sp-6);
+  margin-inline: auto;
+  font-size: clamp(1.375rem, 2.08vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+/* --- Steps-Grid --------------------------------------------------------- */
+
+.s-steps {
+  padding-block: var(--section-space);
+}
+
+.s-steps__title {
+  text-align: center;
+  max-width: 16ch;
+  margin: 0 auto var(--sp-10);
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.s-steps__grid,
+.s-prices__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--site-gutter);
+}
+
+@media (max-width: 1000px) {
+  .s-steps__grid,
+  .s-prices__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .s-steps__grid,
+  .s-prices__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Preise ------------------------------------------------------------- */
+
+.s-prices {
+  padding-block: var(--section-space);
+}
+
+.s-prices__title {
+  text-align: center;
+  margin-bottom: var(--sp-10);
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* --- Feature-Rows (alternierend Bild/Text) ------------------------------ */
+
+.s-feature {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--site-gutter);
+  align-items: center;
+  padding-block: var(--sp-10);
+}
+
+.s-feature + .s-feature {
+  padding-top: 0;
+}
+
+.s-feature__media {
+  aspect-ratio: 800 / 706;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.s-feature__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.s-feature__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  max-width: 42ch;
+  padding-inline: var(--sp-5);
+}
+
+.s-feature__title {
+  font-size: clamp(1.75rem, 2.8vw, 3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.s-feature__body p {
+  font-size: var(--fs-text-main);
+  color: var(--c-text-muted);
+  line-height: 1.45;
+}
+
+.s-feature--reverse .s-feature__media {
+  order: 2;
+}
+
+@media (max-width: 900px) {
+  .s-feature {
+    grid-template-columns: 1fr;
+  }
+
+  .s-feature--reverse .s-feature__media {
+    order: -1;
+  }
+
+  .s-feature__body {
+    padding-inline: 0;
+  }
+}
+
+/* --- FAQ + Kontakt (Split-Layout mit Sticky-Head) ----------------------- */
+
+.s-panel {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr;
+  gap: var(--sp-8) var(--site-gutter);
+  padding-block: var(--section-space);
+  align-items: start;
+}
+
+.s-panel__head {
+  position: sticky;
+  top: 120px;
+  max-width: 24ch;
+}
+
+.s-panel__head .c-topline {
+  margin-bottom: var(--sp-4);
+}
+
+.s-panel__title {
+  margin-bottom: var(--sp-5);
+  font-size: clamp(1.75rem, 2.8vw, 3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 900px) {
+  .s-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .s-panel__head {
+    position: static;
+  }
+}
+
+/* --- Wortmarken-Abschluss ----------------------------------------------- */
+
+.s-wordmark {
+  padding: var(--sp-10) var(--site-margin) var(--sp-5);
+  overflow: hidden;
+}
+
+/* Auf Randbreite gesetzt: 10.3vw ergibt bei 14 Versalien genau die
+   Containerbreite. Größer läuft das Wort aus dem Satzspiegel. */
+.s-wordmark__type {
+  display: block;
+  width: 100%;
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 10.3vw, 11.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- Benefits (Leistungsseiten) ----------------------------------------
+   Dunkles Vollbreiten-Band mit Auswahlliste links und Bild rechts.
+   Verhalten und data-Attribute teilt sie sich mit .s-standards — nur das
+   Erscheinungsbild ist ein anderes: keine Zahnmaske, sondern ein
+   gerundetes Bildfeld, und Ziffern statt zweistelliger Nummern.
+   -------------------------------------------------------------------- */
+
+/* Randlos über die Seitenbreite hinaus, wie im Entwurf (dort -118 bis
+   1752 bei 1728 Rahmen). Der Innenabstand hält den Inhalt trotzdem im
+   Raster. */
+/* Randlos über die volle Fensterbreite und ohne Rundung — im Entwurf ein
+   durchgehendes Band, das die Seite teilt. Die 50vw-Konstruktion bricht
+   aus dem zentrierten Raster aus, ohne dass die Section aus dem Fluss
+   genommen werden muss. */
+.s-benefits {
+  position: relative;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  /* Unten kein Abstand: das braune Band stößt direkt an das Taupe-Band
+     von Vorher/Nachher, die beiden Farbflächen laufen ineinander. */
+  margin-block: var(--section-space) 0;
+  padding-block: clamp(120px, 13vw, 220px);
+  background: var(--c-dark);
+  color: var(--c-bg);
+}
+
+.s-benefits__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--site-gutter);
+  align-items: start;
+}
+
+.s-benefits__head {
+  grid-column: 1;
+  margin-bottom: clamp(48px, 7vw, 120px);
+}
+
+.s-benefits__title {
+  max-width: 14ch;
+  margin-top: var(--sp-4);
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.s-benefits__list {
+  grid-column: 1;
+}
+
+/* Die Trennlinie sitzt unten an jeder Zeile — die erste bekommt zusätzlich
+   eine obere, damit der Block oben abschließt. */
+.s-benefits__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--sp-3);
+  padding-block: var(--sp-4);
+  border-bottom: var(--bw) solid
+    color-mix(in srgb, var(--c-bg) 22%, transparent);
+  cursor: default;
+}
+
+.s-benefits__row:first-child {
+  border-top: var(--bw) solid
+    color-mix(in srgb, var(--c-bg) 22%, transparent);
+}
+
+/* Ziffer im Kreis. Der inaktive Zustand ist nur gedimmt, nicht
+   ausgeblendet — die Liste soll als Ganzes lesbar bleiben. */
+.s-benefits__num {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: var(--bw) solid color-mix(in srgb, var(--c-bg) 45%, transparent);
+  border-radius: var(--r-round);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.55;
+  transition: opacity var(--d-base) var(--e-out),
+    border-color var(--d-base) var(--e-out);
+}
+
+/* Deutlich größer als der Fließtext darunter — im Entwurf trägt der Name
+   die Zeile, der Text ordnet sich unter. */
+.s-benefits__name {
+  font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.2;
+  opacity: 0.55;
+  transition: opacity var(--d-base) var(--e-out);
+}
+
+/* Die Liste behält ihre Höhe, egal welcher Eintrag offen ist. Ohne das
+   wuchs und schrumpfte das ganze Band beim Durchlaufen der Einträge, weil
+   die drei Texte unterschiedlich lang sind. */
+.s-benefits__list {
+  min-height: 22rem;
+}
+
+/* Zusammengeklappt über die Rasterzeile, nicht über display: none —
+   sonst gäbe es keinen Übergang. */
+.s-benefits__text {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  max-width: 46ch;
+  font-size: var(--fs-text-main);
+  line-height: 1.45;
+  opacity: 0;
+  transition: grid-template-rows var(--d-slow) var(--e-out),
+    opacity var(--d-base) var(--e-out), margin-top var(--d-slow) var(--e-out);
+}
+
+/* Der Inhalt braucht ein eigenes, überlaufverstecktes Element — reiner
+   Text im Absatz wird zu einem anonymen Rasterelement, das sich weder
+   ansprechen noch auf Null zusammenziehen lässt (blieb bei 46 px stehen).
+   Deshalb steht im Markup ein <p> innerhalb des Wrappers. */
+.s-benefits__text > * {
+  overflow: hidden;
+  margin: 0;
+}
+
+.s-benefits__row[data-active="true"] .s-benefits__num {
+  opacity: 1;
+  border-color: var(--c-brand);
+}
+
+.s-benefits__row[data-active="true"] .s-benefits__name {
+  opacity: 1;
+}
+
+.s-benefits__row[data-active="true"] .s-benefits__text {
+  grid-template-rows: 1fr;
+  margin-top: var(--sp-2);
+  opacity: 0.75;
+}
+
+/* Fortschritt der aktiven Zeile — liegt auf der unteren Trennlinie. */
+.s-benefits__bar {
+  position: absolute;
+  right: 0;
+  bottom: calc(-1 * var(--bw));
+  left: 0;
+  height: var(--bw);
+  overflow: hidden;
+}
+
+.s-benefits__bar i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--c-brand);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* Das Bildfeld läuft über die volle Höhe der rechten Spalte und beginnt
+   auf Höhe der Headline. */
+.s-benefits__media {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+}
+
+.s-benefits__stage {
+  position: relative;
+  height: 100%;
+  min-height: clamp(360px, 40vw, 560px);
+  overflow: hidden;
+  border-radius: var(--r-md);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Alle Motive liegen übereinander, sichtbar ist immer genau eines. Das
+   Modul blendet über Deckkraft und einen leichten Zoom um. */
+.s-benefits__stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .s-benefits__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .s-benefits__head,
+  .s-benefits__list,
+  .s-benefits__media {
+    grid-column: 1;
+  }
+
+  .s-benefits__media {
+    grid-row: auto;
+    margin-top: var(--sp-6);
+  }
+}

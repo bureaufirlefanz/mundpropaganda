@@ -1,0 +1,24 @@
+{
+  "name": "mundpropaganda-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "schema:deploy": "sanity schema deploy"
+  },
+  "dependencies": {
+    "@sanity/orderable-document-list": "^2.0.17",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sanity": "^6.6.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@sanity/vision": "^6.6.0",
+    "typescript": "^5.9.3"
+  }
+}

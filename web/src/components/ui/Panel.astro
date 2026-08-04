@@ -1,0 +1,69 @@
+---
+/**
+ * Panel-Rahmen: schmaler Kopf links, der beim Scrollen stehen bleibt, breiter
+ * Inhalt rechts. Was rechts steht, gibt der Aufrufer über den Slot mit — das
+ * FAQ ein Akkordeon, der Kontaktbereich ein Formular.
+ *
+ * Eigener Baustein, weil zwei Sections denselben Rahmen ausschreiben. Läge er
+ * in einer von beiden, wäre die abgegrenzte Regel für die andere wirkungslos.
+ */
+interface Props {
+  id?: string;
+  topline: string;
+  titel: string;
+  /** Zusatzzeile unter der Headline. Nicht jedes Panel hat eine. */
+  text?: string;
+}
+
+const { id, topline, titel, text } = Astro.props;
+---
+
+<section class="container s-panel" id={id}>
+  <div class="s-panel__head">
+    <span class="c-topline">{topline}</span>
+    <h2 class="s-panel__title" data-split="lines">{titel}</h2>
+    {text && <p class="t-body t-muted">{text}</p>}
+  </div>
+
+  <slot />
+</section>
+
+<style>
+  .s-panel {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: var(--sp-8) var(--site-gutter);
+    padding-block: var(--section-space);
+    align-items: start;
+  }
+
+  /* Der Kopf bleibt stehen, während der Inhalt daneben durchläuft. */
+  .s-panel__head {
+    position: sticky;
+    top: 120px;
+    max-width: 24ch;
+  }
+
+  .s-panel__head .c-topline {
+    margin-bottom: var(--sp-4);
+  }
+
+  .s-panel__title {
+    margin-bottom: var(--sp-5);
+    font-size: clamp(1.75rem, 2.8vw, 3rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  @media (max-width: 900px) {
+    .s-panel {
+      grid-template-columns: 1fr;
+    }
+
+    /* Einspaltig gibt es nichts, woran der Kopf haften könnte. */
+    .s-panel__head {
+      position: static;
+    }
+  }
+</style>

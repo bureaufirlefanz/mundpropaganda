@@ -1,0 +1,215 @@
+---
+/**
+ * Vorher/Nachher-Vergleich mit Schieberegler.
+ *
+ * Das Band endet auf halber Bildhöhe, der Vergleich ragt darunter heraus —
+ * so steht es im Entwurf. Bedient wird es von modules/ui.js über `data-ba`.
+ */
+import Picture from "../ui/Picture.astro";
+
+interface Props {
+  topline?: string;
+  /** Namen aus der Bildpipeline (public/img), ohne Größe und Endung. */
+  vorher?: string;
+  nachher?: string;
+}
+
+const {
+  topline = "Vorher & Nachher",
+  vorher = "teeth-macro",
+  nachher = "teeth-macro-after",
+} = Astro.props;
+---
+
+<section class="s-ba">
+  <div class="container">
+    <span class="c-topline s-ba__topline" data-reveal="fade">{topline}</span>
+
+    <div class="s-ba__frame" data-ba data-reveal="scale">
+      <Picture
+        name={vorher}
+        widths="640,1024,1600,2048"
+        alt="Zähne vor der Behandlung"
+        sizes="(max-width: 1100px) 100vw, 1100px"
+      />
+      <div class="s-ba__after">
+        <Picture
+          name={nachher}
+          widths="640,1024,1600,2048"
+          alt="Zähne nach der Behandlung"
+          sizes="(max-width: 1100px) 100vw, 1100px"
+        />
+      </div>
+      {/* Der Griff ist das Bedienelement, nicht nur Zierrat: role="slider"
+          samt Tastaturbedienung. Vorher war er ein leeres div — mit der Maus
+          ging es, mit der Tastatur gar nicht (WCAG 2.1.1). */}
+      <div
+        class="s-ba__handle"
+        data-ba-handle
+        role="slider"
+        tabindex="0"
+        aria-label="Vergleich zwischen vorher und nachher"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="50"
+        aria-valuetext="50 % nachher"
+      >
+        <span class="s-ba__grip">
+          <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+          <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="s-ba__labels" data-reveal="fade">
+      <span>Vorher</span>
+      <span>Ziehen zum Vergleichen</span>
+      <span>Nachher</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Das Band endet auf halber Bildhöhe, der Vergleich ragt darunter heraus.
+     Als eigene Ebene gelöst und nicht über einen negativen Rand am Rahmen:
+     der zöge die folgende Section mit hoch. */
+  .s-ba {
+    position: relative;
+    color: var(--c-dark);
+    padding-block: var(--section-space);
+  }
+
+  .s-ba::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 68%;
+    background: var(--c-taupe);
+    z-index: -1;
+  }
+
+  /* Im Prototyp stand der Abstand als style-Attribut am Element. Hier steht
+     er da, wo er hingehört. */
+  .s-ba__topline {
+    margin-bottom: var(--sp-6);
+  }
+
+  .s-ba__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-width: 1100px;
+    margin-inline: auto;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    cursor: ew-resize;
+    user-select: none;
+    /* Ein per transform bewegtes Bild in einem gerundeten, überlaufversteckten
+       Rahmen bekommt sonst pro Frame eine neu gerechnete Ecke. */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* :global(img), weil die Bilder aus Picture.astro kommen. */
+  .s-ba__frame :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Muss selbst eine Box aufspannen, sonst hat clip-path nichts zu clippen
+     (das Bild darin ist absolut zum Rahmen positioniert). */
+  .s-ba__after {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 0 0 var(--ba-pos, 50%));
+  }
+
+  .s-ba__handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--ba-pos, 50%);
+    width: 2px;
+    background: var(--c-white);
+    /* Der Rahmen fängt das Ziehen ab, nicht der Griff — sonst risse die
+       Geste ab, sobald der Zeiger den 2px schmalen Strich verlässt. Der
+       Griff bleibt trotzdem fokussierbar. */
+    pointer-events: none;
+  }
+
+  .s-ba__handle:focus-visible {
+    outline: none;
+  }
+
+  /* Der runde Knopf in der Mitte. Vorher ein ::after ohne Inhalt — deshalb
+     war kein Symbol darin. Jetzt ein echtes Element mit zwei Pfeilen, die
+     zeigen, wohin man ziehen kann.
+
+     Braune Zeichen auf pinkem Grund: 5.50:1, WCAG 1.4.11 verlangt 3:1 für
+     Bedienelemente. Pink auf Pink wäre nicht zu sehen gewesen. */
+  .s-ba__grip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: center;
+    /* Keine Lücke: die beiden Pfeile sollen als ein Doppelpfeil lesen,
+       nicht als zwei Zeichen nebeneinander. */
+    gap: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.15);
+    transition: scale var(--d-fast) var(--e-swift),
+      box-shadow var(--d-fast) var(--e-swift);
+  }
+
+  .s-ba__grip svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Der erste Pfeil zeigt nach links — dasselbe Symbol, gedreht. Ein
+     zweites im Sprite wäre dieselbe Form ein zweites Mal. */
+  .s-ba__grip svg:first-child {
+    transform: rotate(180deg);
+  }
+
+  /* Sichtbarer Fokus am Knopf, nicht am 2px-Strich. */
+  .s-ba__handle:focus-visible .s-ba__grip {
+    outline: var(--bw) solid var(--c-dark);
+    outline-offset: 3px;
+  }
+
+  .s-ba__frame:hover .s-ba__grip,
+  .s-ba__handle:focus-visible .s-ba__grip {
+    scale: 1.08;
+    box-shadow: 0 6px 26px rgb(0 0 0 / 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .s-ba__frame:hover .s-ba__grip,
+    .s-ba__handle:focus-visible .s-ba__grip {
+      scale: 1;
+    }
+  }
+
+  .s-ba__labels {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: var(--sp-3) auto 0;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+</style>
