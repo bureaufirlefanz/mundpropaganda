@@ -1,34 +1,67 @@
-# Inhalte ins Studio einspielen
+# Startbestand einspielen
 
-`inhalte.ndjson` enthält die elf Leistungen in ihrer Relevanzreihenfolge und
-das Startseiten-Dokument. Erzeugt wird sie aus den Fallback-Daten der
-Website, damit sie exakt das enthält, was die Seite heute zeigt:
+Zwei Dateien, weil zwei Importarten nötig sind. Beide werden erzeugt, nicht
+von Hand geschrieben:
 
-    node studio/seed/erzeuge.mjs > studio/seed/inhalte.ndjson
+```bash
+node studio/seed/erzeuge.mjs
+```
 
-Einspielen (schreibt in den Datensatz — schreibt also echte Dokumente):
+Einspielen — schreibt echte Dokumente in den Datensatz:
 
-    cd studio
-    npx sanity dataset import ../studio/seed/inhalte.ndjson production
+```bash
+cd studio
+npx sanity dataset import ../studio/seed/leistungen.ndjson --dataset production --missing
+npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production --replace
+```
 
-## Was drin steht, und was nicht
+## Warum getrennt
 
-Die **Leistungen** kommen mit Titel, Kurzname, Slug, Topline, Platzierung,
-Gruppe, Kürzel und Reihenfolge. Texte, Preise und Bilder bleiben leer — die
-liefert vorerst die Beispiel-Leistung im Code, und der Kunde füllt sie im
-Studio Stück für Stück.
+| Datei | Inhalt | Import | Grund |
+|---|---|---|---|
+| `leistungen.ndjson` | 11 Leistungen, nur Grunddaten | `--missing` | `leistung-veneers` ist voll gepflegt. `--replace` überschriebe seinen Inhalt mit Titel und Slug — ohne Rückfrage. |
+| `seiten.ndjson` | Einstellungen, Startseite | `--replace` | Beide sollen genau diesen Stand bekommen. |
 
-Das **Startseiten-Dokument** ist bis auf seine Kennung leer. Das ist Absicht:
-Jedes Feld, das hier stünde, wäre eine Kopie des Textes, der in den
-Bausteinen steht — und die Kopie ist die, die veraltet. Solange ein Feld leer
-bleibt, zeigt die Seite den eingebauten Text; sobald jemand es füllt, gilt
-seins.
+Die IDs sind fest (`leistung-<slug>`, `einstellungen`, `startseite`), der
+Vorgang also wiederholbar. Ohne feste IDs vergäbe Sanity zufällige, und jeder
+zweite Import legte alles ein zweites Mal an.
 
-## Nur einmal
+## Was drin steht
 
-Die Leistungen bekommen keine feste `_id`, Sanity vergibt sie. Ein zweiter
-Import legt sie deshalb ein zweites Mal an. Wer neu einspielen will, löscht
-die alten vorher im Studio.
+**Leistungen** — Titel, Kurzname, Slug, Topline, Platzierung, Gruppe, Kürzel
+und Reihenfolge. Texte, Preise und Bilder bleiben leer; die pflegt der Kunde
+im Studio.
 
-Das Startseiten-Dokument hängt an der ID `startseite` und wird beim erneuten
-Import überschrieben, nicht verdoppelt.
+**Einstellungen** — Telefon, E-Mail, Bewertungszahlen, Profile, beide
+Anschriften.
+
+**Startseite** — alle siebzehn Felder mit dem Text, den die Seite zeigt:
+Hero-Zeilen, Split, Services-Titel, die fünf Standards, Standorte-Titel,
+Experten, die fünf Stories, Magazin und die sechs FAQ-Einträge.
+
+## Warum der Seed jetzt Inhalt trägt
+
+Bis Aufgabe 4 war er bis auf die Kennungen leer, mit der Begründung: Was hier
+stünde, wäre eine Kopie des Textes in den Bausteinen, und die Kopie veraltet.
+Das galt, solange der eingebaute Text die Seite trug.
+
+Mit Aufgabe 4 trägt ihn das CMS. Damit dreht sich die Lage um — der Seed ist
+nicht mehr die zweite Kopie, sondern der Umzug der ersten. Danach gibt es
+keinen zweiten Ort, von dem er abweichen könnte.
+
+Erzeugt wird er aus den Quelldateien, nicht abgetippt. Ein abgetippter Seed
+hätte genau einen Tippfehler, und den fände niemand — er sähe aus wie eine
+Textentscheidung.
+
+## Die Probe
+
+Nach dem Einspielen liest die Seite aus dem CMS statt aus dem Code. Ist der
+Seed originalgetreu, darf sich am Ergebnis nichts ändern:
+
+```bash
+npm run web:build && npm run web:preview
+npm run web:styles          # im zweiten Terminal
+```
+
+Gemessen beim Einspielen: 3918 Elemente über drei Breakpoints, keine
+Abweichung.

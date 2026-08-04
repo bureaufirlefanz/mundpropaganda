@@ -9,4 +9,3 @@
 {"_id":"leistung-cmd-behandlung","_type":"leistung","titel":"CMD mit Botoxbehandlung und elektronischer Kiefergelenksvermessung","kurzname":"CMD-Behandlung","slug":{"_type":"slug","current":"cmd-behandlung"},"topline":"CMD-Behandlung in Berlin","platzierung":"liste","gruppe":"behandlung","orderRank":"0008"}
 {"_id":"leistung-prophylaxe","_type":"leistung","titel":"Prophylaxe / Professionelle Zahnreinigung","kurzname":"Prophylaxe","slug":{"_type":"slug","current":"prophylaxe"},"topline":"Prophylaxe in Berlin","platzierung":"liste","gruppe":"behandlung","orderRank":"0009"}
 {"_id":"leistung-parodontitis-behandlung","_type":"leistung","titel":"Parodontitis-Behandlung","kurzname":"Parodontitis","slug":{"_type":"slug","current":"parodontitis-behandlung"},"topline":"Parodontitis in Berlin","platzierung":"liste","gruppe":"behandlung","orderRank":"0010"}
-{"_id":"startseite","_type":"startseite"}
