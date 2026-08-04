@@ -49,12 +49,11 @@ Zwei Dinge, die dabei leicht schiefgehen:
 
 Die Zuständigkeit ist geschichtet, nicht vermischt:
 
-1. **`../../src/styles/tokens.css`** — die einzigen festen Werte im Projekt.
-   Farben, Typo-Skala, Abstände, Radien, Bewegungsgrößen. Wird aus dem
-   Prototyp eingebunden, nicht kopiert: es soll genau eine Quelle geben.
-2. **`../../src/styles/base.css`** — Schriften, Reset, Typo-Hilfsklassen,
+1. **`src/styles/tokens.css`** — die einzigen festen Werte im Projekt.
+   Farben, Typo-Skala, Abstände, Radien, Bewegungsgrößen.
+2. **`src/styles/base.css`** — Schriften, Reset, Typo-Hilfsklassen,
    Layout-Primitive (`.container`, `.grid`, `.section`, `.media`) und die
-   Motion-Basis (`[data-reveal]`, Marker-Regeln). Ebenfalls eingebunden.
+   Motion-Basis (`[data-reveal]`, Marker-Regeln).
 3. **`src/styles/shared.css`** — was mehr als ein Baustein ausschreibt und
    keinem allein gehört: `.c-topline` und die Slider-Steuerung, die Gallery
    und Magazin teilen. Absichtlich kurz. Wächst die Datei, ist das das
