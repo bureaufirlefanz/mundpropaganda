@@ -1,23 +1,34 @@
 ---
-/** Bewertungsbalken. Zahlen und Quelle kommen aus den Einstellungen. */
+/**
+ * Bewertungsbalken. Zahlen und Quelle kommen aus den Einstellungen.
+ *
+ * Klasse 2: Sind sie dort nicht gepflegt, erscheint der Balken gar nicht.
+ * Bis Aufgabe 4 fiel er auf die Zahlen aus dem Prototyp zurück — 272
+ * Bewertungen bei 5,0, für eine Praxis, die davon nichts wusste. Eine
+ * erfundene Bewertungszahl ist die Sorte Rückfall, die nicht nur Vertrauen
+ * kostet, sondern eine Aussage über die Praxis trifft, die niemand gedeckt
+ * hat.
+ */
 import { ladeEinstellungen, schnittText } from "../../lib/einstellungen";
 
-const e = await ladeEinstellungen();
-const sterne = Math.round(e.bewertungenSchnitt);
+const { bewertungen } = await ladeEinstellungen();
+const sterne = bewertungen ? Math.round(bewertungen.schnitt) : 0;
 ---
 
+{bewertungen && (
 <div class="c-reviews">
   <div class="c-reviews__meta">
-    <span>{e.bewertungenAnbieter}</span>
-    <span>{e.bewertungenAnzahl} Bewertungen</span>
-    <span>{schnittText(e.bewertungenSchnitt)}</span>
+    <span>{bewertungen.anbieter}</span>
+    <span>{bewertungen.anzahl} Bewertungen</span>
+    <span>{schnittText(bewertungen.schnitt)}</span>
   </div>
-  <div class="c-reviews__stars" aria-label={`${schnittText(e.bewertungenSchnitt)} Sternen`}>
+  <div class="c-reviews__stars" aria-label={`${schnittText(bewertungen.schnitt)} Sternen`}>
     {Array.from({ length: sterne }).map(() => (
       <svg aria-hidden="true"><use href="#i-star" /></svg>
     ))}
   </div>
 </div>
+)}
 
 <style>
   .c-reviews {

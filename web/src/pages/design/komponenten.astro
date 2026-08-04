@@ -6,10 +6,11 @@
  * Bewusst OHNE Farben, Typografie und Bewegungswerte: die stehen im
  * Styleguide. Was hier steht, sind die zusammengesetzten Teile.
  *
- * Die Beispiele laufen mit echten Daten, nicht mit eigens erfundenen: die
- * Startseiten-Bausteine mit dem Inhalt aus dem CMS, die Leistungsbausteine mit
- * denselben Beispieldaten, die auch eine ungepflegte Leistung versorgen. Damit
- * ist ausgeschlossen, dass diese Seite etwas zeigt, das es so nirgends gibt.
+ * Die Beispiele laufen mit echten Daten aus dem CMS, nicht mit erfundenen:
+ * die Startseiten-Bausteine mit dem Startseiten-Dokument, die
+ * Leistungsbausteine mit Veneers. Damit ist ausgeschlossen, dass diese Seite
+ * etwas zeigt, das es so nirgends gibt — und sie ist zugleich die Probe, ob
+ * ein Baustein ohne seine Daten heil bleibt.
  *
  * Nicht eingebettet sind die Bausteine, die den Seitenrahmen bilden
  * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen) und die beiden
@@ -20,8 +21,8 @@
  * kaputter Seitenkopf. Sie stehen deshalb mit Beschreibung und Verweis da.
  */
 import Design from "../../layouts/Design.astro";
-import { beispielLeistung as bl } from "../../lib/fixtures";
 import { ladeStartseite } from "../../lib/startseite";
+import { ladeLeistung } from "../../lib/leistungen";
 import {
   ZAHLEN, STELLEN, ABLAUF, STIMMEN,
   VERGLEICH_SPALTEN, VERGLEICH_ZEILEN, VERGLEICH_HINWEIS,
@@ -65,6 +66,11 @@ import Voices from "../../components/sections/Voices.astro";
    Beispieldaten wären der falsche Ersatz: Diese Seite soll zeigen, was es
    wirklich gibt, nicht etwas, das so nirgends steht. */
 const inhalt = await ladeStartseite();
+
+/* Die Leistungsbausteine am Beispiel Veneers — der einzigen voll gepflegten
+   Leistung. Bis Aufgabe 4 kamen sie aus `beispielLeistung` in fixtures.ts;
+   die Datei hat damit ihre letzte Aufgabe verloren und ist entfallen. */
+const bl = await ladeLeistung("veneers");
 
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
@@ -135,7 +141,7 @@ const RAHMEN = [
   },
 ];
 
-const FRAGEN_KURZ = bl.faq.slice(0, 3);
+const FRAGEN_KURZ = (bl?.faq ?? []).slice(0, 3);
 
 const RING_BILDER = [
   { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
@@ -363,7 +369,7 @@ const RING_BILDER = [
         hat eine feste Höhe - mit Mindesthöhe trug der längste Eintrag sie über
         das Maß hinaus und das ganze Band sprang beim Durchlaufen.
       </p>
-      <div class="d-live"><Benefits {...bl.benefits} /></div>
+      <div class="d-live">{bl?.benefits?.topline && bl.benefits.headline && bl.benefits.eintraege?.length ? <Benefits topline={bl.benefits.topline} headline={bl.benefits.headline} eintraege={bl.benefits.eintraege} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -415,7 +421,7 @@ const RING_BILDER = [
       <p class="d-probe__text d-eingerueckt">
         Einstiegstext: Überschrift links, zwei Textspalten daneben.
       </p>
-      <div class="d-live"><Intro {...bl.intro} /></div>
+      <div class="d-live">{bl?.intro?.topline && bl.intro.headline && bl.intro.spalten?.length ? <Intro topline={bl.intro.topline} headline={bl.intro.headline} spalten={bl.intro.spalten} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -427,7 +433,7 @@ const RING_BILDER = [
         Ein einzelner Satz über die volle Breite. Trennt zwei inhaltliche
         Blöcke und gibt der Seite Luft.
       </p>
-      <div class="d-live">{bl.statement && <Statement {...bl.statement} />}</div>
+      <div class="d-live">{bl?.statement?.topline && bl.statement.text ? <Statement topline={bl.statement.topline} text={bl.statement.text} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -439,7 +445,7 @@ const RING_BILDER = [
         Zwei Aufnahmen übereinander, dazwischen ein Schieberegler. Über
         Tastatur bedienbar, nicht nur per Zeiger.
       </p>
-      <div class="d-live"><BeforeAfter /></div>
+      <div class="d-live">{bl?.vorherNachher?.topline ? <BeforeAfter topline={bl.vorherNachher.topline} vorher={bl.vorherNachher.vorher} nachher={bl.vorherNachher.nachher} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -449,7 +455,7 @@ const RING_BILDER = [
       </div>
       <p class="d-probe__text d-eingerueckt">Der Behandlungsablauf als nummerierte Folge.</p>
       <div class="d-live">
-        {bl.schritte && <Steps titel={bl.schritte.titel} schritte={bl.schritte.eintraege} />}
+        {bl?.schritte?.titel && bl.schritte.eintraege?.length ? <Steps titel={bl.schritte.titel} schritte={bl.schritte.eintraege} /> : null}
       </div>
     </div>
 
@@ -459,7 +465,7 @@ const RING_BILDER = [
         <span class="d-probe__pfad">components/sections/Prices.astro</span>
       </div>
       <p class="d-probe__text d-eingerueckt">Die Preiskarten einer Leistung.</p>
-      <div class="d-live"><Prices preise={bl.preise} /></div>
+      <div class="d-live">{bl?.preise?.length ? <Prices preise={bl.preise} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -470,7 +476,7 @@ const RING_BILDER = [
       <p class="d-probe__text d-eingerueckt">
         Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt.
       </p>
-      <div class="d-live">{bl.features && <Features zeilen={bl.features} />}</div>
+      <div class="d-live">{bl?.features?.length ? <Features zeilen={bl.features} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -581,7 +587,7 @@ const RING_BILDER = [
         Das Kontaktformular im Panel, mit Vorauswahl der Leistung und einem
         Feld für ein Foto.
       </p>
-      <div class="d-live"><Contact leistung={bl.titel} /></div>
+      <div class="d-live"><Contact leistung={bl?.titel} /></div>
     </div>
   </section>
 

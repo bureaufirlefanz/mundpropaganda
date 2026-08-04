@@ -240,6 +240,105 @@ export const leistung = defineType({
       ],
     }),
 
+    /* --- Vier Abschnitte, die die Seite baut und das Schema bisher nicht
+       kannte -------------------------------------------------------------
+
+       Sie standen als Beispieldaten in `web/src/lib/fixtures.ts`, und die
+       Datenschicht setzte sie bei JEDER Leistung ein — auch bei denen, die
+       nichts damit zu tun haben. Auf der Bleaching-Seite stand deshalb „In
+       vier Schritten zu neuen Veneers".
+
+       Alle vier sind wahlfrei (Klasse 2): Nicht jede Behandlung hat einen
+       Vorher/Nachher-Vergleich oder einen vierstufigen Ablauf. Was fehlt,
+       erscheint nicht — es tritt nichts an seine Stelle.
+
+       Die Bilder darin sind wahlfrei mit Rückfall auf das gestaltete Motiv,
+       wie bei Split, Experts und Stories auch. */
+
+    defineField({
+      name: "vorherNachher",
+      title: "Vorher / Nachher",
+      type: "object",
+      group: "inhalt",
+      options: { collapsible: true, collapsed: true },
+      description:
+        "Zwei Aufnahmen mit Schieberegler. Ohne eigene Bilder stehen hier die gestalteten Motive - laden Sie für diese Behandlung eigene hoch, sonst zeigt der Vergleich fremde Zähne.",
+      fields: [
+        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
+        defineField({ name: "vorher", title: "Aufnahme vorher", type: "bild" }),
+        defineField({ name: "nachher", title: "Aufnahme nachher", type: "bild" }),
+      ],
+    }),
+
+    defineField({
+      name: "statement",
+      title: "Kernaussage",
+      type: "object",
+      group: "inhalt",
+      options: { collapsible: true, collapsed: true },
+      description: "Ein einzelner Absatz, größer gesetzt. Trägt eine Aussage, ohne Überschrift zu sein.",
+      fields: [
+        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
+        defineField({ name: "text", title: "Text", type: "text", rows: 5, validation: (r) => r.required() }),
+      ],
+    }),
+
+    defineField({
+      name: "schritte",
+      title: "Ablauf",
+      type: "object",
+      group: "inhalt",
+      options: { collapsible: true, collapsed: true },
+      description: "Der Ablauf der Behandlung als nummerierte Karten.",
+      fields: [
+        defineField({
+          name: "titel",
+          title: "Überschrift",
+          type: "string",
+          description: "Zum Beispiel „In vier Schritten zu neuen Veneers“.",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "eintraege",
+          title: "Schritte",
+          type: "array",
+          of: [
+            defineArrayMember({
+              type: "object",
+              name: "schritt",
+              fields: [
+                defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required() }),
+                defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
+              ],
+              preview: { select: { title: "titel", subtitle: "text" } },
+            }),
+          ],
+          validation: (r) => r.required().min(2),
+        }),
+      ],
+    }),
+
+    defineField({
+      name: "features",
+      title: "Bild-Text-Zeilen",
+      type: "array",
+      group: "inhalt",
+      description: "Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt von selbst.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "featureZeile",
+          fields: [
+            defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "titel", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
+            defineField({ name: "bild", title: "Bild", type: "bild" }),
+          ],
+          preview: { select: { title: "titel", subtitle: "topline", media: "bild" } },
+        }),
+      ],
+    }),
+
     defineField({
       name: "seoBeschreibung",
       title: "Meta-Beschreibung",

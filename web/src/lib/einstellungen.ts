@@ -3,9 +3,20 @@ import { ohneNull } from "./ohne-null";
 import { EINSTELLUNGEN_QUERY } from "./queries";
 
 /**
- * Die Angaben, die auf jeder Seite gleich sind. Ein Einzeldokument im Studio,
- * hier ein Objekt mit Rückfall — Kontaktdaten dürfen nie fehlen, auch nicht,
- * solange im CMS noch nichts gepflegt ist.
+ * Die Angaben, die auf jeder Seite gleich sind. Ein Einzeldokument im Studio.
+ *
+ * Bis Aufgabe 4 stand hier ein vollständiger Beispielstand aus dem Prototyp,
+ * und jedes leere Feld fiel darauf zurück. Das ist abgeschafft: Die Telefon-
+ * nummer, die auf der Seite steht, ist die, die im Studio steht — sonst
+ * telefoniert der Kunde einer Nummer hinterher, die er dort nirgends findet.
+ *
+ * Die Klassen wie bei der Startseite:
+ *
+ *   Klasse 1  telefon, email, standorte — im Schema Pflicht. Ohne Anschrift
+ *             und Rufnummer ist eine Praxis-Website kaputt, nicht leer.
+ *   Klasse 2  Bewertungen und Profile. Was nicht gepflegt ist, verschwindet:
+ *             der Balken ganz, ein Profil einzeln. Eine Praxis ohne
+ *             Bewertungen soll nicht „0 Bewertungen, 0,0 von 5" anzeigen.
  */
 
 export interface Social {
@@ -24,51 +35,30 @@ export interface Standort {
   name: string;
   strasse: string;
   ort: string;
-  /* Wahlfrei — im Schema steht keine Pflichtregel. Bis Aufgabe 4 entscheidet,
-     ob dieses Feld die Section trägt, bildet der Vertrag ab, was das Schema
-     wirklich zusagt. TypeGen hat den Unterschied aufgedeckt. */
+  /* Klasse 2: Im Schema steht keine Pflichtregel. Fehlt der Text, steht unter
+     der Anschrift nichts — es tritt keiner an seine Stelle. */
   beschreibung?: string;
+}
+
+/**
+ * Der Bewertungsbalken. Als EIN wahlfreies Objekt und nicht als drei einzelne
+ * Felder: Der Balken braucht Quelle, Anzahl und Schnitt zusammen. Läge jedes
+ * für sich vor, ließe sich ein halber Balken bauen — „Google Reviews, 0
+ * Bewertungen" ist schlechter als gar keiner.
+ */
+export interface Bewertungen {
+  anbieter: string;
+  anzahl: number;
+  schnitt: number;
 }
 
 export interface Einstellungen {
   telefon: string;
   email: string;
-  bewertungenAnbieter: string;
-  bewertungenAnzahl: number;
-  bewertungenSchnitt: number;
-  social: Social;
   standorte: Standort[];
+  bewertungen?: Bewertungen;
+  social: Social;
 }
-
-/** Der Stand aus dem Prototyp. */
-export const beispielEinstellungen: Einstellungen = {
-  telefon: "+49 3051 9999 580",
-  email: "praxis@mundpropaganda.de",
-  bewertungenAnbieter: "Google Reviews",
-  bewertungenAnzahl: 272,
-  bewertungenSchnitt: 5,
-  social: { facebook: "#", instagram: "#", linkedin: "#", youtube: "#" },
-  standorte: [
-    {
-      kuerzel: "P25",
-      name: "Praxis Prenzlauer Allee",
-      strasse: "Prenzlauer Allee 25",
-      ort: "10405 Berlin",
-      beschreibung:
-        "Sechs Behandlungsräume, eigenes Meisterlabor im Haus, direkter " +
-        "Zugang über den Innenhof. Termine Mo–Fr, 8–19 Uhr.",
-    },
-    {
-      kuerzel: "C37",
-      name: "Praxis Christburger Straße",
-      strasse: "Christburger Straße 37",
-      ort: "10405 Berlin",
-      beschreibung:
-        "Unser Standort für Prophylaxe und Aligner-Kontrollen. Barrierefrei, " +
-        "fünf Minuten vom Kollwitzplatz.",
-    },
-  ],
-};
 
 /* Einmal je Build. Rahmen und Hero fragen dasselbe Dokument ab. */
 let gemerkt: Promise<Einstellungen> | null = null;
@@ -78,17 +68,34 @@ export function ladeEinstellungen(): Promise<Einstellungen> {
     .fetch(EINSTELLUNGEN_QUERY)
     .then(ohneNull)
     .then((d) => ({
-      // Feld für Feld auffüllen, nicht das ganze Dokument verwerfen: ein
-      // gepflegtes Telefon soll auch dann gelten, wenn die Bewertungszahlen
-      // noch fehlen.
-      ...beispielEinstellungen,
-      ...Object.fromEntries(Object.entries(d ?? {}).filter(([, v]) => v != null && v !== "")),
-      social: { ...beispielEinstellungen.social, ...(d?.social ?? {}) },
-      // Standorte nur übernehmen, wenn wirklich welche gepflegt sind — eine
-      // leere Liste im CMS soll die Adressen nicht von der Seite nehmen.
-      standorte: d?.standorte?.length ? d.standorte : beispielEinstellungen.standorte,
+      /* Klasse 1, notfalls leer. Das Schema verlangt die drei, aber der Build
+         liest ein Dataset und kein Studio — ein Import oder ein von Hand
+         gelöschtes Feld kommt an der Pflichtregel vorbei. Dann steht die
+         Stelle leer, und die Bausteine blenden sie aus. Ein Ersatzwert wäre
+         hier besonders teuer: Eine erfundene Rufnummer sieht richtig aus. */
+      telefon: d?.telefon || "",
+      email: d?.email || "",
+      standorte: d?.standorte ?? [],
+
+      /* Klasse 2, alles oder nichts. `!= null` und nicht `||`: Ein Schnitt von
+         0 ist ein gepflegter Wert und keine Lücke. */
+      bewertungen:
+        d?.bewertungenAnbieter && d?.bewertungenAnzahl != null && d?.bewertungenSchnitt != null
+          ? {
+              anbieter: d.bewertungenAnbieter,
+              anzahl: d.bewertungenAnzahl,
+              schnitt: d.bewertungenSchnitt,
+            }
+          : undefined,
+
+      /* Klasse 2 je Profil. Ein Symbol ohne Ziel führt nirgends hin und sieht
+         trotzdem nach Angebot aus — Footer.astro filtert leere heraus. */
+      social: d?.social ?? {},
     }))
-    .catch(() => beispielEinstellungen);
+    /* Kein Rückfall mehr im Fehlerfall. Ist das CMS nicht erreichbar, soll der
+       Build eine sichtbar leere Seite ergeben und nicht eine, die mit alten
+       Daten aus dem Prototyp vollständig aussieht. */
+    .catch(() => ({ telefon: "", email: "", standorte: [], social: {} }));
 
   return gemerkt;
 }

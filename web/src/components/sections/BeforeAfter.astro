@@ -6,19 +6,25 @@
  * so steht es im Entwurf. Bedient wird es von modules/ui.js über `data-ba`.
  */
 import Picture from "../ui/Picture.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
+/* Die Topline ist Pflicht und kommt aus dem CMS — der Abschnitt selbst ist
+   dort wahlfrei, wer ihn anlegt, benennt ihn auch. Die beiden Aufnahmen sind
+   wahlfrei mit Rückfall auf die gestalteten Motive. */
 interface Props {
-  topline?: string;
-  /** Namen aus der Bildpipeline (public/img), ohne Größe und Endung. */
-  vorher?: string;
-  nachher?: string;
+  topline: string;
+  vorher?: Bildquelle;
+  nachher?: Bildquelle;
 }
 
-const {
-  topline = "Vorher & Nachher",
-  vorher = "teeth-macro",
-  nachher = "teeth-macro-after",
-} = Astro.props;
+const { topline, vorher, nachher } = Astro.props;
+
+/* Klasse 3: die Motive aus der lokalen Bildpipeline. Sie zeigen Veneers —
+   deshalb steht im Studio an diesem Abschnitt ausdrücklich, dass eigene
+   Aufnahmen hochgeladen gehören. Ohne den Rückfall bliebe der Vergleich leer. */
+const MOTIV_VORHER = "teeth-macro";
+const MOTIV_NACHHER = "teeth-macro-after";
 ---
 
 <section class="s-ba">
@@ -26,19 +32,17 @@ const {
     <span class="c-topline s-ba__topline" data-reveal="fade">{topline}</span>
 
     <div class="s-ba__frame" data-ba data-reveal="scale">
-      <Picture
-        name={vorher}
-        widths="640,1024,1600,2048"
-        alt="Zähne vor der Behandlung"
-        sizes="(max-width: 1100px) 100vw, 1100px"
-      />
+      {istCmsBild(vorher) ? (
+        <CmsImage quelle={vorher} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+      ) : (
+        <Picture name={MOTIV_VORHER} widths="640,1024,1600,2048" alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+      )}
       <div class="s-ba__after">
-        <Picture
-          name={nachher}
-          widths="640,1024,1600,2048"
-          alt="Zähne nach der Behandlung"
-          sizes="(max-width: 1100px) 100vw, 1100px"
-        />
+        {istCmsBild(nachher) ? (
+          <CmsImage quelle={nachher} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+        ) : (
+          <Picture name={MOTIV_NACHHER} widths="640,1024,1600,2048" alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+        )}
       </div>
       {/* Der Griff ist das Bedienelement, nicht nur Zierrat: role="slider"
           samt Tastaturbedienung. Vorher war er ein leeres div — mit der Maus

@@ -62,6 +62,14 @@ const BILD = `{
     asset->{ _id, url, metadata { lqip, dimensions { width, height } } }
   }`;
 
+/**
+ * Eine Leistung mit allem, was ihre Seite baut.
+ *
+ * Die letzten vier Abschnitte sind mit Aufgabe 4 dazugekommen. Sie waren
+ * gebaut, standen aber nicht im Schema — die Seite nahm sie aus
+ * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
+ * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
+ */
 export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current == $slug][0]{
   titel,
   topline,
@@ -70,7 +78,11 @@ export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current
   intro{ topline, headline, spalten },
   benefits{ topline, headline, eintraege[]{ name, text, bild${BILD} } },
   preise[]{ name, preis },
-  faq[]{ frage, antwort }
+  faq[]{ frage, antwort },
+  vorherNachher{ topline, vorher${BILD}, nachher${BILD} },
+  statement{ topline, text },
+  schritte{ titel, eintraege[]{ titel, text } },
+  features[]{ topline, titel, text, bild${BILD} }
 }`);
 
 /**

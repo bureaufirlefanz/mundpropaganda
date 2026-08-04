@@ -69,6 +69,10 @@ export const einstellungen = defineType({
       description:
         "Erscheinen in der Standorte-Section und im Seitenfuß - eine Quelle für beides.",
       group: "standorte",
+      /* Klasse 1: Ohne Anschrift ist eine Praxis-Website kaputt, nicht leer.
+         Bis Aufgabe 4 fiel eine leere Liste auf zwei Beispieladressen aus dem
+         Prototyp zurück — Straßen, die im Studio nirgends standen. */
+      validation: (rule) => rule.required().min(1),
       of: [
         {
           type: "object",

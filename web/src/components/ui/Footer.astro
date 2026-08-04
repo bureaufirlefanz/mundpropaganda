@@ -36,9 +36,12 @@ const jahr = new Date().getFullYear();
         ))}
       </div>
 
+      {/* Je Zeile geprüft: Ein `tel:`-Link ohne Nummer ist kein leerer Text,
+          sondern ein Link, der beim Antippen die Wählmaske mit nichts darin
+          öffnet. Was fehlt, steht deshalb gar nicht erst da. */}
       <div class="c-footer__lines">
-        <a class="c-link" href={telLink(e.telefon)}>{e.telefon}</a>
-        <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>
+        {e.telefon && <a class="c-link" href={telLink(e.telefon)}>{e.telefon}</a>}
+        {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
       </div>
 
       <Button label="Termin buchen" href="#kontakt" />

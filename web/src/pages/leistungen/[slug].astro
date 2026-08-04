@@ -18,6 +18,7 @@ import Magazine from "../../components/sections/Magazine.astro";
 import Faq from "../../components/sections/Faq.astro";
 import Contact from "../../components/sections/Contact.astro";
 import { ladeLeistung, ladeSlugs } from "../../lib/leistungen";
+import { ladeLeistungsliste } from "../../lib/leistungsliste";
 import { ladeStartseite } from "../../lib/startseite";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
@@ -27,7 +28,14 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { daten: d, ausCms } = await ladeLeistung(slug!);
+const d = await ladeLeistung(slug!);
+
+/* Der Name aus der Liste trägt die Überschrift, falls das Dokument fehlt —
+   sonst stünde über der Seite nichts. Alles Weitere kommt aus dem Dokument
+   oder erscheint nicht: Seit Aufgabe 4 füllt kein Beispielinhalt mehr auf.
+   Ein ungepflegter Abschnitt ist ein fehlender Abschnitt. */
+const eintrag = (await ladeLeistungsliste()).find((l) => l.slug === slug);
+const titel = d?.titel || eintrag?.name || "";
 
 /* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
    deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4
@@ -36,32 +44,65 @@ const { daten: d, ausCms } = await ladeLeistung(slug!);
    Ein zweites Feld je Leistung wäre die falsche Antwort: Es liefe auseinander,
    und niemand pflegt zwölf Mal dieselben fünf Zitate. */
 const { storiesEintraege } = await ladeStartseite();
+
+/* Ein Abschnitt ist wahlfrei, aber nicht halb.
+ *
+ * Das Schema verlangt innerhalb von Intro und Benefits alle Felder — wer den
+ * Abschnitt anlegt, füllt ihn auch. Die Abfrage kann das nicht zusagen: GROQ
+ * liefert jedes Feld für sich, und TypeGen bildet genau das ab. Die Prüfung
+ * steht deshalb hier, an einer Stelle, statt in den Bausteinen als vier
+ * einzelne `&&`. Fehlt ein Teil, erscheint der Abschnitt gar nicht — eine
+ * Überschrift ohne Text wäre die halbe Wahrheit statt keiner. */
+const intro =
+  d?.intro?.topline && d.intro.headline && d.intro.spalten?.length
+    ? { topline: d.intro.topline, headline: d.intro.headline, spalten: d.intro.spalten }
+    : undefined;
+
+const benefits =
+  d?.benefits?.topline && d.benefits.headline && d.benefits.eintraege?.length
+    ? { topline: d.benefits.topline, headline: d.benefits.headline, eintraege: d.benefits.eintraege }
+    : undefined;
+
+const statement =
+  d?.statement?.topline && d.statement.text
+    ? { topline: d.statement.topline, text: d.statement.text }
+    : undefined;
+
+const schritte =
+  d?.schritte?.titel && d.schritte.eintraege?.length
+    ? { titel: d.schritte.titel, eintraege: d.schritte.eintraege }
+    : undefined;
 ---
 
-<Base title={`${d.titel} - Mundpropaganda`} description={d.seoBeschreibung ?? d.hero.text}>
+{/* Jeder Abschnitt hängt an seinen eigenen Daten. Was das Dokument nicht
+    trägt, steht nicht da — das ist der ganze Unterschied zu vorher, wo eine
+    ungepflegte Leistung die Abschnitte einer anderen zeigte. */}
+<Base title={`${titel} - Mundpropaganda`} description={d?.seoBeschreibung ?? d?.hero?.text}>
   <ServiceHero
-    topline={d.topline}
-    titel={d.titel}
-    text={d.hero.text}
-    bild={d.hero.bild}
-    alt={d.hero.alt ?? ""}
+    topline={d?.topline}
+    titel={titel}
+    text={d?.hero?.text}
+    bild={d?.hero?.bild}
+    alt={d?.hero?.bild?.alt ?? ""}
   />
 
-  <Intro {...d.intro} />
+  {intro && <Intro {...intro} />}
 
-  <Benefits {...d.benefits} />
+  {benefits && <Benefits {...benefits} />}
 
-  {d.vorherNachher && <BeforeAfter {...d.vorherNachher} />}
+  {d?.vorherNachher?.topline && (
+    <BeforeAfter topline={d.vorherNachher.topline} vorher={d.vorherNachher.vorher} nachher={d.vorherNachher.nachher} />
+  )}
 
-  {d.statement && <Statement {...d.statement} />}
+  {statement && <Statement {...statement} />}
 
-  {d.schritte && <Steps titel={d.schritte.titel} schritte={d.schritte.eintraege} />}
+  {schritte && <Steps titel={schritte.titel} schritte={schritte.eintraege} />}
 
   <Stories eintraege={storiesEintraege} />
 
-  <Prices preise={d.preise} />
+  {d?.preise?.length ? <Prices preise={d.preise} /> : null}
 
-  {d.features && <Features zeilen={d.features} />}
+  {d?.features?.length ? <Features zeilen={d.features} /> : null}
 
   {/* Die Überschrift stand bis Aufgabe 4 fest im Baustein. Sie gehört hierher:
       Auf der Startseite kommt sie aus dem CMS, hier ist sie auf die Leistung
@@ -69,17 +110,11 @@ const { storiesEintraege } = await ladeStartseite();
   <Magazine
     topline="Passend zum Thema"
     titel="Magazin"
-    text={`Weiterlesen zu ${d.titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
+    text={`Weiterlesen zu ${titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
   />
 
-  <Faq titel={`Häufige Fragen zu ${d.titel}`} fragen={d.faq} />
+  {d?.faq?.length ? <Faq titel={`Häufige Fragen zu ${titel}`} fragen={d.faq} /> : null}
 
-  <Contact leistung={d.titel} />
-
-  {!ausCms && (
-    <p class="container t-mono" style="padding-block: 2rem; opacity:.5">
-      Beispieldaten - im Dataset „production" liegt noch kein Dokument vom Typ „leistung".
-    </p>
-  )}
+  <Contact leistung={titel} />
 </Base>
 

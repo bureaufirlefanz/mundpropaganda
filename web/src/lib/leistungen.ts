@@ -2,8 +2,6 @@ import { sanityClient } from "sanity:client";
 import { ohneNull, type OhneNull } from "./ohne-null";
 import type { LEISTUNG_QUERY_RESULT } from "./sanity.types";
 import { LEISTUNG_QUERY } from "./queries";
-import { beispielLeistung, type Leistung } from "./fixtures";
-import { istCmsBild } from "./bilder";
 import { ladeLeistungsliste } from "./leistungsliste";
 
 /**
@@ -20,112 +18,41 @@ export async function ladeSlugs(): Promise<{ params: { slug: string } }[]> {
 }
 
 /**
- * Solange im CMS keine Bilder gepflegt sind, treten die lokalen Motive ein.
- * Ohne das lieferte die Seite leere <img> aus — Text ist gepflegt, Bilder
- * sind es typischerweise erst später.
+ * Was die Abfrage liefert — und nichts darüber hinaus.
  *
- * Geprüft wird auf ein aufgelöstes Asset, nicht nur auf Vorhandensein: ein
- * Bildfeld, das im Studio angefasst und wieder geleert wurde, bleibt als
- * Objekt ohne `asset` stehen. Mit einer `??`-Prüfung galt das als gepflegtes
- * Bild, und der URL-Bauer bekäme nichts zu tun.
+ * Bis Aufgabe 4 stand hier `mitRueckfall()`: eine Funktion, die jedes fehlende
+ * Feld aus `beispielLeistung` auffüllte. Gedacht war sie als Netz für die
+ * Einrichtung, gewirkt hat sie als Etikettenschwindel — nur `veneers` ist
+ * gepflegt, und die zehn übrigen Seiten zeigten dadurch dessen Inhalt unter
+ * eigenem Namen. Auf `/leistungen/bleaching` stand „Was Veneers leisten",
+ * das Wort Veneers kam 31-mal vor, und darunter standen Veneers-Preise.
+ *
+ * Das ist kein CMS-Problem mehr, sondern eine falsche Aussage über eine
+ * Behandlung samt Preis. Der Rückfall ist deshalb ersatzlos weg: Ein
+ * Abschnitt, den das Dokument nicht trägt, erscheint nicht. Zehn Seiten sind
+ * seitdem dünn — sie waren es vorher auch, man sah es nur nicht.
+ *
+ * Die Bilder bleiben die bekannte Ausnahme: Ein leeres Bildfeld fällt weiter
+ * auf das gestaltete Motiv zurück. Das entscheidet der Baustein, nicht diese
+ * Datei — er kennt sein Motiv, die Datenschicht nicht.
  */
-/* Was aus dem CMS kommt, ist NICHT schon eine `Leistung` — es ist das, was
-   die Abfrage zurückgibt, und dort ist fast alles wahlfrei. Die Signatur
-   behauptete bis Aufgabe 1 das Gegenteil, obwohl der Rumpf mit `d.intro?.`
-   längst vom Gegenteil ausging. TypeGen macht daraus einen Vertrag, den man
-   nicht mehr versehentlich brechen kann. */
-type LeistungAusCms = NonNullable<OhneNull<LEISTUNG_QUERY_RESULT>>;
+export type Leistung = NonNullable<OhneNull<LEISTUNG_QUERY_RESULT>>;
 
-function mitRueckfall(d: LeistungAusCms): Leistung {
-  const b = beispielLeistung;
-
-  return {
-    ...d,
-    titel: d.titel || b.titel,
-    topline: d.topline || b.topline,
-
-    /* Abschnitt für Abschnitt, nicht nur die Handvoll, die das Schema noch
-       nicht kennt.
-
-       Der Grund ist ein Fehler, den der leere Datensatz lange verdeckt hat:
-       Sobald ein Leistungsdokument existiert, gilt `ausCms` — und dann kamen
-       die Abschnitte, die darin noch nicht gepflegt sind, als `undefined`
-       bei den Bausteinen an. `intro.spalten.map` brach den Build ab, sobald
-       die erste Leistung mit bloßen Grunddaten im CMS lag.
-
-       So ist die Pflege im Studio Feld für Feld möglich: Eine Leistung mit
-       nur Titel und Slug zeigt eine vollständige Seite, und jedes gefüllte
-       Feld übernimmt seinen Platz. */
-    hero: {
-      ...b.hero,
-      ...d.hero,
-      text: d.hero?.text || b.hero.text,
-      bild: istCmsBild(d.hero?.bild) ? d.hero.bild : b.hero.bild,
-    },
-
-    intro: {
-      topline: d.intro?.topline || b.intro.topline,
-      headline: d.intro?.headline || b.intro.headline,
-      spalten: d.intro?.spalten?.length ? d.intro.spalten : b.intro.spalten,
-    },
-
-    benefits: {
-      topline: d.benefits?.topline || b.benefits.topline,
-      headline: d.benefits?.headline || b.benefits.headline,
-      eintraege: (d.benefits?.eintraege?.length ? d.benefits.eintraege : b.benefits.eintraege).map(
-        (e, i) => ({
-          ...e,
-          bild: istCmsBild(e.bild)
-            ? e.bild
-            : b.benefits.eintraege[i % b.benefits.eintraege.length].bild,
-        })
-      ),
-    },
-
-    preise: d.preise?.length ? d.preise : b.preise,
-    faq: d.faq?.length ? d.faq : b.faq,
-
-    /* Abschnitte, die das Inhaltsmodell nicht kennt — und die die Abfrage
-       deshalb auch nicht auswählt.
-
-       Hier stand bis Aufgabe 1 `d.vorherNachher ?? b.vorherNachher` und so
-       fort, als könnte das CMS diese vier liefern. Konnte es nie: Weder das
-       Schema noch die Projektion in `queries.ts` enthalten sie. Die vier
-       Ausdrücke werteten bei jedem Aufruf zum Rückfall aus, und der
-       handgeschriebene Typparameter am Abruf ließ das wie Absicht aussehen.
-       TypeGen hat es in dem Moment aufgedeckt, in dem der Typ aus der
-       Abfrage kam statt aus der Behauptung.
-
-       Sie stehen jetzt als das da, was sie sind: fest, nicht gepflegt.
-       Wächst das Schema um dieselben Feldnamen, gewinnt es automatisch —
-       dann tauchen sie im erzeugten Typ auf, und diese Zeilen werden zur
-       Übernahme aus `d`. */
-    vorherNachher: b.vorherNachher,
-    statement: b.statement,
-    schritte: b.schritte,
-    features: b.features,
-  };
-}
-
-export async function ladeLeistung(slug: string): Promise<{ daten: Leistung; ausCms: boolean }> {
+/**
+ * Eine Leistung laden.
+ *
+ * `undefined`, wenn es zum Slug kein Dokument gibt. Der Fall ist echt: Die
+ * Seiten entstehen aus der Liste, und die Liste kommt aus derselben
+ * Collection — ein Slug ohne Dokument kann also nur eine Leistung sein, die
+ * zwischen Listenabfrage und Detailabfrage verschwunden ist. Die Seite zeigt
+ * dann ihren Titel aus der Liste und sonst nichts Erfundenes.
+ */
+export async function ladeLeistung(slug: string): Promise<Leistung | undefined> {
   try {
-    const daten = ohneNull(await sanityClient.fetch(LEISTUNG_QUERY, { slug }));
-    if (daten) return { daten: mitRueckfall(daten), ausCms: true };
+    return ohneNull(await sanityClient.fetch(LEISTUNG_QUERY, { slug })) ?? undefined;
   } catch {
-    // s. o.
+    /* Ist das CMS nicht erreichbar, soll die Seite sichtbar leer sein und
+       nicht mit fremdem Inhalt gefüllt. */
+    return undefined;
   }
-
-  /* Kein Dokument zu diesem Slug — die Beispieldaten tragen die Seite. Den
-     Namen aber aus der Liste übernehmen: sonst stünde über jeder ungepflegten
-     Leistung „Veneers", und alle Seiten sähen identisch aus.
-
-     Als Überschrift der ausgeschriebene Name, in der Topline der kurze: „CMD
-     mit Botoxbehandlung und elektronischer Kiefergelenksvermessung in Berlin"
-     wäre als Topline unlesbar. */
-  const eintrag = (await ladeLeistungsliste()).find((l) => l.slug === slug);
-  const daten = eintrag
-    ? { ...beispielLeistung, titel: eintrag.titel ?? eintrag.name, topline: `${eintrag.name} in Berlin` }
-    : beispielLeistung;
-
-  return { daten, ausCms: false };
 }

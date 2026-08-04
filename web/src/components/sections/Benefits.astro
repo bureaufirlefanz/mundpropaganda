@@ -4,10 +4,24 @@
  * die Inhalte kommen jetzt aus der Datenschicht. Die data-Attribute bleiben
  * erhalten, dadurch greift standards.js ohne Anpassung.
  */
-import type { Eintrag } from "../../lib/fixtures";
+import type { Eintrag } from "../../lib/formen";
 import CmsImage from "../ui/CmsImage.astro";
+import { istCmsBild } from "../../lib/bilder";
+
 interface Props { topline: string; headline: string; eintraege: Eintrag[] }
 const { topline, headline, eintraege } = Astro.props;
+
+/* Klasse 3: die gestalteten Motive, positionsgenau. Sie kamen bis Aufgabe 4
+   aus `mitRueckfall` in der Datenschicht — dort waren sie falsch aufgehoben,
+   weil die Datenschicht die Motive eines Bausteins nicht kennen muss. Jetzt
+   stehen sie neben dem Markup, das sie zeigt.
+   Über den Index und modulo: Ohne das trüge jeder Punkt dasselbe Bild, und
+   der Wechsel beim Aufklappen wäre nicht zu sehen. */
+const MOTIVE = [
+  "/img/treatment-01-1600.webp",
+  "/img/lab-veneers-1024.webp",
+  "/img/teeth-macro-1024.webp",
+];
 ---
 
 <section class="s-benefits" data-standards>
@@ -35,8 +49,8 @@ const { topline, headline, eintraege } = Astro.props;
         {/* Alle Motive liegen übereinander, sichtbar ist immer genau eines —
             das Modul blendet um. Deshalb ohne Alternativtext: die Bühne
             trägt keine eigene Information, der Text steht in der Liste. */}
-        {eintraege.map((e) => (
-          <CmsImage quelle={e.bild} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
+        {eintraege.map((e, i) => (
+          <CmsImage quelle={istCmsBild(e.bild) ? e.bild : MOTIVE[i % MOTIVE.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
         ))}
       </div>
     </div>
