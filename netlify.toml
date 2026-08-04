@@ -1,13 +1,14 @@
 # Veröffentlichung des Astro-Stands als statische Seite.
 #
-# Der Prototyp in `src/` bleibt außen vor — live geht `web/`. Beide teilen
-# sich CSS und JS über `vite.server.fs.allow`, deshalb muss der Build vom
-# Projektstamm aus laufen und nicht aus `web/` heraus: Sonst liegt `src/`
-# außerhalb des Wurzelverzeichnisses und die Einbindungen brechen.
+# `web/` ist in sich geschlossen: Tokens, Basis-CSS und die Module liegen seit
+# A2 darin, nicht mehr im Prototyp an der Wurzel. Der Build braucht deshalb
+# nichts oberhalb von `base` — hier stand vorher die umgekehrte Begründung,
+# und die galt genau bis zu diesem Umzug.
 
 [build]
-  command = "npm --prefix web run build"
-  publish = "web/dist"
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"

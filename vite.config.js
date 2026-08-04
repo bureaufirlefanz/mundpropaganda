@@ -11,6 +11,12 @@ const root = dirname(fileURLToPath(import.meta.url));
  * zusammenstecken lassen — genau der Zweck dieses Prototyps.
  */
 export default defineConfig({
+  /* Die statischen Dateien liegen seit A2 beim Produkt, nicht mehr an der
+     Wurzel. Ohne diese Zeile suchte Vite sie unter `./public` und lieferte
+     kein einziges Bild aus. Genau die Richtung ist gewollt: Das Produkt
+     besitzt sein Fundament, der Prototyp leiht es sich. */
+  publicDir: resolve(root, "web/public"),
+
   plugins: [
     handlebars({
       partialDirectory: resolve(root, "src/partials"),

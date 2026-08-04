@@ -1,5 +1,5 @@
 /**
- * Bild-Pipeline: Figma-Exports → responsive WebP/AVIF in public/img.
+ * Bild-Pipeline: Figma-Exports → responsive WebP/AVIF in web/public/img.
  *
  * Aufruf: npm run images
  * Quelle: assets/raw/<semantischer-name>.png
@@ -13,7 +13,7 @@ import { readdir, mkdir, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
 
 const SRC = "assets/raw";
-const OUT = "public/img";
+const OUT = "web/public/img";
 const WIDTHS = [640, 1024, 1600, 2200];
 
 /* Große Flächenbilder brauchen mehr Breiten als kleine Karten. */

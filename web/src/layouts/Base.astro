@@ -11,8 +11,8 @@
  * Astro grenzt sie dort ab, dadurch kann keine Section mehr in eine andere
  * hineinschreiben. Wer eine Regel sucht, findet sie neben ihrem Markup.
  */
-import "../../../src/styles/tokens.css";
-import "../../../src/styles/base.css";
+import "../styles/tokens.css";
+import "../styles/base.css";
 import "../styles/shared.css";
 
 import Icons from "../components/ui/Icons.astro";
@@ -86,8 +86,8 @@ const { title, description = "" } = Astro.props;
     <Footer />
 
     <script>
-      import { init } from "../../../src/js/init.js";
-      import { gsap, ScrollTrigger } from "../../../src/js/lib/gsap.js";
+      import { init } from "../js/init.js";
+      import { gsap, ScrollTrigger } from "../js/lib/gsap.js";
 
       /* Bei einem Seitenwechsel tauscht der Router nur den Inhalt aus — die
          Module müssen danach erneut anlaufen, sonst sind Reveals, Kartendeck

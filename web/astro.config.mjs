@@ -12,11 +12,12 @@ const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET } = loadEnv(
 );
 
 // Kein Framework-Adapter: die Seite ist statisch, die Interaktion läuft über
-// dieselben vanilla-Module wie im Prototyp. Astro liefert damit null
-// Framework-JavaScript aus.
+// vanilla-Module. Astro liefert damit null Framework-JavaScript aus.
 //
-// fs.allow zeigt auf den Prototyp daneben: CSS und JS werden von dort
-// eingebunden statt kopiert, damit beide Stände nicht auseinanderlaufen.
+// Kein `vite.server.fs.allow` mehr: Es stand hier, solange Tokens, Basis-CSS
+// und die Module aus dem Prototyp an der Wurzel eingebunden wurden. Seit A2
+// liegen sie unter `src/styles/` und `src/js/` in diesem Ordner — der Zugriff
+// nach oben ist damit weder nötig noch erwünscht.
 export default defineConfig({
   output: "static",
   integrations: [
@@ -30,7 +31,4 @@ export default defineConfig({
       // studioBasePath, sonst würde es in die Auslieferung eingebettet.
     }),
   ],
-  vite: {
-    server: { fs: { allow: [".."] } },
-  },
 });

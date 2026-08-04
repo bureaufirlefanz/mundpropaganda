@@ -15,8 +15,8 @@
  * Das Skriptbündel läuft mit — die Beispiele sollen sich bewegen wie im
  * Einsatz, nicht als tote Bilder dastehen.
  */
-import "../../../src/styles/tokens.css";
-import "../../../src/styles/base.css";
+import "../styles/tokens.css";
+import "../styles/base.css";
 import "../styles/shared.css";
 import Icons from "../components/ui/Icons.astro";
 
@@ -64,7 +64,7 @@ const SEITEN = [
     <main class="d-haupt"><slot /></main>
 
     <script>
-      import { init } from "../../../src/js/init.js";
+      import { init } from "../js/init.js";
       init();
     </script>
 
