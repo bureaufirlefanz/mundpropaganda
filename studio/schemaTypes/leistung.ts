@@ -142,16 +142,19 @@ export const leistung = defineType({
       type: "object",
       group: "inhalt",
       options: { collapsible: true, collapsed: true },
+      /* Wahlfrei, aber nicht halb: Der Abschnitt darf fehlen — wer ihn
+         anlegt, füllt ihn auch. Eine Überschrift ohne Text wäre die halbe
+         Wahrheit statt keiner. Dasselbe gilt für Benefits darunter. */
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string" }),
-        defineField({ name: "headline", title: "Überschrift", type: "string" }),
+        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
+        defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
         defineField({
           name: "spalten",
           title: "Textspalten",
           description: "Genau zwei - die Section ist zweispaltig angelegt.",
           type: "array",
           of: [defineArrayMember({ type: "text", rows: 5 })],
-          validation: (rule) => rule.max(2),
+          validation: (rule) => rule.required().max(2),
         }),
       ],
     }),
@@ -163,8 +166,8 @@ export const leistung = defineType({
       group: "inhalt",
       options: { collapsible: true, collapsed: true },
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string" }),
-        defineField({ name: "headline", title: "Überschrift", type: "string" }),
+        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
+        defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
         defineField({
           name: "eintraege",
           title: "Einträge",
@@ -192,7 +195,7 @@ export const leistung = defineType({
               preview: { select: { title: "name", media: "bild" } },
             }),
           ],
-          validation: (rule) => rule.min(2).max(5),
+          validation: (rule) => rule.required().min(2).max(5),
         }),
       ],
     }),
