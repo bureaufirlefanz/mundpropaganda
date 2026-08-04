@@ -1,21 +1,22 @@
 /**
- * Erzeugt die Seed-Datei aus dem, was die Seite heute zeigt.
+ * Der einmalige Umzug der Inhalte aus dem Code ins CMS — Aufgabe 4.
  *
- * Aufruf:  node studio/seed/erzeuge.mjs > studio/seed/inhalte.ndjson
+ * ── ERLEDIGT. Dieses Skript läuft nicht mehr. ────────────────────────────
  *
- * ── Was sich mit Aufgabe 4 geändert hat ──────────────────────────────────
+ * Es hat die Vorgabewerte aus den Frontmatter-Blöcken der Bausteine gelesen
+ * und daraus `leistungen.ndjson` und `seiten.ndjson` erzeugt. Genau diese
+ * Vorgaben gibt es seit Aufgabe 4 nicht mehr: Die Bausteine bekommen ihren
+ * Text von der Seite, die Seite aus dem CMS. Ein Aufruf endet deshalb mit
+ * „Vorgabe nicht gefunden", und das ist richtig so.
  *
- * Der Seed war bis dahin bis auf die Kennungen LEER, mit der Begründung: Was
- * hier stünde, wäre eine Kopie des Textes in den Bausteinen, und die Kopie
- * veraltet. Das galt, solange der eingebaute Text die Seite trug.
+ * Es bleibt liegen, weil es belegt, WOHER der Startbestand stammt — nicht
+ * abgetippt, sondern aus dem Stand gelesen, den die Seite an dem Tag zeigte.
+ * Die beiden .ndjson-Dateien daneben sind das Ergebnis und ab jetzt die
+ * Quelle; wer den Datensatz neu aufsetzen muss, spielt sie ein (siehe
+ * README.md).
  *
- * Mit Aufgabe 4 trägt ihn das CMS. Damit dreht sich die Lage um: Der Seed ist
- * nicht mehr die zweite Kopie, sondern der Umzug der ersten. Danach gibt es
- * keinen zweiten Ort mehr, von dem er abweichen könnte.
- *
- * Gelesen wird aus den Quelldateien, nicht abgetippt. Ein abgetippter Seed
- * hätte genau einen Tippfehler, und den fände niemand — er sähe aus wie eine
- * Textentscheidung.
+ * Wer den Umzug nachvollziehen will, findet den lauffähigen Stand im Commit
+ * „Aufgabe 4, erste Hälfte: der Inhalt liegt jetzt im CMS".
  */
 import { readFileSync } from "node:fs";
 
@@ -153,6 +154,9 @@ zeilen.push({
     .map(schluessel("story")),
 
   magazinTopline: vorgabe(magazine, "topline"),
+  /* Stand bis Aufgabe 4 fest im Markup, obwohl es das Feld gab — der Kunde
+     konnte es füllen, ohne dass sich etwas änderte. */
+  magazinTitel: "Magazin",
   magazinText: vorgabe(magazine, "text"),
 
   faqTitel: "Häufige Fragen",

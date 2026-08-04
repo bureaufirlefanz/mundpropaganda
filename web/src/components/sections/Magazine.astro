@@ -7,15 +7,16 @@ import Picture from "../ui/Picture.astro";
  * allgemein, auf einer Leistungsseite auf sie bezogen.
  */
 interface Props {
-  topline?: string;
-  titel?: string;
-  text?: string;
+  topline: string;
+  titel: string;
+  text: string;
 }
 
-const {
-  topline = "Guides",
-  text = "Was wir sonst am Stuhl erklären, steht hier zum Nachlesen: Behandlungen, Materialien und die Fragen, die uns am häufigsten gestellt werden - ohne Fachjargon und ohne Verkaufsabsicht.",
-} = Astro.props;
+/* Keine Vorgaben mehr: Die drei Felder sind im Schema Pflicht, die Seite
+   reicht sie durch. Eine Vorgabe hier wäre der stille Rückfall, den
+   Aufgabe 4 abgeschafft hat — der Kunde löschte die Zeile und sähe sie
+   weiter stehen. */
+const { topline, titel, text } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -37,7 +38,7 @@ const {
             </div>
 
             <div class="s-magazine__intro">
-              <h2 class="s-magazine__title" data-split="lines">Magazin</h2>
+              <h2 class="s-magazine__title" data-split="lines">{titel}</h2>
               <p data-reveal="up" data-reveal-delay="0.08">{text}</p>
             </div>
           </div>

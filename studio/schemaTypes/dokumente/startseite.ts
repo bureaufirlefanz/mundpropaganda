@@ -29,11 +29,27 @@ const gruppen = [
 ];
 
 /** Überschrift + Zusatzzeilen, wie sie fast jeder Abschnitt braucht. */
+/* Topline und Überschrift tragen ihren Abschnitt — ohne sie beginnt er ohne
+   Ansage. Beide sind deshalb Pflicht (Klasse 1). Bis Aufgabe 4 waren sie
+   wahlfrei, und ein geleertes Feld fiel still auf den Text im Baustein
+   zurück; der Kunde löschte eine Überschrift und sah sie weiter stehen. */
 const kopf = (gruppe: string, mitTopline = true) =>
   [
     mitTopline &&
-      defineField({ name: `${gruppe}Topline`, title: "Topline", type: "string", group: gruppe }),
-    defineField({ name: `${gruppe}Titel`, title: "Überschrift", type: "string", group: gruppe }),
+      defineField({
+        name: `${gruppe}Topline`,
+        title: "Topline",
+        type: "string",
+        group: gruppe,
+        validation: (r) => r.required(),
+      }),
+    defineField({
+      name: `${gruppe}Titel`,
+      title: "Überschrift",
+      type: "string",
+      group: gruppe,
+      validation: (r) => r.required(),
+    }),
   ].filter(Boolean) as ReturnType<typeof defineField>[];
 
 export const startseite = defineType({
@@ -53,6 +69,7 @@ export const startseite = defineType({
         "Die beiden kleinen Blöcke links und rechts unter der Wortmarke. Zeilenumbrüche bleiben erhalten. Genau zwei Einträge.",
       validation: (r) => r.max(2),
       group: "hero",
+      validation: (r) => r.required(),
     }),
 
     /* --- Über uns ------------------------------------------------------- */
@@ -63,6 +80,7 @@ export const startseite = defineType({
       type: "array",
       of: [{ type: "text", rows: 5 }],
       group: "split",
+      validation: (r) => r.required(),
     }),
     defineField({ name: "splitBild", title: "Bild", type: "bild", group: "split" }),
 
@@ -73,6 +91,7 @@ export const startseite = defineType({
       type: "string",
       description: "Die Leistungen selbst kommen aus der Collection „Leistungen“ - hier steht nur der Rahmen.",
       group: "services",
+      validation: (r) => r.required(),
     }),
     defineField({
       name: "servicesZusatz",
@@ -122,6 +141,7 @@ export const startseite = defineType({
       type: "string",
       description: "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Seitenfuß.",
       group: "standorte",
+      validation: (r) => r.required(),
     }),
     defineField({
       name: "standorteBilder",
@@ -144,7 +164,7 @@ export const startseite = defineType({
     /* --- Team ----------------------------------------------------------- */
     ...kopf("experten", false),
     defineField({ name: "expertenText", title: "Text", type: "text", rows: 4, group: "experten" }),
-    defineField({ name: "expertenNamen", title: "Namenszeile", type: "string", group: "experten" }),
+    defineField({ name: "expertenNamen", title: "Namenszeile", type: "string", group: "experten", validation: (r) => r.required() }),
     defineField({ name: "expertenBild", title: "Bild", type: "bild", group: "experten" }),
 
     /* --- Geschichten ---------------------------------------------------- */
@@ -170,10 +190,10 @@ export const startseite = defineType({
 
     /* --- Magazin -------------------------------------------------------- */
     ...kopf("magazin"),
-    defineField({ name: "magazinText", title: "Zusatzzeile", type: "text", rows: 3, group: "magazin" }),
+    defineField({ name: "magazinText", title: "Zusatzzeile", type: "text", rows: 3, group: "magazin", validation: (r) => r.required() }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitel", title: "Überschrift", type: "string", group: "faq" }),
+    defineField({ name: "faqTitel", title: "Überschrift", type: "string", group: "faq", validation: (r) => r.required() }),
     defineField({ name: "faqText", title: "Zusatzzeile", type: "text", rows: 2, group: "faq" }),
     defineField({
       name: "faq",

@@ -54,8 +54,12 @@ const { daten: d, ausCms } = await ladeLeistung(slug!);
 
   {d.features && <Features zeilen={d.features} />}
 
+  {/* Die Überschrift stand bis Aufgabe 4 fest im Baustein. Sie gehört hierher:
+      Auf der Startseite kommt sie aus dem CMS, hier ist sie auf die Leistung
+      bezogen und damit Sache der Seite. */}
   <Magazine
     topline="Passend zum Thema"
+    titel="Magazin"
     text={`Weiterlesen zu ${d.titel} und allem, was damit zusammenhängt: Materialien, Haltbarkeit und die Fragen, die uns dazu am häufigsten gestellt werden.`}
   />
 
