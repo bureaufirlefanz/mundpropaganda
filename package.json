@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "proto:dev": "vite --config prototypen/vite/vite.config.js",
+    "proto:build": "vite build --config prototypen/vite/vite.config.js",
+    "proto:preview": "vite preview --config prototypen/vite/vite.config.js",
     "images": "node scripts/optimize-images.mjs",
     "shots": "node scripts/shots.mjs",
     "intro": "node scripts/intro.mjs",

@@ -11,11 +11,16 @@ const root = dirname(fileURLToPath(import.meta.url));
  * zusammenstecken lassen — genau der Zweck dieses Prototyps.
  */
 export default defineConfig({
-  /* Die statischen Dateien liegen seit A2 beim Produkt, nicht mehr an der
-     Wurzel. Ohne diese Zeile suchte Vite sie unter `./public` und lieferte
-     kein einziges Bild aus. Genau die Richtung ist gewollt: Das Produkt
-     besitzt sein Fundament, der Prototyp leiht es sich. */
-  publicDir: resolve(root, "web/public"),
+  /* Ausdrücklich gesetzt, weil die Konfiguration nicht mehr im
+     Arbeitsverzeichnis liegt: Aufgerufen wird sie vom Projektstamm aus über
+     `--config`, und Vite nähme sonst den Stamm als Wurzel. */
+  root,
+
+  /* Die statischen Dateien liegen seit A2 beim Produkt. Ohne diese Zeile
+     suchte Vite sie unter `./public` und lieferte kein einziges Bild aus.
+     Genau die Richtung ist gewollt: Das Produkt besitzt sein Fundament, der
+     Prototyp leiht es sich. */
+  publicDir: resolve(root, "../../web/public"),
 
   plugins: [
     handlebars({
@@ -69,5 +74,11 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
+
+    /* Erlaubt den Zugriff auf `web/src/…` oberhalb der Wurzel — dort liegen
+       Tokens, Basis-CSS und die Module, die `src/js/main.js` einbindet. In
+       der Astro-Konfiguration stand bis A2 dieselbe Zeile mit umgekehrter
+       Blickrichtung; dort ist sie entfallen, hier ist sie richtig. */
+    fs: { allow: [resolve(root, "../..")] },
   },
 });
