@@ -1,0 +1,136 @@
+---
+/**
+ * Das Inhaltsverzeichnis neben einem Beitrag.
+ *
+ * Steht klebend in der linken Spalte und hebt hervor, in welchem Abschnitt
+ * man gerade liest. Die Hervorhebung setzt `js/modules/toc.js`; ohne
+ * JavaScript bleibt eine gewöhnliche Liste aus Sprungmarken stehen, und die
+ * funktioniert vollständig — deshalb liegt hier kein verborgener
+ * Startzustand.
+ *
+ * Ab drei Zwischentiteln lohnt es sich. Bei zweien ist es kein Verzeichnis,
+ * sondern eine Dopplung der Überschriften, die man ohnehin beim Scrollen
+ * sieht; darüber entscheidet der Aufrufer.
+ */
+import type { Marke } from "../../lib/inhaltsverzeichnis";
+
+interface Props {
+  marken: Marke[];
+  titel?: string;
+}
+
+const { marken, titel = "Inhalt" } = Astro.props;
+---
+
+<nav class="c-toc" aria-labelledby="toc-titel" data-toc>
+  <p class="c-toc__kopf" id="toc-titel">{titel}</p>
+
+  <ol class="c-toc__liste">
+    {marken.map((m) => (
+      <li class:list={["c-toc__punkt", m.ebene === 3 && "c-toc__punkt--tief"]}>
+        <a class="c-toc__link" href={`#${m.id}`} data-toc-link={m.id}>
+          <span class="c-toc__strich" aria-hidden="true"></span>
+          <span class="c-toc__text">{m.text}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  /* Klebt mit Abstand zur Navigationsleiste. Die eigene Höhe ist gedeckelt
+     und scrollt selbst — ein Beitrag mit fünfzehn Zwischentiteln schöbe das
+     Verzeichnis sonst unten aus dem Bild. */
+  .c-toc {
+    position: sticky;
+    top: calc(var(--nav-hoehe, 96px) + var(--sp-6));
+    max-height: calc(100vh - var(--nav-hoehe, 96px) - var(--sp-10));
+    overflow-y: auto;
+    /* Die Bildlaufleiste des Verzeichnisses gehört nicht ins Bild. */
+    scrollbar-width: none;
+  }
+
+  .c-toc::-webkit-scrollbar {
+    display: none;
+  }
+
+  .c-toc__kopf {
+    margin-bottom: var(--sp-4);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .c-toc__liste {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    list-style: none;
+  }
+
+  .c-toc__punkt--tief {
+    padding-left: var(--sp-4);
+  }
+
+  .c-toc__link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    padding-block: 2px;
+    font-size: var(--fs-text-small);
+    line-height: 1.35;
+    color: var(--c-text-muted);
+    transition:
+      color var(--d-base) var(--e-out),
+      opacity var(--d-base) var(--e-out);
+  }
+
+  /* Der Strich ist die eigentliche Anzeige. Er wächst, statt dass die Farbe
+     springt — bei einer Liste aus zehn Zeilen liest sich eine wandernde
+     Länge ruhiger als zehnmal Hell/Dunkel. */
+  .c-toc__strich {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 1px;
+    translate: 0 -4px;
+    background: currentColor;
+    opacity: 0.5;
+    transition:
+      width var(--d-base) var(--e-out),
+      opacity var(--d-base) var(--e-out);
+  }
+
+  .c-toc__link[aria-current="true"] {
+    color: var(--c-text);
+  }
+
+  .c-toc__link[aria-current="true"] .c-toc__strich {
+    width: 24px;
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .c-toc__link:hover {
+      color: var(--c-text);
+    }
+  }
+
+  /* Unter der zweispaltigen Schwelle liegt das Verzeichnis über dem Text.
+     Dann klebt es nicht — ein klebender Kasten quer über dem Satzspiegel
+     nähme auf einem Telefon ein Drittel der Höhe. */
+  @media (max-width: 1000px) {
+    .c-toc {
+      position: static;
+      max-height: none;
+      padding-bottom: var(--sp-6);
+      border-bottom: var(--bw) solid var(--c-line);
+    }
+
+    .c-toc__liste {
+      gap: 0;
+    }
+  }
+</style>

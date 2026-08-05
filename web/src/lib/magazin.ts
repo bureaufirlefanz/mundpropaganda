@@ -5,7 +5,12 @@ import type {
   BEITRAG_QUERY_RESULT,
   MAGAZIN_INDEX_QUERY_RESULT,
 } from "./sanity.types";
-import { BEITRAEGE_QUERY, BEITRAG_QUERY, MAGAZIN_INDEX_QUERY } from "./queries";
+import {
+  BEITRAEGE_QUERY,
+  BEITRAG_QUERY,
+  MAGAZIN_INDEX_QUERY,
+  AEHNLICHE_QUERY,
+} from "./queries";
 
 /**
  * Die Magazinbeiträge.
@@ -70,6 +75,23 @@ export async function ladeBeitrag(slug: string): Promise<BeitragVoll | undefined
     return ohneNull(await sanityClient.fetch(BEITRAG_QUERY, { slug })) ?? undefined;
   } catch {
     return undefined;
+  }
+}
+
+/**
+ * Bis zu drei Beiträge aus derselben Kategorie.
+ *
+ * Ohne Kategorie am Ausgangsbeitrag gibt es nichts Ähnliches — dann bleibt
+ * die Liste leer und der Abschnitt entfällt. Kein Auffüllen mit den neuesten
+ * Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches steht, ist
+ * dieselbe stille Behauptung, die Aufgabe 4 überall abgeräumt hat.
+ */
+export async function ladeAehnliche(kategorie?: string, slug?: string): Promise<Beitrag[]> {
+  if (!kategorie || !slug) return [];
+  try {
+    return ohneNull(await sanityClient.fetch(AEHNLICHE_QUERY, { kategorie, slug })) ?? [];
+  } catch {
+    return [];
   }
 }
 

@@ -3,7 +3,7 @@
  * Eine Route für alle Beiträge. Daten laden, Renderer aufrufen.
  */
 import Beitrag from "../../seiten/Beitrag.astro";
-import { ladeBeitrag, ladeBeitraege } from "../../lib/magazin";
+import { ladeBeitrag, ladeBeitraege, ladeAehnliche } from "../../lib/magazin";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
@@ -15,6 +15,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { titel } = Astro.props;
 const daten = await ladeBeitrag(slug!);
+const aehnliche = await ladeAehnliche(daten?.kategorie, slug);
 ---
 
-<Beitrag daten={daten} titel={daten?.titel || titel || ""} />
+<Beitrag daten={daten} titel={daten?.titel || titel || ""} aehnliche={aehnliche} />

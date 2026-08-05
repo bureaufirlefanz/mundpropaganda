@@ -1,0 +1,23 @@
+---
+/**
+ * Ein Zwischentitel im Fließtext — mit Sprungmarke.
+ *
+ * Ersetzt die eingebauten h2/h3 von astro-portabletext. Der einzige
+ * Unterschied ist das `id`, und das wird hier nicht berechnet, sondern
+ * gelesen: `mitKennungen()` hat es vorher an den Block geschrieben, aus
+ * derselben Liste, aus der auch das Inhaltsverzeichnis entsteht. Zwei
+ * Stellen, die dieselbe Kennung berechnen, laufen auseinander.
+ */
+import type { Block } from "astro-portabletext/types";
+
+interface Props {
+  /** Der Block, wie ihn `mitKennungen()` durchgereicht hat. */
+  node: Block & { _tocId?: string };
+}
+
+const { node } = Astro.props;
+const id = node._tocId;
+const Tag = node.style === "h3" ? "h3" : "h2";
+---
+
+<Tag id={id} data-toc-ziel={id}><slot /></Tag>

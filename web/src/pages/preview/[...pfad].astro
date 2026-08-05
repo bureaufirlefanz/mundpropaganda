@@ -42,6 +42,7 @@ import {
   STELLEN_QUERY,
   LEISTUNGSLISTE_QUERY,
   RECHTSTEXT_QUERY,
+  AEHNLICHE_QUERY,
 } from "../../lib/queries";
 import { ohneNull } from "../../lib/ohne-null";
 import type { StartseiteInhalt } from "../../lib/startseite";
@@ -121,7 +122,15 @@ if (ziel.art === "startseite") {
   inhalt = { ...inhalt, magazinKopf: kopf, beitraege: beitraege ?? [] };
 } else if (ziel.art === "beitrag") {
   const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: ziel.slug });
-  inhalt = { ...inhalt, beitrag: daten, titel: daten?.titel ?? "" };
+  /* Erst nach dem Beitrag, nicht parallel: Die Kategorie steht in ihm, und
+     ohne sie gibt es nichts Ähnliches zu holen. */
+  const aehnliche = daten?.kategorie
+    ? ((await hole<BeitragKarte[]>(AEHNLICHE_QUERY, {
+        kategorie: daten.kategorie,
+        slug: ziel.slug,
+      })) ?? [])
+    : [];
+  inhalt = { ...inhalt, beitrag: daten, titel: daten?.titel ?? "", beitraege: aehnliche };
 } else if (ziel.art === "rechtstext") {
   const daten = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: ziel.slug });
   /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
@@ -154,7 +163,9 @@ if (ziel.art === "startseite") {
   <Magazin kopf={inhalt.magazinKopf} beitraege={inhalt.beitraege} />
 )}
 
-{ziel.art === "beitrag" && <Beitrag daten={inhalt.beitrag} titel={inhalt.titel} />}
+{ziel.art === "beitrag" && (
+  <Beitrag daten={inhalt.beitrag} titel={inhalt.titel} aehnliche={inhalt.beitraege} />
+)}
 
 {ziel.art === "karriere" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
 

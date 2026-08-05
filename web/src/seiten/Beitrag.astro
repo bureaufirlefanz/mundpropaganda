@@ -2,28 +2,46 @@
 /**
  * Der Zusammenbau einer Beitragsseite.
  *
+ * Drei Teile: ein großes Kopfbild, darunter der Text mit dem
+ * Inhaltsverzeichnis daneben, und am Fuß Beiträge aus derselben Kategorie.
+ *
  * Der Fließtext ist Portable Text und wird mit `astro-portabletext`
  * gerendert. Die Bausteine dafür sind knapp gehalten, weil das Schema die
  * Auswahl schon begrenzt: Absatz, Zwischentitel, Unterpunkt und Bild. Kein
- * h1 — den setzt diese Seite.
+ * h1 — den setzt diese Seite. Die Zwischentitel laufen über `TextTitel`,
+ * damit sie eine Sprungmarke bekommen; alles andere bleibt, wie es war.
  */
 import { PortableText } from "astro-portabletext";
 import Base from "../layouts/Base.astro";
 import Contact from "../components/sections/Contact.astro";
 import CmsImage from "../components/ui/CmsImage.astro";
+import Picture from "../components/ui/Picture.astro";
 import Button from "../components/ui/Button.astro";
+import PostKarte from "../components/ui/PostKarte.astro";
+import Inhaltsverzeichnis from "../components/ui/Inhaltsverzeichnis.astro";
+import TextTitel from "../components/ui/TextTitel.astro";
 import { istCmsBild } from "../lib/bilder";
-import { kategorieText, datumText, type BeitragVoll } from "../lib/magazin";
+import { markenAus, mitKennungen } from "../lib/inhaltsverzeichnis";
+import { kategorieText, datumText, type Beitrag, type BeitragVoll } from "../lib/magazin";
 
 interface Props {
   daten: BeitragVoll | undefined;
   /** Aus der Liste, falls das Dokument fehlt. */
   titel: string;
+  /** Beiträge derselben Kategorie. Leer, wenn es keine gibt. */
+  aehnliche?: Beitrag[];
 }
 
-const { daten: d, titel } = Astro.props;
+const { daten: d, titel, aehnliche = [] } = Astro.props;
 
 const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
+
+/* Ab drei Zwischentiteln lohnt sich ein Verzeichnis. Bei zweien ist es keine
+   Orientierung, sondern eine Dopplung der Überschriften, die man beim
+   Scrollen ohnehin sieht — und es nähme die halbe linke Spalte ein. */
+const marken = markenAus(d?.text);
+const zeigeToc = marken.length >= 3;
+const bloecke = mitKennungen(d?.text, marken);
 ---
 
 <Base
@@ -32,53 +50,136 @@ const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
   nichtIndexieren={d?.seo?.nichtIndexieren}
 >
   <article class="s-beitrag">
-    <header class="container s-beitrag__kopf">
-      <div class="s-beitrag__meta">
-        {d?.kategorie && <span class="c-topline">{kategorieText(d.kategorie)}</span>}
-        {d?.datum && <time datetime={d.datum}>{datumText(d.datum)}</time>}
+    {/* --- Kopf: Bild über die volle Breite, Titel darauf ----------------- */}
+    <header class="s-beitrag__kopf">
+      <div class="s-beitrag__kopfbild">
+        {istCmsBild(d?.vorschaubild) ? (
+          <CmsImage
+            quelle={d.vorschaubild}
+            alt=""
+            widths={[640, 1024, 1600, 2200]}
+            sizes="100vw"
+            eager
+          />
+        ) : (
+          <Picture name="teeth-macro" alt="" sizes="100vw" eager />
+        )}
       </div>
 
-      <h1 class="s-beitrag__titel" data-split="lines">{titel}</h1>
-      {d?.einleitung && <p class="s-beitrag__lead" data-reveal="up">{d.einleitung}</p>}
+      <div class="container s-beitrag__kopftext">
+        <div class="s-beitrag__meta">
+          {d?.kategorie && <span class="c-topline">{kategorieText(d.kategorie)}</span>}
+          {d?.datum && <time datetime={d.datum}>{datumText(d.datum)}</time>}
+        </div>
+        <h1 class="s-beitrag__titel" data-split="lines">{titel}</h1>
+        {d?.einleitung && <p class="s-beitrag__lead" data-reveal="up">{d.einleitung}</p>}
+      </div>
     </header>
 
-    {istCmsBild(d?.vorschaubild) && (
-      <div class="container s-beitrag__bild" data-reveal="scale">
-        <CmsImage quelle={d.vorschaubild} alt="" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 80vw" eager />
-      </div>
-    )}
-
+    {/* --- Satz: Verzeichnis links, Text rechts --------------------------- */}
     {d?.text && (
-      <div class="container s-beitrag__text" data-reveal="up">
-        <PortableText value={d.text} />
-      </div>
-    )}
+      <div class:list={["container", "s-beitrag__satz", zeigeToc && "s-beitrag__satz--mit-toc"]}>
+        {zeigeToc && (
+          <aside class="s-beitrag__seite">
+            <Inhaltsverzeichnis marken={marken} />
+          </aside>
+        )}
 
-    {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist. Das ist
-        der Gewinn der Referenz im Schema: Sie trägt in beide Richtungen — die
-        Leistungsseite zeigt passende Beiträge, der Beitrag führt zurück. */}
-    {d?.leistung?.slug && (
-      <div class="container s-beitrag__zurueck">
-        <Button label={`Zur Leistung: ${d.leistung.titel}`} href={`/leistungen/${d.leistung.slug}`} variant="dark" />
+        <div class="s-beitrag__text" data-toc-bereich>
+          <PortableText
+            value={bloecke}
+            components={{
+              block: {
+                h2: TextTitel,
+                h3: TextTitel,
+              },
+            }}
+          />
+
+          {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist.
+              Das ist der Gewinn der Referenz im Schema: Sie trägt in beide
+              Richtungen — die Leistungsseite zeigt passende Beiträge, der
+              Beitrag führt zurück. */}
+          {d?.leistung?.slug && (
+            <div class="s-beitrag__zurueck">
+              <Button
+                label={`Zur Leistung: ${d.leistung.titel}`}
+                href={`/leistungen/${d.leistung.slug}`}
+                variant="dark"
+              />
+            </div>
+          )}
+        </div>
       </div>
     )}
   </article>
+
+  {/* --- Weiterlesen ------------------------------------------------------
+      Nur echte Treffer aus derselben Kategorie. Kein Auffüllen mit den
+      neuesten Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches
+      steht, ist dieselbe stille Behauptung, die Aufgabe 4 abgeräumt hat. */}
+  {aehnliche.length > 0 && (
+    <section class="container s-weiter">
+      <div class="s-weiter__kopf">
+        <span class="c-topline" data-reveal="fade">Weiterlesen</span>
+        <h2 class="s-weiter__titel" data-split="lines">
+          Mehr aus {kategorieText(d?.kategorie)}
+        </h2>
+      </div>
+
+      <div class="s-weiter__raster" data-reveal-stagger="0.06">
+        {aehnliche.map((p, i) => (
+          <PostKarte
+            beitrag={p}
+            position={i}
+            sizes="(max-width: 700px) 100vw, 30vw"
+            mitDatum
+            mitKnopf
+            data-reveal-child
+          />
+        ))}
+      </div>
+    </section>
+  )}
 
   <Contact />
 </Base>
 
 <style>
   .s-beitrag {
-    padding-block: calc(var(--section-space) + 80px) var(--section-space);
+    padding-bottom: var(--section-space);
   }
 
-  /* Ein Beitrag liest sich in einer Spalte, nicht über die Seitenbreite.
-     65 Zeichen sind die Grenze, ab der das Auge die nächste Zeile nicht mehr
-     sicher findet. */
-  .s-beitrag__kopf,
-  .s-beitrag__text,
-  .s-beitrag__zurueck {
+  /* --- Kopf -------------------------------------------------------------
+     Das Bild läuft über die volle Breite und beginnt unter der Navigation.
+     Kein `container`: Ein Kopfbild, das an derselben Kante endet wie der
+     Fließtext, liest sich als Abbildung im Text und nicht als Auftakt.
+     -------------------------------------------------------------------- */
+  .s-beitrag__kopfbild {
+    height: clamp(320px, 56vh, 640px);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt
+     und das Scope-Attribut dieser Datei nicht trägt. */
+  .s-beitrag__kopfbild :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* `margin-inline: 0`, sonst zentriert `max-width` den Kopf innerhalb des
+     Rahmens: Der Titel begann bei 412px, der Fließtext darunter bei 332px,
+     und zwei Kanten, die um 80px auseinanderliegen, liest man als Fehler und
+     nicht als Absicht. Der Kopf steht jetzt an der linken Rahmenkante, also
+     über der Spalte des Inhaltsverzeichnisses — er gilt für die ganze Seite
+     und nicht nur für die Textspalte. */
+  .s-beitrag__kopftext {
     max-width: 68ch;
+    margin-inline: 0;
+    padding-top: var(--sp-10);
+    padding-bottom: var(--sp-8);
   }
 
   .s-beitrag__meta {
@@ -108,24 +209,40 @@ const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
     color: var(--c-text-muted);
   }
 
-  .s-beitrag__bild {
-    margin-block: var(--sp-10);
-    border-radius: var(--r-md);
-    overflow: hidden;
+  /* --- Satz -------------------------------------------------------------
+     Zwei Spuren: das Verzeichnis in einer festen Breite, der Text in seiner
+     Lesebreite. Beide zusammen stehen links, nicht mittig — ein zentrierter
+     Satz mit klebendem Verzeichnis daneben wandert beim Scrollen gefühlt
+     nach rechts, weil nur eine der beiden Spalten stillsteht.
+     -------------------------------------------------------------------- */
+  .s-beitrag__satz--mit-toc {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 68ch);
+    gap: clamp(var(--sp-6), 5vw, 96px);
+    /* KEIN `align-items: start`. Das ließ die linke Spalte auf die Höhe des
+       Verzeichnisses schrumpfen, und ein klebendes Element kann sich nur
+       innerhalb seines Kastens bewegen — bei gleicher Höhe also gar nicht.
+       Das Verzeichnis stand dadurch oben und scrollte mit dem Text weg.
+       Gestreckt reicht die Spalte bis zum Ende des Textes, und genau diese
+       Strecke ist der Weg, den es klebend zurücklegt. */
   }
 
-  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
-  .s-beitrag__bild :global(img) {
-    width: 100%;
-    height: auto;
+  .s-beitrag__text {
+    max-width: 68ch;
   }
 
-  /* :global(), weil PortableText das Markup zur Laufzeit erzeugt — es trägt
-     das Scope-Attribut dieser Datei nicht. */
+  /* :global(), weil PortableText das Markup zur Laufzeit erzeugt. */
   .s-beitrag__text :global(p) {
     margin-bottom: var(--sp-5);
     font-size: var(--fs-text-main);
     line-height: 1.6;
+  }
+
+  /* `scroll-margin-top`, damit ein Sprung nicht unter der Navigationsleiste
+     landet. Sie liegt fest oben und ist rund 96px hoch. */
+  .s-beitrag__text :global(h2),
+  .s-beitrag__text :global(h3) {
+    scroll-margin-top: calc(var(--nav-hoehe, 96px) + var(--sp-4));
   }
 
   .s-beitrag__text :global(h2) {
@@ -165,5 +282,53 @@ const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
 
   .s-beitrag__zurueck {
     margin-top: var(--sp-10);
+  }
+
+  /* --- Weiterlesen ------------------------------------------------------ */
+
+  .s-weiter {
+    padding-block: var(--section-space-sm) 0;
+  }
+
+  .s-weiter__kopf {
+    margin-bottom: var(--sp-10);
+  }
+
+  .s-weiter__titel {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* Dieselben drei Spalten wie unter /magazin. Die Karte merkt selbst, dass
+     sie hier schmal ist, und stapelt — siehe PostKarte.astro. */
+  .s-weiter__raster {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+  }
+
+  @media (max-width: 1000px) {
+    /* Unter dieser Schwelle steht das Verzeichnis über dem Text statt
+       daneben — 220px Spalte plus Lesebreite passen nicht mehr nebeneinander,
+       ohne dass eine von beiden zu schmal wird. */
+    .s-beitrag__satz--mit-toc {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-6);
+    }
+
+    .s-weiter__raster {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .s-weiter__raster {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-10) 0;
+    }
   }
 </style>

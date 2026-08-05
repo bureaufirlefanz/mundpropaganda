@@ -221,6 +221,31 @@ export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "rechtstext" && slug.cur
   seo
 }`);
 
+/**
+ * Beiträge aus derselben Kategorie — der Weiterlesen-Block unter einem
+ * Beitrag.
+ *
+ * Über `kategorie` und nicht über ein eigenes Tag-System: Die vier Werte
+ * (Behandlung, Vorsorge, Material & Technik, Praxis) stehen schon im Schema,
+ * jeder Beitrag trägt genau einen davon, und eine zweite Ordnung daneben
+ * hieße, dass der Kunde beim Anlegen zweimal dasselbe entscheidet.
+ *
+ * `$slug` schließt den gerade gelesenen Beitrag aus. Ohne das stünde er unter
+ * sich selbst.
+ */
+export const AEHNLICHE_QUERY = defineQuery(`
+  *[_type == "beitrag" && defined(slug.current)
+    && kategorie == $kategorie && slug.current != $slug]
+    | order(datum desc) [0...3] {
+    "slug": slug.current,
+    titel,
+    datum,
+    kategorie,
+    einleitung,
+    vorschaubild${BILD}
+  }
+`);
+
 /** Der Kopf der Magazin-Übersicht. Die Beiträge kommen aus der Collection. */
 export const MAGAZIN_INDEX_QUERY = defineQuery(`
   *[_id == "magazinIndex"][0]{ titel, topline, einleitung, seo }
