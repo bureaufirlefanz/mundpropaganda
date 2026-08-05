@@ -1,0 +1,28 @@
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/flo/Dropbox/Bureau Firlefanz/Claude Code/Mundpropaganda/dist"
+publishOrigin = "ui"
+commandOrigin = "ui"
+command = "npm run proto:build"
+base = "/Users/flo/Dropbox/Bureau Firlefanz/Claude Code/Mundpropaganda/web"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

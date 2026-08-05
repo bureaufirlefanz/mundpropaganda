@@ -1,12 +1,23 @@
 # Veröffentlichung des Astro-Stands.
 #
-# Diese Datei liegt in `web/` und nicht im Projektstamm. Der Grund ist der
-# Netlify-Adapter: Astro läuft mit `web/` als Arbeitsverzeichnis, und der
-# Adapter löst `netlify.toml` von dort aus auf. Stand die Konfiguration im
-# Stamm mit `base = "web"`, ergab das `web/web` — der Dev-Server startete
-# nicht mehr.
+# Diese Datei liegt in `web/` und trägt KEIN `base`. Beides ist erzwungen,
+# nicht Geschmack:
 #
-# Der Stamm behält deshalb nur noch den Zeiger auf dieses Verzeichnis.
+# Der Astro-Netlify-Adapter hängt bei jedem `astro dev` ein Vite-Plugin ein,
+# das `netlify.toml` von `web/` aus auflöst. Das lässt sich nicht abschalten —
+# `devFeatures: false` steuert nur, was das Plugin danach tut. Stünde
+# `base = "web"` in einer Datei, die von hier aus erreichbar ist, löste es
+# sich zu `web/web` auf, und der Dev-Server startete nicht mehr.
+#
+# Das Basisverzeichnis steht deshalb in den Projekteinstellungen bei Netlify:
+#
+#   Project configuration → Build & deploy → Build settings
+#   Base directory: web
+#
+# Sobald Netlify dorthin gewechselt ist, liest es diese Datei, und was hier
+# steht, sticht die Einstellungen der Oberfläche aus. Das ist wichtig: Dort
+# stand noch `npm run proto:build` aus der Vite-Zeit, und genau daran ist der
+# erste Deploy-Versuch gescheitert.
 
 [build]
   command = "npm run build"
@@ -15,20 +26,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Der Astro-Netlify-Adapter legt seine Funktion unter `.netlify/v1/` ab
-# (Frameworks API). Netlify findet sie dort von selbst, sofern es den Build
-# SELBST ausführt.
+# Der Adapter legt seine Funktion unter `.netlify/v1/` ab (Frameworks API).
+# Netlify findet sie dort von selbst, sofern es den Build SELBST ausführt —
+# deshalb läuft `web:deploy` mit `--build` statt mit `--no-build`. Vorher
+# wurde nur der fertige `dist`-Ordner hochgeladen; die Funktion wäre
+# liegengeblieben, und /preview hätte 404 geliefert, ohne dass am Build etwas
+# aufgefallen wäre.
 #
-# Genau deshalb ist `web:deploy` von `--no-build` auf `--build` umgestellt.
-# Vorher wurde der fertige `dist`-Ordner hochgeladen; die Funktion wäre dabei
-# liegengeblieben, und /preview sowie /api/draft-mode hätten in der
-# Auslieferung 404 geliefert — ohne dass am Build etwas aufgefallen wäre.
-#
-# `SANITY_API_READ_TOKEN` muss als Umgebungsvariable im Netlify-Projekt
-# stehen. Nicht hier: Diese Datei liegt in der Versionsgeschichte.
+# `SANITY_API_READ_TOKEN` steht als Umgebungsvariable im Netlify-Projekt,
+# nicht hier: Diese Datei liegt in der Versionsgeschichte.
 
 # Keine eigene Regel für die Verzeichnis-URLs. Astro legt jede Seite als
 # `pfad/index.html` ab, und Netlifys „Pretty URLs" leiten /karriere per 301
-# auf /karriere/ um — gemessen, nicht vermutet. Eine zusätzliche
-# Rewrite-Regel darüber wäre wirkungslos und würde nur den Eindruck
-# erwecken, sie täte etwas. Die 404-Seite blendet sie im Zweifel sogar aus.
+# auf /karriere/ um — gemessen, nicht vermutet.

@@ -35,8 +35,20 @@ export default defineConfig({
   output: "static",
 
   /* Nötig für die Vorschau-Route: Sie muss je Aufruf frisch rendern, weil sie
-     Entwürfe zeigt. Alles Übrige bleibt vorgerendert. */
-  adapter: netlify(),
+     Entwürfe zeigt. Alles Übrige bleibt vorgerendert.
+
+     `devFeatures: false` schaltet ab, was der Adapter beim `astro dev`
+     zusätzlich hochfährt — Netlifys Image CDN und das Laden von
+     Umgebungsvariablen aus dem verknüpften Projekt. Beides brauchen wir
+     nicht: Bilder kommen aus Sanitys CDN oder der lokalen Pipeline, und die
+     Variablen stehen in `.env`.
+
+     Es löst NICHT das Problem, das netlify.toml betrifft: Das Vite-Plugin
+     des Adapters läuft in jedem Fall und löst die Datei von `web/` aus auf.
+     Ein `base = "web"` darin ergäbe `web/web`. Deshalb trägt
+     `web/netlify.toml` kein base — das steht in den Projekteinstellungen bei
+     Netlify. Die Begründung dazu vollständig in jener Datei. */
+  adapter: netlify({ devFeatures: false }),
 
   integrations: [
     sanity({
