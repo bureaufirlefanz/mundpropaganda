@@ -21,10 +21,24 @@ import { CaseIcon } from "@sanity/icons/Case";
  * derselbe Fehler wie eine zweite Leistungsliste im Menü.
  */
 
+/* Eine Gruppe je Abschnitt, in der Reihenfolge der Seite — dasselbe Muster
+   wie bei der Startseite: Wer den dritten Reiter öffnet, sieht den dritten
+   Abschnitt.
+   Eine einzige Gruppe „Abschnitte" trug hier zwanzig Felder. Das ist genau
+   die flache Liste, die Aufgabe 13 abschafft: Man scrollt an dem vorbei, was
+   man sucht, und findet es beim zweiten Mal wieder nicht.
+   SEO steht zuletzt. Sonst füllt der Kunde erst Meta-Beschreibungen aus und
+   verliert die Lust, bevor er beim Text ist. */
 const gruppen = [
   { name: "kopf", title: "Kopf", default: true },
-  { name: "inhalt", title: "Abschnitte" },
+  { name: "intro", title: "Haltung" },
+  { name: "zahlen", title: "Zahlen" },
+  { name: "vergleich", title: "Vergleich" },
+  { name: "stellen", title: "Stellen" },
+  { name: "stimmen", title: "Stimmen" },
+  { name: "ablauf", title: "Ablauf" },
   { name: "bewerbung", title: "Bewerbung" },
+  { name: "faq", title: "Fragen" },
   { name: "seo", title: "SEO" },
 ];
 
@@ -75,26 +89,26 @@ export const karriere = defineType({
     }),
 
     /* --- Haltung -------------------------------------------------------- */
-    ...kopf("inhalt", "intro"),
+    ...kopf("intro", "intro"),
     defineField({
       name: "introSpalten",
       title: "Textspalten",
       type: "array",
       of: [defineArrayMember({ type: "text", rows: 5 })],
       description: "Genau zwei - der Abschnitt ist zweispaltig angelegt.",
-      group: "inhalt",
+      group: "intro",
       validation: (r) => r.required().max(2),
     }),
 
     /* --- Zahlen --------------------------------------------------------- */
-    ...kopf("inhalt", "zahlen"),
+    ...kopf("zahlen", "zahlen"),
     defineField({
       name: "zahlenEintraege",
       title: "Zahlen",
       type: "array",
       description:
         "Wenige und überprüfbare Angaben. Eine Karriereseite, die mit „100 % Zufriedenheit“ wirbt, glaubt niemand.",
-      group: "inhalt",
+      group: "zahlen",
       of: [
         defineArrayMember({
           type: "object",
@@ -119,13 +133,13 @@ export const karriere = defineType({
     }),
 
     /* --- Vergleich ------------------------------------------------------ */
-    ...kopf("inhalt", "vergleich"),
+    ...kopf("vergleich", "vergleich"),
     defineField({
       name: "vergleichSpalten",
       title: "Spalten",
       type: "array",
       description: "Genau zwei: links das Übliche, rechts der eigene Stand.",
-      group: "inhalt",
+      group: "vergleich",
       of: [
         defineArrayMember({
           type: "object",
@@ -150,7 +164,7 @@ export const karriere = defineType({
       name: "vergleichZeilen",
       title: "Zeilen",
       type: "array",
-      group: "inhalt",
+      group: "vergleich",
       of: [
         defineArrayMember({
           type: "object",
@@ -213,19 +227,19 @@ export const karriere = defineType({
       rows: 4,
       description:
         "Das Kleingedruckte. Ohne ihn läse sich die linke Spalte wie eine Behauptung über den Wettbewerb - und die wäre weder belegbar noch fair.",
-      group: "inhalt",
+      group: "vergleich",
     }),
 
     /* --- Stellen -------------------------------------------------------- */
-    ...kopf("inhalt", "stellen"),
+    ...kopf("stellen", "stellen"),
 
     /* --- Stimmen -------------------------------------------------------- */
-    ...kopf("inhalt", "stimmen"),
+    ...kopf("stimmen", "stimmen"),
     defineField({
       name: "stimmenEintraege",
       title: "Stimmen",
       type: "array",
-      group: "inhalt",
+      group: "stimmen",
       of: [
         defineArrayMember({
           type: "object",
@@ -253,12 +267,12 @@ export const karriere = defineType({
     }),
 
     /* --- Ablauf --------------------------------------------------------- */
-    ...kopf("inhalt", "ablauf"),
+    ...kopf("ablauf", "ablauf"),
     defineField({
       name: "ablaufEtappen",
       title: "Etappen",
       type: "array",
-      group: "inhalt",
+      group: "ablauf",
       of: [
         defineArrayMember({
           type: "object",
@@ -290,12 +304,12 @@ export const karriere = defineType({
     }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitel", title: "Überschrift der Fragen", type: "string", group: "inhalt", validation: (r) => r.required() }),
+    defineField({ name: "faqTitel", title: "Überschrift der Fragen", type: "string", group: "faq", validation: (r) => r.required() }),
     defineField({
       name: "faq",
       title: "Häufige Fragen",
       type: "array",
-      group: "inhalt",
+      group: "faq",
       of: [
         defineArrayMember({
           type: "object",

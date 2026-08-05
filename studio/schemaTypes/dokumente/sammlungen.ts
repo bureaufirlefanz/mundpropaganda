@@ -5,6 +5,7 @@ import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
 import { slugFrei, RESERVIERTE_SLUGS } from "../../lib/pfade";
+import { fliesstext } from "../objekte/fliesstext";
 
 /**
  * Die Sammlungen: Typen, von denen es beliebig viele gibt.
@@ -84,10 +85,7 @@ export const beitrag = defineType({
       name: "text",
       title: "Beitrag",
       type: "array",
-      of: [
-        { type: "block", styles: [{ title: "Absatz", value: "normal" }, { title: "Zwischentitel", value: "h2" }, { title: "Unterpunkt", value: "h3" }] },
-        { type: "bild" },
-      ],
+      of: [fliesstext, { type: "bild" }],
       group: "inhalt",
     }),
     seoFeld,
@@ -180,7 +178,7 @@ export const rechtstext = defineType({
       name: "text",
       title: "Text",
       type: "array",
-      of: [{ type: "block", styles: [{ title: "Absatz", value: "normal" }, { title: "Zwischentitel", value: "h2" }, { title: "Unterpunkt", value: "h3" }] }],
+      of: [fliesstext],
       group: "inhalt",
     }),
     /* Rechtstexte gehören nicht in den Suchindex — sie ziehen Suchanfragen
@@ -229,9 +227,16 @@ export const stelle = defineType({
      in einer Folge, die niemand bestimmt hatte und die sich beim nächsten
      Import wieder ändern konnte. */
   orderings: [orderRankOrdering],
+  /* Sechzehn Felder in einer flachen Liste. Die Ausschreibung ist das, was
+     man schreibt und ändert; die Eckdaten sind das, was man einmal setzt.
+     Getrennt, damit man beim Redigieren nicht an der Kennung vorbeiscrollt. */
+  groups: [
+    { name: "ausschreibung", title: "Ausschreibung", default: true },
+    { name: "eckdaten", title: "Eckdaten" },
+  ],
   fields: [
     orderRankField({ type: "stelle" }),
-    defineField({ name: "titel", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "titel", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required(), group: "ausschreibung" }),
     defineField({
       name: "kennung",
       title: "Kennung",
@@ -239,23 +244,26 @@ export const stelle = defineType({
       description: "Wird zur Sprungmarke auf der Karriereseite und zum Betreff der Bewerbungsmail.",
       options: { source: "titel", maxLength: 40 },
       validation: (r) => r.required(),
+      group: "eckdaten"
     }),
     defineField({
       name: "art",
       title: "Art",
       type: "string",
       description: "Steht als Marke neben dem Titel, z. B. „Vollzeit oder Teilzeit“.",
+      group: "eckdaten"
     }),
-    defineField({ name: "standort", title: "Standort", type: "string" }),
-    defineField({ name: "umfang", title: "Beginn oder Umfang", type: "string" }),
-    defineField({ name: "einleitung", title: "Einleitung", type: "text", rows: 4 }),
-    defineField({ name: "aufgaben", title: "Deine Aufgaben", type: "array", of: [{ type: "string" }] }),
-    defineField({ name: "profil", title: "Das bringst du mit", type: "array", of: [{ type: "string" }] }),
+    defineField({ name: "standort", title: "Standort", type: "string", group: "eckdaten" }),
+    defineField({ name: "umfang", title: "Beginn oder Umfang", type: "string", group: "eckdaten" }),
+    defineField({ name: "einleitung", title: "Einleitung", type: "text", rows: 4, group: "ausschreibung" }),
+    defineField({ name: "aufgaben", title: "Deine Aufgaben", type: "array", of: [{ type: "string" }], group: "ausschreibung" }),
+    defineField({ name: "profil", title: "Das bringst du mit", type: "array", of: [{ type: "string" }], group: "ausschreibung" }),
     defineField({
       name: "besonderheit",
       title: "Besonderheit",
       type: "string",
       description: "Ein Satz, der hervorgehoben unter den Aufzählungen steht.",
+      group: "ausschreibung"
     }),
     defineField({
       name: "aktiv",
@@ -263,6 +271,7 @@ export const stelle = defineType({
       type: "boolean",
       description: "Abwählen, statt zu löschen - dann verschwindet die Stelle von der Seite, bleibt aber erhalten.",
       initialValue: true,
+      group: "eckdaten"
     }),
   ],
   preview: {

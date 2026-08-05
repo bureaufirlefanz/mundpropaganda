@@ -5,6 +5,13 @@ import { TagIcon } from "@sanity/icons/Tag";
 /**
  * Eine Leistung (Veneers, Implantate, ...).
  *
+ * Alle Bildfelder sind vom Typ `bild`, nicht rohe `image`-Felder. Drei waren
+ * es bis Aufgabe 12: Vorschaubild, Hero-Bild und das Bild am Benefits-Eintrag.
+ * Sie hatten keinen Alternativtext, keinen Dekorativ-Haken, und eines nicht
+ * einmal einen Bildmittelpunkt. Ein Typ, der an drei von acht Stellen nicht
+ * benutzt wird, ist schlimmer als keiner — er weckt den Eindruck, das Thema
+ * sei erledigt. Bei einer Arztpraxis ist Barrierefreiheit kein Beiwerk.
+ *
  * Zwei Rollen in einem Dokument:
  *
  *  1. **Die eigene Seite.** Der Zuschnitt folgt den Abschnitten, die sie
@@ -111,10 +118,9 @@ export const leistung = defineType({
     defineField({
       name: "vorschau",
       title: "Vorschaubild",
-      type: "image",
+      type: "bild",
       description:
         "Hängt am Zeiger, wenn man in der Services-Tabelle über die Zeile fährt. Hochformat wirkt am besten.",
-      options: { hotspot: true },
       group: "liste",
     }),
 
@@ -126,13 +132,7 @@ export const leistung = defineType({
       options: { collapsible: true, collapsed: false },
       fields: [
         defineField({ name: "text", title: "Einleitung", type: "text", rows: 4 }),
-        defineField({
-          name: "bild",
-          title: "Bild",
-          type: "image",
-          options: { hotspot: true },
-          fields: [defineField({ name: "alt", title: "Alternativtext", type: "string" })],
-        }),
+        defineField({ name: "bild", title: "Bild", type: "bild" }),
       ],
     }),
 
@@ -190,7 +190,7 @@ export const leistung = defineType({
                      aufgedeckt. */
                   validation: (r) => r.required(),
                 }),
-                defineField({ name: "bild", title: "Bild", type: "image", options: { hotspot: true } }),
+                defineField({ name: "bild", title: "Bild", type: "bild" }),
               ],
               preview: { select: { title: "name", media: "bild" } },
             }),

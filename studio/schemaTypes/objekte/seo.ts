@@ -31,6 +31,11 @@ export const seo = defineType({
         "Der graue Text unter dem Titel im Suchergebnis. 120–155 Zeichen. Kein Keyword-Stapel - er wird gelesen, nicht gezählt.",
       validation: (r) => r.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
     }),
+    /* Bewusst ein ROHES `image` und nicht der `bild`-Typ: Das Open-Graph-Motiv
+       wird nie vorgelesen. Es erscheint als Vorschau in Messengern und
+       sozialen Netzwerken, nie im Dokument — ein Alternativtext hätte dort
+       niemanden, der ihn hört, und der Dekorativ-Haken wäre eine Frage ohne
+       Antwort. Das ist die eine Ausnahme von Aufgabe 12. */
     defineField({
       name: "bild",
       title: "Vorschaubild",

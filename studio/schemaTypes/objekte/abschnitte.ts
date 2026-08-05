@@ -1,4 +1,15 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import type { ComponentType } from "react";
+import { BlockContentIcon } from "@sanity/icons/BlockContent";
+import { BarChartIcon } from "@sanity/icons/BarChart";
+import { SplitVerticalIcon } from "@sanity/icons/SplitVertical";
+import { ClockIcon } from "@sanity/icons/Clock";
+import { UsersIcon } from "@sanity/icons/Users";
+import { BlockquoteIcon } from "@sanity/icons/Blockquote";
+import { OlistIcon } from "@sanity/icons/Olist";
+import { TagIcon } from "@sanity/icons/Tag";
+import { HelpCircleIcon } from "@sanity/icons/HelpCircle";
+import { EnvelopeIcon } from "@sanity/icons/Envelope";
 
 /**
  * Der Baukasten für frei zusammengestellte Seiten.
@@ -15,12 +26,27 @@ import { defineType, defineField, defineArrayMember } from "sanity";
  */
 
 /* Für die Vorschau in der Liste: Jeder Abschnitt zeigt, was er ist und was
-   in ihm steht — sonst steht dort zehnmal „Objekt“. */
-const vorschau = (art: string, feld = "headline") => ({
-  select: { titel: feld, unter: "topline" },
-  prepare: ({ titel, unter }: { titel?: string; unter?: string }) => ({
+   in ihm steht — sonst steht dort zehnmal „Objekt“.
+ *
+ * Dazu ein Bild oder ein Symbol. In einer Liste von zwölf zugeklappten
+ * Abschnitten ist das der Unterschied zwischen Scrollen und Finden: Das Auge
+ * springt auf das Motiv, lange bevor es die Zeile gelesen hat.
+ *
+ * `media` nimmt das erste Bild, das der Abschnitt trägt — bei den Stimmen
+ * das Porträt der ersten Stimme, bei einem Bildabschnitt sein Motiv. Wo es
+ * keines gibt, steht das Symbol des Typs. Ein Abschnitt ohne beides bekäme
+ * ein graues Quadrat, und zwölf graue Quadrate helfen niemandem.
+ */
+const vorschau = (
+  art: string,
+  feld = "headline",
+  extra: { media?: string; icon?: ComponentType } = {}
+) => ({
+  select: { titel: feld, unter: "topline", ...(extra.media ? { bild: extra.media } : {}) },
+  prepare: ({ titel, unter, bild }: { titel?: string; unter?: string; bild?: unknown }) => ({
     title: titel || art,
     subtitle: unter ? `${art} · ${unter}` : art,
+    media: bild ?? extra.icon,
   }),
 });
 
@@ -45,7 +71,8 @@ export const abschnittIntro = defineType({
       validation: (r) => r.max(2),
     }),
   ],
-  preview: vorschau("Einleitung"),
+  icon: BlockContentIcon,
+  preview: vorschau("Einleitung", "headline", { icon: BlockContentIcon }),
 });
 
 /* --- Zahlen ------------------------------------------------------------ */
@@ -85,7 +112,8 @@ export const abschnittFacts = defineType({
       validation: (r) => r.max(4),
     }),
   ],
-  preview: vorschau("Zahlen"),
+  icon: BarChartIcon,
+  preview: vorschau("Zahlen", "headline", { icon: BarChartIcon }),
 });
 
 /* --- Vergleich --------------------------------------------------------- */
@@ -188,7 +216,8 @@ export const abschnittCompare = defineType({
         "Woher die Angaben stammen. Bei einem Vergleich mit „üblichen“ Bedingungen gehört das dazu - ohne Quelle ist es eine Behauptung.",
     }),
   ],
-  preview: vorschau("Vergleichstabelle"),
+  icon: SplitVerticalIcon,
+  preview: vorschau("Vergleichstabelle", "headline", { icon: SplitVerticalIcon }),
 });
 
 /* --- Ablauf als Zeitstrahl --------------------------------------------- */
@@ -219,7 +248,8 @@ export const abschnittTimeline = defineType({
       description: "Vier passen nebeneinander. Mehr kippt in die Senkrechte.",
     }),
   ],
-  preview: vorschau("Zeitstrahl"),
+  icon: ClockIcon,
+  preview: vorschau("Zeitstrahl", "headline", { icon: ClockIcon }),
 });
 
 /* --- Stimmen ----------------------------------------------------------- */
@@ -259,7 +289,8 @@ export const abschnittVoices = defineType({
       ],
     }),
   ],
-  preview: vorschau("Stimmen"),
+  icon: UsersIcon,
+  preview: vorschau("Stimmen", "headline", { media: "stimmen.0.bild", icon: UsersIcon }),
 });
 
 /* --- Aussage ----------------------------------------------------------- */
@@ -272,7 +303,8 @@ export const abschnittStatement = defineType({
     topline,
     defineField({ name: "text", title: "Satz", type: "text", rows: 3, validation: (r) => r.required() }),
   ],
-  preview: vorschau("Aussage", "text"),
+  icon: BlockquoteIcon,
+  preview: vorschau("Aussage", "text", { icon: BlockquoteIcon }),
 });
 
 /* --- Schritte ---------------------------------------------------------- */
@@ -300,7 +332,8 @@ export const abschnittSchritte = defineType({
       ],
     }),
   ],
-  preview: vorschau("Schritte", "titel"),
+  icon: OlistIcon,
+  preview: vorschau("Schritte", "titel", { icon: OlistIcon }),
 });
 
 /* --- Preise ------------------------------------------------------------ */
@@ -328,7 +361,8 @@ export const abschnittPreise = defineType({
       ],
     }),
   ],
-  preview: vorschau("Preise", "titel"),
+  icon: TagIcon,
+  preview: vorschau("Preise", "titel", { icon: TagIcon }),
 });
 
 /* --- Häufige Fragen ---------------------------------------------------- */
@@ -357,7 +391,8 @@ export const abschnittFaq = defineType({
       ],
     }),
   ],
-  preview: vorschau("Häufige Fragen", "titel"),
+  icon: HelpCircleIcon,
+  preview: vorschau("Häufige Fragen", "titel", { icon: HelpCircleIcon }),
 });
 
 /* --- Kontaktformular --------------------------------------------------- */
@@ -376,7 +411,8 @@ export const abschnittKontakt = defineType({
       description: "Steht im Auswahlfeld voreingestellt. Leer lassen für keine Vorauswahl.",
     }),
   ],
-  preview: vorschau("Kontaktformular", "titel"),
+  icon: EnvelopeIcon,
+  preview: vorschau("Kontaktformular", "titel", { icon: EnvelopeIcon }),
 });
 
 /**
