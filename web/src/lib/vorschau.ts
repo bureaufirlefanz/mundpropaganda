@@ -86,7 +86,8 @@ export type Ziel =
   | { art: "leistung"; slug: string }
   | { art: "magazinIndex" }
   | { art: "beitrag"; slug: string }
-  | { art: "karriere" };
+  | { art: "karriere" }
+  | { art: "rechtstext"; slug: string };
 
 export function zielVon(pfad: string): Ziel | null {
   /* Führende und schließende Schrägstriche weg — Astro liefert den Rest-Pfad
@@ -102,5 +103,11 @@ export function zielVon(pfad: string): Ziel | null {
   if (teile[0] === "leistungen" && teile.length === 2) {
     return { art: "leistung", slug: teile[1] };
   }
+  /* Zuletzt, nicht zuerst: Rechtstexte liegen auf der obersten Ebene, und
+     `/karriere` läge dort auch. Erst die festen Pfade prüfen, dann den Rest
+     als Slug lesen — sonst verdeckte ein Rechtstext namens „karriere" die
+     Karriereseite. Im Studio verhindert `slugFrei()` genau diesen Fall, aber
+     die Reihenfolge hier darf sich nicht darauf verlassen. */
+  if (teile.length === 1) return { art: "rechtstext", slug: teile[0] };
   return null;
 }

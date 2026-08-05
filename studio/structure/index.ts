@@ -56,11 +56,18 @@ export const OHNE_ROUTE = [
   "kontakt",
   "notdienst",
   "pillar",
-  "rechtstext",
 ];
 
 /** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
-const AUSGESCHRIEBEN = [...EINZELDOKUMENTE, ...OHNE_ROUTE, "leistung", "beitrag", "person", "stelle"];
+const AUSGESCHRIEBEN = [
+  ...EINZELDOKUMENTE,
+  ...OHNE_ROUTE,
+  "leistung",
+  "beitrag",
+  "person",
+  "stelle",
+  "rechtstext",
+];
 
 function einzeldokument(
   S: StructureBuilder,
@@ -121,6 +128,13 @@ export const structure: StructureResolver = (S, context) =>
       einzeldokument(S, "navigation", "Navigation", MenuIcon),
       einzeldokument(S, "footer", "Seitenfuß", StackCompactIcon),
       einzeldokument(S, "einstellungen", "Einstellungen", CogIcon),
+
+      /* Rechtstexte. Standen bis hierher in OHNE_ROUTE — nicht weil sie
+         niemand braucht, sondern weil es `/impressum` nicht gab und die Zeile
+         im Seitenfuß deshalb leer blieb. Mit der Route `/[slug]` ist beides
+         aufgelöst. Ganz unten, weil man sie einmal schreibt und dann jahrelang
+         nicht mehr anfasst. */
+      S.documentTypeListItem("rechtstext").title("Rechtstexte").icon(DocumentTextIcon),
 
       /* Was künftig dazukommt, erscheint hier von selbst — ohne dass jemand
          diese Datei anfassen muss. Erst wenn ein Typ eine eigene Ordnung

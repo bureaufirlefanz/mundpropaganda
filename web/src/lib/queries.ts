@@ -199,6 +199,28 @@ export const BEITRAG_QUERY = defineQuery(`*[_type == "beitrag" && slug.current =
   seo
 }`);
 
+/**
+ * Die Rechtstexte. Sie liegen auf der obersten Ebene: /impressum, /datenschutz.
+ *
+ * Zwei Abfragen statt einer: Die Liste trägt nur die Slugs für
+ * `getStaticPaths` und die Zeile im Seitenfuß, der Einzelabruf den Fließtext.
+ * Ein Datenschutztext ist der längste Text der ganzen Site — ihn dreimal
+ * mitzuladen, nur um drei Links zu setzen, wäre der teuerste Posten einer
+ * Seite, auf der er gar nicht steht.
+ */
+export const RECHTSTEXTE_QUERY = defineQuery(`
+  *[_type == "rechtstext" && defined(slug.current)] | order(titel asc) {
+    "slug": slug.current,
+    titel
+  }
+`);
+
+export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "rechtstext" && slug.current == $slug][0]{
+  titel,
+  text[]{ ..., _type == "bild" => ${BILD} },
+  seo
+}`);
+
 /** Der Kopf der Magazin-Übersicht. Die Beiträge kommen aus der Collection. */
 export const MAGAZIN_INDEX_QUERY = defineQuery(`
   *[_id == "magazinIndex"][0]{ titel, topline, einleitung, seo }

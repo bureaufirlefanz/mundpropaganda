@@ -28,6 +28,7 @@ import Leistung from "../../seiten/Leistung.astro";
 import Magazin from "../../seiten/Magazin.astro";
 import Beitrag from "../../seiten/Beitrag.astro";
 import Karriere from "../../seiten/Karriere.astro";
+import Rechtstext from "../../seiten/Rechtstext.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
 import { vorschauClient, zielVon, VORSCHAU_COOKIE } from "../../lib/vorschau";
@@ -40,6 +41,7 @@ import {
   KARRIERE_QUERY,
   STELLEN_QUERY,
   LEISTUNGSLISTE_QUERY,
+  RECHTSTEXT_QUERY,
 } from "../../lib/queries";
 import { ohneNull } from "../../lib/ohne-null";
 import type { StartseiteInhalt } from "../../lib/startseite";
@@ -47,6 +49,7 @@ import type { Leistung as LeistungDaten } from "../../lib/leistungen";
 import type { Beitrag as BeitragKarte, BeitragVoll, MagazinKopf } from "../../lib/magazin";
 import type { Karriere as KarriereDaten, Stelle } from "../../lib/karriere";
 import type { LeistungsEintrag } from "../../lib/leistungsliste";
+import type { Rechtstext as RechtstextDaten } from "../../lib/rechtstexte";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
@@ -84,6 +87,7 @@ let inhalt: {
   magazinKopf?: MagazinKopf;
   beitrag?: BeitragVoll;
   karriere?: KarriereDaten;
+  rechtstext?: RechtstextDaten;
   beitraege: BeitragKarte[];
   stellen: Stelle[];
   titel: string;
@@ -118,6 +122,12 @@ if (ziel.art === "startseite") {
 } else if (ziel.art === "beitrag") {
   const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: ziel.slug });
   inhalt = { ...inhalt, beitrag: daten, titel: daten?.titel ?? "" };
+} else if (ziel.art === "rechtstext") {
+  const daten = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: ziel.slug });
+  /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
+     wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
+  if (!daten) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+  inhalt = { ...inhalt, rechtstext: daten, titel: daten.titel ?? "" };
 } else {
   const [daten, stellen] = await Promise.all([
     hole<KarriereDaten>(KARRIERE_QUERY),
@@ -147,5 +157,9 @@ if (ziel.art === "startseite") {
 {ziel.art === "beitrag" && <Beitrag daten={inhalt.beitrag} titel={inhalt.titel} />}
 
 {ziel.art === "karriere" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
+
+{ziel.art === "rechtstext" && (
+  <Rechtstext daten={inhalt.rechtstext} titel={inhalt.titel} />
+)}
 
 <VisualEditing />

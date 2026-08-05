@@ -13,11 +13,13 @@ npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production 
 npx sanity dataset import ../studio/seed/karriere.ndjson   --dataset production --replace
 npx sanity dataset import ../studio/seed/leistungen.ndjson --dataset production --missing
 npx sanity dataset import ../studio/seed/magazin.ndjson    --dataset production --missing
+npx sanity dataset import ../studio/seed/recht.ndjson      --dataset production --missing
 npx sanity dataset import ../studio/seed/rahmen.ndjson     --dataset production --replace
 ```
 
-**Die Reihenfolge zählt.** `rahmen.ndjson` verweist auf Startseite, Magazin und
-Karriere — deshalb muss `karriere.ndjson` davor laufen; `magazin.ndjson` verweist auf Leistungen. Sanity prüft Verweise beim
+**Die Reihenfolge zählt.** `rahmen.ndjson` verweist auf Startseite, Magazin,
+Karriere und die drei Rechtstexte — deshalb müssen `karriere.ndjson` und
+`recht.ndjson` davor laufen; `magazin.ndjson` verweist auf Leistungen. Sanity prüft Verweise beim
 Import und bricht ab, wenn das Ziel fehlt — mit `references non-existent
 document`. Deshalb zuerst die Einzelseiten, dann die Sammlungen, zuletzt der
 Rahmen.
@@ -29,6 +31,7 @@ Rahmen.
 | `leistungen.ndjson` | 11 Leistungen, nur Grunddaten | `--missing` | `leistung-veneers` ist voll gepflegt. `--replace` überschriebe seinen Inhalt mit Titel und Slug — ohne Rückfrage. |
 | `magazin.ndjson` | Magazin-Übersicht und 4 Beiträge | `--missing` | Sobald jemand einen Beitrag redigiert, soll ein erneuter Import ihn nicht zurücksetzen. |
 | `karriere.ndjson` | Karriereseite und 4 Stellen | `--replace` | Die Seite ist ein Einzeldokument; die Stellen sollen genau diesen Stand bekommen, solange sie niemand redigiert hat. |
+| `recht.ndjson` | Impressum, Datenschutz, Barrierefreiheit | `--missing` | Sobald jemand die Angaben vervollständigt, soll ein erneuter Import sie nicht auf „Noch zu ergänzen“ zurücksetzen. |
 | `rahmen.ndjson` | Navigation und Seitenfuß | `--replace` | Zwei Einzeldokumente, die genau diesen Stand bekommen sollen. |
 | `seiten.ndjson` | Einstellungen, Startseite | `--replace` | Beide sollen genau diesen Stand bekommen. |
 
@@ -53,6 +56,20 @@ als eigene Dokumente, jede mit Aufgaben, Profil und einem Haken
 **Startseite** — jedes Feld mit dem Text, den die Seite zeigt: Hero-Zeilen,
 Split, Services-Titel, die fünf Standards, Standorte-Titel, Experten mit
 beiden Absätzen, die fünf Stories, Magazin und die sechs FAQ-Einträge.
+
+**Rechtstexte** — Impressum, Datenschutzerklärung und
+Barrierefreiheitserklärung, gegliedert und mit den Daten der Praxis gefüllt,
+soweit sie bekannt sind. Wo eine rechtsverbindliche Angabe fehlt, steht
+ausdrücklich „Noch zu ergänzen“ statt einer erfundenen. Ein Impressum, das
+vollständig aussieht und falsche Namen trägt, ist die gefährlichste Sorte
+Platzhalter.
+
+Die Datenschutzerklärung hält fest, dass die Website keine
+einwilligungspflichtigen Cookies setzt: keine Analysedienste, keine
+Werbenetzwerke, keine fremden Schriftarten, keine eingebetteten Karten. Das
+ist gemessen, nicht behauptet — im gebauten HTML steht kein einziger
+Fremdhost. Deshalb gibt es auch keinen Punkt „Cookie-Einstellungen“ im Fuß:
+Er öffnete ein leeres Fenster.
 
 Bilder und SEO trägt der Seed nicht — die pflegt der Kunde. Ein leeres
 Bildfeld fällt auf das gestaltete Motiv zurück, ein leeres SEO-Feld auf den

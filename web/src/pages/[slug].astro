@@ -1,0 +1,27 @@
+---
+/**
+ * Die oberste Ebene: /impressum, /datenschutz, /barrierefreiheit.
+ *
+ * Diese Route ist die einzige mit einem Platzhalter direkt unter der Wurzel,
+ * und das ist der Grund, warum `slugFrei()` im Schema steht: Ein Rechtstext
+ * mit dem Slug „magazin" oder „karriere" träte hier gegen eine bestehende
+ * Seite an. Astro entscheidet solche Fälle zugunsten der spezifischeren
+ * Route, aber verlassen sollte man sich darauf nicht — das Studio lässt den
+ * Slug erst gar nicht zu.
+ */
+import Rechtstext from "../seiten/Rechtstext.astro";
+import { ladeRechtstext, ladeRechtstexte } from "../lib/rechtstexte";
+
+// Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
+// zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
+export async function getStaticPaths() {
+  const texte = await ladeRechtstexte();
+  return texte.map((t) => ({ params: { slug: t.slug }, props: { titel: t.titel } }));
+}
+
+const { slug } = Astro.params;
+const { titel } = Astro.props;
+const daten = await ladeRechtstext(slug!);
+---
+
+<Rechtstext daten={daten} titel={daten?.titel || titel || ""} />

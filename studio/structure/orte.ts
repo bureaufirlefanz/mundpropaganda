@@ -40,6 +40,21 @@ export const resolve: PresentationPluginOptions["resolve"] = {
       resolve: () => ({ locations: [{ title: "Magazin", href: "/magazin" }] }),
     }),
 
+    rechtstext: defineLocations({
+      select: { titel: "titel", slug: "slug.current" },
+      resolve: (doc) => {
+        const pfad = pfadVon("rechtstext", doc?.slug ?? undefined);
+        return {
+          locations: [
+            ...(pfad ? [{ title: doc?.titel ?? "Der Rechtstext", href: pfad }] : []),
+            /* Und die Zeile im Seitenfuß, die auf ihn verweist — sie steht
+               auf jeder Seite. */
+            { title: "Seitenfuß (überall)", href: "/" },
+          ],
+        };
+      },
+    }),
+
     leistung: defineLocations({
       select: { titel: "titel", kurzname: "kurzname", slug: "slug.current" },
       resolve: (doc) => {

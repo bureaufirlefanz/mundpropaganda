@@ -1,0 +1,109 @@
+---
+/**
+ * Der Zusammenbau einer Rechtstextseite.
+ *
+ * Bewusst karg: eine Spalte, eine Überschrift, Fließtext. Ein Impressum wird
+ * gelesen, wenn jemand etwas sucht — eine Adresse, einen Namen, eine
+ * Widerspruchsmöglichkeit. Alles, was dabei ins Auge fällt, ohne die Suche zu
+ * verkürzen, steht im Weg.
+ *
+ * Kein Kontaktabschnitt am Fuß wie bei den Beiträgen. Wer im Datenschutztext
+ * steht, will nicht als Nächstes einen Termin buchen.
+ */
+import { PortableText } from "astro-portabletext";
+import Base from "../layouts/Base.astro";
+import type { Rechtstext } from "../lib/rechtstexte";
+
+interface Props {
+  daten: Rechtstext | undefined;
+  /** Aus der Liste, falls das Dokument selbst nicht geladen werden konnte. */
+  titel: string;
+}
+
+const { daten: d, titel } = Astro.props;
+---
+
+<Base
+  title={d?.seo?.titel || `${titel} - Mundpropaganda`}
+  description={d?.seo?.beschreibung || ""}
+  nichtIndexieren={d?.seo?.nichtIndexieren ?? true}
+>
+  <article class="s-recht">
+    <header class="container s-recht__kopf">
+      <h1 class="s-recht__titel" data-split="lines">{titel}</h1>
+    </header>
+
+    {d?.text && (
+      <div class="container s-recht__text" data-reveal="up">
+        <PortableText value={d.text} />
+      </div>
+    )}
+  </article>
+</Base>
+
+<style>
+  .s-recht {
+    padding-block: calc(var(--section-space) + 80px) var(--section-space);
+  }
+
+  /* Dieselbe Spaltenbreite wie ein Magazinbeitrag. Rechtstexte sind länger
+     und werden seltener am Stück gelesen — ein Grund mehr, die Zeile nicht
+     über die Seitenbreite laufen zu lassen. */
+  .s-recht__kopf,
+  .s-recht__text {
+    max-width: 68ch;
+  }
+
+  .s-recht__titel {
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .s-recht__text {
+    margin-top: var(--sp-10);
+  }
+
+  /* :global(), weil das Markup aus astro-portabletext kommt und das
+     Scope-Attribut nicht trägt. */
+  .s-recht__text :global(h2) {
+    margin-top: var(--sp-10);
+    margin-bottom: var(--sp-4);
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .s-recht__text :global(h3) {
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-text-large);
+    font-weight: 500;
+  }
+
+  .s-recht__text :global(p),
+  .s-recht__text :global(li) {
+    line-height: 1.65;
+  }
+
+  .s-recht__text :global(p + p) {
+    margin-top: var(--sp-4);
+  }
+
+  .s-recht__text :global(ul) {
+    margin-top: var(--sp-4);
+    padding-left: var(--sp-6);
+    list-style: disc;
+  }
+
+  .s-recht__text :global(li + li) {
+    margin-top: var(--sp-2);
+  }
+
+  /* Adressen und Paragraphenketten sind lang und brechen ungünstig. Ohne das
+     schiebt eine einzelne Zeile die Spalte auf schmalen Geräten auf. */
+  .s-recht__text :global(a) {
+    overflow-wrap: anywhere;
+  }
+</style>
