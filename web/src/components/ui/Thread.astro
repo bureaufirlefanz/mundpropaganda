@@ -55,10 +55,26 @@
 
   /* Eigene, teilerfremde Periode: fielen Drift und Deckkraft zusammen,
      läse sich das als ein einziger Puls statt als ruhiges Eigenleben. */
+  /* Dunkel, nicht weiß.
+   *
+   * Weiß war hier nicht zu sehen — nicht als Geschmacksfrage, sondern
+   * gemessen: Auf dem Seitengrund (#d6d6d6) erreicht weißer Strich bei voller
+   * Deckkraft 1.45:1, bei den hier gesetzten 0.48–0.72 nur 1.21–1.32:1.
+   * Chrome malte den Strich mit 12 von 255 über dem Grund, also knapp 5 %
+   * Helligkeitsunterschied; in Safari war er zu sehen, in Chrome nicht. An
+   * dieser Schwelle entscheidet die Kantenglättung des Browsers darüber, ob
+   * etwas erscheint — und darauf darf sich keine Gestaltung verlassen.
+   *
+   * Mit `--c-dark` liegt derselbe Strich bei 2.06:1 (0.40) bzw. 2.53:1
+   * (0.50). Er bleibt damit deutlich zurückhaltender als Text, ist aber
+   * vorhanden — eine Bleistiftlinie statt eines Lichtstreifens.
+   *
+   * Im Hero funktioniert Weiß weiterhin: Die Linien dort liegen über dunklen
+   * Bildern, nicht über dem Seitengrund. */
   .s-thread__line {
     fill: none;
-    stroke: var(--c-white);
-    stroke-opacity: 0.62;
+    stroke: var(--c-dark);
+    stroke-opacity: 0.42;
     stroke-width: 1.6;
     vector-effect: non-scaling-stroke;
     animation: thread-breathe 19s ease-in-out infinite alternate;
@@ -66,10 +82,10 @@
 
   @keyframes thread-breathe {
     from {
-      stroke-opacity: 0.48;
+      stroke-opacity: 0.34;
     }
     to {
-      stroke-opacity: 0.72;
+      stroke-opacity: 0.5;
     }
   }
 
