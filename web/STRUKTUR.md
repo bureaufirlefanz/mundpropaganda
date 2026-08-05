@@ -15,6 +15,8 @@ src/
 │       Standards · Gallery · Experts · Stories · Magazine
 │       Benefits · BeforeAfter · Steps · Prices · Features
 │       Faq · Contact
+├── seiten/                     Der Zusammenbau je Seitentyp — Startseite,
+│                               Leistung, Magazin, Beitrag, Karriere
 ├── lib/                        Datenzugriff und Abfragen
 └── styles/shared.css           s. u.
 ```
@@ -32,9 +34,17 @@ Props durch. Steht dort ein `<style>`-Block, ist das der Hinweis, dass ein
 Baustein fehlt: sein Markup ließe sich woanders nicht wiederverwenden, ohne es
 samt CSS zu kopieren.
 
-Aktueller Stand: `index.astro` und `leistungen/[slug].astro` haben **keine
-eigene Zeile CSS**. Die elf Zeilen in `Base.astro` sind der Rahmen selbst
-(`main`), kein Baustein.
+Seit Aufgabe 5 geht das noch einen Schritt weiter: Eine Datei unter `pages/`
+lädt Daten und ruft einen **Renderer** aus `seiten/` auf, mehr nicht. Die
+drei Produktrouten sind zusammen 62 Zeilen, davon das meiste Kommentar.
+
+Der Grund ist die Vorschau: Sie muss exakt dasselbe rendern wie die echte
+Seite. Zwei Zusammenbauten, die dasselbe zeigen sollen, laufen garantiert
+auseinander — und zwar unbemerkt, weil man immer nur einen von beiden ansieht.
+
+Unter `seiten/` ist ein `<style>`-Block erlaubt: Was dort steht, ist das
+Markup EINES Zusammenbaus und keines Bausteins — etwa die Initiativ-Box der
+Karriereseite. Unter `pages/` bleibt er der Hinweis, dass etwas fehlt.
 
 Zwei Dinge, die dabei leicht schiefgehen:
 

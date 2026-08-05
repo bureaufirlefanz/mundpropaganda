@@ -80,8 +80,7 @@ studio/
 │   └── leistung.ts           Collection: Leistungen
 ├── structure/
 │   ├── index.ts              die Seitenleiste
-│   ├── dokumentAnsichten.ts  welche Reiter ein Dokument bekommt
-│   └── WebVorschau.tsx       der Vorschau-Reiter
+│   └── orte.ts               wo ein Dokument auf der Website auftaucht
 └── seed/                     Startbestand zum Einspielen
 ```
 
@@ -98,11 +97,28 @@ alles Übrige.**
 - Darunter erscheint automatisch, was künftig dazukommt — ohne dass jemand die
   Strukturdatei anfassen muss.
 
-Leistungen haben einen zweiten Reiter **Vorschau**: die Seite im iframe neben
-dem Formular. Bewusst kein Presentation-Werkzeug — das bräuchte
-Stega-Markierungen in der Ausgabe und einen Vorschau-Endpunkt in der Astro-App.
-Gezeigt wird der Dev-Server auf :4321, also der letzte Build und nicht der
-Entwurf.
+**Klick-zum-Bearbeiten** über das Presentation-Werkzeug (Stufe 2). Die Website
+steht neben dem Formular, mit den Entwürfen statt dem letzten Build, und ein
+Klick auf einen Text öffnet das zugehörige Feld.
+
+Hier stand die Begründung, warum es das nicht gebe: Es bräuchte
+Stega-Markierungen in der Ausgabe. Das stimmte so nicht — die Markierungen
+schaltet ein eigener Vorschau-Client ein, und die ausgelieferte Seite trägt
+kein einziges davon (gemessen: 165.848 in der Vorschau, 0 im Build).
+
+Der frühere Vorschau-Reiter am Dokument ist damit entfallen. Er zeigte den
+gebauten Stand in einem iframe, also gerade nicht den Entwurf, den man
+bearbeitet.
+
+**Wo ein Dokument auftaucht**, steht in `structure/orte.ts`. Das ist der
+eigentliche Gewinn: Die Einstellungen, die Navigation und der Fuß haben keine
+eigene Seite und erscheinen trotzdem überall — ohne diese Zuordnung sähe die
+Redaktion beim Bearbeiten ein leeres Vorschaufenster.
+
+**Die Vorschau zeigt den Rahmen nicht als Entwurf.** Navigation, Fuß und
+Einstellungen holen ihre Daten über die Ladefunktionen in `web/src/lib/`, und
+die hängen am veröffentlichten Client. Für die Seite, die man gerade
+bearbeitet, stimmt die Vorschau.
 
 **TypeGen läuft** (Aufgabe 1 der Umbauliste): `npm run types` zieht das Schema
 und erzeugt `web/src/lib/sanity.types.ts`, gesteuert über `sanity-typegen.json`
@@ -185,8 +201,6 @@ Studio löscht, sieht sie auch aus Tabelle, Menü und Fuß verschwinden.
 
 ## Was noch offen ist
 
-- Visual Editing (Klick-zum-Bearbeiten) ist nicht eingerichtet — das ist
-  Stufe 2 der Umbauliste.
 - **Zehn der elf Leistungen sind ungepflegt.** Sie tragen Grunddaten und
   sonst nichts, ihre Seiten zeigen deshalb Hero, Stories, Magazin und
   Kontakt. Bis Aufgabe 4 sahen sie vollständig aus, weil der Rückfall den
@@ -251,3 +265,49 @@ Bilder aus dem CMS laufen über `CmsImage.astro`, nicht über `Picture.astro`:
   `CmsImage` nimmt beides an. Geprüft wird auf ein aufgelöstes Asset — ein
   angefasstes und wieder geleertes Bildfeld bleibt sonst als leeres Objekt
   stehen und gilt fälschlich als gepflegt.
+
+## Betrieb
+
+### Publish erreicht die Website noch nicht
+
+**Das fehlt noch und ist der wahrscheinlichste erste Support-Anruf.** Die
+Website ist statisch; sie entsteht beim Build. Ohne Webhook wartet der Kunde
+auf eine Änderung, die nie ankommt.
+
+Zu tun, beides außerhalb dieses Repositorys:
+
+1. **Netlify** → Site configuration → Build & deploy → Build hooks →
+   *Add build hook*. Name z. B. „Sanity Publish". Ergibt eine URL.
+2. **sanity.io/manage** → Projekt `a6bjftwf` → API → Webhooks → *Create
+   webhook*. Die URL von oben, Trigger auf *Create, Update, Delete*, Dataset
+   `production`, HTTP-Methode POST. Filter leer lassen — jede Änderung soll
+   bauen.
+
+Der Hinweis im Studio, dass eine Veröffentlichung ein bis zwei Minuten
+braucht, steht schon (`studio/components/PublishHinweis.tsx`).
+
+### Umgebungsvariablen
+
+| Name | Wo | Wofür |
+|---|---|---|
+| `PUBLIC_SANITY_PROJECT_ID` | `web/.env`, Netlify | Projekt |
+| `PUBLIC_SANITY_DATASET` | `web/.env`, Netlify | Datensatz |
+| `SANITY_API_READ_TOKEN` | `web/.env`, Netlify | Entwürfe für die Vorschau |
+| `PUBLIC_SANITY_STUDIO_URL` | Netlify | Wohin Stega beim Klick springt |
+| `SANITY_STUDIO_PREVIEW_URL` | Studio-Deploy | Wo die Website läuft |
+
+**`SANITY_API_READ_TOKEN` trägt kein `PUBLIC_`.** Mit dem Präfix backte Astro
+ihn ins ausgelieferte JavaScript, und ein Lesetoken für Entwürfe stünde im
+Quelltext jeder Seite. Rechte: **Viewer** genügt — die Vorschau liest nur.
+
+### Rollen
+
+Der Kunde gehört als **Editor** eingeladen, nicht als Administrator. Ob die
+Rolle im gebuchten Plan verfügbar ist, vorher prüfen: Bei manchen Plänen ist
+Administrator die einzige Option, dann braucht es stattdessen eine kurze
+schriftliche Absprache, was nicht angefasst wird.
+
+### Für den Kunden
+
+`ANLEITUNG.md` — eine Seite, deutsch, ohne Screenshots von Zuständen, die
+sich ändern.

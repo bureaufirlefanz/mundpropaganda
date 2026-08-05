@@ -6,6 +6,7 @@ import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./schemaTypes";
 import { structure, EINZELDOKUMENTE, OHNE_ROUTE } from "./structure";
 import { resolve } from "./structure/orte";
+import { PublishHinweis } from "./components/PublishHinweis";
 
 /**
  * Wo die Website läuft. Lokal der Dev-Server, in der Auslieferung die echte
@@ -49,6 +50,13 @@ export default defineConfig({
     // nicht in die Auslieferung.
     visionTool({ defaultApiVersion: "2026-07-28" }),
   ],
+
+  /* Der Hinweis, dass Publish nicht sofort wirkt. Siehe die Begründung in
+     components/PublishHinweis.tsx — ohne ihn ist die naheliegende Erklärung
+     „es funktioniert nicht", und der Anruf kommt, bevor der Build durch ist. */
+  studio: {
+    components: { layout: PublishHinweis },
+  },
 
   schema: {
     types: schemaTypes,

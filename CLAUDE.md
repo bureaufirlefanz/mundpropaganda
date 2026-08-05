@@ -28,7 +28,8 @@ npm run web:deploy  # bauen und auf Netlify veröffentlichen
 ```
 
 Weiterführend: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (Aufbau der
-Astro-App, verbindlich) · `CMS-UMBAU.md` (die laufende Umbauliste)
+Astro-App, verbindlich) · `CMS-UMBAU.md` (die laufende Umbauliste) ·
+`ANLEITUNG.md` (eine Seite für den Kunden)
 
 Je eine `CLAUDE.md` liegt in `web/` und `studio/` mit dem, was dort gilt.
 
@@ -70,9 +71,11 @@ einen Variablennamen erfinden.
 
 - **Astro + Sanity ist das Produkt** (04.08.2026). Webflow/Lumos und der
   Vite-Stand sind Prototypen.
-- **Der CMS-Umbau läuft nach `CMS-UMBAU.md`** — Stufe A (Ordnung), Stufe 0
-  (Absicherung), Stufe 1 (das Studio sagt die Wahrheit), Stufe 2
-  (Presentation Tool), danach Politur und Betrieb. Die Liste sticht, wo
-  ältere Begründungen in `SANITY.md` ihr widersprechen.
+- **Der CMS-Umbau läuft nach `CMS-UMBAU.md`.** Stufe A bis 3 sind durch:
+  Ordnung, Absicherung, das Studio sagt die Wahrheit, Presentation Tool,
+  Studio-Politur. Alle Inhalte lassen sich über das CMS pflegen — Startseite,
+  Leistungen, Magazin, Karriere, Navigation und Fuß. Offen ist Stufe 4
+  (Betrieb): der Webhook, die Rollen. Beides braucht Zugänge außerhalb des
+  Repositorys, siehe „Betrieb" in `SANITY.md`.
 - **Offene Webflow-Fragen** (Slug-Sprache, Filterung, Spacing in rem) stehen
   in `prototypen/webflow/README.md` und sind ruhend gestellt.
