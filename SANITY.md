@@ -300,6 +300,21 @@ braucht, steht schon (`studio/components/PublishHinweis.tsx`).
 ihn ins ausgelieferte JavaScript, und ein Lesetoken für Entwürfe stünde im
 Quelltext jeder Seite. Rechte: **Viewer** genügt — die Vorschau liest nur.
 
+Bei Netlify gehört an dieser Variable der Haken **„Contains secret values"**.
+Er setzt die Scopes von selbst auf Builds, Functions und Runtime und nimmt
+Post processing heraus — genau richtig. Bei den beiden `PUBLIC_`-Variablen
+gehört er NICHT gesetzt: Sie landen ohnehin im ausgelieferten JavaScript, und
+als Secret markiert lassen sie sich nur nicht mehr nachlesen.
+
+**Der Scope „Functions" muss bleiben.** `lib/vorschau.ts` liest den Token
+zuerst über `process.env`, also zur Laufzeit der Funktion. Der Grund steht
+dort ausführlich: Astro ersetzt `import.meta.env.X` beim Bauen durch den
+damaligen Wert, auch im Servercode — gemessen, der Klartext steht im
+Funktionsbündel unter `.netlify/` (in `dist/` dagegen in keiner einzigen
+Datei). Ohne den Laufzeitzugriff wirkte ein Tokenwechsel erst nach einem
+neuen Deploy, und man hielte einen kompromittierten Token für gewechselt,
+während der alte weiterläuft.
+
 ### Rollen
 
 Der Kunde gehört als **Editor** eingeladen, nicht als Administrator. Ob die

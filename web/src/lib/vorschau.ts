@@ -24,19 +24,37 @@ const STUDIO = import.meta.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:333
 /**
  * Der Token. **Ohne `PUBLIC_`** — sonst backte Astro ihn ins ausgelieferte
  * JavaScript, und ein Lesetoken für Entwürfe stünde im Quelltext jeder Seite.
+ * Gemessen: Er steht im Funktionsbündel unter `.netlify/`, aber in keiner
+ * einzigen Datei unter `dist/`. Kein Browser bekommt ihn zu sehen.
  *
- * Er wird zur Laufzeit gelesen und nicht beim Bauen: Die Vorschau-Route ist
- * die einzige Stelle, die nicht vorgerendert wird.
+ * **Erst die Laufzeit, dann der Build.** Astro ersetzt `import.meta.env.X`
+ * beim Bauen durch den damaligen Wert — auch im Servercode. Stünde hier nur
+ * das, wäre der Token fest im Bündel, und ein Tausch bei Netlify wirkte erst
+ * nach einem neuen Deploy. Das ist genau der Fall, in dem man einen
+ * kompromittierten Token für gewechselt hält, während der alte weiterläuft.
+ *
+ * `process.env` liest die Netlify-Funktion zur Laufzeit — dafür muss die
+ * Variable dort den Scope „Functions" haben. Der Rückfall auf
+ * `import.meta.env` trägt die lokale Entwicklung: Astro lädt `.env` dorthin,
+ * nicht nach `process.env`.
  */
-export const vorschauToken = () => import.meta.env.SANITY_API_READ_TOKEN as string | undefined;
+export function vorschauToken(): string | undefined {
+  const laufzeit =
+    typeof process !== "undefined" ? process.env?.SANITY_API_READ_TOKEN : undefined;
+  return laufzeit || (import.meta.env.SANITY_API_READ_TOKEN as string | undefined);
+}
 
-let gemerkt: SanityClient | null = null;
+/* Am Token gemerkt, nicht global: Wechselt er zur Laufzeit, entsteht ein
+   neuer Client statt weiter mit dem alten zu arbeiten. */
+let gemerkt: { token: string; client: SanityClient } | null = null;
 
 /** `null`, wenn kein Token gesetzt ist — dann gibt es keine Vorschau. */
 export function vorschauClient(): SanityClient | null {
   const token = vorschauToken();
   if (!token) return null;
-  gemerkt ??= createClient({
+  if (gemerkt?.token === token) return gemerkt.client;
+
+  const client = createClient({
     projectId: PROJEKT,
     dataset: DATENSATZ,
     apiVersion: "2026-07-28",
@@ -45,7 +63,9 @@ export function vorschauClient(): SanityClient | null {
     perspective: "drafts",
     stega: { enabled: true, studioUrl: STUDIO },
   });
-  return gemerkt;
+
+  gemerkt = { token, client };
+  return client;
 }
 
 /** Name des Cookies, das die Vorschau freischaltet. */
