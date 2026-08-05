@@ -23,10 +23,10 @@ import {
   leistungenIndex,
   praxis,
   magazinIndex,
-  karriere,
   kontakt,
   notdienst,
 } from "./dokumente/einzelseiten";
+import { karriere } from "./dokumente/karriere";
 
 import { beitrag, pillar, rechtstext, person, stelle } from "./dokumente/sammlungen";
 import { navigation, footer } from "./dokumente/rahmen";

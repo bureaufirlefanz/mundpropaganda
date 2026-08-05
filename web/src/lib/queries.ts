@@ -122,6 +122,48 @@ export const FOOTER_QUERY = defineQuery(`
 `);
 
 /**
+ * Die Karriereseite und die ausgeschriebenen Stellen.
+ *
+ * Die Stellen kommen aus ihrer eigenen Sammlung, nicht aus dem Dokument:
+ * `aktiv` schaltet eine ab, ohne sie zu löschen, und die Kennung trägt
+ * Sprungmarke und Mail-Betreff. Beides gäbe es in einem eingebetteten Array
+ * nicht.
+ */
+export const KARRIERE_QUERY = defineQuery(`
+  *[_id == "karriere"][0]{
+    topline, titel, einleitung, bild${BILD}, aktion${LINK},
+    introTopline, introHeadline, introSpalten,
+    zahlenTopline, zahlenHeadline, zahlenEintraege[]{ wert, einheit, text },
+    vergleichTopline, vergleichHeadline,
+    vergleichSpalten[]{ name, meta, betont },
+    vergleichZeilen[]{ name, werte[]{ art, text } },
+    vergleichHinweis,
+    stellenTopline, stellenHeadline,
+    stimmenTopline, stimmenHeadline,
+    stimmenEintraege[]{ zitat, name, rolle, dabeiSeit, bild${BILD}, versatz },
+    ablaufTopline, ablaufHeadline, ablaufEtappen[]{ marke, titel, text },
+    initiativTopline, initiativTitel, initiativText, initiativAbsatz,
+    bewerbungMail,
+    faqTitel, faq[]{ frage, antwort },
+    seo{ titel, beschreibung, nichtIndexieren, bild${BILD} }
+  }
+`);
+
+export const STELLEN_QUERY = defineQuery(`
+  *[_type == "stelle" && aktiv != false] | order(orderRank) {
+    titel,
+    "kennung": kennung.current,
+    art,
+    standort,
+    umfang,
+    einleitung,
+    aufgaben,
+    profil,
+    besonderheit
+  }
+`);
+
+/**
  * Die Magazinbeiträge als Karten — für das Karussell auf Start- und
  * Leistungsseiten und für die Übersicht unter /magazin.
  *

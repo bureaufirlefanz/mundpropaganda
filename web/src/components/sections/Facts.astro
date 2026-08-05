@@ -11,7 +11,17 @@
  * Bewegung steht die richtige Zahl da; das Hochzählen ist die Zugabe, nicht
  * die Voraussetzung.
  */
-import type { Zahl } from "../../lib/karriere";
+/**
+ * Eine Zahl in der Leiste. Steht hier und nicht in lib/karriere.ts: Die Form
+ * gehört zum Baustein, nicht zu einer Seite — dieselbe Leiste könnte auch
+ * woanders stehen.
+ */
+interface Zahl {
+  wert: number;
+  /** Was hinter der Zahl steht: „+", „%", „ min". Leer lassen für nichts. */
+  einheit?: string;
+  text: string;
+}
 
 interface Props {
   topline: string;

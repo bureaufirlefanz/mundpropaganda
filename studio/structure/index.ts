@@ -105,7 +105,13 @@ export const structure: StructureResolver = (S, context) =>
 
       /* --- Bausteine, die auf mehreren Seiten auftauchen ---------------- */
       S.documentTypeListItem("person").title("Team").icon(UserIcon),
-      S.documentTypeListItem("stelle").title("Stellen").icon(CaseIcon),
+      orderableDocumentListDeskItem({
+        type: "stelle",
+        title: "Stellen",
+        icon: CaseIcon,
+        S,
+        context,
+      }),
 
       S.divider(),
 

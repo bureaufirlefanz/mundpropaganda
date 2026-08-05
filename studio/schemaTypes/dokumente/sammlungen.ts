@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
@@ -223,7 +224,13 @@ export const stelle = defineType({
   title: "Stelle",
   type: "document",
   icon: CaseIcon,
+  /* Ziehbar wie die Leistungen. Ohne Sortierfeld kam die Reihenfolge der
+     Datenbank heraus — auf der Karriereseite standen die vier Stellen damit
+     in einer Folge, die niemand bestimmt hatte und die sich beim nächsten
+     Import wieder ändern konnte. */
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: "stelle" }),
     defineField({ name: "titel", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required() }),
     defineField({
       name: "kennung",

@@ -1,12 +1,16 @@
 ---
 /**
- * Die Route. Der Zusammenbau liegt in `seiten/Karriere.astro`.
+ * Die Route. Daten laden, Renderer aufrufen.
  *
- * Diese Seite lädt nichts: Ihre Inhalte stehen als Konstanten in
- * `lib/karriere.ts` und nicht im CMS. Die Route bleibt trotzdem so dünn wie
- * die übrigen — dann steht sie schon richtig, wenn die Inhalte umziehen.
+ * Die Seite hing bis hierher an `lib/karriere.ts` und nicht am CMS. Jetzt
+ * kommt beides aus dem Datensatz: der Rahmen aus dem Karriere-Dokument, die
+ * Stellen aus ihrer eigenen Sammlung.
  */
 import Karriere from "../seiten/Karriere.astro";
+import { ladeKarriere, ladeStellen } from "../lib/karriere";
+
+const daten = await ladeKarriere();
+const stellen = await ladeStellen();
 ---
 
-<Karriere />
+<Karriere daten={daten} stellen={stellen} />

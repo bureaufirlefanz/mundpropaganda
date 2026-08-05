@@ -24,10 +24,7 @@ import Design from "../../layouts/Design.astro";
 import { ladeStartseite } from "../../lib/startseite";
 import { ladeLeistung } from "../../lib/leistungen";
 import { ladeBeitraege } from "../../lib/magazin";
-import {
-  ZAHLEN, STELLEN, ABLAUF, STIMMEN,
-  VERGLEICH_SPALTEN, VERGLEICH_ZEILEN, VERGLEICH_HINWEIS,
-} from "../../lib/karriere";
+import { ladeKarriere, ladeStellen } from "../../lib/karriere";
 
 import Button from "../../components/ui/Button.astro";
 import Accordion from "../../components/ui/Accordion.astro";
@@ -73,6 +70,12 @@ const inhalt = await ladeStartseite();
    die Datei hat damit ihre letzte Aufgabe verloren und ist entfallen. */
 const bl = await ladeLeistung("veneers");
 const beitraege = await ladeBeitraege();
+
+/* Die Karriere-Bausteine mit den echten Inhalten der Karriereseite. Bis zum
+   Umzug ins CMS kamen sie aus Konstanten in lib/karriere.ts; die Datei trägt
+   jetzt nur noch den Datenzugriff. */
+const kr = await ladeKarriere();
+const stellen = await ladeStellen();
 
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
@@ -517,7 +520,7 @@ const RING_BILDER = [
         steht im Markup, das Skript setzt ihn nur kurz auf null. Ohne
         JavaScript und ohne Bewegung steht sofort die richtige Zahl da.
       </p>
-      <div class="d-live"><Facts topline="Beispiel" headline="Was sich nachrechnen lässt" zahlen={ZAHLEN} /></div>
+      <div class="d-live">{kr?.zahlenEintraege?.length ? <Facts topline="Beispiel" headline="Was sich nachrechnen lässt" zahlen={kr.zahlenEintraege} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -531,7 +534,7 @@ const RING_BILDER = [
         damit greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
         Vorlesegeräte beim Ansteuern den Stellentitel ausgeben.
       </p>
-      <div class="d-live"><Jobs topline="Beispiel" headline="Offene Stellen" stellen={STELLEN.slice(0, 2)} /></div>
+      <div class="d-live">{stellen.length ? <Jobs topline="Beispiel" headline="Offene Stellen" stellen={stellen.slice(0, 2)} bewerbungMail={kr?.bewerbungMail ?? ""} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -548,7 +551,7 @@ const RING_BILDER = [
         Text, ein Ja/Nein-Zeichen oder eine Pille.
       </p>
       <div class="d-live">
-        <Compare topline="Beispiel" headline="Vergleich" spalten={VERGLEICH_SPALTEN} zeilen={VERGLEICH_ZEILEN.slice(0, 5)} hinweis={VERGLEICH_HINWEIS} />
+        {kr?.vergleichSpalten?.length && kr.vergleichZeilen?.length ? <Compare topline="Beispiel" headline="Vergleich" spalten={kr.vergleichSpalten} zeilen={kr.vergleichZeilen.slice(0, 5)} hinweis={kr.vergleichHinweis ?? undefined} /> : null}
       </div>
     </div>
 
@@ -562,7 +565,7 @@ const RING_BILDER = [
         Daten, nicht in <code>:nth-child</code> - bei einer vierten Stimme
         bräuchte eine Regel nach Position sonst eine neue Ausnahme.
       </p>
-      <div class="d-live"><Voices topline="Beispiel" headline="Stimmen" stimmen={STIMMEN} /></div>
+      <div class="d-live">{kr?.stimmenEintraege?.length ? <Voices topline="Beispiel" headline="Stimmen" stimmen={kr.stimmenEintraege} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -577,7 +580,7 @@ const RING_BILDER = [
         Zustand - ohne JavaScript steht sie vollständig da, eine leere Bahn
         wäre eine falsche Aussage über den Ablauf.
       </p>
-      <div class="d-live"><Timeline topline="Beispiel" headline="Ablauf" etappen={ABLAUF} /></div>
+      <div class="d-live">{kr?.ablaufEtappen?.length ? <Timeline topline="Beispiel" headline="Ablauf" etappen={kr.ablaufEtappen} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">

@@ -25,7 +25,7 @@
 
 export interface VergleichSpalte {
   name: string;
-  meta: string;
+  meta?: string;
   /** Hebt eine Spalte hervor — hier die eigene. */
   betont?: boolean;
 }
@@ -34,7 +34,16 @@ export interface VergleichSpalte {
  * Ein Wert je Zelle: Text, ja/nein als Zeichen, oder eine Pille für etwas,
  * das noch nicht gilt.
  */
-export type VergleichWert = string | boolean | { pille: string };
+/**
+ * Ein Zellenwert. Vier Darstellungen, ausgeschrieben statt aus dem Typ
+ * geraten: Vorher war es `string | boolean | { pille: string }` — im Code
+ * kompakt, im Studio aber nicht abbildbar. Ein Redakteur kann keinen
+ * TypeScript-Union eingeben; er wählt eine Darstellung aus vier.
+ */
+export interface VergleichWert {
+  art: "text" | "ja" | "nein" | "pille";
+  text?: string;
+}
 
 export interface VergleichZeile {
   name: string;
@@ -53,7 +62,7 @@ interface Props {
 const { topline, headline, spalten, zeilen, hinweis } = Astro.props;
 
 const beschriftung = (w: VergleichWert) =>
-  typeof w === "boolean" ? (w ? "enthalten" : "nicht enthalten") : undefined;
+  w.art === "ja" ? "enthalten" : w.art === "nein" ? "nicht enthalten" : undefined;
 ---
 
 <section class="s-compare container">
@@ -96,7 +105,7 @@ const beschriftung = (w: VergleichWert) =>
                 aria-label={beschriftung(w)}
                 class:list={["comparison-row__cell", spalten[i]?.betont && "is-betont"]}
               >
-                {typeof w === "boolean" ? (
+                {w.art === "ja" || w.art === "nein" ? (
                   /* Die Zeichen tragen keine eigene Bedeutung — die steht im
                      aria-label der Zelle. Deshalb aria-hidden, sonst hörte
                      man die Angabe zweimal. */
@@ -110,12 +119,12 @@ const beschriftung = (w: VergleichWert) =>
                     stroke-linejoin="round"
                     aria-hidden="true"
                   >
-                    {w ? <polyline points="5 12 10 17 19 7" /> : <line x1="6" y1="12" x2="18" y2="12" />}
+                    {w.art === "ja" ? <polyline points="5 12 10 17 19 7" /> : <line x1="6" y1="12" x2="18" y2="12" />}
                   </svg>
-                ) : typeof w === "object" ? (
-                  <div class="comparison-row__pill">{w.pille}</div>
+                ) : w.art === "pille" ? (
+                  <div class="comparison-row__pill">{w.text}</div>
                 ) : (
-                  <p class="comparison-row__label">{w}</p>
+                  <p class="comparison-row__label">{w.text}</p>
                 )}
               </div>
             ))}

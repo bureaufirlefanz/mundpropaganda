@@ -93,6 +93,7 @@ export const leistungenIndex = einzelseite(
 
 export const praxis = einzelseite("praxis", "Praxis & Team", UsersIcon, "/praxis");
 export const magazinIndex = einzelseite("magazinIndex", "Magazin (Übersicht)", DocumentsIcon, "/magazin");
-export const karriere = einzelseite("karriere", "Karriere", CaseIcon, "/karriere");
+/* `karriere` steht nicht mehr hier: Die Seite hat eine feste, gestaltete
+   Abfolge und keinen Baukasten. Ihr Typ liegt in `dokumente/karriere.ts`. */
 export const kontakt = einzelseite("kontakt", "Kontakt", EnvelopeIcon, "/kontakt");
 export const notdienst = einzelseite("notdienst", "Notdienst", WarningOutlineIcon, "/notdienst");

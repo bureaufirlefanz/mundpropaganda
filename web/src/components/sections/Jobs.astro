@@ -15,13 +15,16 @@
 import Button from "../ui/Button.astro";
 import { bewerbungLink, type Stelle } from "../../lib/karriere";
 
+
 interface Props {
   id?: string;
   topline: string;
   headline: string;
   stellen: Stelle[];
+  /** Adresse für Bewerbungen. Steht im Karriere-Dokument, nicht hier. */
+  bewerbungMail: string;
 }
-const { id, topline, headline, stellen } = Astro.props;
+const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
 ---
 
 <section class="s-jobs container" id={id}>
@@ -66,13 +69,13 @@ const { id, topline, headline, stellen } = Astro.props;
               <div>
                 <h4 class="s-jobs__untertitel">Deine Aufgaben</h4>
                 <ul class="s-jobs__punkte">
-                  {s.aufgaben.map((a) => <li>{a}</li>)}
+                  {(s.aufgaben ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
               <div>
                 <h4 class="s-jobs__untertitel">Das bringst du mit</h4>
                 <ul class="s-jobs__punkte">
-                  {s.profil.map((a) => <li>{a}</li>)}
+                  {(s.profil ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
             </div>
@@ -82,7 +85,7 @@ const { id, topline, headline, stellen } = Astro.props;
             <div class="s-jobs__aktion">
               {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
                   einem Postfach unter „Bewerbung". */}
-              <Button label="Auf diese Stelle bewerben" href={bewerbungLink(s)} />
+              <Button label="Auf diese Stelle bewerben" href={bewerbungLink(bewerbungMail, s)} />
             </div>
           </div>
         </div>

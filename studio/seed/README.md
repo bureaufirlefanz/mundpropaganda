@@ -10,13 +10,14 @@ Einspielen — schreibt echte Dokumente in den Datensatz:
 ```bash
 cd studio
 npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production --replace
+npx sanity dataset import ../studio/seed/karriere.ndjson   --dataset production --replace
 npx sanity dataset import ../studio/seed/leistungen.ndjson --dataset production --missing
 npx sanity dataset import ../studio/seed/magazin.ndjson    --dataset production --missing
 npx sanity dataset import ../studio/seed/rahmen.ndjson     --dataset production --replace
 ```
 
 **Die Reihenfolge zählt.** `rahmen.ndjson` verweist auf Startseite, Magazin und
-Karriere; `magazin.ndjson` verweist auf Leistungen. Sanity prüft Verweise beim
+Karriere — deshalb muss `karriere.ndjson` davor laufen; `magazin.ndjson` verweist auf Leistungen. Sanity prüft Verweise beim
 Import und bricht ab, wenn das Ziel fehlt — mit `references non-existent
 document`. Deshalb zuerst die Einzelseiten, dann die Sammlungen, zuletzt der
 Rahmen.
@@ -27,6 +28,7 @@ Rahmen.
 |---|---|---|---|
 | `leistungen.ndjson` | 11 Leistungen, nur Grunddaten | `--missing` | `leistung-veneers` ist voll gepflegt. `--replace` überschriebe seinen Inhalt mit Titel und Slug — ohne Rückfrage. |
 | `magazin.ndjson` | Magazin-Übersicht und 4 Beiträge | `--missing` | Sobald jemand einen Beitrag redigiert, soll ein erneuter Import ihn nicht zurücksetzen. |
+| `karriere.ndjson` | Karriereseite und 4 Stellen | `--replace` | Die Seite ist ein Einzeldokument; die Stellen sollen genau diesen Stand bekommen, solange sie niemand redigiert hat. |
 | `rahmen.ndjson` | Navigation und Seitenfuß | `--replace` | Zwei Einzeldokumente, die genau diesen Stand bekommen sollen. |
 | `seiten.ndjson` | Einstellungen, Startseite | `--replace` | Beide sollen genau diesen Stand bekommen. |
 
@@ -42,6 +44,11 @@ im Studio.
 
 **Einstellungen** — Telefon, E-Mail, Bewertungszahlen, Profile, beide
 Anschriften.
+
+**Karriere** — Kopf, Haltung, vier Zahlen, zehn Zeilen Vergleichstabelle, drei
+Stimmen, vier Etappen des Bewerbungsablaufs und sechs Fragen. Dazu vier Stellen
+als eigene Dokumente, jede mit Aufgaben, Profil und einem Haken
+„Ausgeschrieben“. Alles davon lag bis zum Umzug in `web/src/lib/karriere.ts`.
 
 **Startseite** — jedes Feld mit dem Text, den die Seite zeigt: Hero-Zeilen,
 Split, Services-Titel, die fünf Standards, Standorte-Titel, Experten mit
