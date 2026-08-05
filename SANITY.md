@@ -279,7 +279,7 @@ darauf antwortet mit 200 und startet einen Deploy („Deploy triggered by
 hook"). Die Adresse:
 
 ```
-https://api.netlify.com/build_hooks/6a7354cd92c57f7993d9be0f
+https://api.netlify.com/build_hooks/6a736594a374ca00c47c1aa2
 ```
 
 Was fehlt, ist die Gegenseite bei Sanity. Sie lässt sich nicht mit dem
@@ -334,24 +334,34 @@ Datei). Ohne den Laufzeitzugriff wirkte ein Tokenwechsel erst nach einem
 neuen Deploy, und man hielte einen kompromittierten Token für gewechselt,
 während der alte weiterläuft.
 
-### Builds bei Netlify und der Git-Contributor
+### Builds bei Netlify und die Sichtbarkeit des Repositorys
 
 Netlify baut bei **privaten** Repositories auf dem kostenlosen Plan nur
-Commits von Personen, die es als Kontomitglied erkennt. Andernfalls:
+Commits von verifizierten Kontomitgliedern. Andernfalls:
 „Build blocked: This commit is from an unrecognized Git contributor."
 
-Entscheidend ist dabei **nicht** die E-Mail-Adresse im Commit, sondern der
-GitHub-Account, über den gepusht wurde — im Deploy steht er als `committer`.
-Das kostet leicht einen halben Nachmittag, wenn man es andersherum vermutet:
-Die Commit-Adresse umzustellen bringt nichts.
+Das Repository ist deshalb **öffentlich**. Es enthält keine Zugangsdaten —
+vor dem ersten Push geprüft, und `.env` ist seit jeher ignoriert. Die Inhalte
+liegen ohnehin öffentlich lesbar in Sanity.
 
-Damit es baut, muss der GitHub-Account unter
-`app.netlify.com/user/settings` → *Connected accounts* mit dem Netlify-Konto
-verknüpft sein.
+**Zwei Fallen dabei, beide teuer:**
 
-Betroffen ist nicht nur der Push. Der Sanity-Webhook baut ebenfalls den
-aktuellen Stand von `main` — ist der Commit blockiert, bewirkt auch ein
-Publish im Studio nichts.
+Die Meldung führt in die Irre. Sie klingt nach der E-Mail-Adresse im Commit;
+gemeint ist der GitHub-Account, über den gepusht wurde (im Deploy steht er
+als `committer`). Die Commit-Adresse umzustellen bringt nichts, und den
+GitHub-Account mit Netlify zu verknüpfen allein auch nicht.
+
+**Netlify speichert die Sichtbarkeit beim Verbinden.** Stellt man das
+Repository bei GitHub auf öffentlich, merkt Netlify das nicht — im Site-Objekt
+steht weiter `public_repo: false`, und es blockt gegen den alten Stand. Über
+die API lässt sich das Feld nicht setzen. Der einzige Weg ist *Unlink
+repository* und erneut verbinden; dabei liest Netlify sie neu ein.
+
+Wer das Repository wieder auf privat stellt, braucht Netlify Pro — oder muss
+denselben Weg noch einmal gehen.
+
+**Das Neuverbinden löscht die Build Hooks.** Danach steht die Adresse unten
+nicht mehr, und der Sanity-Webhook zeigt ins Leere. Beides neu anlegen.
 
 ### Rollen
 
