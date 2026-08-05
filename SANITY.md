@@ -274,14 +274,33 @@ Bilder aus dem CMS laufen über `CmsImage.astro`, nicht über `Picture.astro`:
 Website ist statisch; sie entsteht beim Build. Ohne Webhook wartet der Kunde
 auf eine Änderung, die nie ankommt.
 
-Zu tun, beides außerhalb dieses Repositorys:
+**Der Build Hook steht schon.** Angelegt, ausgelöst und geprüft: Ein POST
+darauf antwortet mit 200 und startet einen Deploy („Deploy triggered by
+hook"). Die Adresse:
 
-1. **Netlify** → Site configuration → Build & deploy → Build hooks →
-   *Add build hook*. Name z. B. „Sanity Publish". Ergibt eine URL.
-2. **sanity.io/manage** → Projekt `a6bjftwf` → API → Webhooks → *Create
-   webhook*. Die URL von oben, Trigger auf *Create, Update, Delete*, Dataset
-   `production`, HTTP-Methode POST. Filter leer lassen — jede Änderung soll
-   bauen.
+```
+https://api.netlify.com/build_hooks/6a7354cd92c57f7993d9be0f
+```
+
+Was fehlt, ist die Gegenseite bei Sanity. Sie lässt sich nicht mit dem
+Lesetoken anlegen — das Verwalten von Webhooks verlangt das Recht
+`sanity.project.webhooks/read` und mehr, ein Viewer-Token hat es nicht. Das
+ist die richtige Grenze und kein Mangel.
+
+**sanity.io/manage** → Projekt `a6bjftwf` → API → Webhooks → *Create webhook*
+
+| Feld | Wert |
+|---|---|
+| Name | `Netlify Build` |
+| URL | die Adresse oben |
+| Dataset | `production` |
+| Trigger on | Create, Update, Delete — alle drei |
+| Filter | leer |
+| HTTP method | POST |
+
+Danach die Probe: Im Studio etwas ändern und publizieren. Bei Netlify muss
+innerhalb von Sekunden ein Deploy anlaufen. Falls nicht, steht unter dem
+Webhook bei Sanity ein Protokoll mit der Antwort.
 
 Der Hinweis im Studio, dass eine Veröffentlichung ein bis zwei Minuten
 braucht, steht schon (`studio/components/PublishHinweis.tsx`).
