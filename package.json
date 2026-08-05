@@ -21,7 +21,7 @@
     "web": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
     "web:preview": "npm --prefix web run preview",
-    "web:deploy": "npx --yes netlify-cli@latest deploy --prod --build --site=a89dd2ef-d430-454e-8489-541c2c8a86df"
+    "web:deploy": "cd web && npx --yes netlify-cli@latest deploy --prod --build --site=a89dd2ef-d430-454e-8489-541c2c8a86df"
   },
   "keywords": [],
   "author": "",

@@ -20,3 +20,6 @@ aufnahmen/
 # zweite Wahrheit neben dem Schema und liefe irgendwann daneben.
 schema.json
 web/src/lib/sanity.types.ts
+
+# Local Netlify folder
+.netlify
