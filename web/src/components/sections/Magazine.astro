@@ -1,9 +1,7 @@
 ---
 import Button from "../ui/Button.astro";
-import Picture from "../ui/Picture.astro";
-import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild } from "../../lib/bilder";
-import { kategorieText, beitragPfad, type Beitrag } from "../../lib/magazin";
+import PostKarte from "../ui/PostKarte.astro";
+import type { Beitrag } from "../../lib/magazin";
 
 /**
  * Dieselben Beiträge überall, nur der Einstieg wechselt: auf der Startseite
@@ -25,20 +23,6 @@ interface Props {
    Aufgabe 4 abgeschafft hat — der Kunde löschte die Zeile und sähe sie
    weiter stehen. */
 const { topline, titel, text, beitraege } = Astro.props;
-
-/* Klasse 3: die gestalteten Motive, positionsgenau, solange an einem Beitrag
-   kein Vorschaubild hängt.
-
-   Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
-   WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
-   es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
-   Telefon das Bild in voller Breite aus. */
-const MOTIVE = [
-  { name: "motion-04", breiten: "640,1024" },
-  { name: "teeth-macro", breiten: "640,1024,1600,2048" },
-  { name: "lab-veneers", breiten: "640,1024,1600,2200" },
-  { name: "treatment-03", breiten: "640,1024,1600,2200" },
-];
 ---
 
 <!-- ==================================================================
@@ -67,23 +51,7 @@ const MOTIVE = [
 
           <div class="s-magazine__track" data-magazine-track>
             {beitraege.map((p, i) => (
-              <article class="c-post" data-magazine-item>
-                <div class="c-post__media">
-                  {istCmsBild(p.vorschaubild) ? (
-                    <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes="24vw" data-parallax="9" />
-                  ) : (
-                    <Picture name={MOTIVE[i % MOTIVE.length].name} widths={MOTIVE[i % MOTIVE.length].breiten} alt="" sizes="24vw" parallax="9" />
-                  )}
-                </div>
-                <div class="c-post__card">
-                  {p.kategorie && <span class="c-post__kicker">{kategorieText(p.kategorie)}</span>}
-                  <h3 class="c-post__title">
-                    <a class="c-post__link" href={beitragPfad(p.slug)}>{p.titel}</a>
-                  </h3>
-                  {p.einleitung && <p class="c-post__text">{p.einleitung}</p>}
-                </div>
-                <Button label="Beitrag lesen" static />
-              </article>
+              <PostKarte beitrag={p} position={i} sizes="24vw" parallax="9" mitKnopf data-magazine-item />
             ))}
           </div>
 
@@ -139,9 +107,15 @@ const MOTIVE = [
     gap: clamp(4px, 0.9vw, 16px);
   }
 
+  /* Rechts mehr Polster als links, und das ist kein Versehen: `letter-spacing`
+     wirkt auch hinter dem letzten Buchstaben und schluckt negativ gesetzt
+     (-0.03em) rund 5px hinter dem D. Mit gleichem Polster auf beiden Seiten
+     sah der Balken rechts angeschnitten aus, obwohl er rechnerisch symmetrisch
+     war. 0.11em gleicht die 5px aus und lässt beidseitig etwa gleich viel
+     Luft stehen; 0.16em kippte sichtbar zur anderen Seite. */
   .s-magazine__bar {
     display: inline-block;
-    padding: 0.06em 0.05em 0.14em;
+    padding: 0.06em 0.11em 0.14em 0.06em;
     border-radius: var(--r-sm);
     background: var(--c-brand);
     color: var(--c-dark);
@@ -224,83 +198,11 @@ const MOTIVE = [
     margin-inline: auto;
   }
 
-  /* --- Beitragskarte ----------------------------------------------------- */
-
-  .c-post {
-    position: relative;
-    flex: 0 0 auto;
-    width: clamp(420px, 36vw, 554px);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .c-post__media {
-    width: 59%;
-    aspect-ratio: 326 / 431;
-    border-radius: var(--r-md);
-    overflow: hidden;
-  }
-
-  /* :global(img), weil das Bild aus Picture.astro kommt. */
-  .c-post__media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Überlappt das Bild nach rechts unten — die Versetzung ist der Kern der
-     Komposition. */
-  .c-post__card {
-    position: absolute;
-    top: 27%;
-    right: 0;
-    width: 57%;
-    min-height: 62%;
-    display: flex;
-    flex-direction: column;
-    padding: var(--sp-4);
-    border-radius: var(--r-md);
-    background: var(--c-white);
-    color: var(--c-neutral-800);
-  }
-
-  .c-post__kicker {
-    font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
-  }
-
-  .c-post__title {
-    margin-top: var(--sp-2);
-    font-size: clamp(1.375rem, 1.85vw, 2rem);
-    font-weight: 400;
-    line-height: 1.12;
-    letter-spacing: -0.01em;
-  }
-
-  /* Ganze Karte klickbar, ohne verschachtelte Links. */
-  .c-post__link::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-  }
-
-  .c-post__text {
-    margin-top: auto;
-    padding-top: var(--sp-6);
-    font-size: var(--fs-text-small);
-    line-height: 1.45;
-    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
-  }
-
-  /* :global(.c-btn), weil der Button aus Button.astro kommt. */
-  .c-post :global(.c-btn) {
-    margin-top: var(--sp-4);
+  /* Die Karte selbst steht in `ui/PostKarte.astro` — die Übersicht unter
+     /magazin zeigt dieselbe. Von hier kommt nur ihre Breite: Die Spur
+     scrollt waagerecht, also ist sie fest und nicht die der Zelle. */
+  .s-magazine__track {
+    --post-breite: clamp(420px, 36vw, 554px);
   }
 
   @media (max-width: 900px) {
@@ -308,61 +210,14 @@ const MOTIVE = [
       grid-template-columns: 1fr;
     }
 
-    .c-post {
-      width: min(78vw, 420px);
+    .s-magazine__track {
+      --post-breite: min(78vw, 420px);
     }
   }
 
-  /* --- Telefon ----------------------------------------------------------
-     Die versetzte Überlappung ist auf 390px nicht zu retten. Sie rechnet in
-     Anteilen der Kartenbreite: Bild 59 %, weiße Karte 57 % — auf 554px sind
-     das 327 und 316px, auf 304px noch 180 und 173. In 173px Breite braucht
-     derselbe Text die dreifache Höhe, die Karte wächst über ihren Rahmen
-     hinaus, verdeckt den Knopf darunter und schiebt sich in die Navigation.
-     Genau das war zu sehen.
-
-     Also gestapelt statt überlappt — aber nicht als schlichte Reihe: Das
-     Bild nimmt die volle Breite, die Karte sitzt etwas schmaler rechts und
-     zieht sich über die Bildkante herauf. Der Versatz bleibt damit als Idee
-     erhalten, ohne dass etwas gegeneinander gedrückt wird.
-     -------------------------------------------------------------------- */
   @media (max-width: 700px) {
-    .c-post {
-      width: min(84vw, 380px);
-    }
-
-    /* Breiter und flacher: Hochformat auf voller Breite nähme allein zwei
-       Drittel der Bildschirmhöhe, bevor der Text beginnt. */
-    .c-post__media {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-    }
-
-    /* `position: relative` mit z-index, nicht `static`: Das Bild trägt einen
-       Parallax-Transform, und ein transformiertes Element wird über allen
-       nicht positionierten Kästen gezeichnet — unabhängig von der Reihenfolge
-       im Markup. Die Karte lag dadurch UNTER dem Bild, und ihre obersten
-       64px (Kicker und die erste Titelzeile) waren verdeckt. */
-    .c-post__card {
-      position: relative;
-      z-index: 1;
-      /* `inset: auto` MUSS mit: `top: 27%` und `right: 0` aus der Regel für
-         breite Fenster gelten bei `relative` weiter — nur eben als
-         Verschiebung statt als Lage. Gemessen schob das die Karte um 120px
-         nach unten, über den Knopf hinweg und aus ihrem Beitrag heraus. */
-      inset: auto;
-      align-self: flex-end;
-      width: 92%;
-      min-height: 0;
-      margin-top: calc(-1 * var(--sp-8));
-    }
-
-    /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
-       deren Unterkante. Ohne feste Höhe gibt es nichts mehr zu schieben —
-       der Abstand steht jetzt einfach da. */
-    .c-post__text {
-      margin-top: 0;
-      padding-top: var(--sp-3);
+    .s-magazine__track {
+      --post-breite: min(84vw, 380px);
     }
 
     /* Umbrechend: Pfeile, Punkte und Knopf brauchen zusammen mehr als die

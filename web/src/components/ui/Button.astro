@@ -101,27 +101,22 @@ const klasse = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" 
     height: 15px;
   }
 
-  /* Die Umkehrung beim Überfahren — braune Fläche, pinkes Zeichen — ist auf
-     hellem Grund der Kontrast. Auf einer dunklen Fläche verschwände der Knopf
-     genau darin. Deshalb sind die beiden Farben Regler statt fester Werte:
-     Eine dunkle Section setzt `--knopf-hover-grund` und
-     `--knopf-hover-schrift` auf ihre eigenen Werte, und der Knopf bleibt
-     pink. Die Rückmeldung trägt dort der Pfeil, der abrückt.
-
-     Beim Hover löst sich der Kreis vom Rechteck und rückt ein Stück ab —
-     der Button „öffnet" sich in Leserichtung. Das ersetzt den früheren
+  /* Beim Überfahren löst sich der Kreis vom Rechteck und rückt ein Stück ab —
+     der Knopf „öffnet" sich in Leserichtung. Das ersetzt den früheren
      Magneteffekt: die Bewegung gehört zum Element, nicht zum Zeiger.
      Der Pfeil im Kreis bleibt dabei ruhig — sonst rutschen zwei Dinge
-     gegeneinander und die Geste wird unklar. */
+     gegeneinander und die Geste wird unklar.
+
+     Die Bewegung ist die einzige Rückmeldung. Vorher kippte zusätzlich die
+     Farbe um, braune Fläche mit pinkem Zeichen — zwei Signale für einen
+     Vorgang, und das kräftigere übertönte das feinere: Man sah den Farbsprung
+     und nicht mehr, dass der Kreis abrückt. Mit der Farbe fallen auch die
+     beiden Regler `--knopf-hover-grund` und `--knopf-hover-schrift` weg; sie
+     gab es nur, damit der umgekehrte Knopf auf dunklen Sections nicht im
+     Grund verschwand. Ohne Umkehrung gibt es das Problem nicht mehr. */
   @media (hover: hover) {
     .c-btn:hover .c-btn__icon {
       transform: translateX(5px);
-    }
-
-    .c-btn:hover .c-btn__label,
-    .c-btn:hover .c-btn__icon {
-      background: var(--knopf-hover-grund, var(--c-dark));
-      color: var(--knopf-hover-schrift, var(--c-brand));
     }
   }
 
@@ -139,18 +134,6 @@ const klasse = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" 
   .c-btn--dark .c-btn__icon {
     background: var(--c-dark);
     color: var(--c-grey);
-  }
-
-  @media (hover: hover) {
-    .c-btn--dark:hover .c-btn__label {
-      background: transparent;
-      color: var(--c-text);
-    }
-
-    .c-btn--dark:hover .c-btn__icon {
-      background: var(--c-brand);
-      color: var(--c-dark);
-    }
   }
 
   /* Variante volle Breite, für den Absenden-Knopf im Formular. Ein

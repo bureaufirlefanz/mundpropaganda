@@ -123,7 +123,13 @@ export function initSplitHeadlines() {
           const items = isChars ? self.chars : isWords ? self.words : self.lines;
 
           return gsap.from(items, {
-            yPercent: 100,
+            /* 130 statt 100: Der Maskenkasten in base.css trägt unten
+               0.24em Polster, damit Unterlängen nicht abgeschnitten werden.
+               Bei `yPercent: 100` steht die Zeile genau an seiner alten
+               Unterkante und ihre Oberkante ragte sichtbar ins Polster.
+               Der Überschuss schadet nicht — die Zeile legt lediglich einen
+               etwas längeren Weg zurück. */
+            yPercent: 130,
             duration: isChars ? 1.6 : 1.9,
             ease: EASE,
             stagger: isChars ? 0.035 : 0.13,

@@ -346,6 +346,26 @@ p {
   visibility: hidden;
 }
 
+/* Raum für Unterlängen.
+
+   SplitText legt mit `mask: "lines"` um jede Zeile einen Kasten mit
+   `overflow: clip`, und der ist genau eine Zeilenhöhe hoch. Bei den
+   Display-Graden steht `line-height` auf 1 oder knapp darunter — das g, j, p
+   und y ragt dann unter den Kasten und wird abgeschnitten. Gemessen an der
+   Magazin-Überschrift: 104px Schriftgrad, 104px Kastenhöhe, rund 22px Ink
+   darunter.
+
+   Das Polster macht den Kasten tiefer, die negative Marge nimmt es dem Fluss
+   wieder weg — am Umbruch und an den Abständen ändert sich dadurch nichts.
+
+   Wichtig: `yPercent` in reveal.js MUSS größer als 100 bleiben. Die Zeile
+   startet um ihre eigene Höhe versetzt; wäre der Kasten tiefer und der
+   Versatz unverändert, lugte ihre Oberkante ins Polster. */
+.split-line-mask {
+  padding-bottom: 0.24em;
+  margin-bottom: -0.24em;
+}
+
 /* --- Highlight-Marker-Reveal -------------------------------------------
    Balken verdecken die Zeilen und skalieren zur Seite weg. Die drei
    negativen Werte (Zeilenhöhe, margin, inset) bestimmen zusammen, ob die

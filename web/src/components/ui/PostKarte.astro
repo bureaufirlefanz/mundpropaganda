@@ -1,0 +1,254 @@
+---
+/**
+ * Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche.
+ *
+ * Stand bis hierher nur im Karussell, und die Übersicht unter `/magazin`
+ * baute daneben eine zweite, flachere Karte. Der Kommentar dort nannte den
+ * Grund: In einem Raster aus drei Spalten stoßen die Überlappungen
+ * aneinander. Das stimmte für drei Spalten — die Komposition rechnet in
+ * Anteilen ihrer eigenen Breite und braucht rund 420px, damit die weiße
+ * Fläche den Text trägt. Die Antwort ist also die Spaltenzahl, nicht eine
+ * zweite Karte. Die Übersicht steht jetzt auf zwei Spalten und zeigt
+ * dieselbe.
+ *
+ * Die Breite kommt von außen, über `--post-breite`: Im Karussell ist sie
+ * fest (die Spur scrollt waagerecht), im Raster füllt sie die Zelle. Alles
+ * andere ist an beiden Stellen gleich und steht deshalb nur hier.
+ */
+import Button from "./Button.astro";
+import Picture from "./Picture.astro";
+import CmsImage from "./CmsImage.astro";
+import { istCmsBild } from "../../lib/bilder";
+import { kategorieText, beitragPfad, datumText, type Beitrag } from "../../lib/magazin";
+
+interface Props {
+  beitrag: Beitrag;
+  /** Entscheidet über das Ersatzmotiv, solange kein Vorschaubild hängt. */
+  position: number;
+  sizes: string;
+  /** Tiefe des Parallax auf dem Bild. Ohne Wert steht es still. */
+  parallax?: string;
+  /** Das Datum trägt die Übersicht, nicht das Karussell. */
+  mitDatum?: boolean;
+  /** Der Knopf trägt das Karussell, nicht die Übersicht. */
+  mitKnopf?: boolean;
+  /**
+   * Die Ebene der Überschrift.
+   *
+   * Nicht fest verdrahtet, weil sie von der Seite abhängt: Im Karussell steht
+   * darüber ein h2 („Mund zu Mund"), also ist h3 richtig. Auf /magazin ist der
+   * Seitentitel das h1 und es gibt kein h2 dazwischen — dort wäre h3 eine
+   * übersprungene Ebene. Der Test in `web:check` hat genau das gemeldet:
+   * „h1 → h3 bei Zahngesundheit & Fitness".
+   */
+  ueberschrift?: "h2" | "h3";
+}
+
+const {
+  beitrag: p,
+  position,
+  sizes,
+  parallax,
+  mitDatum = false,
+  mitKnopf = false,
+  ueberschrift: Titel = "h3",
+  ...rest
+} = Astro.props;
+
+/* Klasse 3: die gestalteten Motive, positionsgenau, solange an einem Beitrag
+   kein Vorschaubild hängt.
+
+   Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
+   WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
+   es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
+   Telefon das Bild in voller Breite aus. */
+const MOTIVE = [
+  { name: "motion-04", breiten: "640,1024" },
+  { name: "teeth-macro", breiten: "640,1024,1600,2048" },
+  { name: "lab-veneers", breiten: "640,1024,1600,2200" },
+  { name: "treatment-03", breiten: "640,1024,1600,2200" },
+];
+const motiv = MOTIVE[position % MOTIVE.length];
+---
+
+<article class="c-post" {...rest}>
+  <div class="c-post__media">
+    {istCmsBild(p.vorschaubild) ? (
+      <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
+    ) : (
+      <Picture name={motiv.name} widths={motiv.breiten} alt="" sizes={sizes} parallax={parallax} />
+    )}
+  </div>
+
+  <div class="c-post__card">
+    <div class="c-post__meta">
+      {p.kategorie && <span class="c-post__kicker">{kategorieText(p.kategorie)}</span>}
+      {mitDatum && p.datum && (
+        <time class="c-post__kicker" datetime={p.datum}>{datumText(p.datum)}</time>
+      )}
+    </div>
+
+    <Titel class="c-post__title">
+      <a class="c-post__link" href={beitragPfad(p.slug)}>{p.titel}</a>
+    </Titel>
+
+    {p.einleitung && <p class="c-post__text">{p.einleitung}</p>}
+  </div>
+
+  {mitKnopf && <Button label="Beitrag lesen" static />}
+</article>
+
+<style>
+  /* Im Entwurf sitzt das Bild bei x=81 (326 breit), die weiße Karte bei
+     x=319 (316 breit) — daher die Anteile 59 % und 57 %. Zusammen 116 %, die
+     Überlappung ist also 16 % der Kartenbreite und bleibt innerhalb davon.
+     Nichts ragt aus dem Kasten heraus; die Karte ist im Raster so brauchbar
+     wie in der Spur. */
+  .c-post {
+    position: relative;
+    flex: 0 0 auto;
+    width: var(--post-breite, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .c-post__media {
+    width: 59%;
+    aspect-ratio: 326 / 431;
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro bzw. CmsImage.astro kommt
+     und das Scope-Attribut nicht trägt. */
+  .c-post__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--d-slow) var(--e-out);
+  }
+
+  @media (hover: hover) {
+    .c-post:hover .c-post__media :global(img) {
+      scale: 1.04;
+    }
+  }
+
+  /* Überlappt das Bild nach rechts unten — die Versetzung ist der Kern der
+     Komposition.
+
+     `bottom: 0` statt `min-height: 62%`: Mit der Mindesthöhe endete die
+     Fläche dort, wo ihr Inhalt aufhörte, gemessen 50px über der Unterkante
+     des Knopfes und damit zufällig fast bündig mit dem Bild. Die untere
+     Kante der Karte ist aber die Linie, an der die Komposition steht — sie
+     soll mit dem Knopf abschließen, nicht mit dem Text darin. */
+  .c-post__card {
+    position: absolute;
+    /* Die Unterkante steht fest (bündig mit dem Knopf), die Oberkante nicht:
+       Im Karussell ist die Karte schmal und der Text füllt die Fläche, in der
+       Übersicht ist sie breiter, derselbe Text braucht weniger Zeilen und die
+       Fläche stünde halb leer. Deshalb rückt der Ansatz dort nach unten. */
+    top: var(--post-fläche-oben, 27%);
+    bottom: 0;
+    right: 0;
+    width: 57%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--c-white);
+    color: var(--c-neutral-800);
+  }
+
+  .c-post__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .c-post__kicker {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+  }
+
+  .c-post__title {
+    margin-top: var(--sp-2);
+    font-size: clamp(1.375rem, 1.85vw, 2rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ganze Karte klickbar, ohne verschachtelte Links. */
+  .c-post__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .c-post__text {
+    margin-top: auto;
+    padding-top: var(--sp-6);
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
+  }
+
+  /* :global(.c-btn), weil der Knopf aus Button.astro kommt. */
+  .c-post :global(.c-btn) {
+    margin-top: var(--sp-4);
+  }
+
+  /* --- Telefon ----------------------------------------------------------
+     Die versetzte Überlappung ist auf 390px nicht zu retten. Sie rechnet in
+     Anteilen der Kartenbreite: Bild 59 %, weiße Karte 57 % — auf 554px sind
+     das 327 und 316px, auf 304px noch 180 und 173. In 173px Breite braucht
+     derselbe Text die dreifache Höhe, die Karte wächst über ihren Rahmen
+     hinaus und verdeckt, was darunter liegt. Genau das war zu sehen.
+
+     Also gestapelt statt überlappt — aber nicht als schlichte Reihe: Das
+     Bild nimmt die volle Breite, die Karte sitzt etwas schmaler rechts und
+     zieht sich über die Bildkante herauf. Der Versatz bleibt damit als Idee
+     erhalten, ohne dass etwas gegeneinander gedrückt wird.
+     -------------------------------------------------------------------- */
+  @media (max-width: 700px) {
+    /* Breiter und flacher: Hochformat auf voller Breite nähme allein zwei
+       Drittel der Bildschirmhöhe, bevor der Text beginnt. */
+    .c-post__media {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+    }
+
+    /* `position: relative` mit z-index, nicht `static`: Das Bild trägt einen
+       Parallax-Transform, und ein transformiertes Element wird über allen
+       nicht positionierten Kästen gezeichnet — unabhängig von der Reihenfolge
+       im Markup. Die Karte lag dadurch UNTER dem Bild, und ihre obersten
+       64px (Kicker und die erste Titelzeile) waren verdeckt. */
+    .c-post__card {
+      position: relative;
+      z-index: 1;
+      /* `inset: auto` MUSS mit: `top: 27%` und `right: 0` aus der Regel für
+         breite Fenster gelten bei `relative` weiter — nur eben als
+         Verschiebung statt als Lage. Gemessen schob das die Karte um 120px
+         nach unten und aus ihrem Beitrag heraus. */
+      inset: auto;
+      align-self: flex-end;
+      width: 92%;
+      margin-top: calc(-1 * var(--sp-8));
+    }
+
+    /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
+       deren Unterkante. Ohne feste Höhe gibt es nichts mehr zu schieben —
+       der Abstand steht jetzt einfach da. */
+    .c-post__text {
+      margin-top: 0;
+      padding-top: var(--sp-3);
+    }
+  }
+</style>

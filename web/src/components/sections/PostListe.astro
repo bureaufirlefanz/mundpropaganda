@@ -2,55 +2,37 @@
 /**
  * Die Beiträge als Raster — die Übersicht unter /magazin.
  *
- * Bewusst nicht dieselbe Karte wie im Karussell: Dort überlappt eine weiße
- * Fläche das Bild nach rechts unten, und das lebt davon, dass die Karten
- * nebeneinander laufen. In einem Raster mit drei Spalten stoßen die
- * Überlappungen aneinander. Hier steht das Bild oben und der Text darunter.
+ * Zeigt dieselbe Karte wie das Karussell auf der Startseite. Bis hierher war
+ * es eine zweite, flachere: Bild oben, Text darunter. Die Begründung dafür
+ * stand hier und war richtig, aber sie zielte auf die falsche Stellschraube.
+ * Sie lautete: In einem Raster aus drei Spalten stoßen die Überlappungen
+ * aneinander. Das stimmt — die Komposition rechnet in Anteilen ihrer eigenen
+ * Breite und braucht rund 420px. Bei drei Spalten hat sie die nicht, bei
+ * zwei schon. Also zwei Spalten und eine Karte statt drei Spalten und zwei
+ * Karten.
  */
-import CmsImage from "../ui/CmsImage.astro";
-import Picture from "../ui/Picture.astro";
-import { istCmsBild } from "../../lib/bilder";
-import { kategorieText, beitragPfad, datumText, type Beitrag } from "../../lib/magazin";
+import PostKarte from "../ui/PostKarte.astro";
+import type { Beitrag } from "../../lib/magazin";
 
 interface Props {
   beitraege: Beitrag[];
 }
 
 const { beitraege } = Astro.props;
-
-/* Klasse 3: die gestalteten Motive, solange an einem Beitrag kein
-   Vorschaubild hängt. Positionsgenau, damit nicht alle gleich aussehen.
-   Über `Picture`, damit AVIF und srcset erhalten bleiben. */
-const MOTIVE = [
-  { name: "motion-04", breiten: "640,1024" },
-  { name: "teeth-macro", breiten: "640,1024,1600,2048" },
-  { name: "lab-veneers", breiten: "640,1024,1600,2200" },
-  { name: "treatment-03", breiten: "640,1024,1600,2200" },
-];
 ---
 
 <section class="container s-postliste">
   <div class="s-postliste__raster" data-reveal-stagger="0.06">
     {beitraege.map((p, i) => (
-      <article class="c-karte" data-reveal-child>
-        <a class="c-karte__link" href={beitragPfad(p.slug)}>
-          <div class="c-karte__media">
-            {istCmsBild(p.vorschaubild) ? (
-              <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes="(max-width: 900px) 100vw, 33vw" />
-            ) : (
-              <Picture name={MOTIVE[i % MOTIVE.length].name} widths={MOTIVE[i % MOTIVE.length].breiten} alt="" sizes="(max-width: 900px) 100vw, 33vw" />
-            )}
-          </div>
-
-          <div class="c-karte__kopf">
-            {p.kategorie && <span class="c-karte__kicker">{kategorieText(p.kategorie)}</span>}
-            {p.datum && <time class="c-karte__datum" datetime={p.datum}>{datumText(p.datum)}</time>}
-          </div>
-
-          <h2 class="c-karte__titel">{p.titel}</h2>
-          {p.einleitung && <p class="c-karte__text">{p.einleitung}</p>}
-        </a>
-      </article>
+      <PostKarte
+        beitrag={p}
+        position={i}
+        sizes="(max-width: 700px) 100vw, 30vw"
+        mitDatum
+        mitKnopf
+        ueberschrift="h2"
+        data-reveal-child
+      />
     ))}
   </div>
 </section>
@@ -60,78 +42,38 @@ const MOTIVE = [
     padding-block: var(--section-space-sm) var(--section-space);
   }
 
+  /* Zwei Spalten, nicht drei. Die Karte trägt ihren Text in einer Fläche,
+     die 57 % ihrer Breite einnimmt; unter etwa 420px Kartenbreite bleibt
+     davon zu wenig übrig, und die Fläche wächst über das Bild hinaus.
+
+     Gedeckelt auf dieselben 554px wie im Karussell, und die Spalten stehen
+     auseinander statt zu dehnen. Ohne den Deckel ergaben zwei Spalten auf
+     1440px Fenster rund 660px je Karte: Das Bild wuchs auf 520px Höhe, die
+     weiße Fläche auf 460 — bei unverändert drei Zeilen Text. Viel Fläche für
+     wenig Inhalt, und gegenüber dem Karussell dieselbe Karte in zwei Größen.
+
+     `align-items: start` ist kein Feinschliff, sondern nötig: Rasterzellen
+     dehnen ihren Inhalt auf die Zeilenhöhe, und die weiße Fläche reicht mit
+     `bottom: 0` bis an die Unterkante des Kastens. Gedehnt hing sie deshalb
+     58px unter dem Knopf statt bündig mit ihm. */
   .s-postliste__raster {
+    /* Flacher als im Karussell. Dort füllt der Text die Fläche, hier stünde
+       sie zu einem Drittel leer: Die Karte ist breiter, dieselben drei Zeilen
+       brauchen weniger Höhe. Die Unterkante bleibt am Knopf. */
+    --post-fläche-oben: 42%;
+
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 554px));
+    justify-content: space-between;
+    align-items: start;
     gap: var(--sp-10) var(--site-gutter);
-  }
-
-  /* Die ganze Karte ist der Link — ein zweiter „weiterlesen" darunter wäre
-     ein zweites Ziel für dieselbe Sache. */
-  .c-karte__link {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .c-karte__media {
-    aspect-ratio: 4 / 3;
-    border-radius: var(--r-md);
-    overflow: hidden;
-    margin-bottom: var(--sp-4);
-  }
-
-  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
-  .c-karte__media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: scale var(--d-slow) var(--e-out);
-  }
-
-  @media (hover: hover) {
-    .c-karte__link:hover .c-karte__media :global(img) {
-      scale: 1.04;
-    }
-  }
-
-  .c-karte__kopf {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-3);
-    margin-bottom: var(--sp-2);
-    font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--c-text-muted);
-  }
-
-  .c-karte__titel {
-    font-size: var(--fs-h5);
-    font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-  }
-
-  .c-karte__text {
-    margin-top: var(--sp-3);
-    font-size: var(--fs-text-small);
-    line-height: 1.5;
-    color: var(--c-text-muted);
-  }
-
-  @media (max-width: 900px) {
-    .s-postliste__raster {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--sp-8) var(--site-gutter);
-    }
   }
 
   @media (max-width: 700px) {
     .s-postliste__raster {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-10) 0;
     }
+
   }
 </style>
