@@ -334,6 +334,25 @@ Datei). Ohne den Laufzeitzugriff wirkte ein Tokenwechsel erst nach einem
 neuen Deploy, und man hielte einen kompromittierten Token für gewechselt,
 während der alte weiterläuft.
 
+### Warum die Commits auf flo@notyouraverage.studio laufen
+
+Netlify baut bei **privaten** Repositories auf dem kostenlosen Plan nur
+Commits von verifizierten Kontomitgliedern. Das Konto läuft auf
+`flo@notyouraverage.studio`; Commits von `hello@bureau-firlefanz.com` wies es
+ab — „Build blocked: This commit is from an unrecognized Git contributor."
+
+Betroffen war dabei nicht nur der Push: Der Sanity-Webhook baut ebenfalls den
+aktuellen Stand von `main`, und der trug denselben Autor. Ein Publish im
+Studio hätte also genauso wenig bewirkt.
+
+Der andere Weg wäre gewesen, `hello@bureau-firlefanz.com` bei Netlify als
+zweite Adresse zu hinterlegen. Die ist dort aber schon in einem anderen Konto
+in Gebrauch und lässt sich nicht ein zweites Mal verifizieren.
+
+**Wer hier committet, prüft vorher `git config user.email`.** Steht dort etwas
+anderes, wird der Build abgewiesen — und zwar erst bei Netlify, nicht beim
+Push.
+
 ### Rollen
 
 Der Kunde gehört als **Editor** eingeladen, nicht als Administrator. Ob die
