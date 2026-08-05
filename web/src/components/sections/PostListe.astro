@@ -42,38 +42,31 @@ const { beitraege } = Astro.props;
     padding-block: var(--section-space-sm) var(--section-space);
   }
 
-  /* Zwei Spalten, nicht drei. Die Karte trägt ihren Text in einer Fläche,
-     die 57 % ihrer Breite einnimmt; unter etwa 420px Kartenbreite bleibt
-     davon zu wenig übrig, und die Fläche wächst über das Bild hinaus.
+  /* Drei Spalten. Auf 1440px Fenster sind das rund 400px je Karte — zu wenig
+     für die versetzte Überlappung, und genau deshalb muss hier nichts weiter
+     stehen: Die Karte merkt es selbst und stapelt (siehe PostKarte.astro,
+     Schwelle 460px). Vorher stand hier eine zweite, eigene Kartenform für
+     genau diesen Fall.
 
-     Gedeckelt auf dieselben 554px wie im Karussell, und die Spalten stehen
-     auseinander statt zu dehnen. Ohne den Deckel ergaben zwei Spalten auf
-     1440px Fenster rund 660px je Karte: Das Bild wuchs auf 520px Höhe, die
-     weiße Fläche auf 460 — bei unverändert drei Zeilen Text. Viel Fläche für
-     wenig Inhalt, und gegenüber dem Karussell dieselbe Karte in zwei Größen.
-
-     `align-items: start` ist kein Feinschliff, sondern nötig: Rasterzellen
-     dehnen ihren Inhalt auf die Zeilenhöhe, und die weiße Fläche reicht mit
-     `bottom: 0` bis an die Unterkante des Kastens. Gedehnt hing sie deshalb
-     58px unter dem Knopf statt bündig mit ihm. */
+     `align-items: start`, sonst dehnen die Zellen ihren Inhalt auf die
+     Zeilenhöhe und die weiße Fläche hinge unter dem Knopf. */
   .s-postliste__raster {
-    /* Flacher als im Karussell. Dort füllt der Text die Fläche, hier stünde
-       sie zu einem Drittel leer: Die Karte ist breiter, dieselben drei Zeilen
-       brauchen weniger Höhe. Die Unterkante bleibt am Knopf. */
-    --post-fläche-oben: 42%;
-
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 554px));
-    justify-content: space-between;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
-    gap: var(--sp-10) var(--site-gutter);
+    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 1000px) {
+    .s-postliste__raster {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
     .s-postliste__raster {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-10) 0;
     }
-
   }
 </style>

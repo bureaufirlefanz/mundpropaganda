@@ -106,6 +106,12 @@ const motiv = MOTIVE[position % MOTIVE.length];
      wie in der Spur. */
   .c-post {
     position: relative;
+    /* Die Karte ist ihr eigener Bezug: Welche der beiden Kompositionen unten
+       greift, hängt an IHRER Breite, nicht an der des Fensters. Vorher stand
+       dort `max-width: 700px` — das traf das Telefon und verfehlte die 420px
+       schmale Karte in einer Rasterspalte, obwohl beide dasselbe Problem
+       haben. */
+    container-type: inline-size;
     flex: 0 0 auto;
     width: var(--post-breite, 100%);
     display: flex;
@@ -205,19 +211,24 @@ const motiv = MOTIVE[position % MOTIVE.length];
     margin-top: var(--sp-4);
   }
 
-  /* --- Telefon ----------------------------------------------------------
-     Die versetzte Überlappung ist auf 390px nicht zu retten. Sie rechnet in
-     Anteilen der Kartenbreite: Bild 59 %, weiße Karte 57 % — auf 554px sind
-     das 327 und 316px, auf 304px noch 180 und 173. In 173px Breite braucht
-     derselbe Text die dreifache Höhe, die Karte wächst über ihren Rahmen
-     hinaus und verdeckt, was darunter liegt. Genau das war zu sehen.
+  /* --- Schmale Karte ----------------------------------------------------
+     Die versetzte Überlappung ist unter etwa 460px nicht zu retten. Sie
+     rechnet in Anteilen der Kartenbreite: Bild 59 %, weiße Fläche 57 % — auf
+     554px sind das 327 und 316px, auf 420px noch 248 und 239, auf 304px nur
+     180 und 173. In 173px Breite braucht derselbe Text die dreifache Höhe,
+     die Fläche wächst über ihren Rahmen hinaus und verdeckt, was darunter
+     liegt.
 
      Also gestapelt statt überlappt — aber nicht als schlichte Reihe: Das
-     Bild nimmt die volle Breite, die Karte sitzt etwas schmaler rechts und
+     Bild nimmt die volle Breite, die Fläche sitzt etwas schmaler rechts und
      zieht sich über die Bildkante herauf. Der Versatz bleibt damit als Idee
      erhalten, ohne dass etwas gegeneinander gedrückt wird.
+
+     Der Schwellwert steht auf der Karte, nicht auf dem Fenster: Dieselbe
+     Komposition trägt damit das Telefon UND die schmale Spalte im Raster
+     unter /magazin, ohne dass eine der beiden Stellen von der anderen weiß.
      -------------------------------------------------------------------- */
-  @media (max-width: 700px) {
+  @container (max-width: 460px) {
     /* Breiter und flacher: Hochformat auf voller Breite nähme allein zwei
        Drittel der Bildschirmhöhe, bevor der Text beginnt. */
     .c-post__media {
@@ -241,6 +252,9 @@ const motiv = MOTIVE[position % MOTIVE.length];
       align-self: flex-end;
       width: 92%;
       margin-top: calc(-1 * var(--sp-8));
+      /* Der Ansatz von oben gilt hier nicht: Die Fläche steht im Fluss und
+         bekommt ihre Höhe vom Text. */
+      top: auto;
     }
 
     /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
