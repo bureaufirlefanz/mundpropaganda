@@ -34,7 +34,7 @@ const { topline, titel, absaetze, bild } = Astro.props;
           {istCmsBild(bild) ? (
             <CmsImage quelle={bild} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
           ) : (
-            <Picture name="portrait-hero" widths="640,1024,1600,2200" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
+            <Picture name="portrait-hero" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
           )}
         </div>
 

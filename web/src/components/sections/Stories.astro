@@ -36,13 +36,7 @@ const { eintraege, aktion } = Astro.props;
 /* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
    Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
    Stand, auf dem die Section steht, bis echte Fotos da sind. */
-const MOTIVE = [
-  { name: "smile-portrait", breiten: "563" },
-  { name: "motion-01", breiten: "640,1024" },
-  { name: "motion-02", breiten: "640,1024" },
-  { name: "motion-03", breiten: "640,1024" },
-  { name: "motion-04", breiten: "640,1024" },
-];
+const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion-04"];
 ---
 
 <!-- ==================================================================
@@ -80,7 +74,7 @@ const MOTIVE = [
                 {istCmsBild(e.bild) ? (
                   <CmsImage quelle={e.bild} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
                 ) : (
-                  <Picture name={MOTIVE[i % MOTIVE.length].name} widths={MOTIVE[i % MOTIVE.length].breiten} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
+                  <Picture name={MOTIVE[i % MOTIVE.length]} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
                 )}
                 <figcaption class="s-stories__name">{e.name}</figcaption>
               </figure>

@@ -38,11 +38,11 @@ const { standorte } = await ladeEinstellungen();
    Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
    Standortfotos hochlädt, sieht sie hier. */
 const MOTIVE: RingBild[] = [
-  { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
-  { name: "praxis-01", widths: "640", alt: "Empfangsbereich Prenzlauer Allee" },
-  { name: "praxis-02", widths: "640", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
-  { name: "abstract-01", widths: "640,1024" },
-  { name: "abstract-02", widths: "640,1024" },
+  { name: "praxis-03", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
+  { name: "praxis-01", alt: "Empfangsbereich Prenzlauer Allee" },
+  { name: "praxis-02", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
+  { name: "abstract-01" },
+  { name: "abstract-02" },
 ];
 
 /* Gepflegte Bilder gewinnen als GANZE Liste, nicht Karte für Karte: Der Ring
@@ -65,21 +65,21 @@ const ringBilder: RingBild[] = bilder?.length
           <Fragment>
           <div class="s-gallery__track" data-gallery-track>
             <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="abstract-02" widths="640,1024" alt="" sizes="10vw" parallax="9" />
+              <Picture name="abstract-02" alt="" sizes="10vw" parallax="9" />
             </figure>
             <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="praxis-01" widths="640" alt="Empfangsbereich Prenzlauer Allee" sizes="20vw" parallax="9" />
+              <Picture name="praxis-01" alt="Empfangsbereich Prenzlauer Allee" sizes="20vw" parallax="9" />
             </figure>
             <figure class="s-gallery__item s-gallery__item--lg">
-              <Picture name="praxis-03" widths="640,1024,1600,2200" alt="Behandlungsräume mit Tageslicht" sizes="45vw" parallax="9" />
+              <Picture name="praxis-03" alt="Behandlungsräume mit Tageslicht" sizes="45vw" parallax="9" />
               <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
             </figure>
             <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="praxis-02" widths="640" alt="Wartebereich Christburger Straße" sizes="20vw" parallax="9" />
+              <Picture name="praxis-02" alt="Wartebereich Christburger Straße" sizes="20vw" parallax="9" />
               <figcaption class="s-gallery__caption">Christburger Straße</figcaption>
             </figure>
             <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="abstract-01" widths="640,1024" alt="" sizes="10vw" parallax="9" />
+              <Picture name="abstract-01" alt="" sizes="10vw" parallax="9" />
             </figure>
           </div>
 

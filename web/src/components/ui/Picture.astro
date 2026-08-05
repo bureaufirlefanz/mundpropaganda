@@ -1,23 +1,49 @@
 ---
 /**
- * Responsives Bild. Ersetzt picture.hbs samt der beiden Handlebars-Helfer
- * (srcset/fallback) — die Logik liegt jetzt hier statt in der Build-Konfig.
+ * Responsives Bild aus der lokalen Pipeline.
  *
  * AVIF zuerst, WebP als Rückfall: der Browser nimmt das erste Format, das er
  * versteht. Der src zeigt auf die kleinste Breite, damit alte Browser ohne
  * srcset nicht das größte Bild ziehen.
+ *
+ * **Die Breiten kommen aus `bild-breiten.json`, nicht von außen.** Vorher
+ * nannte sie jeder Aufrufer selbst, und das ging so lange gut, wie die
+ * Pipeline die genannten Stufen auch erzeugt hatte. Sie deckelt aber auf die
+ * Breite der Quelle: `treatment-02` ist 1920px breit und hat keine 2200er
+ * Fassung. `Features.astro` forderte sie trotzdem an, der Browser wählte auf
+ * breiten Schirmen genau diese Kandidatin, bekam 404 und zeigte nichts. Auf
+ * der Veneers-Seite war das die erste Bild-Text-Zeile.
+ *
+ * Dass im Markup längst `widths="640,961"` und `widths="640,1017"` standen,
+ * war der Hinweis darauf: Wer Stufen abtippt, tippt irgendwann eine ab, die
+ * es nicht gibt. Jetzt kann das Markup keine falsche mehr nennen, weil es
+ * gar keine mehr nennt.
  */
+import BREITEN from "../../lib/bild-breiten.json";
+
 interface Props {
   name: string;
-  widths: string;
   alt?: string;
   sizes?: string;
   eager?: boolean;
   parallax?: string;
 }
-const { name, widths, alt = "", sizes = "100vw", eager = false, parallax } = Astro.props;
+const { name, alt = "", sizes = "100vw", eager = false, parallax } = Astro.props;
 
-const liste = widths.split(",").map((w) => w.trim());
+const liste = (BREITEN as Record<string, number[]>)[name];
+
+/* Lauter Abbruch statt eines leeren Kastens: Ein Motiv, das die Pipeline
+   nicht kennt, ist ein Tippfehler im Namen oder ein vergessenes
+   `npm run images` — beides soll den Build anhalten und nicht erst auf der
+   fertigen Seite auffallen. */
+if (!liste?.length) {
+  throw new Error(
+    `Picture: Motiv „${name}" steht nicht in bild-breiten.json. ` +
+      `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
+      `\`npm run images\` (bzw. \`node scripts/bild-breiten.mjs\`).`
+  );
+}
+
 const srcset = (ext: string) => liste.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
 const fallback = `/img/${name}-${liste[0]}.webp`;
 ---

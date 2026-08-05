@@ -11,6 +11,7 @@
 import sharp from "sharp";
 import { readdir, mkdir, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
+import { schreibeBreiten } from "./bild-breiten.mjs";
 
 const SRC = "assets/raw";
 const OUT = "web/public/img";
@@ -63,6 +64,12 @@ for (const file of files) {
       `(LQIP ${lqip.length} B)`
   );
 }
+
+/* Festhalten, welche Stufen tatsächlich entstanden sind. `Picture.astro`
+   liest das; ohne diesen Schritt bliebe die alte Liste stehen und das Markup
+   forderte Breiten an, die es nicht mehr (oder noch nicht) gibt. */
+const karte = await schreibeBreiten();
+console.log(`\nBreiten-Verzeichnis geschrieben: ${Object.keys(karte).length} Motive.`);
 
 const mb = (b) => (b / 1024 / 1024).toFixed(1);
 console.log(

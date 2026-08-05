@@ -313,6 +313,80 @@ async function ladePfadmodell() {
   };
 }
 
+/**
+ * Jede Bildadresse im gebauten HTML muss auf eine Datei zeigen.
+ *
+ * Der Fall, der das nötig gemacht hat: `Picture` bekam die Breiten als Text
+ * mitgegeben, die Pipeline deckelt sie aber auf die Breite der Quelle.
+ * `treatment-02` ist 1920px breit, das Markup forderte 2200 an. Auf breiten
+ * Schirmen wählte der Browser genau diese Kandidatin, bekam 404 und zeigte
+ * nichts — auf der Veneers-Seite die erste Bild-Text-Zeile. Kein Test schlug
+ * an: Die Seite war gültig, das Bild fehlte nur.
+ *
+ * Gelesen wird aus `dist/`, nicht über das Netz. Ein srcset hat bis zu fünf
+ * Kandidatinnen, von denen der Browser genau eine holt — über HTTP fiele
+ * immer nur die auf, die dieses Fenster gerade wählt.
+ */
+async function pruefeBilder() {
+  const { readFile, readdir, access } = await import("node:fs/promises");
+  const { join, relative } = await import("node:path");
+
+  async function alleHtml(ordner) {
+    const raus = [];
+    for (const eintrag of await readdir(ordner, { withFileTypes: true })) {
+      const pfad = join(ordner, eintrag.name);
+      if (eintrag.isDirectory()) raus.push(...(await alleHtml(pfad)));
+      else if (eintrag.name.endsWith(".html")) raus.push(pfad);
+    }
+    return raus;
+  }
+
+  const wurzel = "web/dist";
+  let dateien;
+  try {
+    dateien = await alleHtml(wurzel);
+  } catch {
+    console.log("  (kein web/dist — übersprungen)");
+    return 0;
+  }
+
+  /* Adresse -> Seiten, auf denen sie steht. So nennt die Meldung nicht nur
+     die fehlende Datei, sondern auch, wo man sie sieht. */
+  const referenzen = new Map();
+  for (const datei of dateien) {
+    const html = await readFile(datei, "utf8");
+    for (const treffer of html.matchAll(/(?:src|srcset)="([^"]+)"/g)) {
+      for (const teil of treffer[1].split(",")) {
+        const url = teil.trim().split(/\s+/)[0];
+        if (!url.startsWith("/") || url.startsWith("//")) continue;
+        if (!/\.(avif|webp|png|jpe?g|gif|svg)$/i.test(url)) continue;
+        if (!referenzen.has(url)) referenzen.set(url, new Set());
+        referenzen.get(url).add("/" + relative(wurzel, datei).replace(/index\.html$/, ""));
+      }
+    }
+  }
+
+  const fehlend = [];
+  for (const url of referenzen.keys()) {
+    try {
+      await access(join(wurzel, decodeURIComponent(url)));
+    } catch {
+      fehlend.push(url);
+    }
+  }
+
+  if (!fehlend.length) {
+    console.log(`  ✓ ${referenzen.size} Bildadressen zeigen auf vorhandene Dateien`);
+    return 0;
+  }
+  for (const url of fehlend.sort()) {
+    const wo = [...referenzen.get(url)].sort();
+    console.log(`  ✗ ${url}`);
+    console.log(`      steht auf: ${wo.slice(0, 3).join(", ")}${wo.length > 3 ? ` und ${wo.length - 3} weiteren` : ""}`);
+  }
+  return fehlend.length;
+}
+
 const browser = await starteBrowser();
 const SEITEN = await findeSeiten(browser);
 console.log(`Gefundene Seiten: ${SEITEN.join(" · ")}`);
@@ -364,6 +438,9 @@ if (ziel) {
 
 console.log(`\n── Routen-Deckung ──`);
 probleme += await pruefeRoutenDeckung(browser, SEITEN);
+
+console.log(`\n── Bilddateien ──`);
+probleme += await pruefeBilder();
 
 await browser.close();
 console.log(probleme ? `\n${probleme} Befund(e).` : "\nAlles sauber.");

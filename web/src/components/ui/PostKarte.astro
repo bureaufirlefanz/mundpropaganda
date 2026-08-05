@@ -62,12 +62,7 @@ const {
    WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
    es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
    Telefon das Bild in voller Breite aus. */
-const MOTIVE = [
-  { name: "motion-04", breiten: "640,1024" },
-  { name: "teeth-macro", breiten: "640,1024,1600,2048" },
-  { name: "lab-veneers", breiten: "640,1024,1600,2200" },
-  { name: "treatment-03", breiten: "640,1024,1600,2200" },
-];
+const MOTIVE = ["motion-04", "teeth-macro", "lab-veneers", "treatment-03"];
 const motiv = MOTIVE[position % MOTIVE.length];
 ---
 
@@ -76,7 +71,7 @@ const motiv = MOTIVE[position % MOTIVE.length];
     {istCmsBild(p.vorschaubild) ? (
       <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
     ) : (
-      <Picture name={motiv.name} widths={motiv.breiten} alt="" sizes={sizes} parallax={parallax} />
+      <Picture name={motiv} alt="" sizes={sizes} parallax={parallax} />
     )}
   </div>
 

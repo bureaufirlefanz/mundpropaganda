@@ -18,7 +18,8 @@ import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 /**
  * Eine Karte auf dem Ring. Entweder ein Bild aus dem CMS (`bild`) oder ein
- * Motiv aus der lokalen Bildpipeline (`name` + `widths`) — beides muss hier
+ * Motiv aus der lokalen Bildpipeline (`name`; die Breiten kennt `Picture`
+ * selbst) — der Name muss hier
  * ankommen können, weil der Ring seinen Rückfall braucht, solange im Studio
  * nichts hochgeladen ist.
  */
@@ -26,7 +27,6 @@ export interface RingBild {
   bild?: Bildquelle;
   /** Nur für den Rückfall: Name aus public/img, ohne Größe und Endung. */
   name?: string;
-  widths?: string;
   alt?: string;
   caption?: string;
 }
@@ -88,7 +88,6 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
           ) : (
             <Picture
               name={bild.name ?? "praxis-01"}
-              widths={bild.widths ?? "640"}
               alt={wiederholung ? "" : (bild.alt ?? "")}
               sizes="(max-width: 700px) 80vw, 38vw"
             />

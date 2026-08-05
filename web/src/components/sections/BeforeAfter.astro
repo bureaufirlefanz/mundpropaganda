@@ -35,13 +35,13 @@ const MOTIV_NACHHER = "teeth-macro-after";
       {istCmsBild(vorher) ? (
         <CmsImage quelle={vorher} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
       ) : (
-        <Picture name={MOTIV_VORHER} widths="640,1024,1600,2048" alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+        <Picture name={MOTIV_VORHER} alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
       )}
       <div class="s-ba__after">
         {istCmsBild(nachher) ? (
           <CmsImage quelle={nachher} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
         ) : (
-          <Picture name={MOTIV_NACHHER} widths="640,1024,1600,2048" alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+          <Picture name={MOTIV_NACHHER} alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
         )}
       </div>
       {/* Der Griff ist das Bedienelement, nicht nur Zierrat: role="slider"
