@@ -56,13 +56,17 @@
     }
   }
 
-  /* Weiß auf halber Deckkraft — die Linien liegen heller als der Seitengrund,
-     nicht dunkler. So steht es im Entwurf. */
+  /* Weiß auf niedriger Deckkraft — die Linien liegen heller als der
+     Seitengrund, nicht dunkler. So steht es im Entwurf.
+
+     Dünn und zurückgenommen: Sie sind Grund, nicht Zeichnung. Wird der Strich
+     kräftiger, liest sich der Hero als Illustration mit Text darauf statt als
+     Text auf einer Fläche, die sich leise bewegt. */
   .s-lines .tooth-line {
     fill: none;
     stroke: var(--c-white);
-    stroke-opacity: 0.62;
-    stroke-width: 1.6;
+    stroke-opacity: 0.4;
+    stroke-width: 1.1;
   }
 </style>
 

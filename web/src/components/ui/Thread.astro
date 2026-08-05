@@ -6,8 +6,15 @@
 
 <style>
   /* Durchlaufender Pfad. Zieht sich ab der Standards-Section durch die
-     restliche Seite. Gleiche Anmutung wie die Linien im Hero: weiß, leicht
-     unscharf, sehr ruhig.
+     restliche Seite.
+
+     Anders bemaßt als die Hero-Linien, obwohl er wie deren Fortsetzung
+     aussieht: Der Hero ist dunkel, hier liegt der Pfad auf hellem Grund.
+     Mit den Hero-Werten (1,6 px unter blur(1.2px)) kam auf dem Schirm eine
+     Spitze von +20/255 an — auf ein bis zwei Pixeln, also gar nichts. Der
+     Weichzeichner verteilt die Deckkraft eines so dünnen Strichs, bis nichts
+     übrig ist. Gemessen mit halbem Blur und 2,4 px: +124/255 auf rund 2900
+     Pixeln. Wer hier am Blur dreht, muss die Strichstärke mitziehen.
 
      Liegt absolut in der Section, die ihn startet, und reicht weit darüber
      hinaus. preserveAspectRatio="none" streckt ihn auf die volle Länge,
@@ -39,7 +46,7 @@
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: blur(1.2px);
+    filter: blur(0.6px);
     animation: thread-sway 26s cubic-bezier(0.32, 0.14, 0.68, 0.86) infinite
       alternate;
   }
@@ -59,7 +66,7 @@
     fill: none;
     stroke: var(--c-white);
     stroke-opacity: 0.62;
-    stroke-width: 1.6;
+    stroke-width: 2.4;
     vector-effect: non-scaling-stroke;
     animation: thread-breathe 19s ease-in-out infinite alternate;
   }

@@ -29,6 +29,7 @@ export function initGallery() {
     dots: "[data-magazine-dots]",
     prev: "[data-magazine-prev]",
     next: "[data-magazine-next]",
+    seitenweise: true,
     label: "Beitrag",
     startInMiddle: false,
   });
@@ -50,18 +51,45 @@ function initCarousel(cfg) {
   const dotsBox = section.querySelector(cfg.dots);
   let index = 0;
 
-  /* Punkte aus der Anzahl der Bilder erzeugen — so bleibt das Markup frei
-     von Zählwerten, die beim Ergänzen eines Standorts vergessen werden. */
-  const dots = items.map((_, i) => {
-    const dot = document.createElement("button");
-    dot.type = "button";
-    dot.className = "s-gallery__dot";
-    dot.setAttribute("role", "tab");
-    dot.setAttribute("aria-label", `${cfg.label} ${i + 1}`);
-    dot.addEventListener("click", () => go(i));
-    dotsBox?.append(dot);
-    return dot;
-  });
+  /**
+   * Wie viele Elemente stehen nebeneinander im Bild?
+   *
+   * Gemessen statt gezählt: Die Karten sind in `clamp()` bemaßt und ändern
+   * ihre Breite mit dem Fenster — eine feste Zahl liefe bei der nächsten
+   * Fenstergröße daneben. Der Abstand steckt in der Differenz zweier
+   * Startkanten, deshalb reicht ein Blick auf die ersten beiden.
+   */
+  function proSeite() {
+    if (!cfg.seitenweise) return 1;
+    const sicht = track.parentElement.clientWidth;
+    const schritt =
+      items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : items[0].offsetWidth;
+    return Math.max(1, Math.floor(sicht / schritt));
+  }
+
+  /* Punkte: bei seitenweisem Blättern einer je SEITE, sonst einer je Element.
+     Sonst stünden unter vier gleichzeitig sichtbaren Beiträgen vier Punkte,
+     von denen drei nichts bewirken. */
+  let dots = [];
+
+  function baueDots() {
+    dotsBox?.replaceChildren();
+    const anzahl = cfg.seitenweise
+      ? Math.ceil(items.length / proSeite())
+      : items.length;
+    dots = Array.from({ length: anzahl }, (_, i) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "s-gallery__dot";
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", `${cfg.label} ${i + 1}`);
+      dot.addEventListener("click", () => go(cfg.seitenweise ? i * proSeite() : i));
+      dotsBox?.append(dot);
+      return dot;
+    });
+  }
+
+  baueDots();
 
   /** Verschiebt die Spur auf das gewählte Element. */
   function go(next) {
@@ -81,16 +109,27 @@ function initCarousel(cfg) {
       overwrite: "auto",
     });
 
-    dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === index)));
+    const aktiv = cfg.seitenweise ? Math.floor(index / proSeite()) : index;
+    dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === aktiv)));
   }
 
-  section.querySelector(cfg.next)?.addEventListener("click", () => go(index + 1));
-  section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - 1));
+  /* Ein Klick blättert eine SEITE weiter, nicht einen Beitrag. Bei vier
+     nebeneinander sichtbaren Karten sprang der Pfeil sonst um eine Karte —
+     das las sich wie ein Ruckeln und nicht wie Blättern. */
+  const schrittweite = () => (cfg.seitenweise ? proSeite() : 1);
+
+  section.querySelector(cfg.next)?.addEventListener("click", () => go(index + schrittweite()));
+  section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - schrittweite()));
 
   go(cfg.startInMiddle ? Math.floor(items.length / 2) : 0);
 
-  // Nach einem Resize stimmen die Offsets nicht mehr.
-  ScrollTrigger.addEventListener("refreshInit", () => go(index));
+  /* Nach einem Resize stimmen die Offsets nicht mehr — und bei seitenweisem
+     Blättern auch die Anzahl der Punkte nicht, weil dann andere viele Karten
+     nebeneinander passen. */
+  ScrollTrigger.addEventListener("refreshInit", () => {
+    if (cfg.seitenweise) baueDots();
+    go(index);
+  });
 }
 
 /**
