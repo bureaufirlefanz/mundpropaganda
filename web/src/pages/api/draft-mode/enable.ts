@@ -39,7 +39,16 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     secure: !import.meta.env.DEV,
   });
 
-  /* Auf die Vorschau-Fassung der Zielseite, nicht auf die echte: Diese Route
-     hier ist statisch und wüsste nichts von Entwürfen. */
-  return redirect(`/preview${redirectTo === "/" ? "" : redirectTo}`, 307);
+  /* Auf die Vorschau-Fassung der Zielseite, nicht auf die echte: Die echten
+     Routen sind vorgerendert und wüssten nichts von Entwürfen.
+
+     Der Präfix wird nur gesetzt, wenn er fehlt. Das Presentation-Werkzeug
+     liefert den Pfad der Location, also `/leistungen/veneers`; ruft jemand
+     den Endpunkt aber mit einem bereits präfigierten Pfad auf, entstünde
+     sonst `/preview/preview/…` und damit ein 404. */
+  const ziel = redirectTo.startsWith("/preview")
+    ? redirectTo
+    : `/preview${redirectTo === "/" ? "" : redirectTo}`;
+
+  return redirect(ziel, 307);
 };

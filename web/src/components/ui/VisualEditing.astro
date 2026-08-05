@@ -18,6 +18,37 @@
 <script>
   import { enableVisualEditing } from "@sanity/visual-editing/enable-visual-editing";
 
+  /* In der Vorschau bleiben.
+   *
+   * Die Bausteine rendern die echten Pfade — `/leistungen/veneers`, nicht
+   * `/preview/leistungen/veneers`. Das ist richtig so: Sie wissen nichts von
+   * der Vorschau, und sie sollen es auch nicht. Ein Klick auf einen Link
+   * führte damit aber aus der Vorschau heraus auf die veröffentlichte Seite,
+   * mitten im Bearbeiten.
+   *
+   * Deshalb hier, an der einen Stelle, die es nur in der Vorschau gibt: Ein
+   * Klick auf einen seiteninternen Link bekommt das Präfix vorgesetzt.
+   * Sprungmarken (#kontakt) und fremde Ziele bleiben unangetastet. */
+  const PRAEFIX = "/preview";
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      const a = (e.target as HTMLElement)?.closest?.("a");
+      if (!a) return;
+
+      const ziel = a.getAttribute("href");
+      if (!ziel?.startsWith("/") || ziel.startsWith(PRAEFIX + "/") || ziel === PRAEFIX) return;
+
+      e.preventDefault();
+      /* Über den Astro-Router, damit die Module nicht neu anlaufen müssen. */
+      window.location.assign(PRAEFIX + ziel);
+    },
+    /* In der Capture-Phase: Der Router von Astro hängt selbst am Klick, und
+       wer später kommt, sieht das Ereignis nicht mehr. */
+    true
+  );
+
   /* `history` verbindet die Klicks im Studio mit dem Router der Seite: Ein
      Sprung im Studio soll hier navigieren, statt das Fenster neu zu laden —
      sonst ginge bei jedem Klick die Auftrittschoreografie von vorn los. */

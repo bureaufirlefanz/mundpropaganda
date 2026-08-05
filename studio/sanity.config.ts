@@ -1,10 +1,18 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
+import { presentationTool } from "sanity/presentation";
 import { visionTool } from "@sanity/vision";
 
 import { schemaTypes } from "./schemaTypes";
 import { structure, EINZELDOKUMENTE, OHNE_ROUTE } from "./structure";
-import { dokumentAnsichten } from "./structure/dokumentAnsichten";
+import { resolve } from "./structure/orte";
+
+/**
+ * Wo die Website läuft. Lokal der Dev-Server, in der Auslieferung die echte
+ * Adresse — gesetzt über SANITY_STUDIO_PREVIEW_URL, damit ein
+ * veröffentlichtes Studio nicht auf localhost zeigt.
+ */
+const WEBSITE = process.env.SANITY_STUDIO_PREVIEW_URL || "http://localhost:4321";
 
 // Eigenständiges Studio, nicht in die Astro-App eingebettet: Redaktion und
 // Auslieferung bleiben dadurch getrennt deploybar.
@@ -16,8 +24,26 @@ export default defineConfig({
   dataset: "production",
 
   plugins: [
-    // Aufbau der Seitenleiste und die Reiter am Dokument liegen in structure/.
-    structureTool({ structure, defaultDocumentNode: dokumentAnsichten }),
+    // Aufbau der Seitenleiste liegt in structure/.
+    structureTool({ structure }),
+
+    /* Klick-zum-Bearbeiten. Beides bleibt nebeneinander: structureTool ist der
+       Weg über die Liste, presentationTool der über die Seite.
+
+       Der Vorschau-Reiter am Dokument ist mit Aufgabe 7 entfallen
+       (`WebVorschau.tsx`, `dokumentAnsichten.ts`). Er zeigte den gebauten
+       Stand in einem iframe — also nicht den Entwurf, den man gerade
+       bearbeitet. Zwei Vorschauen nebeneinander sind schlechter als eine:
+       Man sieht immer nur eine und weiß nicht, welche gerade lügt. */
+    presentationTool({
+      resolve,
+      previewUrl: {
+        initial: WEBSITE,
+        /* Der Endpunkt prüft das Geheimnis gegen den Datensatz und setzt erst
+           dann das Cookie, das /preview freischaltet. */
+        previewMode: { enable: "/api/draft-mode/enable" },
+      },
+    }),
 
     // Abfragen ausprobieren, ohne die Seite zu bauen. Bleibt im Studio, geht
     // nicht in die Auslieferung.
