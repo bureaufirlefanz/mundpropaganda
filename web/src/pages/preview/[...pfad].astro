@@ -1,0 +1,151 @@
+---
+/**
+ * Die Vorschau. Zeigt dieselben Seiten wie die Website, nur mit Entwürfen.
+ *
+ * **Die einzige Route der Seite, die nicht vorgerendert wird.** Alles andere
+ * bleibt statisch — `output: "static"` gilt weiter, und `prerender = false`
+ * ist hier die Ausnahme. Die Alternative wäre, die ganze Seite auf SSR zu
+ * stellen; das kostete Auslieferungsgeschwindigkeit, Cache und die
+ * Eigenschaft, dass die Site auch ohne laufenden Server steht. Für eine
+ * Praxis-Website ist das ein schlechter Tausch.
+ *
+ * Gerendert wird über dieselben Zusammenbauten aus `seiten/` wie die echten
+ * Routen. Das ist der Grund, warum Aufgabe 5 vor dieser hier stand: Zwei
+ * Zusammenbauten, die dasselbe zeigen sollen, laufen garantiert auseinander —
+ * und zwar unbemerkt, weil man immer nur eine von beiden ansieht.
+ *
+ * Was die Vorschau NICHT als Entwurf zeigt: den Rahmen. Navigation, Fuß und
+ * Einstellungen holen sich ihre Daten selbst über die Ladefunktionen in
+ * `lib/`, und die hängen am veröffentlichten Client. Für die Seite, die man
+ * gerade bearbeitet, stimmt die Vorschau; ein Entwurf der Navigation ist
+ * darin noch nicht zu sehen. Das aufzulösen hieße, jede Ladefunktion einen
+ * Client entgegennehmen zu lassen — ein eigener Schritt.
+ */
+export const prerender = false;
+
+import Startseite from "../../seiten/Startseite.astro";
+import Leistung from "../../seiten/Leistung.astro";
+import Magazin from "../../seiten/Magazin.astro";
+import Beitrag from "../../seiten/Beitrag.astro";
+import Karriere from "../../seiten/Karriere.astro";
+import VisualEditing from "../../components/ui/VisualEditing.astro";
+
+import { vorschauClient, zielVon, VORSCHAU_COOKIE } from "../../lib/vorschau";
+import {
+  STARTSEITE_QUERY,
+  LEISTUNG_QUERY,
+  BEITRAEGE_QUERY,
+  BEITRAG_QUERY,
+  MAGAZIN_INDEX_QUERY,
+  KARRIERE_QUERY,
+  STELLEN_QUERY,
+  LEISTUNGSLISTE_QUERY,
+} from "../../lib/queries";
+import { ohneNull } from "../../lib/ohne-null";
+import type { StartseiteInhalt } from "../../lib/startseite";
+import type { Leistung as LeistungDaten } from "../../lib/leistungen";
+import type { Beitrag as BeitragKarte, BeitragVoll, MagazinKopf } from "../../lib/magazin";
+import type { Karriere as KarriereDaten, Stelle } from "../../lib/karriere";
+import type { LeistungsEintrag } from "../../lib/leistungsliste";
+
+/* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
+   und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
+   geprüft wurde. Ohne diese Sperre wären sämtliche Entwürfe für jeden
+   lesbar, der die Adresse errät — `/preview/` ist nicht geheim. */
+if (Astro.cookies.get(VORSCHAU_COOKIE)?.value !== "an") {
+  return new Response(
+    "Vorschau nicht freigeschaltet. Sie wird aus dem Studio heraus geöffnet.",
+    { status: 401, headers: { "content-type": "text/plain; charset=utf-8" } }
+  );
+}
+
+const client = vorschauClient();
+if (!client) {
+  return new Response(
+    "SANITY_API_READ_TOKEN fehlt — ohne Token gibt die API keine Entwürfe heraus.",
+    { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } }
+  );
+}
+
+const ziel = zielVon(Astro.params.pfad ?? "");
+if (!ziel) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+
+/* Kein Zwischenspeichern wie in den Ladefunktionen unter `lib/`: Die Vorschau
+   läuft je Aufruf frisch, das ist ihr Zweck. */
+async function hole<T>(abfrage: string, params: Record<string, unknown> = {}) {
+  return ohneNull(await client!.fetch<T>(abfrage, params));
+}
+
+/* Je Seitenart genau die Abfragen, die ihr Zusammenbau braucht — und jede nur
+   einmal. */
+let inhalt: {
+  startseite?: StartseiteInhalt;
+  leistung?: LeistungDaten;
+  magazinKopf?: MagazinKopf;
+  beitrag?: BeitragVoll;
+  karriere?: KarriereDaten;
+  beitraege: BeitragKarte[];
+  stellen: Stelle[];
+  titel: string;
+} = { beitraege: [], stellen: [], titel: "" };
+
+if (ziel.art === "startseite") {
+  const [daten, beitraege] = await Promise.all([
+    hole<StartseiteInhalt>(STARTSEITE_QUERY),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: null }),
+  ]);
+  inhalt = { ...inhalt, startseite: daten, beitraege: beitraege ?? [] };
+} else if (ziel.art === "leistung") {
+  const [daten, liste, start, beitraege] = await Promise.all([
+    hole<LeistungDaten>(LEISTUNG_QUERY, { slug: ziel.slug }),
+    hole<LeistungsEintrag[]>(LEISTUNGSLISTE_QUERY),
+    hole<StartseiteInhalt>(STARTSEITE_QUERY),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: ziel.slug }),
+  ]);
+  inhalt = {
+    ...inhalt,
+    leistung: daten,
+    beitraege: beitraege ?? [],
+    titel: daten?.titel || (liste ?? []).find((l) => l.slug === ziel.slug)?.name || "",
+    startseite: start,
+  };
+} else if (ziel.art === "magazinIndex") {
+  const [kopf, beitraege] = await Promise.all([
+    hole<MagazinKopf>(MAGAZIN_INDEX_QUERY),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: null }),
+  ]);
+  inhalt = { ...inhalt, magazinKopf: kopf, beitraege: beitraege ?? [] };
+} else if (ziel.art === "beitrag") {
+  const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: ziel.slug });
+  inhalt = { ...inhalt, beitrag: daten, titel: daten?.titel ?? "" };
+} else {
+  const [daten, stellen] = await Promise.all([
+    hole<KarriereDaten>(KARRIERE_QUERY),
+    hole<Stelle[]>(STELLEN_QUERY),
+  ]);
+  inhalt = { ...inhalt, karriere: daten, stellen: stellen ?? [] };
+}
+---
+
+{ziel.art === "startseite" && inhalt.startseite && (
+  <Startseite daten={inhalt.startseite} beitraege={inhalt.beitraege} />
+)}
+
+{ziel.art === "leistung" && (
+  <Leistung
+    daten={inhalt.leistung}
+    titel={inhalt.titel}
+    stories={inhalt.startseite?.storiesEintraege ?? []}
+    beitraege={inhalt.beitraege}
+  />
+)}
+
+{ziel.art === "magazinIndex" && (
+  <Magazin kopf={inhalt.magazinKopf} beitraege={inhalt.beitraege} />
+)}
+
+{ziel.art === "beitrag" && <Beitrag daten={inhalt.beitrag} titel={inhalt.titel} />}
+
+{ziel.art === "karriere" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
+
+<VisualEditing />

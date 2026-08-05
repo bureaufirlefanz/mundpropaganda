@@ -1,20 +1,13 @@
-# Veröffentlichung des Astro-Stands als statische Seite.
+# Der Zeiger auf das Verzeichnis, in dem gebaut wird.
 #
-# `web/` ist in sich geschlossen: Tokens, Basis-CSS und die Module liegen seit
-# A2 darin, nicht mehr im Prototyp an der Wurzel. Der Build braucht deshalb
-# nichts oberhalb von `base` — hier stand vorher die umgekehrte Begründung,
-# und die galt genau bis zu diesem Umzug.
+# Alles Weitere steht in `web/netlify.toml`. Diese Aufteilung ist nicht
+# Geschmack, sondern nötig: Der Astro-Netlify-Adapter läuft mit `web/` als
+# Arbeitsverzeichnis und löst `netlify.toml` von dort auf. Eine einzelne
+# Datei im Stamm mit `base = "web"` ergab dabei `web/web`, und der
+# Dev-Server startete nicht mehr.
+#
+# Netlify liest zuerst diese Datei, wechselt in das Basisverzeichnis und
+# liest die dortige `netlify.toml` darüber.
 
 [build]
   base = "web"
-  command = "npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "22"
-
-# Keine eigene Regel für die Verzeichnis-URLs. Astro legt jede Seite als
-# `pfad/index.html` ab, und Netlifys „Pretty URLs" leiten /karriere per 301
-# auf /karriere/ um — gemessen, nicht vermutet. Eine zusätzliche
-# Rewrite-Regel darüber wäre wirkungslos und würde nur den Eindruck
-# erwecken, sie täte etwas. Die 404-Seite blendet sie im Zweifel sogar aus.

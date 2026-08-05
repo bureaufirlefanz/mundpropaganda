@@ -1,0 +1,34 @@
+# Veröffentlichung des Astro-Stands.
+#
+# Diese Datei liegt in `web/` und nicht im Projektstamm. Der Grund ist der
+# Netlify-Adapter: Astro läuft mit `web/` als Arbeitsverzeichnis, und der
+# Adapter löst `netlify.toml` von dort aus auf. Stand die Konfiguration im
+# Stamm mit `base = "web"`, ergab das `web/web` — der Dev-Server startete
+# nicht mehr.
+#
+# Der Stamm behält deshalb nur noch den Zeiger auf dieses Verzeichnis.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Der Astro-Netlify-Adapter legt seine Funktion unter `.netlify/v1/` ab
+# (Frameworks API). Netlify findet sie dort von selbst, sofern es den Build
+# SELBST ausführt.
+#
+# Genau deshalb ist `web:deploy` von `--no-build` auf `--build` umgestellt.
+# Vorher wurde der fertige `dist`-Ordner hochgeladen; die Funktion wäre dabei
+# liegengeblieben, und /preview sowie /api/draft-mode hätten in der
+# Auslieferung 404 geliefert — ohne dass am Build etwas aufgefallen wäre.
+#
+# `SANITY_API_READ_TOKEN` muss als Umgebungsvariable im Netlify-Projekt
+# stehen. Nicht hier: Diese Datei liegt in der Versionsgeschichte.
+
+# Keine eigene Regel für die Verzeichnis-URLs. Astro legt jede Seite als
+# `pfad/index.html` ab, und Netlifys „Pretty URLs" leiten /karriere per 301
+# auf /karriere/ um — gemessen, nicht vermutet. Eine zusätzliche
+# Rewrite-Regel darüber wäre wirkungslos und würde nur den Eindruck
+# erwecken, sie täte etwas. Die 404-Seite blendet sie im Zweifel sogar aus.

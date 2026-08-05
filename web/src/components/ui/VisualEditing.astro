@@ -1,0 +1,47 @@
+---
+/**
+ * Klick-zum-Bearbeiten in der Vorschau.
+ *
+ * Bewusst OHNE Rahmenwerk. Die übliche Einbindung von `@sanity/visual-editing`
+ * ist eine React-Komponente; die brächte React, ReactDOM und die
+ * Astro-Integration mit — für eine Seite, die in `astro.config.mjs` damit
+ * wirbt, null Framework-JavaScript auszuliefern.
+ *
+ * `enable-visual-editing` ist der rahmenfreie Einstieg: eine Funktion, die
+ * sich an das Dokument hängt und die Stega-Markierungen im Text auswertet.
+ *
+ * Das Skript steht nur auf der Vorschau-Route. Auf den ausgelieferten Seiten
+ * gibt es weder Markierungen noch dieses Bündel.
+ */
+---
+
+<script>
+  import { enableVisualEditing } from "@sanity/visual-editing/enable-visual-editing";
+
+  /* `history` verbindet die Klicks im Studio mit dem Router der Seite: Ein
+     Sprung im Studio soll hier navigieren, statt das Fenster neu zu laden —
+     sonst ginge bei jedem Klick die Auftrittschoreografie von vorn los. */
+  enableVisualEditing({
+    history: {
+      subscribe: (navigate) => {
+        const melde = () =>
+          navigate({ type: "push", url: location.pathname + location.search });
+        document.addEventListener("astro:page-load", melde);
+        return () => document.removeEventListener("astro:page-load", melde);
+      },
+      update: (update) => {
+        if (update.type === "push" || update.type === "replace") {
+          /* Über den Astro-Router, nicht über location.href. */
+          window.history[update.type === "push" ? "pushState" : "replaceState"](
+            {},
+            "",
+            update.url
+          );
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        } else if (update.type === "pop") {
+          window.history.back();
+        }
+      },
+    },
+  });
+</script>

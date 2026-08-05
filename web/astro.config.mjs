@@ -1,18 +1,31 @@
 import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
 import sanity from "@sanity/astro";
+import netlify from "@astrojs/netlify";
 
 // astro.config.mjs läuft vor Astros Env-Ladung — import.meta.env.PUBLIC_* ist
 // hier noch nicht verfügbar. loadEnv liest dieselben Variablen, die die Seiten
 // später über import.meta.env bekommen.
-const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET } = loadEnv(
-  process.env.NODE_ENV ?? "development",
-  process.cwd(),
-  ""
-);
+const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET, PUBLIC_SANITY_STUDIO_URL } =
+  loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
+
+/* Wo das Studio läuft. Braucht Stega, um aus einem angeklickten Text den
+   richtigen Feldpfad im Studio zu öffnen. Voreinstellung ist der lokale
+   Entwicklungsstand; für ein veröffentlichtes Studio setzt Netlify die
+   Variable. */
+const STUDIO = PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 
 // Kein Framework-Adapter: die Seite ist statisch, die Interaktion läuft über
-// vanilla-Module. Astro liefert damit null Framework-JavaScript aus.
+// vanilla-Module. Astro liefert damit null Framework-JavaScript aus — auch
+// nach Aufgabe 6 noch. Visual Editing bringt zwar üblicherweise React mit;
+// `@sanity/visual-editing/enable-visual-editing` ist aber eine schlichte
+// Funktion ohne Rahmenwerk, und die reicht.
+//
+// `output: "static"` BLEIBT. In Astro 5 heißt das: alles wird vorgerendert,
+// außer wo `export const prerender = false` steht. Genau zwei Stellen tun
+// das — die Vorschau-Route und die beiden Draft-Mode-Endpunkte. Der Rest der
+// Seite bleibt Byte für Byte, was er war, und steht auch ohne laufenden
+// Server.
 //
 // Kein `vite.server.fs.allow` mehr: Es stand hier, solange Tokens, Basis-CSS
 // und die Module aus dem Prototyp an der Wurzel eingebunden wurden. Seit A2
@@ -20,6 +33,11 @@ const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET } = loadEnv(
 // nach oben ist damit weder nötig noch erwünscht.
 export default defineConfig({
   output: "static",
+
+  /* Nötig für die Vorschau-Route: Sie muss je Aufruf frisch rendern, weil sie
+     Entwürfe zeigt. Alles Übrige bleibt vorgerendert. */
+  adapter: netlify(),
+
   integrations: [
     sanity({
       projectId: PUBLIC_SANITY_PROJECT_ID,
@@ -29,6 +47,14 @@ export default defineConfig({
       useCdn: false,
       // Das Studio bleibt eigenständig in studio/ — hier bewusst kein
       // studioBasePath, sonst würde es in die Auslieferung eingebettet.
+
+      /* Stega webt unsichtbare Markierungen in jeden Text, aus denen das
+         Studio ablesen kann, welches Feld hinter einer Stelle steckt.
+         `false` als Voreinstellung: Eingeschaltet wird es AUSSCHLIESSLICH in
+         der Vorschau-Route, über einen eigenen Client. Stünde hier `true`,
+         landeten die Markierungen im ausgelieferten HTML — unsichtbar zwar,
+         aber sie stehen in Textinhalten und damit im Suchindex. */
+      stega: { studioUrl: STUDIO, enabled: false },
     }),
   ],
 
