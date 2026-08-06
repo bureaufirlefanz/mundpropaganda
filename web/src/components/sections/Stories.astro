@@ -36,7 +36,10 @@ const { items, action } = Astro.props;
 /* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
    Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
    Stand, auf dem die Section steht, bis echte Fotos da sind. */
-const MOTIFS = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion-04"];
+/* Zwei echte Porträts vorn, danach die abstrakten Motive. `smile-portrait`
+   ist entfallen: Es lag nur in 563px vor, und die Karte zeigt das Motiv bis
+   1024px breit — es wurde also hochskaliert ausgeliefert. */
+const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-02", "motion-03"];
 ---
 
 <!-- ==================================================================

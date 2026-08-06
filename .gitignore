@@ -21,5 +21,12 @@ aufnahmen/
 schema.json
 web/src/lib/sanity.types.ts
 
+# Original exports. Two portraits alone are 17 MB; the pipeline turns them
+# into 1.7 MB under web/public/img/, and those ARE versioned because the build
+# needs them. Keeping the originals in history would mean carrying every
+# revision of a 10 MB PNG forever, for files nothing reads at build time.
+assets/raw/*
+!assets/raw/README.md
+
 # Local Netlify folder
 .netlify
