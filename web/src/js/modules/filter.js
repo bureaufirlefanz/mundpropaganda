@@ -131,7 +131,7 @@ export function initFilter() {
     }
 
     for (const o of optionen) {
-      o.setAttribute("aria-pressed", String((o.dataset.filterWert || "") === (value || "")));
+      o.setAttribute("aria-pressed", String((o.dataset.filterValue || "") === (value || "")));
     }
 
     if (punkt) punkt.hidden = !value;
@@ -139,7 +139,7 @@ export function initFilter() {
 
   for (const o of optionen) {
     o.addEventListener("click", () => {
-      const value = o.dataset.filterWert || "";
+      const value = o.dataset.filterValue || "";
       wende(value);
       klappe(false);
       knopf.focus();
@@ -158,7 +158,7 @@ export function initFilter() {
      Ohne Animation — beim ersten Bild soll nichts eingeblendet werden, was
      ohnehin schon dasteht. */
   const start = new URL(location.href).searchParams.get("category");
-  if (start && optionen.some((o) => o.dataset.filterWert === start)) {
+  if (start && optionen.some((o) => o.dataset.filterValue === start)) {
     wende(start, { animieren: false });
   }
 }

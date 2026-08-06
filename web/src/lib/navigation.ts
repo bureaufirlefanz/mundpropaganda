@@ -28,15 +28,21 @@ export type LinkValue = NonNullable<Navigation["mainMenu"]>[number];
  * ändert sich selten; wenn sie sich ändert, bricht `web:check` an der
  * Routen-Deckung.
  */
+/* Links der Typname (englisch, wie im Schema), rechts das Verzeichnis in der
+   Adresse (deutsch, wie die Website). Beides zu verwechseln kostete bei der
+   Sprachumstellung sämtliche Menü- und Fußlinks: Die Schlüssel hießen noch
+   `startseite` und `karriere`, die Dokumente längst `homepage` und `careers`.
+   `documentPath` fand nichts, gab `null` zurück, und `resolved()` verwirft
+   jeden Verweis ohne Ziel — das Menü war leer, ohne dass etwas kaputt war. */
 const DIRECTORIES: Record<string, string> = {
-  service: "services",
-  beitrag: "magazine",
+  service: "leistungen",
+  post: "magazin",
 };
 
 const FIXED_PATHS: Record<string, string> = {
-  startseite: "/",
-  magazinIndex: "/magazin",
-  karriere: "/karriere",
+  homepage: "/",
+  magazineIndex: "/magazin",
+  careers: "/karriere",
 };
 
 function documentPath(typ?: string, slug?: string): string | null {

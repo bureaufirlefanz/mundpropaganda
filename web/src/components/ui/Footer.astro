@@ -79,7 +79,7 @@ const columns = (
           Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
           breit genug für zwei nebeneinander. Quelle sind dieselben
           Einstellungen wie in der Standorte-Section. */}
-      <div class="c-footer__standlocations">
+      <div class="c-footer__locations">
         {e.locations.map((o) => (
           <div>
             {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
@@ -256,7 +256,7 @@ const columns = (
   /* Zwei Anschriften nebeneinander, solange Platz ist. Unter 560px stapeln
      sie — zwei Adressen in halber Spaltenbreite brächen sonst nach jedem
      zweiten Wort um. */
-  .c-footer__standorte {
+  .c-footer__locations {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-4) var(--site-gutter);
@@ -264,7 +264,7 @@ const columns = (
   }
 
   @media (max-width: 560px) {
-    .c-footer__standorte {
+    .c-footer__locations {
       grid-template-columns: 1fr;
     }
   }
@@ -279,7 +279,7 @@ const columns = (
     color: var(--c-grey);
   }
 
-  .c-footer__standorte address {
+  .c-footer__locations address {
     font-style: normal;
     line-height: 1.5;
   }

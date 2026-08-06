@@ -49,15 +49,15 @@ const bloecke = withHeadingIds(d?.text, headings);
   description={description}
   noIndex={d?.seo?.noIndex}
 >
-  <article class="s-beitrag">
+  <article class="s-post">
     {/* --- Kopf: Bild über die volle Breite, Titel darauf ----------------- */}
-    <header class="s-beitrag__kopf">
+    <header class="s-post__header">
       {/* Ohne Bild im CMS dasselbe Ersatzmotiv wie auf der Karte im Raster
           und im Karussell. Vorher stand hier ein festes `teeth-macro`: Ein
           Beitrag zeigte in der Übersicht ein Bild und auf seiner eigenen
           Seite ein anderes, und wer geklickt hatte, landete sichtbar
           woanders. */}
-      <div class="s-beitrag__kopfpicture">
+      <div class="s-post__headerimage">
         {isCmsImage(d?.previewImage) ? (
           <CmsImage
             source={d.previewImage}
@@ -71,26 +71,26 @@ const bloecke = withHeadingIds(d?.text, headings);
         )}
       </div>
 
-      <div class="container s-beitrag__kopftext">
-        <div class="s-beitrag__meta">
+      <div class="container s-post__headertext">
+        <div class="s-post__meta">
           {d?.category && <span class="c-topline">{categoryLabel(d.category)}</span>}
           {d?.date && <time datetime={d.date}>{dateLabel(d.date)}</time>}
         </div>
-        <h1 class="s-beitrag__titel" data-split="lines">{title}</h1>
-        {d?.lead && <p class="s-beitrag__lead" data-reveal="up">{d.lead}</p>}
+        <h1 class="s-post__title" data-split="lines">{title}</h1>
+        {d?.lead && <p class="s-post__lead" data-reveal="up">{d.lead}</p>}
       </div>
     </header>
 
     {/* --- Satz: Verzeichnis links, Text rechts --------------------------- */}
     {d?.text && (
-      <div class:list={["container", "s-beitrag__satz", zeigeToc && "s-beitrag__satz--mit-toc"]}>
+      <div class:list={["container", "s-post__body", zeigeToc && "s-beitrag__satz--mit-toc"]}>
         {zeigeToc && (
-          <aside class="s-beitrag__seite">
+          <aside class="s-post__aside">
             <Inhaltsverzeichnis headings={headings} />
           </aside>
         )}
 
-        <div class="s-beitrag__text" data-toc-bereich>
+        <div class="s-post__text" data-toc-bereich>
           <PortableText
             value={bloecke}
             components={{
@@ -106,7 +106,7 @@ const bloecke = withHeadingIds(d?.text, headings);
               Richtungen — die Leistungsseite zeigt passende Beiträge, der
               Beitrag führt zurück. */}
           {d?.service?.slug && (
-            <div class="s-beitrag__zurueck">
+            <div class="s-post__back">
               <Button
                 label={`Zur Leistung: ${d.service.title}`}
                 href={`/leistungen/${d.service.slug}`}
@@ -149,7 +149,7 @@ const bloecke = withHeadingIds(d?.text, headings);
 </Base>
 
 <style>
-  .s-beitrag {
+  .s-post {
     padding-bottom: var(--section-space);
   }
 
@@ -158,7 +158,7 @@ const bloecke = withHeadingIds(d?.text, headings);
      Kein `container`: Ein Kopfpicture, das an derselben Kante endet wie der
      Fließtext, liest sich als Abpictureung im Text und nicht als Auftakt.
      -------------------------------------------------------------------- */
-  .s-beitrag__kopfbild {
+  .s-post__headerimage {
     height: clamp(320px, 56vh, 640px);
     overflow: hidden;
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
@@ -166,7 +166,7 @@ const bloecke = withHeadingIds(d?.text, headings);
 
   /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt
      und das Scope-Attribut dieser Datei nicht trägt. */
-  .s-beitrag__kopfbild :global(img) {
+  .s-post__headerimage :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -178,14 +178,14 @@ const bloecke = withHeadingIds(d?.text, headings);
      nicht als Absicht. Der Kopf steht jetzt an der linken Rahmenkante, also
      über der Spalte des Inhaltsverzeichnisses — er gilt für die ganze Seite
      und nicht nur für die Textspalte. */
-  .s-beitrag__kopftext {
+  .s-post__headertext {
     max-width: 68ch;
     margin-inline: 0;
     padding-top: var(--sp-10);
     padding-bottom: var(--sp-8);
   }
 
-  .s-beitrag__meta {
+  .s-post__meta {
     display: flex;
     align-items: center;
     gap: var(--sp-4);
@@ -198,14 +198,14 @@ const bloecke = withHeadingIds(d?.text, headings);
     color: var(--c-text-muted);
   }
 
-  .s-beitrag__titel {
+  .s-post__title {
     font-size: var(--fs-h1);
     font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.02em;
   }
 
-  .s-beitrag__lead {
+  .s-post__lead {
     margin-top: var(--sp-6);
     font-size: var(--fs-text-large);
     line-height: 1.45;
@@ -230,12 +230,12 @@ const bloecke = withHeadingIds(d?.text, headings);
        Strecke ist der Weg, den es klebend zurücklegt. */
   }
 
-  .s-beitrag__text {
+  .s-post__text {
     max-width: 68ch;
   }
 
   /* :global(), weil PortableText das Markup zur Laufzeit erzeugt. */
-  .s-beitrag__text :global(p) {
+  .s-post__text :global(p) {
     margin-bottom: var(--sp-5);
     font-size: var(--fs-text-main);
     line-height: 1.6;
@@ -243,12 +243,12 @@ const bloecke = withHeadingIds(d?.text, headings);
 
   /* `scroll-margin-top`, damit ein Sprung nicht unter der Navigationsleiste
      landet. Sie liegt fest oben und ist rund 96px hoch. */
-  .s-beitrag__text :global(h2),
-  .s-beitrag__text :global(h3) {
+  .s-post__text :global(h2),
+  .s-post__text :global(h3) {
     scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
   }
 
-  .s-beitrag__text :global(h2) {
+  .s-post__text :global(h2) {
     margin-top: var(--sp-10);
     margin-bottom: var(--sp-4);
     font-size: var(--fs-h3);
@@ -257,7 +257,7 @@ const bloecke = withHeadingIds(d?.text, headings);
     letter-spacing: -0.01em;
   }
 
-  .s-beitrag__text :global(h3) {
+  .s-post__text :global(h3) {
     margin-top: var(--sp-8);
     margin-bottom: var(--sp-3);
     font-size: var(--fs-h5);
@@ -265,25 +265,25 @@ const bloecke = withHeadingIds(d?.text, headings);
     line-height: 1.2;
   }
 
-  .s-beitrag__text :global(ul) {
+  .s-post__text :global(ul) {
     margin-bottom: var(--sp-5);
     padding-left: var(--sp-5);
     list-style: disc;
   }
 
-  .s-beitrag__text :global(li) {
+  .s-post__text :global(li) {
     margin-bottom: var(--sp-2);
     font-size: var(--fs-text-main);
     line-height: 1.6;
   }
 
-  .s-beitrag__text :global(a) {
+  .s-post__text :global(a) {
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-color: var(--c-brand);
   }
 
-  .s-beitrag__zurueck {
+  .s-post__back {
     margin-top: var(--sp-10);
   }
 

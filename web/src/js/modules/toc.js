@@ -23,7 +23,7 @@ export function initToc() {
   if (!links.size) return;
 
   const ziele = [...document.querySelectorAll("[data-toc-target]")].filter((el) =>
-    links.has(el.dataset.tocZiel)
+    links.has(el.dataset.tocTarget)
   );
   if (!ziele.length) return;
 
@@ -74,8 +74,8 @@ export function initToc() {
          Abschnitt blieb im Verzeichnis dauerhaft unmarkiert. */
       endTrigger: ziele[i + 1] ?? el.closest("[data-toc-bereich]") ?? el,
       end: ziele[i + 1] ? "top 33%" : "bottom 33%",
-      onToggle: (self) => self.isActive && setze(el.dataset.tocZiel),
-      onRefresh: (self) => self.isActive && setze(el.dataset.tocZiel),
+      onToggle: (self) => self.isActive && setze(el.dataset.tocTarget),
+      onRefresh: (self) => self.isActive && setze(el.dataset.tocTarget),
     })
   );
 

@@ -28,7 +28,7 @@ const description = kopf?.seo?.description || kopf?.lead || "";
 ---
 
 <Base title={title} description={description} noIndex={kopf?.seo?.noIndex}>
-  <section class="container s-magazinekopf">
+  <section class="container s-magazine-intro">
     {kopf?.topline && <span class="c-topline" data-reveal="fade">{kopf.topline}</span>}
     <h1 class="s-magazinekopf__titel" data-split="lines">{kopf?.title}</h1>
     {kopf?.lead && <p class="s-magazinekopf__text" data-reveal="up">{kopf.lead}</p>}
@@ -43,11 +43,11 @@ const description = kopf?.seo?.description || kopf?.lead || "";
   /* Der Kopf einer Übersichtsseite. Steht hier und nicht in einem Baustein:
      Er ist das Markup dieses Zusammenbaus, und ein zweiter Ort bräuchte ihn
      erst, wenn eine weitere Übersicht dazukommt. */
-  .s-magazinkopf {
+  .s-magazine-intro {
     padding-block: calc(var(--section-space) + 80px) var(--sp-6);
   }
 
-  .s-magazinkopf .c-topline {
+  .s-magazine-intro .c-topline {
     display: block;
     margin-bottom: var(--sp-4);
   }

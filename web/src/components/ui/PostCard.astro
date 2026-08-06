@@ -74,7 +74,7 @@ const motif = motifFor(p.slug);
     )}
   </div>
 
-  <div class="c-post__card">
+  <div class="c-post__surface">
     {p.category && <span class="c-post__tag">{categoryLabel(p.category)}</span>}
 
     <Titel class="c-post__title">
@@ -138,13 +138,13 @@ const motif = motifFor(p.slug);
      des Knopfes und damit zufällig fast bündig mit dem Bild. Die untere
      Kante der Karte ist aber die Linie, an der die Komposition steht — sie
      soll mit dem Knopf abschließen, nicht mit dem Text darin. */
-  .c-post__card {
+  .c-post__surface {
     position: absolute;
     /* Die Unterkante steht fest (bündig mit dem Knopf), die Oberkante nicht:
        Im Karussell ist die Karte schmal und der Text füllt die Fläche, in der
        Übersicht ist sie breiter, derselbe Text braucht weniger Zeilen und die
        Fläche stünde halb leer. Deshalb rückt der Ansatz dort nach unten. */
-    top: var(--post-fläche-oben, 27%);
+    top: var(--post-surface-top, 27%);
     bottom: 0;
     right: 0;
     width: 57%;
@@ -243,7 +243,7 @@ const motif = motifFor(p.slug);
        nicht positionierten Kästen gezeichnet — unabhängig von der Reihenfolge
        im Markup. Die Karte lag dadurch UNTER dem Bild, und ihre obersten
        64px (Kicker und die erste Titelzeile) waren verdeckt. */
-    .c-post__card {
+    .c-post__surface {
       position: relative;
       z-index: 1;
       /* `inset: auto` MUSS mit: `top: 27%` und `right: 0` aus der Regel für
