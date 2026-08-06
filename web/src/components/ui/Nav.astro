@@ -141,10 +141,20 @@ const zusatzSpalten = (
        der beiden Kanten. */
     --nav-ueberstand: clamp(8px, 1vw, 20px);
 
+    /* Kante und Breite stehen als eigene Werte da, weil zwei Dinge sie
+       brauchen: die Leiste und das Aufklappmenü darunter. Vorher rechnete
+       jedes für sich (`left: var(--site-margin)` gegen `padding: …`), und als
+       die Leiste nach außen rückte, blieb das Menü stehen — beide sollen aber
+       als eine Fläche gelesen werden. */
+    --nav-rand: max(8px, calc(var(--site-margin) - var(--nav-ueberstand)));
+    --nav-breite: calc(
+      var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-ueberstand)
+    );
+
     position: fixed;
     inset: 0 0 auto 0;
     z-index: var(--z-nav);
-    padding: var(--sp-4) max(8px, calc(var(--site-margin) - var(--nav-ueberstand)));
+    padding: var(--sp-4) var(--nav-rand);
     color: var(--c-dark);
     pointer-events: none;
   }
@@ -164,9 +174,7 @@ const zusatzSpalten = (
        Verglichen wird die Leiste aber mit dem, was man sieht — der Spalte
        innerhalb des Rahmens. Ohne diese Rechnung wüchse der Überstand mit
        dem Fenster: bei 1440px wären es 14px, bei 2000px schon 68. */
-    max-width: calc(
-      var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-ueberstand)
-    );
+    max-width: var(--nav-breite);
     margin-inline: auto;
     padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
     border-radius: var(--r-round);
@@ -276,9 +284,9 @@ const zusatzSpalten = (
   .c-megamenu {
     position: absolute;
     top: calc(100% - var(--sp-2));
-    left: var(--site-margin);
-    right: var(--site-margin);
-    max-width: var(--site-max);
+    left: var(--nav-rand);
+    right: var(--nav-rand);
+    max-width: var(--nav-breite);
     margin-inline: auto;
     /* Dasselbe Milchglas wie die Leiste darüber — beide sollen als eine
        Fläche gelesen werden. */

@@ -134,12 +134,16 @@ const { topline, titel, text, beitraege } = Astro.props;
     rotate: -1.4deg;
   }
 
-  /* Liegt als weiße Plakette zwischen den Balken. */
+  /* Liegt als weiße Plakette zwischen den Balken, waagerecht wie senkrecht
+     mittig. Vorher stand die linke Kante auf `clamp(120px, 27vw, 460px)` —
+     ein Wert, der bei einer Fenstergröße passte und bei jeder anderen
+     danebenlag, weil die Balken mit dem Schriftgrad wachsen und die Plakette
+     mit ihrem eigenen. */
   .s-magazine__chip {
     position: absolute;
     top: 50%;
-    left: clamp(120px, 27vw, 460px);
-    translate: 0 -50%;
+    left: 50%;
+    translate: -50% -50%;
     z-index: 2;
     padding: 0.1em 0.42em 0.16em;
     border-radius: var(--r-md);
