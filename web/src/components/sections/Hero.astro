@@ -26,7 +26,7 @@ const { lines } = Astro.props;
 
         <div class="container s-hero__inner">
           {/* Wortmarke, Meta-Zeilen und Zahn liegen zusammen in einem Block:
-              Er ist der Bezugsrahmen, an dem die beiden absolut gesetzten
+              Er ist der Bezugschrome, an dem die beiden absolut gesetzten
               Teile hängen.
 
               Vorher steckten sie IN der <h1>. Das war ungültig — eine
@@ -74,7 +74,7 @@ const { lines } = Astro.props;
 
           </div>
 
-          <a class="s-hero__scroll" href="#leistungen" aria-label="Weiter zum Inhalt" data-hero-scroll>
+          <a class="s-hero__scroll" href="#services" aria-label="Weiter zum Inhalt" data-hero-scroll>
             <svg aria-hidden="true"><use href="#i-arrow" /></svg>
           </a>
 
@@ -175,7 +175,7 @@ const { lines } = Astro.props;
      dem Block, damit die Zahnspitze mit dem Hero-Ende abschließt — so wie
      im Entwurf. `margin-top: auto` schiebt den Block dorthin.
      Wortmarkenhöhe = 2 × 0.92 × 14.2vw = 26.1vw → Abstand 22.5vw. */
-  /* Der Bezugsrahmen für Meta-Zeilen und Zahn. Seine Box ist die der
+  /* Der Bezugschrome für Meta-Zeilen und Zahn. Seine Box ist die der
      Wortmarke — dadurch stimmt `top: 100%` an den Meta-Zeilen weiterhin auf
      deren Unterkante, ohne dass hier eine zweite Rechnung nötig wäre. */
   .s-hero__block {
@@ -188,7 +188,7 @@ const { lines } = Astro.props;
     /* Als h1 gälten sonst die Reset-Werte aus base.css. */
     margin: 0;
 
-    /* Bezugsrahmen für den Zahn. Ohne das bezöge er seine Maße auf die
+    /* Bezugschrome für den Zahn. Ohne das bezöge er seine Maße auf die
        Section — `height: 124%` ergäbe dann 124 % der Heroshöhe statt der
        Wortmarkenhöhe, und er füllte den halben Bildschirm. Genau das war
        nach dem Umbau der Fall. */
@@ -268,7 +268,7 @@ const { lines } = Astro.props;
      Ohne JS greift die Regel nicht, dann ist alles sofort sichtbar.
 
      `html.js` und nicht `.js`: Astro hängt sein Scope-Attribut an jeden
-     Selektorteil, außer der Teil nennt html oder body. Ein bloßes `.js`
+     Selektlocationsil, außer der Teil nennt html oder body. Ein bloßes `.js`
      würde zu `.js[data-astro-cid-…]` und träfe das <html> nie — der Zahn
      bliebe dauerhaft unsichtbar. */
   html.js .s-hero__tooth {

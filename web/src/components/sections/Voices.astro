@@ -13,7 +13,7 @@
  */
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 export interface Stimme {
   quote: string;
@@ -22,7 +22,7 @@ export interface Stimme {
   since?: string;
   /** Bildname aus der Bildpipeline (public/img), ohne Größe und Endung. */
   /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
-  image?: Bildquelle;
+  image?: ImageSource;
   /** Wie tief die Karte hängt: 0 = oben bündig, 1 = ganz abgesenkt. */
   offset?: number;
 }
@@ -36,7 +36,7 @@ const { topline, headline, voices } = Astro.props;
 
 /* Klasse 3: die gestalteten Porträts, positionsgenau, solange an einer
    Stimme kein Bild hängt. */
-const MOTIVE = ["praxis-01", "praxis-02", "praxis-03"];
+const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
 ---
 
 <section class="s-voices container">
@@ -61,11 +61,11 @@ const MOTIVE = ["praxis-01", "praxis-02", "praxis-03"];
         </blockquote>
 
         <figcaption class="s-voices__person">
-          <span class="s-voices__bild">
-            {istCmsBild(s.image) ? (
-              <CmsImage quelle={s.image} alt="" widths={[640]} sizes="72px" />
+          <span class="s-voices__picture">
+            {isCmsImage(s.image) ? (
+              <CmsImage source={s.image} alt="" widths={[640]} sizes="72px" />
             ) : (
-              <Picture name={MOTIVE[i % MOTIVE.length]} alt="" sizes="72px" />
+              <Picture name={MOTIFS[i % MOTIFS.length]} alt="" sizes="72px" />
             )}
           </span>
           <span class="s-voices__daten">

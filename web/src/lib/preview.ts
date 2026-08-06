@@ -38,7 +38,7 @@ const STUDIO = import.meta.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:333
  * `import.meta.env` trägt die lokale Entwicklung: Astro lädt `.env` dorthin,
  * nicht nach `process.env`.
  */
-export function vorschauToken(): string | undefined {
+export function previewToken(): string | undefined {
   const laufzeit =
     typeof process !== "undefined" ? process.env?.SANITY_API_READ_TOKEN : undefined;
   return laufzeit || (import.meta.env.SANITY_API_READ_TOKEN as string | undefined);
@@ -46,13 +46,13 @@ export function vorschauToken(): string | undefined {
 
 /* Am Token gemerkt, nicht global: Wechselt er zur Laufzeit, entsteht ein
    neuer Client statt weiter mit dem alten zu arbeiten. */
-let gemerkt: { token: string; client: SanityClient } | null = null;
+let cached: { token: string; client: SanityClient } | null = null;
 
 /** `null`, wenn kein Token gesetzt ist — dann gibt es keine Vorschau. */
-export function vorschauClient(): SanityClient | null {
-  const token = vorschauToken();
+export function previewClient(): SanityClient | null {
+  const token = previewToken();
   if (!token) return null;
-  if (gemerkt?.token === token) return gemerkt.client;
+  if (cached?.token === token) return cached.client;
 
   const client = createClient({
     projectId: PROJEKT,
@@ -64,12 +64,12 @@ export function vorschauClient(): SanityClient | null {
     stega: { enabled: true, studioUrl: STUDIO },
   });
 
-  gemerkt = { token, client };
+  cached = { token, client };
   return client;
 }
 
 /** Name des Cookies, das die Vorschau freischaltet. */
-export const VORSCHAU_COOKIE = "mp-preview";
+export const PREVIEW_COOKIE = "mp-preview";
 
 /**
  * Welche Seite steckt hinter einem Pfad?
@@ -81,7 +81,7 @@ export const VORSCHAU_COOKIE = "mp-preview";
  * eine andere Seite als die Website — deshalb prüft `web:check` die
  * Routen-Deckung gegen dieselbe Quelle.
  */
-export type Ziel =
+export type Target =
   | { kind: "homepage" }
   | { kind: "service"; slug: string }
   | { kind: "magazineIndex" }
@@ -89,23 +89,23 @@ export type Ziel =
   | { kind: "careers" }
   | { kind: "legalPage"; slug: string };
 
-export function zielVon(pfad: string): Ziel | null {
+export function targetFor(pfad: string): Target | null {
   /* Führende und schließende Schrägstriche weg — Astro liefert den Rest-Pfad
      mal mit, mal ohne, je nachdem ob die URL auf / endet. */
   const teile = pfad.split("/").filter(Boolean);
 
   if (teile.length === 0) return { kind: "homepage" };
-  if (teile[0] === "karriere" && teile.length === 1) return { kind: "careers" };
-  if (teile[0] === "magazin") {
+  if (teile[0] === "careers" && teile.length === 1) return { kind: "careers" };
+  if (teile[0] === "magazine") {
     if (teile.length === 1) return { kind: "magazineIndex" };
     if (teile.length === 2) return { kind: "post", slug: teile[1] };
   }
-  if (teile[0] === "leistungen" && teile.length === 2) {
+  if (teile[0] === "services" && teile.length === 2) {
     return { kind: "service", slug: teile[1] };
   }
   /* Zuletzt, nicht zuerst: Rechtstexte liegen auf der obersten Ebene, und
      `/karriere` läge dort auch. Erst die festen Pfade prüfen, dann den Rest
-     als Slug lesen — sonst verdeckte ein Rechtstext namens „karriere" die
+     als Slug lesen — sonst verdeckte ein Rechtstext namens „careers" die
      Karriereseite. Im Studio verhindert `slugFrei()` genau diesen Fall, aber
      die Reihenfolge hier darf sich nicht darauf verlassen. */
   if (teile.length === 1) return { kind: "legalPage", slug: teile[0] };

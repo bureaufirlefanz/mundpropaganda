@@ -6,11 +6,11 @@
  * kommt beides aus dem Datensatz: der Rahmen aus dem Karriere-Dokument, die
  * Stellen aus ihrer eigenen Sammlung.
  */
-import Karriere from "../seiten/Karriere.astro";
-import { ladeKarriere, ladeStellen } from "../lib/karriere";
+import CareersContent from "../templates/Careers.astro";
+import { loadCareers, loadJobs } from "../lib/careers";
 
-const daten = await ladeKarriere();
-const stellen = await ladeStellen();
+const data = await loadCareers();
+const jobs = await loadJobs();
 ---
 
-<Karriere daten={daten} stellen={stellen} />
+<CareersContent data={data} jobs={jobs} />

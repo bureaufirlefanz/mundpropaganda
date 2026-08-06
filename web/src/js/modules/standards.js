@@ -16,7 +16,7 @@ const STEP_DURATION = 4.5;
 
 /* Pro Instanz, nicht einmalig: dieselbe Mechanik trägt auf der Homepage
    die Standards-Liste und auf den Leistungsseiten die Benefits — nur mit
-   anderem Erscheinungsbild. */
+   anderem Erscheinungspicture. */
 export function initStandards() {
   document.querySelectorAll("[data-standards]").forEach(setup);
 }

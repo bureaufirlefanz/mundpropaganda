@@ -1,7 +1,7 @@
 ---
 import Button from "../ui/Button.astro";
-import PostKarte from "../ui/PostKarte.astro";
-import type { Beitrag } from "../../lib/magazin";
+import PostKarte from "../ui/PostCard.astro";
+import type { Post } from "../../lib/magazine";
 
 /**
  * Dieselben Beiträge überall, nur der Einstieg wechselt: auf der Startseite
@@ -15,21 +15,21 @@ interface Props {
   topline: string;
   title: string;
   text: string;
-  beitraege: Beitrag[];
+  posts: Post[];
 }
 
 /* Keine Vorgaben: Die drei Textfelder sind im Schema Pflicht, die Seite
    reicht sie durch. Eine Vorgabe hier wäre der stille Rückfall, den
    Aufgabe 4 abgeschafft hat — der Kunde löschte die Zeile und sähe sie
    weiter stehen. */
-const { topline, title, text, beitraege } = Astro.props;
+const { topline, title, text, posts } = Astro.props;
 ---
 
 <!-- ==================================================================
            MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
            darunter ein Karussell aus Bild + überlappender weißer Karte
            ================================================================== -->
-      <section class="s-magazine" id="magazin" data-magazine>
+      <section class="s-magazine" id="magazine" data-magazine>
         <div class="container">
           <span class="c-topline" data-reveal="fade">{topline}</span>
 
@@ -50,17 +50,17 @@ const { topline, title, text, beitraege } = Astro.props;
           </div>
 
           <div class="s-magazine__track" data-magazine-track>
-            {beitraege.map((p, i) => (
+            {posts.map((p, i) => (
               <PostKarte beitrag={p} sizes="24vw" parallax="9" mitKnopf data-magazine-item />
             ))}
           </div>
 
           <div class="s-magazine__nav">
             <div class="s-magazine__arrows">
-              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
+              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Post">
                 <svg aria-hidden="true"><use href="#i-arrow" /></svg>
               </button>
-              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
+              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Post">
                 <svg aria-hidden="true"><use href="#i-arrow" /></svg>
               </button>
             </div>
@@ -202,7 +202,7 @@ const { topline, title, text, beitraege } = Astro.props;
     margin-inline: auto;
   }
 
-  /* Die Karte selbst steht in `ui/PostKarte.astro` — die Übersicht unter
+  /* Die Karte selbst steht in `ui/PostCard.astro` — die Übersicht unter
      /magazin zeigt dieselbe. Von hier kommt nur ihre Breite: Die Spur
      scrollt waagerecht, also ist sie fest und nicht die der Zelle. */
   .s-magazine__track {

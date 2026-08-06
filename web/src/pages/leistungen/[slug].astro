@@ -2,14 +2,14 @@
 /**
  * Eine Route für alle Leistungsseiten. Daten laden, Renderer aufrufen.
  *
- * Der Zusammenbau liegt in `seiten/Leistung.astro`, damit die Vorschau-Route
+ * Der Zusammenbau liegt in `templates/Service.astro`, damit die Vorschau-Route
  * aus Aufgabe 6 exakt dasselbe rendert.
  */
-import Leistung from "../../seiten/Leistung.astro";
-import { ladeLeistung, ladeSlugs } from "../../lib/leistungen";
-import { ladeLeistungsliste } from "../../lib/leistungsliste";
-import { ladeStartseite } from "../../lib/startseite";
-import { ladeBeitraege } from "../../lib/magazin";
+import Service from "../../templates/Service.astro";
+import { loadService, ladeSlugs } from "../../lib/services";
+import { loadServiceList } from "../../lib/service-list";
+import { loadHomepage } from "../../lib/homepage";
+import { loadPosts } from "../../lib/magazine";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
@@ -18,22 +18,22 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const daten = await ladeLeistung(slug!);
+const data = await loadService(slug!);
 
 /* Der Name aus der Liste trägt die Überschrift, falls das Dokument fehlt —
    sonst stünde über der Seite nichts. Alles Weitere kommt aus dem Dokument
    oder erscheint nicht: Seit Aufgabe 4 füllt kein Beispielinhalt mehr auf. */
-const eintrag = (await ladeLeistungsliste()).find((l) => l.slug === slug);
-const title = daten?.title || eintrag?.name || "";
+const eintrag = (await loadServiceList()).find((l) => l.slug === slug);
+const title = data?.title || eintrag?.name || "";
 
 /* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
    deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4
    standen sie als Vorgabe im Baustein, sodass jede Seite ihre eigene Kopie
    bekam; wer eine Geschichte änderte, änderte sie nirgends sichtbar. */
-const { storiesItems } = await ladeStartseite();
+const { storiesItems } = await loadHomepage();
 
 /* Nur die Beiträge, die auf diese Leistung verweisen. */
-const beitraege = await ladeBeitraege(slug!);
+const posts = await loadPosts(slug!);
 ---
 
-<Leistung daten={daten} title={title} stories={storiesItems} beitraege={beitraege} />
+<Service data={data} title={title} stories={storiesItems} posts={posts} />

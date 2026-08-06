@@ -3,11 +3,11 @@
  * Preisraster. Jede Karte trägt eine Bezeichnung und eine Preis-Pille, die
  * bündig unten sitzt — dadurch stehen die Pillen aller Karten auf einer Linie.
  */
-import type { Preis } from "../../lib/formen";
+import type { Price } from "../../lib/shapes";
 
 interface Props {
   title?: string;
-  pricing: Preis[];
+  pricing: Price[];
 }
 
 const { title = "Kosten", pricing } = Astro.props;

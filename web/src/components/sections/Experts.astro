@@ -2,7 +2,7 @@
 import Button from "../ui/Button.astro";
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 /**
  * Teamfoto links, Text rechts.
@@ -17,7 +17,7 @@ interface Props {
   title: string;
   namen: string;
   absaetze: string[];
-  image?: Bildquelle;
+  image?: ImageSource;
 }
 
 const { title, namen, absaetze, image } = Astro.props;
@@ -30,8 +30,8 @@ const { title, namen, absaetze, image } = Astro.props;
         <!-- Bild sitzt links und läuft über den Seitenrand hinaus, der Text
              steht rechts auf einer schmalen Spalte — so im Entwurf. -->
         <div class="s-experts__media" data-reveal="fade">
-          {istCmsBild(image) ? (
-            <CmsImage quelle={image} alt={namen.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
+          {isCmsImage(image) ? (
+            <CmsImage source={image} alt={namen.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
           ) : (
             <Picture name="experten" alt="Dr. Hannes Schulte-Ostermann und Dr. Kerrin Gratecap" sizes="(max-width: 900px) 100vw, 62vw" parallax="9" />
           )}

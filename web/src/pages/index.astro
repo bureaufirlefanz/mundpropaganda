@@ -2,16 +2,16 @@
 /**
  * Die Route. Daten laden, Renderer aufrufen — mehr steht hier nicht.
  *
- * Der Zusammenbau liegt in `seiten/Startseite.astro`, damit die
+ * Der Zusammenbau liegt in `templates/Home.astro`, damit die
  * Vorschau-Route aus Aufgabe 6 exakt dasselbe rendern kann. Zwei
  * Zusammenbauten, die dasselbe zeigen sollen, laufen unbemerkt auseinander.
  */
-import Startseite from "../seiten/Startseite.astro";
-import { ladeStartseite } from "../lib/startseite";
-import { ladeBeitraege } from "../lib/magazin";
+import Startseite from "../templates/Home.astro";
+import { loadHomepage } from "../lib/homepage";
+import { loadPosts } from "../lib/magazine";
 
-const daten = await ladeStartseite();
-const beitraege = await ladeBeitraege();
+const data = await loadHomepage();
+const posts = await loadPosts();
 ---
 
-<Startseite daten={daten} beitraege={beitraege} />
+<Startseite data={data} posts={posts} />

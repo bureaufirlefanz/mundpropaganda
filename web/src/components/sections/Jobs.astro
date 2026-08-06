@@ -9,22 +9,22 @@
  * Mechanik ein zweites Mal — und die zweite Fassung ist die, die man beim
  * nächsten Fehler vergisst.
  *
- * Das Erscheinungsbild folgt der Leistungstabelle: Zeilen mit Trennlinie,
+ * Das Erscheinungspicture folgt der Leistungstabelle: Zeilen mit Trennlinie,
  * Titel links, Angaben rechts, beim Überfahren färbt sich die Linie.
  */
 import Button from "../ui/Button.astro";
-import { bewerbungLink, type Stelle } from "../../lib/karriere";
+import { applicationLink, type Job } from "../../lib/careers";
 
 
 interface Props {
   id?: string;
   topline: string;
   headline: string;
-  stellen: Stelle[];
+  jobs: Job[];
   /** Adresse für Bewerbungen. Steht im Karriere-Dokument, nicht hier. */
   applicationEmail: string;
 }
-const { id, topline, headline, stellen, applicationEmail } = Astro.props;
+const { id, topline, headline, jobs, applicationEmail } = Astro.props;
 ---
 
 <section class="s-jobs container" id={id}>
@@ -34,7 +34,7 @@ const { id, topline, headline, stellen, applicationEmail } = Astro.props;
   </div>
 
   <div class="s-jobs__list" data-accordion="single" data-reveal-stagger="0.06">
-    {stellen.map((s, i) => (
+    {jobs.map((s, i) => (
       <article class="s-jobs__item" data-accordion-item data-reveal-child id={`stelle-${s.handle}`}>
         {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
             geben dann beim Ansteuern der Zeile den Stellentitel aus und
@@ -85,7 +85,7 @@ const { id, topline, headline, stellen, applicationEmail } = Astro.props;
             <div class="s-jobs__aktion">
               {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
                   einem Postfach unter „Bewerbung". */}
-              <Button label="Auf diese Stelle bewerben" href={bewerbungLink(applicationEmail, s)} />
+              <Button label="Auf diese Stelle bewerben" href={applicationLink(applicationEmail, s)} />
             </div>
           </div>
         </div>

@@ -57,10 +57,10 @@ export function initRing() {
   document.querySelectorAll("[data-ring]").forEach(baueRing);
 }
 
-function baueRing(wurzel) {
-  const buehne = wurzel.querySelector("[data-ring-stage]");
-  const drehteil = wurzel.querySelector("[data-ring-rotor]");
-  const karten = [...wurzel.querySelectorAll("[data-ring-card]")];
+function baueRing(root) {
+  const buehne = root.querySelector("[data-ring-stage]");
+  const drehteil = root.querySelector("[data-ring-rotor]");
+  const karten = [...root.querySelectorAll("[data-ring-card]")];
   if (!buehne || !drehteil || karten.length < 3) return;
 
   /* Einmal eingesammelt statt je Bild neu gesucht: `zeichnen` läuft in jedem
@@ -88,11 +88,11 @@ function baueRing(wurzel) {
   /* --- Geometrie ------------------------------------------------------ */
 
   function vermessen() {
-    const breite = karten[0].offsetWidth;
+    const width = karten[0].offsetWidth;
     // Der Abstand steht im CSS, damit Aussehen und Rechnung nicht auseinanderlaufen.
-    const luft = parseFloat(getComputedStyle(wurzel).getPropertyValue("--ring-luft")) || 0;
-    radius = Math.round((breite + luft) / (2 * Math.tan(Math.PI / anzahl)));
-    ausschlag = breite * PARALLAX;
+    const luft = parseFloat(getComputedStyle(root).getPropertyValue("--ring-luft")) || 0;
+    radius = Math.round((width + luft) / (2 * Math.tan(Math.PI / anzahl)));
+    ausschlag = width * PARALLAX;
 
     /* Minus: die Karten sitzen auf der abgewandten Seite der Achse, wir
        schauen von innen auf die Wand. Plus wäre die Wölbung nach außen. */
@@ -196,7 +196,7 @@ function baueRing(wurzel) {
     letztesX = e.clientX;
     letzteZeit = e.timeStamp;
     buehne.setPointerCapture(e.pointerId);
-    wurzel.dataset.ringZieht = "true";
+    root.dataset.ringZieht = "true";
   });
 
   buehne.addEventListener("pointermove", (e) => {
@@ -215,7 +215,7 @@ function baueRing(wurzel) {
   const loslassen = (e) => {
     if (!zieht) return;
     zieht = false;
-    delete wurzel.dataset.ringZieht;
+    delete root.dataset.ringZieht;
     if (e.pointerId != null && buehne.hasPointerCapture?.(e.pointerId)) {
       buehne.releasePointerCapture(e.pointerId);
     }
@@ -238,7 +238,7 @@ function baueRing(wurzel) {
   };
 
   /* Auslaufen ist kürzer als Anlaufen: Anhalten soll auf den Zeiger
-     antworten, Wiederanfahren darf sich Zeit lassen und nicht anspringen. */
+     antwlocationsn, Wiederanfahren darf sich Zeit lassen und nicht anspringen. */
   buehne.addEventListener("pointerenter", () => tempoAuf(0, 0.7));
   buehne.addEventListener("pointerleave", () => tempoAuf(1, 1.1));
 
@@ -275,8 +275,8 @@ function baueRing(wurzel) {
     });
   };
 
-  wurzel.querySelector("[data-ring-prev]")?.addEventListener("click", () => drehen(1));
-  wurzel.querySelector("[data-ring-next]")?.addEventListener("click", () => drehen(-1));
+  root.querySelector("[data-ring-prev]")?.addEventListener("click", () => drehen(1));
+  root.querySelector("[data-ring-next]")?.addEventListener("click", () => drehen(-1));
 
   buehne.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") { drehen(1); e.preventDefault(); }

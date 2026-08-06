@@ -10,16 +10,16 @@
  * Textteil darunter bleibt in beiden Fällen derselbe.
  */
 import Picture from "../ui/Picture.astro";
-import BildRing from "../ui/BildRing.astro";
-import { ladeEinstellungen } from "../../lib/einstellungen";
-import type { RingBild } from "../ui/BildRing.astro";
-import type { Bildquelle } from "../../lib/bilder";
+import BildRing from "../ui/ImageRing.astro";
+import { loadSettings } from "../../lib/settings";
+import type { RingBild } from "../ui/ImageRing.astro";
+import type { ImageSource } from "../../lib/images";
 
 interface Props {
   variante?: "reihe" | "ring";
   title: string;
   /** Die Motive auf dem Ring, aus dem CMS. */
-  bilder?: { image: Bildquelle; caption?: string }[];
+  bilder?: { image: ImageSource; caption?: string }[];
 }
 
 /* Keine Vorgabe für den Titel: Pflichtfeld im Schema, die Seite reicht ihn
@@ -28,7 +28,7 @@ interface Props {
 const { variante = "reihe", title, bilder } = Astro.props;
 
 /* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
-const { locations } = await ladeEinstellungen();
+const { locations } = await loadSettings();
 
 /* Klasse 3: die gestalteten Motive, solange im Studio keine hochgeladen sind.
    Drei beschriftete Praxisaufnahmen und zwei Abstraktionen dazwischen — auf
@@ -37,7 +37,7 @@ const { locations } = await ladeEinstellungen();
    `locationsImages` gab es im Schema schon einmal und es erreichte nie ein
    Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
    Standortfotos hochlädt, sieht sie hier. */
-const MOTIVE: RingBild[] = [
+const MOTIFS: RingBild[] = [
   { name: "praxis-03", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
   { name: "praxis-01", alt: "Empfangsbereich Prenzlauer Allee" },
   { name: "praxis-02", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
@@ -50,7 +50,7 @@ const MOTIVE: RingBild[] = [
    Abstraktionen sähen aus wie ein Fehler. */
 const ringBilder: RingBild[] = bilder?.length
   ? bilder.map((b) => ({ image: b.image, alt: b.caption ?? "", caption: b.caption }))
-  : MOTIVE;
+  : MOTIFS;
 ---
 
 <!-- ==================================================================

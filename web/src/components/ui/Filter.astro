@@ -16,7 +16,7 @@
  * keines. Deshalb hängt die Anzeige an `.js` — dieselbe Sperre, mit der
  * `base.css` die verborgenen Startzustände absichert.
  */
-import { kategorieText } from "../../lib/magazin";
+import { categoryLabel } from "../../lib/magazine";
 
 interface Props {
   /** Die Kategoriewerte, die unter den Beiträgen vorkommen. */
@@ -59,7 +59,7 @@ const { kategorien, gesamt } = Astro.props;
       </button>
       {kategorien.map((k) => (
         <button class="c-filter__tag" type="button" data-filter-value={k} aria-pressed="false">
-          {kategorieText(k)}
+          {categoryLabel(k)}
         </button>
       ))}
     </div>
@@ -69,7 +69,7 @@ const { kategorien, gesamt } = Astro.props;
 <style>
   /* Ohne JavaScript gibt es nichts zu bedienen — dann steht hier auch nichts.
      `html.js`, nicht `.js`: Astro hängt sein Scope-Attribut an jeden
-     Selektorteil, und `.js[data-astro-cid-…]` träfe das <html> nie.
+     Selektlocationsil, und `.js[data-astro-cid-…]` träfe das <html> nie.
      (Steht so in web/STRUKTUR.md.) */
   .c-filter {
     display: none;

@@ -14,22 +14,22 @@ interface Props {
 /* Keine Vorgabe: Pflichtfeld im Schema, die Seite reicht es durch. */
 const { title } = Astro.props;
 import Button from "../ui/Button.astro";
-import { ladeLeistungsliste, fuerTabelle, fuerListe, pfad } from "../../lib/leistungsliste";
-import { istCmsBild, bildUrl, motivPfad } from "../../lib/bilder";
+import { loadServiceList, forTable, forList, pfad } from "../../lib/service-list";
+import { isCmsImage, imageUrl, motifPath } from "../../lib/images";
 
-const liste = await ladeLeistungsliste();
-const lines = fuerTabelle(liste);
-const weitere = fuerListe(liste);
+const liste = await loadServiceList();
+const lines = forTable(liste);
+const weitere = forList(liste);
 
 /* Klasse 3: die gestalteten Motive für die Zeilen, an denen im CMS kein
-   Vorschaubild hängt.
+   Vorschaupicture hängt.
 
    Ohne sie stand `data-preview` leer da, und `services.js` ließ folgerichtig
    immer dasselbe Bild stehen: Beim Überfahren der Tabelle wechselte die
    Beschriftung, das Bild nie. Gemessen an allen sechs Zeilen der Startseite,
    alle sechs ohne Wert. Das Preview war damit nicht kaputt, sondern hatte
    nichts zu zeigen. */
-const MOTIVE = [
+const MOTIFS = [
   "treatment-01",
   "lab-veneers",
   "teeth-macro",
@@ -38,18 +38,18 @@ const MOTIVE = [
   "treatment-02",
 ] as const;
 
-/* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
+/* Das Vorschaupicture hängt als Pfad im data-Attribut, weil services.js es an den
    Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
 const vorschauPfad = (l: (typeof lines)[number], i: number) => {
   const v = l.preview;
-  if (istCmsBild(v)) return bildUrl(v, 640);
+  if (isCmsImage(v)) return imageUrl(v, 640);
   if (typeof v === "string" && v) return v;
   /* Hier ausnahmsweise über die Position und nicht über einen Streuwert aus
      dem Slug: Das Preview gibt es nur in dieser einen Tabelle, es kann also
      mit keiner zweiten Darstellung uneins werden. Und die Position ist das
      einzige, was sechs verschiedene Motive garantiert — der Streuwert traf
      bei sechs Zeilen nur drei davon. */
-  return motivPfad(MOTIVE[i % MOTIVE.length]);
+  return motifPath(MOTIFS[i % MOTIFS.length]);
 };
 
 /* Die Linkliste steht in einem Raster mit drei Spalten und fließt zeilenweise.
@@ -63,7 +63,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
 <!-- ==================================================================
            UNSERE SERVICES — Tabelle mit Cursor-Preview
            ================================================================== -->
-      <section class="s-services" id="leistungen" data-services>
+      <section class="s-services" id="services" data-services>
         <div class="container">
           <h2 class="s-services__title" data-split="lines">{title}</h2>
 
@@ -471,7 +471,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
 
     /* Dieselbe Kontur wie in der Haupttabelle darüber, nicht der maskierte
        Pfeil: Ohne Hover käme der nie hervor, und zwei verschiedene
-       Pfeilformen in einer Section wären ohnehin eine Behauptung über einen
+       Pfeilshapes in einer Section wären ohnehin eine Behauptung über einen
        Unterschied, den es nicht gibt.
 
        Damit steht der Pfeil wieder im Fluss statt absolut — der reservierte

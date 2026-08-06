@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { validatePreviewUrl } from "@sanity/preview-url-secret";
-import { vorschauClient, VORSCHAU_COOKIE } from "../../../lib/preview";
+import { previewClient, PREVIEW_COOKIE } from "../../../lib/preview";
 
 /**
  * Schaltet die Vorschau frei.
@@ -17,7 +17,7 @@ import { vorschauClient, VORSCHAU_COOKIE } from "../../../lib/preview";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
-  const client = vorschauClient();
+  const client = previewClient();
   if (!client) {
     return new Response("SANITY_API_READ_TOKEN fehlt.", { status: 500 });
   }
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     return new Response("Ungültiges oder abgelaufenes Geheimnis.", { status: 401 });
   }
 
-  cookies.set(VORSCHAU_COOKIE, "an", {
+  cookies.set(PREVIEW_COOKIE, "an", {
     path: "/",
     /* httpOnly: Kein Skript im Browser soll das Cookie lesen können — es
        schaltet Entwürfe frei. sameSite "none" mit secure, weil die Vorschau

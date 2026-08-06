@@ -2,11 +2,11 @@
 /**
  * Nummerierte Karten: der Ablauf einer Behandlung in wenigen Schritten.
  */
-import type { Schritt } from "../../lib/formen";
+import type { Step } from "../../lib/shapes";
 
 interface Props {
   title: string;
-  steps: Schritt[];
+  steps: Step[];
 }
 
 const { title, steps } = Astro.props;

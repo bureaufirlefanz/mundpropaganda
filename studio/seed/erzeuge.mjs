@@ -4,7 +4,7 @@
  * ── ERLEDIGT. Dieses Skript läuft nicht mehr. ────────────────────────────
  *
  * Es hat die Vorgabewerte aus den Frontmatter-Blöcken der Bausteine gelesen
- * und daraus `leistungen.ndjson` und `seiten.ndjson` erzeugt. Genau diese
+ * und daraus `services.ndjson` und `seiten.ndjson` erzeugt. Genau diese
  * Vorgaben gibt es seit Aufgabe 4 nicht mehr: Die Bausteine bekommen ihren
  * Text von der Seite, die Seite aus dem CMS. Ein Aufruf endet deshalb mit
  * „Vorgabe nicht gefunden", und das ist richtig so.
@@ -29,18 +29,18 @@ const lies = (p) => readFileSync(p, "utf8");
  * wird mit `eval`: Es sind reine Literale aus dem eigenen Quelltext, und ein
  * eigener Parser für JS-Objekte wäre hier die schlechtere Wette.
  */
-function vorgabe(quelle, name) {
-  const start = quelle.indexOf(`${name} =`);
+function vorgabe(source, name) {
+  const start = source.indexOf(`${name} =`);
   if (start < 0) throw new Error(`Vorgabe „${name}" nicht gefunden`);
 
-  let i = quelle.indexOf("=", start) + 1;
+  let i = source.indexOf("=", start) + 1;
   let tiefe = 0;
   let geoeffnet = false;
   let inText = null;
   const anfang = i;
 
-  for (; i < quelle.length; i++) {
-    const c = quelle[i];
+  for (; i < source.length; i++) {
+    const c = source[i];
     if (inText) {
       if (c === "\\") i++;
       else if (c === inText) inText = null;
@@ -73,21 +73,21 @@ function vorgabe(quelle, name) {
     else if (c === ";" && tiefe === 0 && !geoeffnet) break;
   }
 
-  return eval(`(${quelle.slice(anfang, i)})`);
+  return eval(`(${source.slice(anfang, i)})`);
 }
 
 const S = (p) => lies(`web/src/components/sections/${p}.astro`);
 
 /* --- Die elf Leistungen ------------------------------------------------- */
 
-const liste = lies("web/src/lib/leistungsliste.ts");
-const eintraege = [...liste.matchAll(
+const liste = lies("web/src/lib/service-list.ts");
+const items = [...liste.matchAll(
   /\{ slug: "([^"]+)", name: "([^"]+)"(?:, title: "([^"]+)")?, placement: "([^"]+)"(?:, group: "([^"]+)")?(?:, tag: "([^"]+)")?/g
 )];
-if (!eintraege.length) throw new Error("Keine Leistungen gefunden — Form von beispielListe geändert?");
+if (!items.length) throw new Error("Keine Leistungen gefunden — Form von beispielListe geändert?");
 
-const zeilen = eintraege.map(([, slug, name, titel, platzierung, gruppe, tag], i) => ({
-  _id: `leistung-${slug}`,
+const rows = items.map(([, slug, name, titel, platzierung, gruppe, tag], i) => ({
+  _id: `service-${slug}`,
   _type: "service",
   titel: titel || name,
   kurzname: titel ? name : undefined,
@@ -103,8 +103,8 @@ const zeilen = eintraege.map(([, slug, name, titel, platzierung, gruppe, tag], i
 
 /* --- Die Einstellungen -------------------------------------------------- */
 
-const einst = vorgabe(lies("web/src/lib/einstellungen.ts"), "beispielEinstellungen: Einstellungen");
-zeilen.push({
+const einst = vorgabe(lies("web/src/lib/settings.ts"), "beispielEinstellungen: Einstellungen");
+rows.push({
   _id: "settings",
   _type: "settings",
   ...einst,
@@ -123,9 +123,9 @@ const stories = S("Stories");
 const magazine = S("Magazine");
 const index = lies("web/src/pages/index.astro");
 
-const schluessel = (praefix) => (o, i) => ({ _key: `${praefix}-${i}`, ...o });
+const key = (praefix) => (o, i) => ({ _key: `${praefix}-${i}`, ...o });
 
-zeilen.push({
+rows.push({
   _id: "homepage",
   _type: "homepage",
 
@@ -138,7 +138,7 @@ zeilen.push({
   servicesTitle: vorgabe(services, "titel"),
 
   standardsTitle: vorgabe(standards, "titel"),
-  standardsItems: vorgabe(standards, "eintraege").map(schluessel("standard")),
+  standardsItems: vorgabe(standards, "eintraege").map(key("standard")),
 
   locationsTitle: vorgabe(gallery, "titel"),
 
@@ -151,7 +151,7 @@ zeilen.push({
      zeigte das Studio einen Dateinamen, mit dem er nichts anfangen kann. */
   storiesItems: vorgabe(stories, "eintraege")
     .map(({ name, zitat }) => ({ name, zitat }))
-    .map(schluessel("story")),
+    .map(key("story")),
 
   magazinTopline: vorgabe(magazine, "topline"),
   /* Stand bis Aufgabe 4 fest im Markup, obwohl es das Feld gab — der Kunde
@@ -160,14 +160,14 @@ zeilen.push({
   magazinText: vorgabe(magazine, "text"),
 
   faqTitel: "Häufige Fragen",
-  faqText: "Nichts dabei? Schreiben Sie uns - wir antworten in der Regel am selben Werktag.",
-  faq: vorgabe(index, "FRAGEN").map(schluessel("frage")),
+  faqText: "Nichts dabei? Schreiben Sie uns - wir antwlocationsn in der Regel am selben Werktag.",
+  faq: vorgabe(index, "FRAGEN").map(key("frage")),
 });
 
 /* --- Zwei Dateien, weil zwei Importarten nötig sind ---------------------
  *
  * Die Leistungen tragen hier nur ihre Grunddaten — Titel, Slug, Platzierung.
- * `leistung-veneers` ist im Datensatz aber längst voll gepflegt. Mit
+ * `service-veneers` ist im Datensatz aber längst voll gepflegt. Mit
  * `--replace` wäre dieser Inhalt weg, und zwar ohne Rückfrage.
  *
  * Deshalb getrennt: Leistungen mit `--missing` (was da ist, bleibt), die
@@ -179,13 +179,13 @@ import { writeFileSync } from "node:fs";
 const alsNdjson = (liste) =>
   liste.map((z) => JSON.stringify(z, (k, v) => (v === undefined ? undefined : v))).join("\n") + "\n";
 
-const leistungen = zeilen.filter((z) => z._type === "leistung");
-const seiten = zeilen.filter((z) => z._type !== "leistung");
+const services = rows.filter((z) => z._type === "service");
+const pages = rows.filter((z) => z._type !== "service");
 
-writeFileSync("studio/seed/leistungen.ndjson", alsNdjson(leistungen));
-writeFileSync("studio/seed/seiten.ndjson", alsNdjson(seiten));
+writeFileSync("studio/seed/leistungen.ndjson", alsNdjson(services));
+writeFileSync("studio/seed/seiten.ndjson", alsNdjson(pages));
 
 console.error(
-  `leistungen.ndjson  ${leistungen.length} Dokumente  (Import mit --missing)\n` +
-    `seiten.ndjson      ${seiten.length} Dokumente  (Import mit --replace)`
+  `services.ndjson  ${services.length} Dokumente  (Import mit --missing)\n` +
+    `seiten.ndjson      ${pages.length} Dokumente  (Import mit --replace)`
 );

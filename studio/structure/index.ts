@@ -16,7 +16,7 @@ import type { ComponentType } from "react";
  * Datenbank.
  *
  * Wer hier etwas sucht, denkt in Seiten („die Karriereseite“), nicht in
- * Dokumenttypen („ein Dokument vom Typ karriere“). Deshalb steht oben die
+ * Dokumenttypen („ein Dokument vom Typ careers“). Deshalb steht oben die
  * Seitenstruktur in der Reihenfolge der Navigation, darunter erst, was keine
  * eigene Seite ist: Team, Stellen, Einstellungen.
  *

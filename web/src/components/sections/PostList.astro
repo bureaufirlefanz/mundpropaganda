@@ -1,0 +1,92 @@
+---
+/**
+ * Die Beiträge als Raster — die Übersicht unter /magazin.
+ *
+ * Zeigt dieselbe Karte wie das Karussell auf der Startseite. Bis hierher war
+ * es eine zweite, flachere: Bild oben, Text darunter. Die Begründung dafür
+ * stand hier und war richtig, aber sie zielte auf die falsche Stellschraube.
+ * Sie lautete: In einem Raster aus drei Spalten stoßen die Überlappungen
+ * aneinander. Das stimmt — die Komposition rechnet in Anteilen ihrer eigenen
+ * Breite und braucht rund 420px. Bei drei Spalten hat sie die nicht, bei
+ * zwei schon. Also zwei Spalten und eine Karte statt drei Spalten und zwei
+ * Karten.
+ */
+import PostKarte from "../ui/PostCard.astro";
+import Filter from "../ui/Filter.astro";
+import type { Post } from "../../lib/magazine";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+
+/* Nur die Kategorien, unter denen wirklich etwas liegt — in der Reihenfolge,
+   in der sie zuerst auftauchen, also nach Datum. Eine feste Reihenfolge aus
+   dem Schema abzuschreiben wäre die zweite Stelle, an der dieselbe Liste
+   steht. */
+const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as string[];
+---
+
+<section class="container s-postliste">
+  <div class="s-postliste__leiste">
+    <Filter kategorien={kategorien} gesamt={posts.length} />
+  </div>
+
+  <div class="s-postliste__raster" data-reveal-stagger="0.06">
+    {posts.map((p, i) => (
+      <PostKarte
+        beitrag={p}
+        sizes="(max-width: 700px) 100vw, 30vw"
+        mitKnopf
+        ueberschrift="h2"
+        data-reveal-child
+      />
+    ))}
+  </div>
+</section>
+
+<style>
+  .s-postliste {
+    padding-block: var(--section-space-sm) var(--section-space);
+  }
+
+  /* Die Leiste steht über dem Raster und behält ihre Höhe, auch wenn kein
+     Filter gerendert wird (eine einzige Kategorie) — sonst rückte das Raster
+     auf manchen Seiten hoch und auf anderen nicht. */
+  .s-postliste__leiste {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 44px;
+    margin-bottom: var(--sp-8);
+  }
+
+  /* Drei Spalten. Auf 1440px Fenster sind das rund 400px je Karte — zu wenig
+     für die versetzte Überlappung, und genau deshalb muss hier nichts weiter
+     stehen: Die Karte merkt es selbst und stapelt (siehe PostCard.astro,
+     Schwelle 460px). Vorher stand hier eine zweite, eigene Kartenform für
+     genau diesen Fall.
+
+     `align-items: start`, sonst dehnen die Zellen ihren Inhalt auf die
+     Zeilenhöhe und die weiße Fläche hinge unter dem Knopf. */
+  .s-postliste__raster {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+  }
+
+  @media (max-width: 1000px) {
+    .s-postliste__raster {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .s-postliste__raster {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-10) 0;
+    }
+  }
+</style>

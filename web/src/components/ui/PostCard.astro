@@ -1,0 +1,270 @@
+---
+/**
+ * Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche.
+ *
+ * Stand bis hierher nur im Karussell, und die Übersicht unter `/magazin`
+ * baute daneben eine zweite, flachere Karte. Der Kommentar dort nannte den
+ * Grund: In einem Raster aus drei Spalten stoßen die Überlappungen
+ * aneinander. Das stimmte für drei Spalten — die Komposition rechnet in
+ * Anteilen ihrer eigenen Breite und braucht rund 420px, damit die weiße
+ * Fläche den Text trägt. Die Antwort ist also die Spaltenzahl, nicht eine
+ * zweite Karte. Die Übersicht steht jetzt auf zwei Spalten und zeigt
+ * dieselbe.
+ *
+ * Die Breite kommt von außen, über `--post-breite`: Im Karussell ist sie
+ * fest (die Spur scrollt waagerecht), im Raster füllt sie die Zelle. Alles
+ * andere ist an beiden Stellen gleich und steht deshalb nur hier.
+ */
+import Button from "./Button.astro";
+import Picture from "./Picture.astro";
+import CmsImage from "./CmsImage.astro";
+import { isCmsImage } from "../../lib/images";
+import { categoryLabel, postPath, motifFor, type Post } from "../../lib/magazine";
+
+interface Props {
+  beitrag: Post;
+  sizes: string;
+  /** Tiefe des Parallax auf dem Bild. Ohne Wert steht es still. */
+  parallax?: string;
+  /** Der Knopf trägt das Karussell, nicht die Übersicht. */
+  mitKnopf?: boolean;
+  /**
+   * Die Ebene der Überschrift.
+   *
+   * Nicht fest verdrahtet, weil sie von der Seite abhängt: Im Karussell steht
+   * darüber ein h2 („Mund zu Mund"), also ist h3 richtig. Auf /magazin ist der
+   * Seitentitel das h1 und es gibt kein h2 dazwischen — dort wäre h3 eine
+   * übersprungene Ebene. Der Test in `web:check` hat genau das gemeldet:
+   * „h1 → h3 bei Zahngesundheit & Fitness".
+   */
+  ueberschrift?: "h2" | "h3";
+}
+
+const {
+  beitrag: p,
+  sizes,
+  parallax,
+  mitKnopf = false,
+  ueberschrift: Titel = "h3",
+  ...rest
+} = Astro.props;
+
+/* Klasse 3: das gestaltete Ersatzmotiv, solange kein Vorschaupicture hängt.
+   Es hängt am Beitrag und nicht an seiner Position in dieser Liste — sonst
+   zeigte derselbe Beitrag im Raster, im Karussell und auf seiner eigenen
+   Seite drei verschiedene Bilder (siehe `motivFuer` in lib/magazin.ts).
+
+   Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
+   WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
+   es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
+   Telefon das Bild in voller Breite aus. */
+const motif = motifFor(p.slug);
+---
+
+<!-- `data-category` trägt den Rohwert, nicht den Klartext: Der Filter
+     vergleicht ihn mit dem Wert aus dem Schema, und „Material & Technik"
+     gegen „technik" zu prüfen hieße, die Zuordnung ein zweites Mal zu
+     pflegen. -->
+<article class="c-post" data-category={p.category ?? ""} {...rest}>
+  <div class="c-post__media">
+    {isCmsImage(p.previewImage) ? (
+      <CmsImage source={p.previewImage} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
+    ) : (
+      <Picture name={motif} alt="" sizes={sizes} parallax={parallax} />
+    )}
+  </div>
+
+  <div class="c-post__card">
+    {p.category && <span class="c-post__tag">{categoryLabel(p.category)}</span>}
+
+    <Titel class="c-post__title">
+      <a class="c-post__link" href={postPath(p.slug)}>{p.title}</a>
+    </Titel>
+
+    {p.lead && <p class="c-post__text">{p.lead}</p>}
+  </div>
+
+  {mitKnopf && <Button label="Beitrag lesen" static />}
+</article>
+
+<style>
+  /* Im Entwurf sitzt das Bild bei x=81 (326 breit), die weiße Karte bei
+     x=319 (316 breit) — daher die Anteile 59 % und 57 %. Zusammen 116 %, die
+     Überlappung ist also 16 % der Kartenbreite und bleibt innerhalb davon.
+     Nichts ragt aus dem Kasten heraus; die Karte ist im Raster so brauchbar
+     wie in der Spur. */
+  .c-post {
+    position: relative;
+    /* Die Karte ist ihr eigener Bezug: Welche der beiden Kompositionen unten
+       greift, hängt an IHRER Breite, nicht an der des Fensters. Vorher stand
+       dort `max-width: 700px` — das traf das Telefon und verfehlte die 420px
+       schmale Karte in einer Rasterspalte, obwohl beide dasselbe Problem
+       haben. */
+    container-type: inline-size;
+    flex: 0 0 auto;
+    width: var(--post-width, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .c-post__media {
+    width: 59%;
+    aspect-ratio: 326 / 431;
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro bzw. CmsImage.astro kommt
+     und das Scope-Attribut nicht trägt. */
+  .c-post__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--d-slow) var(--e-out);
+  }
+
+  @media (hover: hover) {
+    .c-post:hover .c-post__media :global(img) {
+      scale: 1.04;
+    }
+  }
+
+  /* Überlappt das Bild nach rechts unten — die Versetzung ist der Kern der
+     Komposition.
+
+     `bottom: 0` statt `min-height: 62%`: Mit der Mindesthöhe endete die
+     Fläche dort, wo ihr Inhalt aufhörte, gemessen 50px über der Unterkante
+     des Knopfes und damit zufällig fast bündig mit dem Bild. Die untere
+     Kante der Karte ist aber die Linie, an der die Komposition steht — sie
+     soll mit dem Knopf abschließen, nicht mit dem Text darin. */
+  .c-post__card {
+    position: absolute;
+    /* Die Unterkante steht fest (bündig mit dem Knopf), die Oberkante nicht:
+       Im Karussell ist die Karte schmal und der Text füllt die Fläche, in der
+       Übersicht ist sie breiter, derselbe Text braucht weniger Zeilen und die
+       Fläche stünde halb leer. Deshalb rückt der Ansatz dort nach unten. */
+    top: var(--post-fläche-oben, 27%);
+    bottom: 0;
+    right: 0;
+    width: 57%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--c-white);
+    color: var(--c-neutral-800);
+  }
+
+  /* Die Kategorie als Zeile, nicht als Pille. Sie steht in der weißen
+     Fläche über dem Titel und ist dort schon durch Schnitt und Laufweite
+     abgesetzt; eine gefüllte Form daneben nähme dem Titel den Vorrang und
+     machte aus dem Hinweis einen Knopf, der keiner ist. */
+  .c-post__tag {
+    align-self: flex-start;
+    color: var(--c-dark);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .c-post__title {
+    margin-top: var(--sp-2);
+    font-size: clamp(1.375rem, 1.85vw, 2rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ganze Karte klickbar, ohne verschachtelte Links. */
+  .c-post__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .c-post__text {
+    margin-top: auto;
+    padding-top: var(--sp-6);
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
+  }
+
+  /* :global(.c-btn), weil der Knopf aus Button.astro kommt. */
+  .c-post :global(.c-btn) {
+    margin-top: var(--sp-4);
+  }
+
+  /* Der Knopf reagiert mit, egal wo auf der Karte der Zeiger steht.
+     Er kann es nicht selbst: Über ihm liegt die Klickfläche des Titellinks
+     (`.c-post__link::after`, inset 0), er bekommt also nie einen eigenen
+     Hover. Und da er in dieser Karte ein <span> ist und kein <a>, wäre das
+     auch kein zweites Ziel, sondern ein Anzeigeelement, das stillstand,
+     während offensichtlich etwas anklickbar war. */
+  @media (hover: hover) {
+    .c-post:hover :global(.c-btn__icon) {
+      transform: translateX(5px);
+    }
+  }
+
+  /* --- Schmale Karte ----------------------------------------------------
+     Die versetzte Überlappung ist unter etwa 460px nicht zu retten. Sie
+     rechnet in Anteilen der Kartenbreite: Bild 59 %, weiße Fläche 57 % — auf
+     554px sind das 327 und 316px, auf 420px noch 248 und 239, auf 304px nur
+     180 und 173. In 173px Breite braucht derselbe Text die dreifache Höhe,
+     die Fläche wächst über ihren Rahmen hinaus und verdeckt, was darunter
+     liegt.
+
+     Also gestapelt statt überlappt — aber nicht als schlichte Reihe: Das
+     Bild nimmt die volle Breite, die Fläche sitzt etwas schmaler rechts und
+     zieht sich über die Bildkante herauf. Der Versatz bleibt damit als Idee
+     erhalten, ohne dass etwas gegeneinander gedrückt wird.
+
+     Der Schwellwert steht auf der Karte, nicht auf dem Fenster: Dieselbe
+     Komposition trägt damit das Telefon UND die schmale Spalte im Raster
+     unter /magazin, ohne dass eine der beiden Stellen von der anderen weiß.
+     -------------------------------------------------------------------- */
+  @container (max-width: 460px) {
+    /* Breiter und flacher: Hochformat auf voller Breite nähme allein zwei
+       Drittel der Bildschirmhöhe, bevor der Text beginnt. */
+    .c-post__media {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+    }
+
+    /* `position: relative` mit z-index, nicht `static`: Das Bild trägt einen
+       Parallax-Transform, und ein transformiertes Element wird über allen
+       nicht positionierten Kästen gezeichnet — unabhängig von der Reihenfolge
+       im Markup. Die Karte lag dadurch UNTER dem Bild, und ihre obersten
+       64px (Kicker und die erste Titelzeile) waren verdeckt. */
+    .c-post__card {
+      position: relative;
+      z-index: 1;
+      /* `inset: auto` MUSS mit: `top: 27%` und `right: 0` aus der Regel für
+         breite Fenster gelten bei `relative` weiter — nur eben als
+         Verschiebung statt als Lage. Gemessen schob das die Karte um 120px
+         nach unten und aus ihrem Beitrag heraus. */
+      inset: auto;
+      align-self: flex-end;
+      width: 92%;
+      margin-top: calc(-1 * var(--sp-8));
+      /* Der Ansatz von oben gilt hier nicht: Die Fläche steht im Fluss und
+         bekommt ihre Höhe vom Text. */
+      top: auto;
+    }
+
+    /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
+       deren Unterkante. Ohne feste Höhe gibt es nichts mehr zu schieben —
+       der Abstand steht jetzt einfach da. */
+    .c-post__text {
+      margin-top: 0;
+      padding-top: var(--sp-3);
+    }
+  }
+</style>

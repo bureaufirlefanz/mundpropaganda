@@ -8,8 +8,8 @@
  */
 import Button from "../ui/Button.astro";
 import Panel from "../ui/Panel.astro";
-import { ladeEinstellungen } from "../../lib/einstellungen";
-import { ladeLeistungsliste, fuerTabelle } from "../../lib/leistungsliste";
+import { loadSettings } from "../../lib/settings";
+import { loadServiceList, forTable } from "../../lib/service-list";
 
 interface Props {
   /** Vorauswahl im Feld „Leistung". */
@@ -25,14 +25,14 @@ const { service } = Astro.props;
 
    Vorher standen beide Sätze fest hier. Das war der letzte Textblock der
    Seite, den der Kunde nicht ändern konnte. */
-const { contactTitle, contactText } = await ladeEinstellungen();
+const { contactTitle, contactText } = await loadSettings();
 
 /* Die Auswahlliste kommt aus der Leistungen-Collection. Sie war ein fest
    verdrahtetes Array aus fünf Namen — mit eigener Schreibweise („Keramik
    Inlays" gegen „Keramikinlays" in der Tabelle) und ohne Bezug dazu, was die
    Praxis tatsächlich anbietet. Wer eine Leistung umbenennt, benennt sie jetzt
    auch hier um. */
-const LEISTUNGEN = fuerTabelle(await ladeLeistungsliste()).map((l) => l.name);
+const LEISTUNGEN = forTable(await loadServiceList()).map((l) => l.name);
 ---
 
 <Panel id="kontakt" topline="Kontakt" title={contactTitle} text={contactText}>

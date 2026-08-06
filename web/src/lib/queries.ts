@@ -6,7 +6,7 @@ import { defineQuery } from "groq";
  * dem Frontmatter nicht — importierte dagegen schon.
  *
  * Welche Seiten gebaut werden, entscheidet nicht mehr eine eigene
- * Slug-Abfrage, sondern die Leistungsliste (lib/leistungsliste.ts) — dieselbe
+ * Slug-Abfrage, sondern die Leistungsliste (lib/service-list.ts) — dieselbe
  * Quelle, aus der auch Tabelle, Menü und Footer entstehen.
  */
 /**

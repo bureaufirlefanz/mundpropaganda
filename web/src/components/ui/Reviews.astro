@@ -5,13 +5,13 @@
  * Klasse 2: Sind sie dort nicht gepflegt, erscheint der Balken gar nicht.
  * Bis Aufgabe 4 fiel er auf die Zahlen aus dem Prototyp zurück — 272
  * Bewertungen bei 5,0, für eine Praxis, die davon nichts wusste. Eine
- * erfundene Bewertungszahl ist die Sorte Rückfall, die nicht nur Vertrauen
+ * erfundene Bewertungszahl ist die Slocations Rückfall, die nicht nur Vertrauen
  * kostet, sondern eine Aussage über die Praxis trifft, die niemand gedeckt
  * hat.
  */
-import { ladeEinstellungen, schnittText } from "../../lib/einstellungen";
+import { loadSettings, schnittText } from "../../lib/settings";
 
-const { bewertungen } = await ladeEinstellungen();
+const { bewertungen } = await loadSettings();
 const sterne = bewertungen ? Math.round(bewertungen.schnitt) : 0;
 ---
 

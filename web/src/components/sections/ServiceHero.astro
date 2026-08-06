@@ -9,7 +9,7 @@ import Button from "../ui/Button.astro";
 import CmsImage from "../ui/CmsImage.astro";
 import Reviews from "../ui/Reviews.astro";
 import ToothLines from "../ui/ToothLines.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 /* Der Titel trägt den Hero und ist Pflicht. Topline, Fließtext und Bild sind
    wahlfrei (Klasse 2): Eine Leistung, die noch keinen Einstiegstext hat, zeigt
@@ -19,7 +19,7 @@ interface Props {
   title: string;
   topline?: string;
   text?: string;
-  image?: Bildquelle;
+  image?: ImageSource;
   alt?: string;
   /** Beschriftung des Knopfs. */
   action?: string;
@@ -61,7 +61,7 @@ const gradDeckel = (100 / (0.67 * laengsteEinheit)).toFixed(2);
 
 /* Klasse 3: das gestaltete Motiv, solange im Studio keines hochgeladen ist.
    Es steht hier und nicht mehr in der Datenschicht — der Baustein kennt sein
-   Motiv, `leistungen.ts` ginge das nichts an. Ohne diesen Rückfall bliebe die
+   Motiv, `services.ts` ginge das nichts an. Ohne diesen Rückfall bliebe die
    halbe Seite weiß, und ein leeres Bildfeld heißt „noch nicht hochgeladen",
    nicht „bewusst gelöscht". */
 const MOTIV = "/img/portrait-hero-1600.webp";
@@ -91,7 +91,7 @@ const MOTIV = "/img/portrait-hero-1600.webp";
     {/* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
         unter 900px die ganze. */}
     <CmsImage
-      quelle={istCmsBild(image) ? image : MOTIV}
+      source={isCmsImage(image) ? image : MOTIV}
       alt={alt}
       widths={[640, 1024, 1600, 2200]}
       sizes="(max-width: 900px) 100vw, 50vw"

@@ -16,18 +16,18 @@ import Button from "../ui/Button.astro";
 import Thread from "../ui/Thread.astro";
 import ToothRings from "../ui/ToothRings.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Props {
   title: string;
-  items: { name: string; text?: string; image?: Bildquelle }[];
+  items: { name: string; text?: string; image?: ImageSource }[];
 }
 
 const { title, items } = Astro.props;
 
 /* Klasse 3: die gestalteten Motive, positionsgenau. Über den Index und
    modulo, damit auch ein sechster Punkt ein Bild bekommt. */
-const MOTIVE = [
+const MOTIFS = [
   "/img/treatment-01-1024.webp",
   "/img/lab-veneers-1024.webp",
   "/img/teeth-macro-1024.webp",
@@ -52,7 +52,7 @@ const MOTIVE = [
           <div class="s-standards__stage" data-standards-stage>
             {items.map((e, i) => (
               <CmsImage
-                quelle={istCmsBild(e.image) ? e.image : MOTIVE[i % MOTIVE.length]}
+                source={isCmsImage(e.image) ? e.image : MOTIFS[i % MOTIFS.length]}
                 alt=""
                 widths={[640, 1024]}
                 sizes="40vw"

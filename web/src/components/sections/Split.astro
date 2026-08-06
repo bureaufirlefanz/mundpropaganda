@@ -12,13 +12,13 @@
  */
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Props {
   topline: string;
   title: string;
   absaetze: string[];
-  image?: Bildquelle;
+  image?: ImageSource;
 }
 
 const { topline, title, absaetze, image } = Astro.props;
@@ -31,8 +31,8 @@ const { topline, title, absaetze, image } = Astro.props;
         <!-- Bild von rechts, braune Fläche von links: die beiden fahren
              gegeneinander ein und schließen die Komposition. -->
         <div class="s-split__media" data-reveal="right" data-reveal-trigger=".s-split">
-          {istCmsBild(image) ? (
-            <CmsImage quelle={image} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
+          {isCmsImage(image) ? (
+            <CmsImage source={image} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
           ) : (
             <Picture name="portrait-hero" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
           )}
@@ -174,8 +174,8 @@ const { topline, title, absaetze, image } = Astro.props;
        ist aus dem Seitenverhältnis gerechnet (4:3 auf die Satzbreite), nicht
        geschätzt — sonst stimmte es bei genau einer Fensterbreite. */
     .s-split__head {
-      --foto-hoehe: calc((100vw - 2 * var(--site-margin)) * 3 / 4);
-      --ueberlappung: calc(var(--foto-hoehe) / 3);
+      --foto-height: calc((100vw - 2 * var(--site-margin)) * 3 / 4);
+      --ueberlappung: calc(var(--foto-height) / 3);
 
       /* z-index 0, das Foto trägt 1: Die Fläche schiebt sich HINTER das Bild,
          nicht darüber. Sie reicht damit bis auf zwei Drittel des Fotos herauf

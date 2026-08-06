@@ -23,15 +23,15 @@
  */
 export const prerender = false;
 
-import Startseite from "../../seiten/Startseite.astro";
-import Leistung from "../../seiten/Leistung.astro";
-import Magazin from "../../seiten/Magazin.astro";
-import Beitrag from "../../seiten/Beitrag.astro";
-import Karriere from "../../seiten/Karriere.astro";
-import Rechtstext from "../../seiten/Rechtstext.astro";
+import Startseite from "../../templates/Home.astro";
+import Service from "../../templates/Service.astro";
+import Magazin from "../../templates/Magazine.astro";
+import Post from "../../templates/Post.astro";
+import CareersContent from "../../templates/Careers.astro";
+import LegalPage from "../../templates/LegalPage.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
-import { vorschauClient, zielVon, VORSCHAU_COOKIE } from "../../lib/preview";
+import { previewClient, targetFor, PREVIEW_COOKIE } from "../../lib/preview";
 import {
   STARTSEITE_QUERY,
   LEISTUNG_QUERY,
@@ -44,26 +44,26 @@ import {
   RECHTSTEXT_QUERY,
   AEHNLICHE_QUERY,
 } from "../../lib/queries";
-import { ohneNull } from "../../lib/ohne-null";
-import type { StartseiteInhalt } from "../../lib/startseite";
-import type { Leistung as LeistungDaten } from "../../lib/leistungen";
-import type { Beitrag as BeitragKarte, BeitragVoll, MagazinKopf } from "../../lib/magazin";
-import type { Karriere as KarriereDaten, Stelle } from "../../lib/karriere";
-import type { LeistungsEintrag } from "../../lib/leistungsliste";
-import type { Rechtstext as RechtstextDaten } from "../../lib/rechtstexte";
+import { withoutNull } from "../../lib/without-null";
+import type { HomepageContent } from "../../lib/homepage";
+import type { Service as LeistungDaten } from "../../lib/services";
+import type { Post as BeitragKarte, FullPost, MagazineIntro } from "../../lib/magazine";
+import type { CareersContent as KarriereDaten, Job } from "../../lib/careers";
+import type { ServiceEntry } from "../../lib/service-list";
+import type { LegalPage as RechtstextDaten } from "../../lib/legal-pages";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
    geprüft wurde. Ohne diese Sperre wären sämtliche Entwürfe für jeden
    lesbar, der die Adresse errät — `/preview/` ist nicht geheim. */
-if (Astro.cookies.get(VORSCHAU_COOKIE)?.value !== "an") {
+if (Astro.cookies.get(PREVIEW_COOKIE)?.value !== "an") {
   return new Response(
     "Vorschau nicht freigeschaltet. Sie wird aus dem Studio heraus geöffnet.",
     { status: 401, headers: { "content-type": "text/plain; charset=utf-8" } }
   );
 }
 
-const client = vorschauClient();
+const client = previewClient();
 if (!client) {
   return new Response(
     "SANITY_API_READ_TOKEN fehlt — ohne Token gibt die API keine Entwürfe heraus.",
@@ -71,106 +71,106 @@ if (!client) {
   );
 }
 
-const target = zielVon(Astro.params.pfad ?? "");
+const target = targetFor(Astro.params.pfad ?? "");
 if (!target) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
 
 /* Kein Zwischenspeichern wie in den Ladefunktionen unter `lib/`: Die Vorschau
    läuft je Aufruf frisch, das ist ihr Zweck. */
 async function hole<T>(abfrage: string, params: Record<string, unknown> = {}) {
-  return ohneNull(await client!.fetch<T>(abfrage, params));
+  return withoutNull(await client!.fetch<T>(abfrage, params));
 }
 
 /* Je Seitenart genau die Abfragen, die ihr Zusammenbau braucht — und jede nur
    einmal. */
 let inhalt: {
-  startseite?: StartseiteInhalt;
+  startseite?: HomepageContent;
   service?: LeistungDaten;
-  magazinKopf?: MagazinKopf;
-  beitrag?: BeitragVoll;
+  magazinKopf?: MagazineIntro;
+  beitrag?: FullPost;
   karriere?: KarriereDaten;
   rechtstext?: RechtstextDaten;
-  beitraege: BeitragKarte[];
-  stellen: Stelle[];
+  posts: BeitragKarte[];
+  jobs: Job[];
   title: string;
-} = { beitraege: [], stellen: [], title: "" };
+} = { posts: [], jobs: [], title: "" };
 
 if (target.kind === "homepage") {
-  const [daten, beitraege] = await Promise.all([
-    hole<StartseiteInhalt>(STARTSEITE_QUERY),
+  const [data, posts] = await Promise.all([
+    hole<HomepageContent>(STARTSEITE_QUERY),
     hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
   ]);
-  inhalt = { ...inhalt, startseite: daten, beitraege: beitraege ?? [] };
+  inhalt = { ...inhalt, startseite: data, posts: posts ?? [] };
 } else if (target.kind === "service") {
-  const [daten, liste, start, beitraege] = await Promise.all([
+  const [data, liste, start, posts] = await Promise.all([
     hole<LeistungDaten>(LEISTUNG_QUERY, { slug: target.slug }),
-    hole<LeistungsEintrag[]>(LEISTUNGSLISTE_QUERY),
-    hole<StartseiteInhalt>(STARTSEITE_QUERY),
+    hole<ServiceEntry[]>(LEISTUNGSLISTE_QUERY),
+    hole<HomepageContent>(STARTSEITE_QUERY),
     hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: target.slug }),
   ]);
   inhalt = {
     ...inhalt,
-    service: daten,
-    beitraege: beitraege ?? [],
-    title: daten?.title || (liste ?? []).find((l) => l.slug === target.slug)?.name || "",
+    service: data,
+    posts: posts ?? [],
+    title: data?.title || (liste ?? []).find((l) => l.slug === target.slug)?.name || "",
     startseite: start,
   };
 } else if (target.kind === "magazineIndex") {
-  const [kopf, beitraege] = await Promise.all([
-    hole<MagazinKopf>(MAGAZIN_INDEX_QUERY),
+  const [kopf, posts] = await Promise.all([
+    hole<MagazineIntro>(MAGAZIN_INDEX_QUERY),
     hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
   ]);
-  inhalt = { ...inhalt, magazinKopf: kopf, beitraege: beitraege ?? [] };
+  inhalt = { ...inhalt, magazinKopf: kopf, posts: posts ?? [] };
 } else if (target.kind === "post") {
-  const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: target.slug });
+  const data = await hole<FullPost>(BEITRAG_QUERY, { slug: target.slug });
   /* Erst nach dem Beitrag, nicht parallel: Die Kategorie steht in ihm, und
      ohne sie gibt es nichts Ähnliches zu holen. */
-  const aehnliche = daten?.category
+  const aehnliche = data?.category
     ? ((await hole<BeitragKarte[]>(AEHNLICHE_QUERY, {
-        category: daten.category,
+        category: data.category,
         slug: target.slug,
       })) ?? [])
     : [];
-  inhalt = { ...inhalt, beitrag: daten, title: daten?.title ?? "", beitraege: aehnliche };
+  inhalt = { ...inhalt, beitrag: data, title: data?.title ?? "", posts: aehnliche };
 } else if (target.kind === "legalPage") {
-  const daten = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: target.slug });
+  const data = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: target.slug });
   /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
      wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
-  if (!daten) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
-  inhalt = { ...inhalt, rechtstext: daten, title: daten.title ?? "" };
+  if (!data) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+  inhalt = { ...inhalt, rechtstext: data, title: data.title ?? "" };
 } else {
-  const [daten, stellen] = await Promise.all([
+  const [data, jobs] = await Promise.all([
     hole<KarriereDaten>(KARRIERE_QUERY),
-    hole<Stelle[]>(STELLEN_QUERY),
+    hole<Job[]>(STELLEN_QUERY),
   ]);
-  inhalt = { ...inhalt, karriere: daten, stellen: stellen ?? [] };
+  inhalt = { ...inhalt, karriere: data, jobs: jobs ?? [] };
 }
 ---
 
 {target.kind === "homepage" && inhalt.startseite && (
-  <Startseite daten={inhalt.startseite} beitraege={inhalt.beitraege} />
+  <Startseite data={inhalt.startseite} posts={inhalt.posts} />
 )}
 
 {target.kind === "service" && (
-  <Leistung
-    daten={inhalt.service}
+  <Service
+    data={inhalt.service}
     title={inhalt.title}
     stories={inhalt.startseite?.storiesItems ?? []}
-    beitraege={inhalt.beitraege}
+    posts={inhalt.posts}
   />
 )}
 
 {target.kind === "magazineIndex" && (
-  <Magazin kopf={inhalt.magazinKopf} beitraege={inhalt.beitraege} />
+  <Magazin kopf={inhalt.magazinKopf} posts={inhalt.posts} />
 )}
 
 {target.kind === "post" && (
-  <Beitrag daten={inhalt.beitrag} title={inhalt.title} aehnliche={inhalt.beitraege} />
+  <Post data={inhalt.beitrag} title={inhalt.title} aehnliche={inhalt.posts} />
 )}
 
-{target.kind === "careers" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
+{target.kind === "careers" && <CareersContent data={inhalt.karriere} jobs={inhalt.jobs} />}
 
 {target.kind === "legalPage" && (
-  <Rechtstext daten={inhalt.rechtstext} title={inhalt.title} />
+  <LegalPage data={inhalt.rechtstext} title={inhalt.title} />
 )}
 
 <VisualEditing />

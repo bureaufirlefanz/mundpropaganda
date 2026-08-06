@@ -3,7 +3,7 @@
  * existiert — dadurch teilen sich alle Seiten ein Bundle und wir brauchen
  * keine Per-Page-Einstiegspunkte.
  *
- * Bewusst ohne CSS-Importe und ohne Selbststart: die Astro-App bringt ihre
+ * Bewusst ohne CSS-Implocations und ohne Selbststart: die Astro-App bringt ihre
  * Stile in den Komponenten mit und ruft `init` über den Router auf. Der
  * Prototyp lädt stattdessen main.js daneben, das beides ergänzt.
  */

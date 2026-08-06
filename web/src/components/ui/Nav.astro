@@ -10,17 +10,17 @@
  * Markup.
  */
 import Button from "./Button.astro";
-import { ladeLeistungsliste, fuerGruppe, pfad, GRUPPEN } from "../../lib/leistungsliste";
-import { ladeNavigation, aufgeloest } from "../../lib/navigation";
+import { loadServiceList, fuerGruppe, pfad, GRUPPEN } from "../../lib/service-list";
+import { loadNavigation, resolved } from "../../lib/navigation";
 
-const liste = await ladeLeistungsliste();
+const liste = await loadServiceList();
 const leistungsSpalten = GRUPPEN.map((g) => ({ title: g.title, items: fuerGruppe(liste, g.value) }));
 
-const nav = await ladeNavigation();
+const nav = await loadNavigation();
 const hier = Astro.url.pathname;
 
-const mainMenu = await aufgeloest(nav?.mainMenu, hier);
-const action = (await aufgeloest([nav?.action ?? null], hier))[0];
+const mainMenu = await resolved(nav?.mainMenu, hier);
+const action = (await resolved([nav?.action ?? null], hier))[0];
 
 /* Die Zusatzspalten, jede für sich aufgelöst. Ein Verweis ohne Ziel fällt
    dabei heraus, eine Spalte ohne Verweise ebenfalls — statt eine leere
@@ -29,7 +29,7 @@ const zusatzSpalten = (
   await Promise.all(
     (nav?.menuColumns ?? []).map(async (sp) => ({
       title: sp?.title ?? "",
-      links: await aufgeloest(sp?.links, hier),
+      links: await resolved(sp?.links, hier),
     }))
   )
 ).filter((sp) => sp.title && sp.links.length > 0);
@@ -44,7 +44,7 @@ const zusatzSpalten = (
     </a>
 
     {/* Der ERSTE Eintrag öffnet das große Menü — daran hängt nav.js über
-        `data-nav-item="leistungen"`. Das ist eine Eigenschaft des Aufbaus,
+        `data-nav-item="services"`. Das ist eine Eigenschaft des Aufbaus,
         keine des Inhalts: Die Leistungen sind der einzige Punkt mit
         Unterpunkten.
 
@@ -54,7 +54,7 @@ const zusatzSpalten = (
         behauptet aber einen Namen, den es nicht gibt. */}
     <nav class="c-nav__menu" aria-label="Hauptnavigation">
       {mainMenu.map((eintrag, i) => (
-        <div class="c-nav__item" data-nav-item={i === 0 ? "leistungen" : ""} data-open={i === 0 ? "false" : undefined}>
+        <div class="c-nav__item" data-nav-item={i === 0 ? "services" : ""} data-open={i === 0 ? "false" : undefined}>
           <a class="c-nav__link" href={eintrag.href}>{eintrag.text}</a>
         </div>
       ))}
@@ -75,7 +75,7 @@ const zusatzSpalten = (
     </div>
   </div>
 
-  <div class="c-megamenu" data-megamenu="leistungen">
+  <div class="c-megamenu" data-megamenu="services">
     <div class="c-megamenu__inner">
       {leistungsSpalten.map((spalte) => (
         <div data-megamenu-item>
@@ -147,7 +147,7 @@ const zusatzSpalten = (
        die Leiste nach außen rückte, blieb das Menü stehen — beide sollen aber
        als eine Fläche gelesen werden. */
     --nav-rand: max(8px, calc(var(--site-margin) - var(--nav-ueberstand)));
-    --nav-breite: calc(
+    --nav-width: calc(
       var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-ueberstand)
     );
 
@@ -174,7 +174,7 @@ const zusatzSpalten = (
        Verglichen wird die Leiste aber mit dem, was man sieht — der Spalte
        innerhalb des Rahmens. Ohne diese Rechnung wüchse der Überstand mit
        dem Fenster: bei 1440px wären es 14px, bei 2000px schon 68. */
-    max-width: var(--nav-breite);
+    max-width: var(--nav-width);
     margin-inline: auto;
     padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
     border-radius: var(--r-round);
@@ -279,14 +279,14 @@ const zusatzSpalten = (
      Liegt als Geschwister der Leiste, nicht darin: ein backdrop-filter
      erzeugt einen eigenen Backdrop-Root, und ein Panel innerhalb der Leiste
      hätte nur deren bereits gefilterte Fläche abgetastet statt der Seite.
-     Bezugsrahmen ist damit .c-nav — der Seitenrand muss hier wieder
+     Bezugschrome ist damit .c-nav — der Seitenrand muss hier wieder
      ausgeschrieben werden. */
   .c-megamenu {
     position: absolute;
     top: calc(100% - var(--sp-2));
     left: var(--nav-rand);
     right: var(--nav-rand);
-    max-width: var(--nav-breite);
+    max-width: var(--nav-width);
     margin-inline: auto;
     /* Dasselbe Milchglas wie die Leiste darüber — beide sollen als eine
        Fläche gelesen werden. */

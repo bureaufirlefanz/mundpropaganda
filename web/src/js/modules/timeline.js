@@ -16,9 +16,9 @@
 import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
 
 export function initTimeline() {
-  document.querySelectorAll("[data-timeline]").forEach((wurzel) => {
-    const fuellung = wurzel.querySelector("[data-timeline-fill]");
-    const stages = [...wurzel.querySelectorAll(".s-timeline__etappe")];
+  document.querySelectorAll("[data-timeline]").forEach((root) => {
+    const fuellung = root.querySelector("[data-timeline-fill]");
+    const stages = [...root.querySelectorAll(".s-timeline__etappe")];
     if (!fuellung || !stages.length) return;
 
     if (prefersReducedMotion) {
@@ -26,7 +26,7 @@ export function initTimeline() {
       return;
     }
 
-    const bahn = wurzel.querySelector(".s-timeline__bahn");
+    const bahn = root.querySelector(".s-timeline__bahn");
 
     /* Beim Aufziehen wandert die Kante über die Marken. Erreicht ist eine
        Marke, sobald die Kante ihre Mitte passiert hat — gemessen an der
@@ -43,7 +43,7 @@ export function initTimeline() {
       });
     };
 
-    let marken = anteile();
+    let headings = anteile();
 
     gsap.fromTo(
       fuellung,
@@ -56,16 +56,16 @@ export function initTimeline() {
         scaleY: 1,
         ease: "none",
         scrollTrigger: {
-          trigger: wurzel,
+          trigger: root,
           start: "top 70%",
           end: "bottom 75%",
           scrub: 0.6,
           onRefresh: () => {
-            marken = anteile();
+            headings = anteile();
           },
           onUpdate: (selbst) => {
             stages.forEach((e, i) => {
-              if (selbst.progress >= marken[i]) e.dataset.erreicht = "";
+              if (selbst.progress >= headings[i]) e.dataset.erreicht = "";
               else delete e.dataset.erreicht;
             });
           },

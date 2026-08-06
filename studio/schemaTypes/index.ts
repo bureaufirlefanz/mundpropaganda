@@ -1,9 +1,9 @@
-import { leistung } from "./leistung";
-import { einstellungen } from "./einstellungen";
+import { leistung } from "./service";
+import { einstellungen } from "./settings";
 
-import { seo } from "./objekte/seo";
-import { link } from "./objekte/link";
-import { bild } from "./objekte/bild";
+import { seo } from "./objects/seo";
+import { link } from "./objects/link";
+import { bild } from "./objects/picture";
 import {
   abschnitte,
   abschnittIntro,
@@ -16,20 +16,20 @@ import {
   abschnittPreise,
   abschnittFaq,
   abschnittKontakt,
-} from "./objekte/abschnitte";
+} from "./objects/sections";
 
-import { startseite } from "./dokumente/startseite";
+import { startseite } from "./documents/homepage";
 import {
   leistungenIndex,
   praxis,
   magazinIndex,
   kontakt,
   notdienst,
-} from "./dokumente/einzelseiten";
-import { karriere } from "./dokumente/karriere";
+} from "./documents/single-pages";
+import { karriere } from "./documents/careers";
 
-import { beitrag, pillar, rechtstext, person, stelle } from "./dokumente/sammlungen";
-import { navigation, footer } from "./dokumente/rahmen";
+import { beitrag, pillar, rechtstext, person, stelle } from "./documents/collections";
+import { navigation, footer } from "./documents/chrome";
 
 export const schemaTypes = [
   /* Bausteine zuerst — die Dokumente verweisen darauf. Die Reihenfolge ist

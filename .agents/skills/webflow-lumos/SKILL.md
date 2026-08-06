@@ -78,7 +78,7 @@ Read the relevant file before acting — do not work from memory.
 |---|---|
 | `references/lumos-conventions.md` | Naming any class, creating any variable, styling anything |
 | `references/mcp-workflow.md` | Any MCP call — ordering, discovery, batching, error handling |
-| `references/cms-collections.md` | Any CMS work — schemas for reviews/blog/team/careers, limits, binding |
+| `references/cms-collections.md` | Any CMS work — schemas for reviews/blog/team/karriere, limits, binding |
 | `references/qa-checklist.md` | Before telling the user the build is done |
 
 ## Reporting

@@ -4,11 +4,11 @@
  * die Inhalte kommen jetzt aus der Datenschicht. Die data-Attribute bleiben
  * erhalten, dadurch greift standards.js ohne Anpassung.
  */
-import type { Eintrag } from "../../lib/formen";
+import type { Entry } from "../../lib/shapes";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild } from "../../lib/bilder";
+import { isCmsImage } from "../../lib/images";
 
-interface Props { topline: string; headline: string; items: Eintrag[] }
+interface Props { topline: string; headline: string; items: Entry[] }
 const { topline, headline, items } = Astro.props;
 
 /* Klasse 3: die gestalteten Motive, positionsgenau. Sie kamen bis Aufgabe 4
@@ -17,7 +17,7 @@ const { topline, headline, items } = Astro.props;
    stehen sie neben dem Markup, das sie zeigt.
    Über den Index und modulo: Ohne das trüge jeder Punkt dasselbe Bild, und
    der Wechsel beim Aufklappen wäre nicht zu sehen. */
-const MOTIVE = [
+const MOTIFS = [
   "/img/treatment-01-1600.webp",
   "/img/lab-veneers-1024.webp",
   "/img/teeth-macro-1024.webp",
@@ -50,7 +50,7 @@ const MOTIVE = [
             das Modul blendet um. Deshalb ohne Alternativtext: die Bühne
             trägt keine eigene Information, der Text steht in der Liste. */}
         {items.map((e, i) => (
-          <CmsImage quelle={istCmsBild(e.image) ? e.image : MOTIVE[i % MOTIVE.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
+          <CmsImage source={isCmsImage(e.image) ? e.image : MOTIFS[i % MOTIFS.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
         ))}
       </div>
     </div>
@@ -60,7 +60,7 @@ const MOTIVE = [
 <style>
   /* Dunkles Vollbreiten-Band mit Auswahlliste links und Bild rechts.
      Verhalten und data-Attribute teilt sie sich mit .s-standards — nur das
-     Erscheinungsbild ist ein anderes: keine Zahnmaske, sondern ein
+     Erscheinungspicture ist ein anderes: keine Zahnmaske, sondern ein
      gerundetes Bildfeld, und Ziffern statt zweistelliger Nummern.
 
      Randlos über die volle Fensterbreite und ohne Rundung — im Entwurf ein

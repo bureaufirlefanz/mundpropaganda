@@ -4,24 +4,24 @@
  *
  * Diese Route ist die einzige mit einem Platzhalter direkt unter der Wurzel,
  * und das ist der Grund, warum `slugFrei()` im Schema steht: Ein Rechtstext
- * mit dem Slug „magazin" oder „karriere" träte hier gegen eine bestehende
+ * mit dem Slug „magazine" oder „careers" träte hier gegen eine bestehende
  * Seite an. Astro entscheidet solche Fälle zugunsten der spezifischeren
  * Route, aber verlassen sollte man sich darauf nicht — das Studio lässt den
  * Slug erst gar nicht zu.
  */
-import Rechtstext from "../seiten/Rechtstext.astro";
-import { ladeRechtstext, ladeRechtstexte } from "../lib/rechtstexte";
+import LegalPage from "../templates/LegalPage.astro";
+import { loadLegalPage, loadLegalPages } from "../lib/legal-pages";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
-  const texte = await ladeRechtstexte();
+  const texte = await loadLegalPages();
   return texte.map((t) => ({ params: { slug: t.slug }, props: { title: t.title } }));
 }
 
 const { slug } = Astro.params;
 const { title } = Astro.props;
-const daten = await ladeRechtstext(slug!);
+const data = await loadLegalPage(slug!);
 ---
 
-<Rechtstext daten={daten} title={daten?.title || title || ""} />
+<LegalPage data={data} title={data?.title || title || ""} />

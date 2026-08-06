@@ -1,0 +1,70 @@
+---
+/**
+ * Der Zusammenbau der Magazin-Übersicht.
+ *
+ * Der Kopf kommt aus dem Einzeldokument „Magazin (Übersicht)", die Beiträge
+ * aus der Collection. Der Baukasten (`sections`), den das Dokument
+ * ebenfalls hat, bleibt vorerst ungenutzt — er braucht einen Renderer für
+ * frei zusammensteckbare Abschnitte, und das ist ein eigener Schritt. Bis
+ * dahin trägt der Kopf die Seite, und das steht auch so im Studio.
+ */
+import Base from "../layouts/Base.astro";
+import PostListe from "../components/sections/PostList.astro";
+import Contact from "../components/sections/Contact.astro";
+import type { Post, MagazineIntro } from "../lib/magazine";
+
+interface Props {
+  kopf: MagazineIntro | undefined;
+  posts: Post[];
+}
+
+const { kopf, posts } = Astro.props;
+
+/* Wie auf der Startseite: Suchmaschinenangaben sind kein sichtbarer
+   Seiteninhalt, deshalb darf der Seitentitel auf die Überschrift der Seite
+   zurückfallen. Das sagt das Schema dem Kunden auch zu. */
+const title = kopf?.seo?.title || `${kopf?.title || "Magazin"} - Mundpropaganda`;
+const description = kopf?.seo?.description || kopf?.lead || "";
+---
+
+<Base title={title} description={description} noIndex={kopf?.seo?.noIndex}>
+  <section class="container s-magazinekopf">
+    {kopf?.topline && <span class="c-topline" data-reveal="fade">{kopf.topline}</span>}
+    <h1 class="s-magazinekopf__titel" data-split="lines">{kopf?.title}</h1>
+    {kopf?.lead && <p class="s-magazinekopf__text" data-reveal="up">{kopf.lead}</p>}
+  </section>
+
+  {posts.length > 0 && <PostListe posts={posts} />}
+
+  <Contact />
+</Base>
+
+<style>
+  /* Der Kopf einer Übersichtsseite. Steht hier und nicht in einem Baustein:
+     Er ist das Markup dieses Zusammenbaus, und ein zweiter Ort bräuchte ihn
+     erst, wenn eine weitere Übersicht dazukommt. */
+  .s-magazinkopf {
+    padding-block: calc(var(--section-space) + 80px) var(--sp-6);
+  }
+
+  .s-magazinkopf .c-topline {
+    display: block;
+    margin-bottom: var(--sp-4);
+  }
+
+  .s-magazinkopf__titel {
+    max-width: 16ch;
+    font-size: var(--fs-display-2);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .s-magazinkopf__text {
+    max-width: 52ch;
+    margin-top: var(--sp-6);
+    font-size: var(--fs-text-large);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+</style>

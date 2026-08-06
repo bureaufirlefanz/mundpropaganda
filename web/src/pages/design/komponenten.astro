@@ -12,7 +12,7 @@
  * etwas zeigt, das es so nirgends gibt — und sie ist zugleich die Probe, ob
  * ein Baustein ohne seine Daten heil bleibt.
  *
- * Nicht eingebettet sind die Bausteine, die den Seitenrahmen bilden
+ * Nicht eingebettet sind die Bausteine, die den Seitenchrome pictureen
  * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen) und die beiden
  * Heroes. Sie sind auf ihre Seite als Ganzes bezogen: die Navigation ist
  * fixiert und läge über jedem Beispiel, die Heroes füllen ein ganzes Fenster
@@ -21,17 +21,17 @@
  * kaputter Seitenkopf. Sie stehen deshalb mit Beschreibung und Verweis da.
  */
 import Design from "../../layouts/Design.astro";
-import { ladeStartseite } from "../../lib/startseite";
-import { ladeLeistung } from "../../lib/leistungen";
-import { ladeBeitraege } from "../../lib/magazin";
-import { ladeKarriere, ladeStellen } from "../../lib/karriere";
+import { loadHomepage } from "../../lib/homepage";
+import { loadService } from "../../lib/services";
+import { loadPosts } from "../../lib/magazine";
+import { loadCareers, loadJobs } from "../../lib/careers";
 
 import Button from "../../components/ui/Button.astro";
 import Accordion from "../../components/ui/Accordion.astro";
 import Panel from "../../components/ui/Panel.astro";
 import Reviews from "../../components/ui/Reviews.astro";
 import Picture from "../../components/ui/Picture.astro";
-import BildRing from "../../components/ui/BildRing.astro";
+import BildRing from "../../components/ui/ImageRing.astro";
 import ToothRings from "../../components/ui/ToothRings.astro";
 
 import Intro from "../../components/sections/Intro.astro";
@@ -63,19 +63,19 @@ import Voices from "../../components/sections/Voices.astro";
    Vorgaben in ihrem Frontmatter. Die Vorgaben sind weg, und eigens erfundene
    Beispieldaten wären der falsche Ersatz: Diese Seite soll zeigen, was es
    wirklich gibt, nicht etwas, das so nirgends steht. */
-const inhalt = await ladeStartseite();
+const inhalt = await loadHomepage();
 
 /* Die Leistungsbausteine am Beispiel Veneers — der einzigen voll gepflegten
    Leistung. Bis Aufgabe 4 kamen sie aus `beispielLeistung` in fixtures.ts;
    die Datei hat damit ihre letzte Aufgabe verloren und ist entfallen. */
-const bl = await ladeLeistung("veneers");
-const beitraege = await ladeBeitraege();
+const bl = await loadService("veneers");
+const posts = await loadPosts();
 
 /* Die Karriere-Bausteine mit den echten Inhalten der Karriereseite. Bis zum
    Umzug ins CMS kamen sie aus Konstanten in lib/karriere.ts; die Datei trägt
    jetzt nur noch den Datenzugriff. */
-const kr = await ladeKarriere();
-const stellen = await ladeStellen();
+const kr = await loadCareers();
+const jobs = await loadJobs();
 
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
@@ -494,7 +494,7 @@ const RING_BILDER = [
         Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
       </p>
       <div class="d-live">
-        <Magazine topline={inhalt.magazineTopline} title={inhalt.magazineTitle} text={inhalt.magazineText} beitraege={beitraege} />
+        <Magazine topline={inhalt.magazineTopline} title={inhalt.magazineTitle} text={inhalt.magazineText} posts={posts} />
       </div>
     </div>
 
@@ -534,7 +534,7 @@ const RING_BILDER = [
         damit greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
         Vorlesegeräte beim Ansteuern den Stellentitel ausgeben.
       </p>
-      <div class="d-live">{stellen.length ? <Jobs topline="Beispiel" headline="Offene Stellen" stellen={stellen.slice(0, 2)} applicationEmail={kr?.applicationEmail ?? ""} /> : null}</div>
+      <div class="d-live">{jobs.length ? <Jobs topline="Beispiel" headline="Offene Stellen" jobs={jobs.slice(0, 2)} applicationEmail={kr?.applicationEmail ?? ""} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -596,7 +596,7 @@ const RING_BILDER = [
     </div>
   </section>
 
-  {/* ================= Seitenrahmen ================= */}
+  {/* ================= Seitenchrome ================= */}
   <section class="d-teil">
     <div class="d-teil__kopf">
       <span class="d-teil__nummer">04</span>

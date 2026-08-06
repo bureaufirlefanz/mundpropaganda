@@ -1,13 +1,13 @@
 ---
 import Button from "./Button.astro";
-import { ladeLeistungsliste, fuerTabelle, pfad } from "../../lib/leistungsliste";
-import { ladeEinstellungen, telLink } from "../../lib/einstellungen";
-import { ladeFooter, aufgeloest } from "../../lib/navigation";
+import { loadServiceList, forTable, pfad } from "../../lib/service-list";
+import { loadSettings, telLink } from "../../lib/settings";
+import { loadFooter, resolved } from "../../lib/navigation";
 
 // Dieselbe Quelle wie Services-Tabelle und Menü. Gezeigt werden die
-// Hauptleistungen; die Zusatzlinks der Startseite bleiben dort.
-const leistungen = fuerTabelle(await ladeLeistungsliste());
-const e = await ladeEinstellungen();
+// Hauptservices; die Zusatzlinks der Startseite bleiben dort.
+const services = forTable(await loadServiceList());
+const e = await loadSettings();
 
 // Nur Netzwerke zeigen, die gepflegt sind — ein Symbol ohne Ziel führt nirgends
 // hin und sieht trotzdem nach Angebot aus.
@@ -18,12 +18,12 @@ const e = await ladeEinstellungen();
 // ließen. Ein Platzhalter, der die Prüfung besteht, ist schlimmer als ein
 // leeres Feld.
 const PROFILE = [
-  { schluessel: "facebook", title: "Facebook", symbol: "#i-facebook" },
-  { schluessel: "instagram", title: "Instagram", symbol: "#i-instagram" },
-  { schluessel: "linkedin", title: "LinkedIn", symbol: "#i-linkedin" },
-  { schluessel: "youtube", title: "YouTube", symbol: "#i-youtube" },
+  { key: "facebook", title: "Facebook", symbol: "#i-facebook" },
+  { key: "instagram", title: "Instagram", symbol: "#i-instagram" },
+  { key: "linkedin", title: "LinkedIn", symbol: "#i-linkedin" },
+  { key: "youtube", title: "YouTube", symbol: "#i-youtube" },
 ] as const;
-const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filter(
+const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.key] })).filter(
   (p) => p.url && p.url !== "#"
 );
 
@@ -36,17 +36,17 @@ const jahr = new Date().getFullYear();
    Rechtstext-Links standen before auf `href="#"` — sie sahen aus wie ein
    Angebot und führten nirgendwohin. Jetzt zeigen sie auf Rechtstext-
    Dokumente, und solange es die nicht gibt, steht die Zeile leer. */
-const f = await ladeFooter();
+const f = await loadFooter();
 const hier = Astro.url.pathname;
 
-const action = (await aufgeloest([f?.action ?? null], hier))[0];
-const legalLinks = await aufgeloest(f?.legalLinks, hier);
+const action = (await resolved([f?.action ?? null], hier))[0];
+const legalLinks = await resolved(f?.legalLinks, hier);
 
 const columns = (
   await Promise.all(
     (f?.columns ?? []).map(async (sp) => ({
       title: sp?.title ?? "",
-      links: await aufgeloest(sp?.links, hier),
+      links: await resolved(sp?.links, hier),
     }))
   )
 ).filter((sp) => sp.title && sp.links.length > 0);
@@ -79,7 +79,7 @@ const columns = (
           Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
           breit genug für zwei nebeneinander. Quelle sind dieselben
           Einstellungen wie in der Standorte-Section. */}
-      <div class="c-footer__standorte">
+      <div class="c-footer__standlocations">
         {e.locations.map((o) => (
           <div>
             {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
@@ -98,7 +98,7 @@ const columns = (
 
     <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
       <p class="c-footer__nav-title">{f?.servicesHeading}</p>
-      {leistungen.map((l) => (
+      {services.map((l) => (
         <a class="c-link" href={pfad(l)}>{l.name}</a>
       ))}
     </nav>

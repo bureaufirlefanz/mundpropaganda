@@ -7,15 +7,15 @@
  */
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 /* Die Topline ist Pflicht und kommt aus dem CMS — der Abschnitt selbst ist
    dort wahlfrei, wer ihn anlegt, benennt ihn auch. Die beiden Aufnahmen sind
    wahlfrei mit Rückfall auf die gestalteten Motive. */
 interface Props {
   topline: string;
-  before?: Bildquelle;
-  after?: Bildquelle;
+  before?: ImageSource;
+  after?: ImageSource;
 }
 
 const { topline, before, after } = Astro.props;
@@ -32,14 +32,14 @@ const MOTIV_NACHHER = "teeth-macro-after";
     <span class="c-topline s-ba__topline" data-reveal="fade">{topline}</span>
 
     <div class="s-ba__frame" data-ba data-reveal="scale">
-      {istCmsBild(before) ? (
-        <CmsImage quelle={before} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+      {isCmsImage(before) ? (
+        <CmsImage source={before} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
       ) : (
         <Picture name={MOTIV_VORHER} alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
       )}
       <div class="s-ba__after">
-        {istCmsBild(after) ? (
-          <CmsImage quelle={after} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+        {isCmsImage(after) ? (
+          <CmsImage source={after} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
         ) : (
           <Picture name={MOTIV_NACHHER} alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
         )}

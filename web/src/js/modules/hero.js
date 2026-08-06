@@ -82,7 +82,7 @@ export function initHero() {
        Leistungsseiten stand deshalb „CMD MIT BOTO / XBEHANDLUNG“, mitten im
        Wort und ohne Trennstrich.
 
-       Mit der Wortebene liegen die Zeichen in Wort-Containern. Die allein
+       Mit der Wlocationsbene liegen die Zeichen in Wort-Containern. Die allein
        genügen allerdings nicht: SplitText setzt sie auf inline-block, und ein
        inline-block bricht seinen Inhalt sehr wohl um, wenn der breiter ist
        als die Zeile — nur eben nicht sich selbst. Deshalb die Klasse, an der

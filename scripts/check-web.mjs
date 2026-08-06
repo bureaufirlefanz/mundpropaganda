@@ -213,11 +213,11 @@ async function pruefeBarrierefreiheit(browser, pfad, vp) {
  * pflegt „Praxis & Team", drückt Publish — und findet nirgends etwas. Das
  * Studio hat ihm eine Seite versprochen, die die Website nicht hat.
  *
- * Gelesen wird aus `studio/lib/pfade.ts`, der einzigen Stelle, an der URLs
+ * Gelesen wird aus `studio/lib/paths.ts`, der einzigen Stelle, an der URLs
  * entstehen. Eine zweite Liste hier würde genau den Zweck verfehlen.
  */
 async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
-  const { FESTE_PFADE, VERZEICHNIS, OBERSTE_EBENE } = await ladePfadmodell();
+  const { FIXED_PATHS, DIRECTORIES, TOP_LEVEL } = await ladePfadmodell();
   const ausgeblendet = await ladeAusgeblendete();
 
   /* Ein Typ, den das Studio gar nicht anbietet, kann auch niemanden
@@ -230,7 +230,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
   let geprueft = 0;
 
   /* Einzeldokumente: ihr fester Pfad muss antworten. */
-  for (const [typ, pfad] of Object.entries(FESTE_PFADE)) {
+  for (const [typ, pfad] of Object.entries(FIXED_PATHS)) {
     if (!zeigtStudio(typ)) continue;
     geprueft++;
     const antwort = await seite.goto(BASE + pfad, { waitUntil: "domcontentloaded", timeout: 30000 });
@@ -244,7 +244,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
      (`leistungenIndex`) und wird oben geprüft. Deshalb hier gegen die
      gecrawlte Liste statt gegen das nackte Verzeichnis: sonst meldete die
      Prüfung `leistung` als fehlend, obwohl es elf Seiten hat. */
-  for (const [typ, ordner] of Object.entries(VERZEICHNIS)) {
+  for (const [typ, ordner] of Object.entries(DIRECTORIES)) {
     if (!zeigtStudio(typ)) continue;
     geprueft++;
     if (!gefundeneSeiten.some((p) => p.startsWith(`/${ordner}/`))) {
@@ -256,7 +256,7 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
      könnte — sie leben unter freien Slugs. Geprüft wird deshalb, ob es die
      Route überhaupt gibt: eine Datei, die `/[slug]` bedient. */
   const { existsSync } = await import("node:fs");
-  for (const typ of OBERSTE_EBENE) {
+  for (const typ of TOP_LEVEL) {
     if (!zeigtStudio(typ)) continue;
     geprueft++;
     if (!existsSync("web/src/pages/[slug].astro")) {
@@ -293,11 +293,11 @@ async function ladeAusgeblendete() {
 
 async function ladePfadmodell() {
   const { readFile } = await import("node:fs/promises");
-  const quelle = await readFile("studio/lib/pfade.ts", "utf8");
+  const quelle = await readFile("studio/lib/paths.ts", "utf8");
 
   const block = (name) => {
     const treffer = quelle.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
-    if (!treffer) throw new Error(`In studio/lib/pfade.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
+    if (!treffer) throw new Error(`In studio/lib/paths.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
     return treffer[1];
   };
 
@@ -307,9 +307,9 @@ async function ladePfadmodell() {
     );
 
   return {
-    FESTE_PFADE: paare(block("FESTE_PFADE")),
-    VERZEICHNIS: paare(block("VERZEICHNIS")),
-    OBERSTE_EBENE: [...block("OBERSTE_EBENE").matchAll(/"([^"]+)"/g)].map((m) => m[1]),
+    FIXED_PATHS: paare(block("FIXED_PATHS")),
+    DIRECTORIES: paare(block("DIRECTORIES")),
+    TOP_LEVEL: [...block("TOP_LEVEL").matchAll(/"([^"]+)"/g)].map((m) => m[1]),
   };
 }
 

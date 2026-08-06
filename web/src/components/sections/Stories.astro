@@ -10,19 +10,19 @@
  *
  * Nur die Motive bleiben als Rückfall, positionsgenau: Solange im Studio kein
  * Foto hochgeladen ist, tritt das gestaltete Motiv an derselben Stelle ein.
- * Über den Index und nicht über ein einzelnes Ersatzbild — sonst trügen alle
+ * Über den Index und nicht über ein einzelnes Ersatzpicture — sonst trügen alle
  * fünf Karten dasselbe Gesicht.
  */
 import Button from "../ui/Button.astro";
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
-import { istCmsBild, type Bildquelle } from "../../lib/bilder";
+import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Geschichte {
   name: string;
   quote?: string;
   /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
-  image?: Bildquelle;
+  image?: ImageSource;
 }
 
 interface Props {
@@ -36,7 +36,7 @@ const { items, action } = Astro.props;
 /* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
    Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
    Stand, auf dem die Section steht, bis echte Fotos da sind. */
-const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion-04"];
+const MOTIFS = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion-04"];
 ---
 
 <!-- ==================================================================
@@ -71,10 +71,10 @@ const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion
                  dahinter durchscheinen lassen. -->
             {items.map((e, i) => (
               <figure class="s-stories__card" data-deck-card>
-                {istCmsBild(e.image) ? (
-                  <CmsImage quelle={e.image} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
+                {isCmsImage(e.image) ? (
+                  <CmsImage source={e.image} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
                 ) : (
-                  <Picture name={MOTIVE[i % MOTIVE.length]} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
+                  <Picture name={MOTIFS[i % MOTIFS.length]} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
                 )}
                 <figcaption class="s-stories__name">{e.name}</figcaption>
               </figure>
@@ -142,7 +142,7 @@ const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion
   /* Auf schmalen Fenstern soll vom Textkreis nur der obere Bogen zu sehen
      sein — der untere verschwindet hinter der Taupe-Fläche.
 
-     Dafür fällt der z-index der Section weg: Mit ihm bildet sie einen
+     Dafür fällt der z-index der Section weg: Mit ihm pictureet sie einen
      Stapelkontext, und darin lässt sich nichts unter die Taupe schieben, so
      klein man den Wert am Ring auch macht. Ohne ihn liegen Ring (0) und
      Taupe (0) im selben Kontext, die Taupe kommt später im Dokument und

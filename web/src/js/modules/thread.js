@@ -40,7 +40,7 @@ function measure(path, samples = 240) {
   const ctm = path.getScreenCTM();
   if (!ctm) return { table: [], total: 0 };
 
-  /* Die Abbildung eines SVG-Viewports auf den Schirm ist eine reine
+  /* Die Abpictureung eines SVG-Viewports auf den Schirm ist eine reine
      Skalierung mit Verschiebung — keine Drehung, keine Scherung. Also einmal
      die Maßstäbe lesen und die Abstände selbst skalieren, statt für jede
      Stützstelle ein neues SVGPoint durch matrixTransform() zu schicken. Das

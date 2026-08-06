@@ -6,7 +6,7 @@
  * läuft. Passt zur Marke, weil die Magazin-Section dieselbe Geste als
  * ruhendes Gestaltungsmittel verwendet.
  *
- * Übernommen wie geliefert; angepasst sind nur die Modul-Importe und die
+ * Übernommen wie geliefert; angepasst sind nur die Modul-Implocations und die
  * Farbtabelle, die jetzt auf die Marken-Token zeigt.
  *
  * Steuerung über Attribute:

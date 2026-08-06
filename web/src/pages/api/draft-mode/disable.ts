@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { VORSCHAU_COOKIE } from "../../../lib/preview";
+import { PREVIEW_COOKIE } from "../../../lib/preview";
 
 /**
  * Beendet die Vorschau.
@@ -10,7 +10,7 @@ import { VORSCHAU_COOKIE } from "../../../lib/preview";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ cookies, redirect, url }) => {
-  cookies.delete(VORSCHAU_COOKIE, { path: "/" });
+  cookies.delete(PREVIEW_COOKIE, { path: "/" });
   const target = url.searchParams.get("zurueck") ?? "/";
   return redirect(target.startsWith("/") ? target : "/", 307);
 };
