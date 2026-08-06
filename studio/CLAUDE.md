@@ -1,58 +1,79 @@
-# studio/ — das CMS
+# studio/ — the CMS
 
-**Produkt.** Was hier am Schema geändert wird, ändert, was der Kunde sieht
-und pflegen kann.
+**Product.** What changes in the schema here changes what the client sees and
+can edit.
 
-Sanity 6, eigenständig — nicht in die Astro-App eingebettet.
-Projekt `a6bjftwf`, Dataset `production`.
+Sanity 6, standalone — not embedded in the Astro app.
+Project `a6bjftwf`, dataset `production`.
 
 ```bash
-npm run dev      # Port 3333
+npm run dev      # port 3333
 ```
 
-Vom Projektstamm aus: `npm run studio`.
+From the project root: `npm run studio`.
 
-## Der Grundsatz
+## The principle
 
-**Das Studio darf nicht mehr versprechen, als die Website hält.** Ein Feld,
-das der Kunde pflegt und dessen Wirkung er nirgends sieht, kostet das
-Vertrauen in jedes andere Feld. Daraus folgen zwei Regeln, die
-`../CMS-UMBAU.md` in den Aufgaben 3 und 4 ausbuchstabiert:
+**The Studio must not promise more than the website delivers.** A field the
+client fills in whose effect they never see costs the trust in every other
+field. Two rules follow, spelled out in tasks 3 and 4 of `../CMS-UMBAU.md`:
 
-- **Kein Dokumenttyp in der Seitenleiste ohne Route.** Wer „Praxis & Team"
-  pflegt und publiziert, muss das Ergebnis aufrufen können.
-- **Kein stiller Rückfall auf eingebauten Text.** Ein geleertes Feld
-  verschwindet von der Seite, es wird nicht ersetzt. Jedes Feld gehört in
-  genau eine der drei Klassen: trägt die Seite (`required`), wahlfrei
-  (Abschnitt wird ausgeblendet), oder gar kein Feld.
+- **No document type in the sidebar without a route.** Whoever edits and
+  publishes "Praxis & Team" must be able to open the result.
+- **No silent fallback to built-in text.** An emptied field disappears from the
+  page, it is not substituted. Every field belongs to exactly one of three
+  classes: carries the page (`required`), optional (the section hides), or no
+  field at all.
 
-## Aufbau
+## Layout
 
 ```
-sanity.config.ts       Werkzeuge, Schema, Vorlagen
-sanity.cli.ts          Projekt und Dataset für die Kommandozeile
-schemaTypes/           die Inhaltsmodelle
-structure/index.ts     die Seitenleiste
-lib/pfade.ts           die einzige Quelle für URLs
-seed/                  Startbestand zum Einspielen
+sanity.config.ts       tools, schema, templates
+sanity.cli.ts          project and dataset for the CLI
+schemaTypes/           the content models
+  documents/           one file per group of document types
+  objects/             reusable objects (picture, link, seo, sections)
+structure/index.ts     the sidebar
+structure/locations.ts where a document appears on the site
+lib/paths.ts           the single source for URLs
+seed/                  starting content to import
 ```
 
-`lib/pfade.ts` ist wichtiger, als sie aussieht: `pfadVon()` ist die **eine**
-Stelle, an der eine URL entsteht. Vorschau, Locations und die Routenprüfung in
-`scripts/check-web.mjs` lesen von dort. Eine zweite Stelle, die URLs baut,
-läuft garantiert auseinander.
+`lib/paths.ts` matters more than it looks: `pathFor()` is the **one** place a
+URL is built. Preview, locations and the route check in `scripts/check-web.mjs`
+all read from there. A second place that builds URLs is guaranteed to drift.
 
-## Einzeldokumente
+## Language
 
-Eine Schema-Option dafür gibt es nicht — erzwungen wird sie über eine feste ID
-in `structure/index.ts` **und** dadurch, dass der Typ in den Vorlagen fehlt.
-Ohne das zweite steht im Menü „Neue Einstellungen", und zwei davon lassen die
-Seite still auf das falsche zeigen.
+**Identifiers English, labels German.** Type names, field names and comments
+are English. `title` and `description` on a field are what the client reads in
+the form and stay German.
 
-## Was kein Baukasten wird
+The same applies to the URLs in `lib/paths.ts`: the type is `service`, its
+directory is `leistungen`. During the migration that distinction was lost once
+and `slugAvailable()` began protecting `/careers` instead of `/karriere` — a
+legal page slugged "karriere" would have shadowed the careers page.
 
-Die Startseite hat feste, benannte Felder (`heroZeilen`, `splitTitel`,
-`standardsEintraege`) — kein Array aus austauschbaren Blöcken. Das ist eine
-Entscheidung, keine Unfertigkeit: Ein Baukasten, in dem sich jeder Abschnitt
-in jeden anderen verwandeln lässt, produziert Seiten, die aussehen wie nichts.
-Der freie Baukasten bleibt auf Pillar Pages beschränkt.
+Two names in the content model are not ours and must not be translated:
+everything Portable Text owns (`children`, `marks`, `markDefs`, `style`,
+`listItem`, `level`) and everything Sanity owns (`asset`, `hotspot`, `crop`,
+`orderRank`). Documents whose keys were translated anyway stop rendering, and
+the error only shows up in the Studio, not on import.
+
+`image` is a reserved type name in Sanity. Our image object is therefore called
+`picture`, while the *field* inside it is `image`.
+
+## Singleton documents
+
+There is no schema option for it — it is enforced through a fixed ID in
+`structure/index.ts` **and** by leaving the type out of the templates. Without
+the second part the menu offers "New settings", and two of those quietly make
+the site point at the wrong one.
+
+## What will not become a page builder
+
+The homepage has fixed, named fields (`heroLines`, `splitTitle`,
+`standardsItems`) — not an array of interchangeable blocks. That is a decision,
+not an unfinished state: a builder in which every section can turn into every
+other produces pages that look like nothing. The free builder stays confined to
+pillar pages.

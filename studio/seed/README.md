@@ -1,118 +1,123 @@
-# Startbestand einspielen
+# Importing the starting content
 
-Zwei Dateien, weil zwei Importarten nötig sind. Sie sind **die Quelle** —
-erzeugt wurden sie einmalig von `erzeuge.mjs`, das die Vorgaben aus den
-Bausteinen las. Diese Vorgaben gibt es seit Aufgabe 4 nicht mehr, das Skript
-läuft nicht mehr und liegt nur noch als Beleg daneben.
+Six files, because several import modes are needed. They are **the source** —
+they were generated once by `erzeuge.mjs`, which read the defaults out of the
+building blocks. Those defaults are gone since task 4, the script no longer
+runs and only sits here as a record.
 
-Einspielen — schreibt echte Dokumente in den Datensatz:
+Import — this writes real documents into the dataset:
 
 ```bash
 cd studio
-npx sanity dataset import ../studio/seed/seiten.ndjson     --dataset production --replace
-npx sanity dataset import ../studio/seed/karriere.ndjson   --dataset production --replace
-npx sanity dataset import ../studio/seed/leistungen.ndjson --dataset production --missing
-npx sanity dataset import ../studio/seed/magazin.ndjson    --dataset production --missing
-npx sanity dataset import ../studio/seed/recht.ndjson      --dataset production --missing
-npx sanity dataset import ../studio/seed/rahmen.ndjson     --dataset production --replace
+npx sanity dataset import seed/pages.ndjson    --dataset production --replace
+npx sanity dataset import seed/careers.ndjson  --dataset production --replace
+npx sanity dataset import seed/services.ndjson --dataset production --missing
+npx sanity dataset import seed/magazine.ndjson --dataset production --missing
+npx sanity dataset import seed/legal.ndjson    --dataset production --missing
+npx sanity dataset import seed/chrome.ndjson   --dataset production --replace
 ```
 
-**Die Reihenfolge zählt.** `rahmen.ndjson` verweist auf Startseite, Magazin,
-Karriere und die drei Rechtstexte — deshalb müssen `karriere.ndjson` und
-`recht.ndjson` davor laufen; `magazin.ndjson` verweist auf Leistungen. Sanity prüft Verweise beim
-Import und bricht ab, wenn das Ziel fehlt — mit `references non-existent
-document`. Deshalb zuerst die Einzelseiten, dann die Sammlungen, zuletzt der
-Rahmen.
+**Order matters.** `chrome.ndjson` references the homepage, the magazine, the
+careers page and the three legal pages — so those have to go in first;
+`magazine.ndjson` references services. Sanity validates references on import
+and aborts with `references non-existent document` when the target is missing.
+Single pages first, then the collections, the frame last.
 
-## Warum getrennt
+## Why they are split
 
-| Datei | Inhalt | Import | Grund |
+| File | Contents | Import | Reason |
 |---|---|---|---|
-| `leistungen.ndjson` | 11 Leistungen, nur Grunddaten | `--missing` | `leistung-veneers` ist voll gepflegt. `--replace` überschriebe seinen Inhalt mit Titel und Slug — ohne Rückfrage. |
-| `magazin.ndjson` | Magazin-Übersicht und 4 Beiträge | `--missing` | Sobald jemand einen Beitrag redigiert, soll ein erneuter Import ihn nicht zurücksetzen. |
-| `karriere.ndjson` | Karriereseite und 4 Stellen | `--replace` | Die Seite ist ein Einzeldokument; die Stellen sollen genau diesen Stand bekommen, solange sie niemand redigiert hat. |
-| `recht.ndjson` | Impressum, Datenschutz, Barrierefreiheit | `--missing` | Sobald jemand die Angaben vervollständigt, soll ein erneuter Import sie nicht auf „Noch zu ergänzen“ zurücksetzen. |
-| `rahmen.ndjson` | Navigation und Seitenfuß | `--replace` | Zwei Einzeldokumente, die genau diesen Stand bekommen sollen. |
-| `seiten.ndjson` | Einstellungen, Startseite | `--replace` | Beide sollen genau diesen Stand bekommen. |
+| `services.ndjson` | 11 services, base data only | `--missing` | `service-veneers` is fully edited. `--replace` would overwrite its content with title and slug, without asking. |
+| `magazine.ndjson` | magazine intro and 6 posts | `--missing` | Once someone edits a post, a re-import should not reset it. |
+| `legal.ndjson` | imprint, privacy, accessibility | `--missing` | Once someone completes the legally binding details, a re-import must not put "Noch zu ergänzen" back. |
+| `careers.ndjson` | careers page and 4 jobs | `--replace` | The page is a singleton; the jobs should hold exactly this state as long as nobody has edited them. |
+| `chrome.ndjson` | navigation and footer | `--replace` | Two singletons that should hold exactly this state. |
+| `pages.ndjson` | settings, homepage | `--replace` | Both should hold exactly this state. |
 
-Die IDs sind fest (`leistung-<slug>`, `einstellungen`, `startseite`), der
-Vorgang also wiederholbar. Ohne feste IDs vergäbe Sanity zufällige, und jeder
-zweite Import legte alles ein zweites Mal an.
+The IDs are fixed (`service-<slug>`, `settings`, `homepage`), so the operation
+is repeatable. Without fixed IDs Sanity would assign random ones and every
+second import would create everything a second time.
 
-## Was drin steht
+## What is in them
 
-**Leistungen** — Titel, Kurzname, Slug, Topline, Platzierung, Gruppe, Kürzel
-und Reihenfolge. Texte, Preise und Bilder bleiben leer; die pflegt der Kunde
-im Studio.
+**Services** — title, short name, slug, topline, placement, group, short code
+and order. Text, pricing and images stay empty; the client maintains those in
+the Studio.
 
-**Einstellungen** — Telefon, E-Mail, Bewertungszahlen, Profile, beide
-Anschriften.
+**Settings** — phone, email, review figures, profiles, both addresses.
 
-**Karriere** — Kopf, Haltung, vier Zahlen, zehn Zeilen Vergleichstabelle, drei
-Stimmen, vier Etappen des Bewerbungsablaufs und sechs Fragen. Dazu vier Stellen
-als eigene Dokumente, jede mit Aufgaben, Profil und einem Haken
-„Ausgeschrieben“. Alles davon lag bis zum Umzug in `web/src/lib/karriere.ts`.
+**Careers** — intro, attitude, four figures, ten comparison rows, three voices,
+four stages of the application process and six questions. Plus four jobs as
+their own documents, each with duties, profile and an "active" flag. All of it
+used to live in `web/src/lib/careers.ts`.
 
-**Startseite** — jedes Feld mit dem Text, den die Seite zeigt: Hero-Zeilen,
-Split, Services-Titel, die fünf Standards, Standorte-Titel, Experten mit
-beiden Absätzen, die fünf Stories, Magazin und die sechs FAQ-Einträge.
+**Homepage** — every field with the text the page shows: hero lines, split,
+services title, the five standards, locations title, experts with both
+paragraphs, the five stories, magazine and the six FAQ entries.
 
-**Rechtstexte** — Impressum, Datenschutzerklärung und
-Barrierefreiheitserklärung, gegliedert und mit den Daten der Praxis gefüllt,
-soweit sie bekannt sind. Wo eine rechtsverbindliche Angabe fehlt, steht
-ausdrücklich „Noch zu ergänzen“ statt einer erfundenen. Ein Impressum, das
-vollständig aussieht und falsche Namen trägt, ist die gefährlichste Sorte
-Platzhalter.
+**Legal pages** — imprint, privacy policy and accessibility statement,
+structured and filled with the practice's data as far as it is known. Where a
+legally binding detail is missing, it says "Noch zu ergänzen" rather than
+inventing one. An imprint that looks complete and carries the wrong names is
+the most dangerous kind of placeholder.
 
-Die Datenschutzerklärung hält fest, dass die Website keine
-einwilligungspflichtigen Cookies setzt: keine Analysedienste, keine
-Werbenetzwerke, keine fremden Schriftarten, keine eingebetteten Karten. Das
-ist gemessen, nicht behauptet — im gebauten HTML steht kein einziger
-Fremdhost. Deshalb gibt es auch keinen Punkt „Cookie-Einstellungen“ im Fuß:
-Er öffnete ein leeres Fenster.
+The privacy policy records that the site sets no cookies requiring consent: no
+analytics, no ad networks, no third-party fonts, no embedded maps. That is
+measured, not asserted — there is not a single foreign host in the built HTML.
+Which is also why there is no "cookie settings" entry in the footer: it would
+open an empty panel.
 
-Bilder und SEO trägt der Seed nicht — die pflegt der Kunde. Ein leeres
-Bildfeld fällt auf das gestaltete Motiv zurück, ein leeres SEO-Feld auf den
-Seitentitel.
+Images and SEO are not carried by the seed — the client maintains those. An
+empty image field falls back to the designed motif, an empty SEO field to the
+page title.
 
-## Warum der Seed jetzt Inhalt trägt
+## Why the seed carries content now
 
-Bis Aufgabe 4 war er bis auf die Kennungen leer, mit der Begründung: Was hier
-stünde, wäre eine Kopie des Textes in den Bausteinen, und die Kopie veraltet.
-Das galt, solange der eingebaute Text die Seite trug.
+Until task 4 it was empty apart from the identifiers, on the grounds that
+anything in it would be a copy of the text in the building blocks, and the copy
+goes stale. That held as long as the built-in text carried the page.
 
-Mit Aufgabe 4 trägt ihn das CMS. Damit dreht sich die Lage um — der Seed ist
-nicht mehr die zweite Kopie, sondern der Umzug der ersten. Danach gibt es
-keinen zweiten Ort, von dem er abweichen könnte.
+With task 4 the CMS carries it. That inverts the situation — the seed is no
+longer the second copy but the relocation of the first. After that there is no
+second place it could diverge from.
 
-Erzeugt wird er aus den Quelldateien, nicht abgetippt. Ein abgetippter Seed
-hätte genau einen Tippfehler, und den fände niemand — er sähe aus wie eine
-Textentscheidung.
+It was generated from the source files, not retyped. A retyped seed would
+contain exactly one typo, and nobody would find it: it would look like an
+editorial decision.
 
-## Die Probe
+## The proof
 
-Nach dem Einspielen liest die Seite aus dem CMS statt aus dem Code. Ist der
-Seed originalgetreu, darf sich am Ergebnis nichts ändern:
+After importing, the page reads from the CMS instead of from code. If the seed
+is faithful, nothing about the result may change:
 
 ```bash
 npm run web:build && npm run web:preview
-npm run web:styles          # im zweiten Terminal
+npm run web:styles -- vergleichen      # in a second terminal
 ```
 
-Gemessen beim Einspielen: 3918 Elemente über drei Breakpoints, keine
-Abweichung.
+Measured at the time of import: 3918 elements across three breakpoints, no
+deviation.
 
-## Ein Sonderfall: Veneers
+## A special case: Veneers
 
-`leistung-veneers` ist die einzige voll gepflegte Leistung und steht **nicht**
-in `leistungen.ndjson` — die trägt nur Grunddaten und wird mit `--missing`
-eingespielt, rührt das Dokument also nicht an.
+`service-veneers` is the only fully edited service and is **not** in
+`services.ndjson` — that file carries base data only and is imported with
+`--missing`, so it never touches the document.
 
-Mit Aufgabe 4 sind vier Abschnitte dazugekommen, die gebaut waren und im
-Schema fehlten: Vorher/Nachher, Kernaussage, Ablauf und die Bild-Text-Zeilen.
-Sie lagen als Beispieldaten in `web/src/lib/fixtures.ts`, und die Datenschicht
-setzte bei **jeder** Leistung dieselben ein — auf der Bleaching-Seite stand
-deshalb „In vier Schritten zu neuen Veneers".
+Task 4 added four sections that were built but missing from the schema:
+before/after, statement, process and the image/text rows. They lived as sample
+data in `web/src/lib/fixtures.ts`, and the data layer inserted the same ones for
+**every** service — which is why the bleaching page said "In four steps to new
+veneers".
 
-Dieser Inhalt ist einmalig in das Veneers-Dokument gezogen. Er ist damit
-umgezogen, nicht abgetippt, und `fixtures.ts` ist entfallen.
+That content was moved into the Veneers document once. It relocated rather than
+being retyped, and `fixtures.ts` is gone.
+
+## The 2026 language migration
+
+Type names, document IDs and field names in these files are English, like the
+rest of the code. The mapping is in `scripts/migration/names.mjs`; the same
+rewriter was applied to the dataset and to these files, which is the only
+reason the two still agree.
+
+What stays German: the content itself, and the labels in the Studio.

@@ -1,235 +1,241 @@
-# Aufbau der Astro-App
+# Structure of the Astro app
 
-## Ordner
+## Folders
 
 ```
 src/
-├── layouts/Base.astro          Dokumentrahmen: head, Nav, Backdrop, Skripte
+├── layouts/Base.astro          document frame: head, Nav, Backdrop, scripts
 ├── components/
-│   ├── ui/                     Wiederverwendbar, seitenunabhängig
+│   ├── ui/                     reusable, page-independent
 │   │   Button · Picture · CmsImage · Reviews · Icons · Nav · Footer
-│   │   Panel · Accordion · Backdrop · Transition
+│   │   Panel · Accordion · Backdrop · Transition · Filter
+│   │   TableOfContents · TextHeading · PostCard · ImageRing
 │   │   Thread · ToothLines · ToothRings
-│   └── sections/               Ein Seitenabschnitt, ein Baustein
+│   └── sections/               one page section, one building block
 │       Hero · ServiceHero · Split · Intro · Statement · Services
 │       Standards · Gallery · Experts · Stories · Magazine
 │       Benefits · BeforeAfter · Steps · Prices · Features
-│       Faq · Contact
-├── seiten/                     Der Zusammenbau je Seitentyp — Startseite,
-│                               Leistung, Magazin, Beitrag, Karriere
-├── lib/                        Datenzugriff und Abfragen
-└── styles/shared.css           s. u.
+│       PostList · Faq · Contact
+├── templates/                  the composition per page type — Home,
+│                               Service, Magazine, Post, Careers, LegalPage
+├── lib/                        data access and queries
+└── styles/shared.css           see below
 ```
 
-## Ein Baustein, eine Datei
+`templates/` is deliberately not called `pages/`: Astro owns that name for
+routes, and two folders with the same name side by side are exactly the
+confusion this split is meant to prevent.
 
-Ein Baustein bringt sein Markup **und** seine Regeln mit. Wer ihn irgendwo
-einbindet, bekommt beides; wer ihn ändert, ändert ihn überall. Das ist der
-ganze Mechanismus — es braucht keine Registrierung und keinen Import von
-Stilen daneben.
+## One block, one file
 
-Daraus folgt die verbindliche Regel: **Seiten setzen zusammen, sie gestalten
-nicht.** Eine Datei unter `pages/` holt Daten, wählt Bausteine und reicht
-Props durch. Steht dort ein `<style>`-Block, ist das der Hinweis, dass ein
-Baustein fehlt: sein Markup ließe sich woanders nicht wiederverwenden, ohne es
-samt CSS zu kopieren.
+A block brings its markup **and** its rules. Whoever includes it gets both;
+whoever changes it changes it everywhere. That is the whole mechanism — no
+registration, no separate style import.
 
-Seit Aufgabe 5 geht das noch einen Schritt weiter: Eine Datei unter `pages/`
-lädt Daten und ruft einen **Renderer** aus `seiten/` auf, mehr nicht. Die
-drei Produktrouten sind zusammen 62 Zeilen, davon das meiste Kommentar.
+From that follows the binding rule: **pages compose, they do not style.** A
+file under `pages/` fetches data, picks blocks and passes props through. A
+`<style>` block there is the sign that a building block is missing: its markup
+could not be reused elsewhere without copying the CSS along with it.
 
-Der Grund ist die Vorschau: Sie muss exakt dasselbe rendern wie die echte
-Seite. Zwei Zusammenbauten, die dasselbe zeigen sollen, laufen garantiert
-auseinander — und zwar unbemerkt, weil man immer nur einen von beiden ansieht.
+Since task 5 this goes one step further: a file under `pages/` loads data and
+calls a **template** from `templates/`, nothing more. The three product routes
+come to 62 lines together, most of it comment.
 
-Unter `seiten/` ist ein `<style>`-Block erlaubt: Was dort steht, ist das
-Markup EINES Zusammenbaus und keines Bausteins — etwa die Initiativ-Box der
-Karriereseite. Unter `pages/` bleibt er der Hinweis, dass etwas fehlt.
+The reason is the preview: it has to render exactly what the real page renders.
+Two compositions meant to show the same thing are guaranteed to drift — and
+unnoticed, because you only ever look at one of them.
 
-Zwei Dinge, die dabei leicht schiefgehen:
+Under `templates/` a `<style>` block is allowed: what sits there is the markup
+of ONE composition and not of a block — the speculative-application box on the
+careers page, for instance. Under `pages/` it stays the sign that something is
+missing.
 
-- **Fremdes Markup braucht `:global()`** — siehe unten. Ein Baustein darf die
-  Innereien eines anderen nicht ansprechen, ohne es auszuschreiben.
-- **Typen gehören nicht ins Frontmatter.** Eine `.astro`-Datei kann nur sich
-  selbst exportieren. Gemeinsame Formen (`Frage`, `Schritt`, `Preis`,
-  `Eintrag`) stehen deshalb in `lib/formen.ts` und werden von dort importiert.
-  Was nur ein Baustein braucht, bleibt bei ihm — `Geschichte` in `Stories`,
-  `FeatureZeile` in `Features`. Bis Aufgabe 4 lagen alle vier in
-  `lib/fixtures.ts`; die Datei trug zugleich die Beispieldaten und ist mit
-  deren Umzug ins CMS entfallen.
+Two things that easily go wrong here:
 
-## Stilebenen
+- **Foreign markup needs `:global()`** — see below. A block must not reach into
+  another block's internals without spelling it out.
+- **Types do not belong in frontmatter.** An `.astro` file can only export
+  itself. Shared shapes (`Question`, `Step`, `Price`, `Entry`) therefore live
+  in `lib/shapes.ts` and are imported from there. What only one block needs
+  stays with it — `Story` in `Stories`, `FeatureRow` in `Features`. Until task 4
+  all four lived in `lib/fixtures.ts`; that file also carried the sample data
+  and went away when the data moved into the CMS.
 
-Die Zuständigkeit ist geschichtet, nicht vermischt:
+## Style layers
 
-1. **`src/styles/tokens.css`** — die einzigen festen Werte im Projekt.
-   Farben, Typo-Skala, Abstände, Radien, Bewegungsgrößen.
-2. **`src/styles/base.css`** — Schriften, Reset, Typo-Hilfsklassen,
-   Layout-Primitive (`.container`, `.grid`, `.section`, `.media`) und die
-   Motion-Basis (`[data-reveal]`, Marker-Regeln).
-3. **`src/styles/shared.css`** — was mehr als ein Baustein ausschreibt und
-   keinem allein gehört: `.c-topline` und die Slider-Steuerung, die Gallery
-   und Magazin teilen. Absichtlich kurz. Wächst die Datei, ist das das
-   Zeichen, dass der Baustein eine eigene Komponente werden sollte.
-4. **Komponentenstile** — im `<style>`-Block der jeweiligen `.astro`-Datei.
-   Astro grenzt sie automatisch ab, dadurch kann eine Section ihre Regeln
-   nicht mehr einer anderen unterschieben.
+Responsibility is layered, not mixed:
 
-`components.css` und `sections.css` aus dem Prototyp sind hier **nicht**
-eingebunden. Sie waren auf 1056 bzw. 2311 Zeilen gewachsen, in denen jede
-Section jede andere überschreiben konnte — genau daraus sind mehrere Fehler
-entstanden, etwa der deckende Hintergrund von `.section`, der das Korn
-übermalte. Ihre Regeln liegen jetzt neben dem Markup, das sie betreffen.
+1. **`src/styles/tokens.css`** — the only fixed values in the project. Colours,
+   type scale, spacing, radii, motion sizes.
+2. **`src/styles/base.css`** — fonts, reset, typography helpers, layout
+   primitives (`.container`, `.grid`, `.section`, `.media`) and the motion base
+   (`[data-reveal]`, marker rules, the mask that gives descenders room).
+3. **`src/styles/shared.css`** — what more than one block spells out and none
+   owns alone: `.c-topline` and the slider controls shared by Gallery and
+   Magazine. Deliberately short. If the file grows, that is the sign the block
+   should become its own component.
+4. **Component styles** — in the `<style>` block of the respective `.astro`
+   file. Astro scopes them automatically, which stops a section from slipping
+   its rules to another.
 
-Regel: Eine Komponente definiert **keine** eigenen Farb- oder Abstandswerte.
-Sie greift ausschließlich auf Tokens zu. Steht ein Wert nicht als Token bereit,
-gehört er dorthin — nicht in die Komponente.
+`components.css` and `sections.css` from the prototype are **not** included
+here. They had grown to 1056 and 2311 lines in which every section could
+override every other — several bugs came out of exactly that, among them the
+opaque background on `.section` that painted over the grain. Their rules now
+sit next to the markup they concern.
 
-### Zwei Fallen beim Abgrenzen
+Rule: a component defines **no** colour or spacing values of its own. It only
+reaches for tokens. If a value is not available as a token, that is where it
+belongs — not in the component.
 
-Astro hängt sein Scope-Attribut an **jeden** Teil eines Selektors:
-`.a .b` wird zu `.a[data-astro-cid-x] .b[data-astro-cid-x]`. Daraus folgt:
+### Two traps when scoping
 
-- **Fremdes Markup braucht `:global()`.** Ein `<img>` aus `Picture.astro` oder
-  ein `.c-btn` aus `Button.astro` trägt das Attribut der *einbindenden* Datei
-  nicht. `.s-split__media img` greift deshalb ins Leere —
-  `.s-split__media :global(img)` trifft. Dasselbe gilt für alles, was die
-  Module zur Laufzeit anlegen: `.highlight-marker-line` (marker.js), die
-  Slider-Punkte (gallery.js), die Zeilen von SplitText.
-- **`.js` allein funktioniert nicht.** Ausgenommen vom Scoping sind nur Teile,
-  die `html` oder `body` nennen. Aus `.js .s-hero__tooth` würde
-  `.js[data-astro-cid-x] …` und träfe das `<html>` nie — der Zahn bliebe für
-  immer unsichtbar. Deshalb steht dort `html.js .s-hero__tooth`.
+Astro appends its scope attribute to **every** part of a selector: `.a .b`
+becomes `.a[data-astro-cid-x] .b[data-astro-cid-x]`. From that follows:
 
-Beides sind stille Fehler: es gibt keine Warnung, die Regel gilt einfach nicht.
+- **Foreign markup needs `:global()`.** An `<img>` from `Picture.astro` or a
+  `.c-btn` from `Button.astro` does not carry the *including* file's attribute.
+  `.s-split__media img` therefore matches nothing —
+  `.s-split__media :global(img)` matches. The same holds for everything the
+  modules create at runtime: `.highlight-marker-line` (marker.js), the slider
+  dots (gallery.js), the lines produced by SplitText.
+- **A bare `.js` does not work.** Only parts naming `html` or `body` are exempt
+  from scoping. `.js .s-hero__tooth` would become `.js[data-astro-cid-x] …` and
+  never match `<html>` — the tooth would stay invisible forever. Hence
+  `html.js .s-hero__tooth`.
 
-### Startzustände gehören ins CSS, nicht in GSAP
+Both are silent failures: there is no warning, the rule simply does not apply.
 
-Was erst animiert erscheinen soll, muss **schon im ersten Bild** verborgen
-sein. Ein `gsap.set` in einem Modul ist dafür zu spät: das Bundle ist ein
-Modul-Skript, läuft also nach dem Parsen des Dokuments, und `init` hängt
-zusätzlich an `astro:page-load`. Das Stylesheet steht da längst — der Browser
-hat die Seite fertig gezeichnet.
+### Initial states belong in CSS, not in GSAP
 
-Deshalb gilt: **der verborgene Startzustand steht im CSS und hängt an
-`html.js`, freigegeben wird er im Modul.** Betroffen sind heute
-`[data-reveal]`, `[data-reveal-child]`, `[data-split]` (alle in `base.css`)
-sowie `.s-hero__word`, `.s-hero__foot`, `.s-hero__scroll`, `.s-hero__tooth`
-und `.c-nav__inner` in ihren Komponenten.
+Anything that should only appear once animated has to be hidden **in the first
+frame already**. A `gsap.set` inside a module is too late for that: the bundle
+is a module script, so it runs after the document is parsed, and `init` also
+hangs off `astro:page-load`. The stylesheet is long since in place — the
+browser has finished painting the page.
 
-Zwei Dinge dazu sind leicht zu übersehen:
+So: **the hidden initial state lives in CSS and hangs off `html.js`; the module
+releases it.** Affected today are `[data-reveal]`, `[data-reveal-child]`,
+`[data-split]` (all in `base.css`) plus `.s-hero__word`, `.s-hero__foot`,
+`.s-hero__scroll`, `.s-hero__tooth` and `.c-nav__inner` in their components.
 
-- **Die Klasse `js` muss synchron im `<head>` gesetzt werden**, nicht erst von
-  `init.js`. Beim Seitenwechsel übernimmt der Router zudem die Attribute des
-  eingehenden `<html>`-Elements und wirft sie dabei weg — `Base.astro` setzt
-  sie in `astro:after-swap` nach.
-- **Wer verbirgt, muss freigeben.** Bleibt ein Element hängen, sieht man es nur
-  in dem Fall, den man gerade nicht testet: ohne Hero auf der Seite, oder mit
-  „Bewegung reduzieren". `npm run web:check` prüft beides.
+Two things are easy to miss:
 
-Der Fehler, aus dem diese Regel entstanden ist: beim ersten Aufruf zeichnet
-der Browser Text nicht, solange die Schrift lädt — das verdeckte das Problem
-vollständig. Mit warmem Cache entfällt die Sperre, und die Headline stand
-sofort komplett da.
+- **The `js` class must be set synchronously in the `<head>`**, not by
+  `init.js`. On a page transition the router also takes over the attributes of
+  the incoming `<html>` element and throws them away in the process —
+  `Base.astro` restores them in `astro:after-swap`.
+- **Whoever hides must release.** If an element gets stuck, you only see it in
+  the case you are not currently testing: on a page without a hero, or with
+  "reduce motion". `npm run web:check` covers both.
 
-### Der Auftritt kommt zuerst, der Rest danach
+The bug this rule came out of: on a first visit the browser does not paint text
+while the font is loading — that hid the problem completely. With a warm cache
+the block is gone, and the headline stood there in full immediately.
 
-`init()` läuft in drei Stufen (`src/js/init.js`):
+### The entrance comes first, the rest after
 
-1. **Sofort** — was den Auftritt trägt: Scroll, Navigation, Hero. Alles billig.
-2. **Nach dem ersten Bild** (zwei geschachtelte `requestAnimationFrame`) —
-   Reveals, Headlines, die interaktiven Sections. Zusammen rund 10 ms.
-3. **Beim ersten Scrollen**, spätestens nach 2,5 s — der durchlaufende Pfad und
-   das Neuvermessen aller Trigger. Zusammen rund 140 ms.
+`init()` runs in three phases (`src/js/init.js`):
 
-Der Grund für die Staffelung: solange der Hauptstrang belegt ist, zeichnet der
-Browser nicht und ruft keinen Animationsframe auf. Die Hero-Timeline kann
-fertig dastehen und trotzdem stillstehen — gemessen lag der erste gezeichnete
-Frame bei 1388 ms, obwohl die Timeline seit 105 ms existierte. Genau das sieht
-man als „die Animation feuert nicht": man erwischt sie erst, wenn sie schon
-halb durch ist, und bei `expo.out` sind nach 10 % der Laufzeit bereits 46 % Weg
-zurückgelegt — die Leiste steht dann praktisch.
+1. **Immediately** — what carries the entrance: scroll, navigation, hero. All
+   cheap.
+2. **After the first frame** (two nested `requestAnimationFrame`) — reveals,
+   headlines, the interactive sections. Around 10 ms in total.
+3. **On first scroll**, at the latest after 2.5 s — the running path and the
+   re-measuring of all triggers. Around 140 ms in total.
 
-Der mit Abstand teuerste Posten war `initThread`: die Tabelle, die Höhe auf
-Strichlänge abbildet, wurde mit 900 Stützstellen aufgebaut, jede mit einem
-`getPointAtLength()` und einem `matrixTransform()` — und das gleich zweimal,
-weil `ScrollTrigger.refresh()` am Ende `onRefresh` erneut auslöste.
+The reason for the staging: while the main thread is busy the browser does not
+paint and calls no animation frame. The hero timeline can be fully set up and
+still stand still — measured, the first painted frame landed at 1388 ms, though
+the timeline had existed since 105 ms. That is exactly what you see as "the
+animation does not fire": you catch it only once it is half over, and with
+`expo.out` 46 % of the distance is behind you after 10 % of the runtime — the
+bar is practically standing still by then.
 
-| | vorher | nachher |
+By far the most expensive item was `initThread`: the table mapping height onto
+stroke length was built from 900 sample points, each with a
+`getPointAtLength()` and a `matrixTransform()` — and twice over, because
+`ScrollTrigger.refresh()` triggered `onRefresh` again at the end.
+
+| | before | after |
 | --- | --- | --- |
 | `initThread` | 772 ms | 68 ms |
 | `ScrollTrigger.refresh` | 256 ms | 69 ms |
-| alles Übrige | ~11 ms | ~11 ms |
+| everything else | ~11 ms | ~11 ms |
 
-Behoben durch dreierlei: 240 statt 900 Stützstellen (der viewBox löst nicht
-feiner auf), die Bildschirmabbildung einmal lesen statt je Stützstelle ein
-neues `SVGPoint` zu erzeugen, und das doppelte Messen entfernen.
+Fixed by three things: 240 instead of 900 sample points (the viewBox does not
+resolve any finer), reading the screen mapping once instead of creating a new
+`SVGPoint` per sample, and removing the duplicate measurement.
 
-Wortmarke in Bewegung, gemessen mit `npm run takt`:
+Wordmark in motion, measured with `npm run takt`:
 
-| | vorher | nachher |
+| | before | after |
 | --- | --- | --- |
-| erster Aufruf | 1600 ms | 191 ms |
-| Reload, warmer Cache | 1415 ms | 104 ms |
+| first visit | 1600 ms | 191 ms |
+| reload, warm cache | 1415 ms | 104 ms |
 
-Wer einen neuen Baustein ergänzt, hängt ihn in Stufe 2 — es sei denn, er
-gehört sichtbar zum Auftritt (Stufe 1) oder kostet zweistellige Millisekunden
-und wird erst beim Scrollen gebraucht (Stufe 3). Gefahrlos ist das, weil jeder
-Baustein seinen verborgenen Startzustand im CSS hat (s. o.): ein paar Frames
-früher oder später ändert am Bild nichts.
+Anyone adding a new block hangs it in phase 2 — unless it visibly belongs to
+the entrance (phase 1) or costs double-digit milliseconds and is only needed on
+scroll (phase 3). That is safe because every block has its hidden initial state
+in CSS (see above): a few frames earlier or later changes nothing on screen.
 
-**`requestIdleCallback` ist hier die falsche Wahl** und war ein Zwischenschritt,
-der nicht getragen hat: es feuert schon nach wenigen Millisekunden „Ruhe", und
-ein Block von 140 ms überzieht sein Zeitfenster ohnehin — der Aussetzer landete
-dadurch exakt dort, wo die Leiste losfahren soll.
+**`requestIdleCallback` is the wrong choice here** and was an intermediate step
+that did not hold: it fires "idle" after a few milliseconds, and a 140 ms block
+overruns its window anyway — the stall landed precisely where the bar is meant
+to start moving.
 
-Verwandt, aber eine eigene Falle: **`document.fonts.ready` ist die falsche
-Marke, und `document.fonts.load()` ist es auch**, wenn man es zu spät ruft —
-beide warten darauf, dass die *ganze* Sammlung fertig ist. Gefragt ist
-`document.fonts.check()`: „kann ich mit diesem Schnitt jetzt messen?".
-Gemessen stand die Wortmarken-Schrift nach 92 ms bereit, während
-`load()` erst nach 872 ms erfüllte. Die Begründung steht ausführlich in
+Related but its own trap: **`document.fonts.ready` is the wrong marker, and so
+is `document.fonts.load()`** if you call it too late — both wait for the
+*entire* collection to finish. What is wanted is `document.fonts.check()`: "can
+I measure with this cut right now?". Measured, the wordmark font was ready
+after 92 ms while `load()` only resolved after 872 ms. The full reasoning is in
 `src/js/lib/fonts.js`.
 
-### Was noch gekoppelt ist
+### What is still coupled
 
-`base.css` nennt in einer Sammelregel einige Section-Klassen
-(`.s-split__media`, `.s-experts__media`, `.s-gallery__item`, …), um ihnen eine
-eigene Compositing-Ebene zu geben. Die Regel bleibt dort, weil `base.css` mit
-dem Prototyp geteilt wird. Sie ist harmlos — sie setzt nur
-`transform: translateZ(0)` — aber sie ist der letzte Rest von Section-Wissen
-in der globalen Ebene.
+`base.css` names a few section classes in one collective rule
+(`.s-split__media`, `.s-experts__media`, `.s-gallery__item`, …) to give them
+their own compositing layer. The rule stays there because `base.css` is shared
+with the prototype. It is harmless — it only sets `transform: translateZ(0)` —
+but it is the last remnant of section knowledge in the global layer.
 
-## Prüfen
+## Checks
 
 ```bash
-npm run web:check    # Typen + Rauchtest über drei Breakpoints (Dev-Server nötig)
-npm run web:styles   # Stil-Abgleich gegen einen gesicherten Stand (Build nötig)
-npm run erstbild     # zeigt das erste Bild, bevor die Module laufen (Build nötig)
-npm run intro        # Daumenkino der Ladeanimation (Build nötig)
-npm run takt         # wann passiert was beim Laden (Build nötig)
+npm run web:check    # types + smoke test across three breakpoints (needs dev server)
+npm run web:styles   # computed-style diff against a saved baseline (needs build)
+npm run erstbild     # shows the first frame, before the modules run (needs build)
+npm run intro        # flipbook of the loading animation (needs build)
+npm run takt         # what happens when during load (needs build)
 ```
 
-`web:styles` nimmt für jedes Element im Dokument die gerechneten Werte und
-seine Position auf und vergleicht sie mit einem früheren Stand — gedacht für
-Umbauten am CSS, bei denen sich am Ergebnis nichts ändern soll. Gemessen wird
-ohne JavaScript gegen den Build; sonst mischen sich GSAPs Inline-Stile und der
-Zeitpunkt, zu dem die Module gelaufen sind, in den Vergleich.
+`web:check` also verifies two things that are easy to break silently: that
+every document type in the Studio has a route, and that **every image address
+in the built HTML points at a file that exists**. The second one came out of a
+real bug — a `srcset` offered a width the pipeline had never produced, the
+browser picked exactly that candidate on wide screens, got a 404 and showed
+nothing.
 
-## Animationen
+`web:styles` records the computed values and position of every element in the
+document and compares them against an earlier state — meant for CSS rework
+where the result is not supposed to change. It measures without JavaScript
+against the build; otherwise GSAP's inline styles and the moment the modules
+happened to run mix into the comparison.
 
-Bleiben unverändert: die Module in `../src/js/` werden über `data-`Attribute
-angesteuert. Eine Komponente bringt ihr Attribut mit, das Modul findet sie.
-Kein Framework, keine Hydration, keine Lebenszyklen.
+## Animations
 
-`../src/js/init.js` hält die Modulliste, `main.js` daneben ergänzt für den
-Prototyp die globalen Stylesheets und den Selbststart. Die Astro-App bindet
-`init.js` ein und ruft es bei jedem `astro:page-load` erneut auf — nach einem
-Seitenwechsel muss jedes Modul neu anlaufen.
+Unchanged: the modules in `../src/js/` are driven through `data-` attributes. A
+component brings its attribute, the module finds it. No framework, no
+hydration, no lifecycles.
 
-Verbindlich, wie im Styleguide festgelegt:
+`../src/js/init.js` holds the module list; `main.js` next to it adds the global
+stylesheets and the self-start for the prototype. The Astro app includes
+`init.js` and calls it again on every `astro:page-load` — after a page
+transition every module has to start over.
 
-- `data-split="lines"` — nur Headlines und Display-Typo
-- `data-reveal="up"` — Fließtext, Karten, Listen
-- `data-reveal="left|right"` — nur Flächen und Bilder
-- `data-highlight-marker-reveal` — allein die Meta-Zeilen im Hero
+Binding, as laid down in the styleguide:
+
+- `data-split="lines"` — headlines and display type only
+- `data-reveal="up"` — body text, cards, lists
+- `data-reveal="left|right"` — surfaces and images only
+- `data-highlight-marker-reveal` — the meta lines in the hero, nothing else

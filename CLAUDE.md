@@ -1,81 +1,99 @@
 # Mundpropaganda
 
-## Was ist das Produkt
+## What the product is
 
-**Astro + Sanity.** Entschieden am 04.08.2026. Alles andere ist Prototyp.
+**Astro + Sanity.** Decided 2026-08-04. Everything else is a prototype.
 
-| Ordner | Was | Status |
+| Folder | What | Status |
 |---|---|---|
-| `web/` | Astro — die Website | **Produkt** |
-| `studio/` | Sanity — das CMS | **Produkt** |
-| `prototypen/vite/` | Handlebars-Stand | Archiv, nicht ändern |
-| `prototypen/webflow/` | Lumos-Rekonstruktion | Prototyp, nur auf Ansage |
-| `scripts/` | Bildpipeline, Aufnahmen, Prüfungen | Werkzeug |
+| `web/` | Astro — the website | **product** |
+| `studio/` | Sanity — the CMS | **product** |
+| `prototypen/vite/` | Handlebars build | archive, do not change |
+| `prototypen/webflow/` | Lumos reconstruction | prototype, only on request |
+| `scripts/` | image pipeline, captures, checks | tooling |
 
-Wer hier landet, ohne den Aufbau zu kennen: Änderungen an der Website gehören
-nach `web/` oder `studio/`. Ein Eingriff unter `prototypen/` ändert nichts an
-dem, was ausgeliefert wird — und wird nicht erwartet.
+Anyone landing here without knowing the layout: changes to the website belong
+in `web/` or `studio/`. Touching anything under `prototypen/` changes nothing
+about what ships — and is not expected.
 
-Bis A2 war das umgekehrt: `web/` importierte Tokens, Basis-CSS und das gesamte
-JavaScript aus dem Prototyp, und `web/public` war ein Symlink dorthin. Wer im
-„Prototyp" arbeitete, änderte die Live-Website. Diese Falle ist zu.
+Until stage A2 it was the other way round: `web/` imported tokens, base CSS and
+all JavaScript from the prototype, and `web/public` was a symlink into it.
+Anyone working "in the prototype" was changing the live website. That trap is
+closed.
 
 ```bash
-npm run web         # Astro, Port 4321
-npm run studio      # Sanity Studio, Port 3333
-npm run web:check   # Typen, Rauchtest, Barrierefreiheit
-npm run web:deploy  # bauen und auf Netlify veröffentlichen
+npm run web         # Astro, port 4321
+npm run studio      # Sanity Studio, port 3333
+npm run web:check   # types, smoke test, accessibility
+npm run web:deploy  # build and publish to Netlify
 ```
 
-Weiterführend: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (Aufbau der
-Astro-App, verbindlich) · `CMS-UMBAU.md` (die laufende Umbauliste) ·
-`ANLEITUNG.md` (eine Seite für den Kunden)
+Further reading: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (structure of
+the Astro app, binding) · `CMS-UMBAU.md` (the running rebuild list) ·
+`ANLEITUNG.md` (one page for the client)
 
-Je eine `CLAUDE.md` liegt in `web/` und `studio/` mit dem, was dort gilt.
+A `CLAUDE.md` sits in `web/` and `studio/` with what applies there.
 
-## Grundregeln
+## Language
 
-- **Seiten setzen zusammen, sie gestalten nicht.** Ein `<style>`-Block unter
-  `pages/` ist der Hinweis, dass ein Baustein fehlt. Siehe `web/STRUKTUR.md`.
-- **Ein Baustein, eine Datei** — Markup und Regeln zusammen.
-- `web/src/styles/tokens.css` ist die einzige Quelle für Werte. Keine Magic
-  Numbers, keine Hex-Werte außerhalb davon.
-- CSS-Konvention: `s-*` Abschnitt, `c-*` Komponente, `__element`, `--modifier`.
-  Kein Tailwind, keine atomaren Utilities.
-- **Keine Gedankenstriche in Texten**, die auf der Seite erscheinen. Ein
-  Bindestrich tut es; besser ist ein Satz, der ohne auskommt. Bereiche
-  („Mo–Fr", „8–19 Uhr") und Preise („450,–") sind davon nicht betroffen.
+**Code is English, the product is German.** Identifiers, comments and developer
+documentation in English. German stays wherever a human reads it inside the
+product:
+
+- page copy
+- field labels and descriptions in the Studio (`title`, `description`)
+- `ANLEITUNG.md`, the client guide
+- the URLs — `/karriere`, `/leistungen/veneers`, not `/careers`
+
+The dividing line matters more than it looks. During the migration the list of
+reserved URL segments was translated along with the rest; `slugAvailable()`
+then protected `/careers` instead of `/karriere`, and a legal page with the
+slug "karriere" would have shadowed the careers page. Names that belong to the
+audience are not names that belong to the code.
+
+## Ground rules
+
+- **Pages compose, they do not style.** A `<style>` block under `pages/` means
+  a building block is missing. See `web/STRUKTUR.md`.
+- **One block, one file** — markup and rules together.
+- `web/src/styles/tokens.css` is the only source of values. No magic numbers,
+  no hex values outside it.
+- CSS convention: `s-*` section, `c-*` component, `__element`, `--modifier`.
+  No Tailwind, no atomic utilities.
+- **No em dashes in text that appears on the page.** A hyphen will do; better
+  still, a sentence that needs neither. Ranges ("Mo–Fr", "8–19 Uhr") and prices
+  ("450,–") are exempt. This is about the German page copy, not about code.
 
 ## Sanity
 
-Siehe `SANITY.md` und das Skill `sanity-best-practices` (`.agents/skills/`).
-Abfragen liegen in `web/src/lib/`.
+See `SANITY.md` and the `sanity-best-practices` skill (`.agents/skills/`).
+Queries live in `web/src/lib/`.
 
 ## Webflow + Lumos
 
-**Ein Prototyp. Arbeit daran nur auf ausdrückliche Ansage.**
+**A prototype. Work on it only when explicitly asked.**
 
-Die Site *sollte* einmal in Webflow rekonstruiert werden; diese Absicht steht
-nicht mehr. Was für den Fall gälte, dass sie zurückkommt, liegt vollständig in
-`prototypen/webflow/` — Site-ID, Lumos-Version, die Grenzen des MCP und die
-Abbildung der BEM-Klassen auf Lumos.
+The site *was* once meant to be reconstructed in Webflow; that intention no
+longer stands. Everything that would apply if it came back lives in
+`prototypen/webflow/` — site ID, Lumos version, the limits of the MCP, and the
+mapping of BEM classes onto Lumos.
 
-Falls es doch losgeht: **erst das Skill `webflow-lumos` lesen**
-(`.agents/skills/webflow-lumos/`, verlinkt nach `.claude/skills/`), nicht aus
-dem Gedächtnis arbeiten. `site_id` nie annehmen, nie eine `u-`-Klasse oder
-einen Variablennamen erfinden.
+If it does start up again: **read the `webflow-lumos` skill first**
+(`.agents/skills/webflow-lumos/`, linked into `.claude/skills/`), do not work
+from memory. Never assume a `site_id`, never invent a `u-` class or a variable
+name.
 
-## Projektentscheidungen
+## Project decisions
 
-<!-- Getroffene Entscheidungen hier festhalten, damit sie Sessions überdauern. -->
-
-- **Astro + Sanity ist das Produkt** (04.08.2026). Webflow/Lumos und der
-  Vite-Stand sind Prototypen.
-- **Der CMS-Umbau läuft nach `CMS-UMBAU.md`.** Stufe A bis 3 sind durch:
-  Ordnung, Absicherung, das Studio sagt die Wahrheit, Presentation Tool,
-  Studio-Politur. Alle Inhalte lassen sich über das CMS pflegen — Startseite,
-  Leistungen, Magazin, Karriere, Navigation und Fuß. Offen ist Stufe 4
-  (Betrieb): der Webhook, die Rollen. Beides braucht Zugänge außerhalb des
-  Repositorys, siehe „Betrieb" in `SANITY.md`.
-- **Offene Webflow-Fragen** (Slug-Sprache, Filterung, Spacing in rem) stehen
-  in `prototypen/webflow/README.md` und sind ruhend gestellt.
+- **Astro + Sanity is the product** (2026-08-04). Webflow/Lumos and the Vite
+  build are prototypes.
+- **The CMS rebuild follows `CMS-UMBAU.md`.** Stages A through 3 are done:
+  order, safeguards, the Studio tells the truth, Presentation tool, Studio
+  polish. All content is editable through the CMS — homepage, services,
+  magazine, careers, navigation and footer. Open is stage 4 (operations): the
+  webhook and the roles. Both need access outside the repository, see
+  "Betrieb" in `SANITY.md`.
+- **Code is English since August 2026**, including the content model. The
+  mapping used for the migration is kept in `scripts/migration/`.
+- **Open Webflow questions** (slug language, filtering, spacing in rem) are in
+  `prototypen/webflow/README.md` and are on hold.
