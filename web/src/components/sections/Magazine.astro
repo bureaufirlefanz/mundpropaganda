@@ -51,7 +51,7 @@ const { topline, titel, text, beitraege } = Astro.props;
 
           <div class="s-magazine__track" data-magazine-track>
             {beitraege.map((p, i) => (
-              <PostKarte beitrag={p} position={i} sizes="24vw" parallax="9" mitKnopf data-magazine-item />
+              <PostKarte beitrag={p} sizes="24vw" parallax="9" mitKnopf data-magazine-item />
             ))}
           </div>
 

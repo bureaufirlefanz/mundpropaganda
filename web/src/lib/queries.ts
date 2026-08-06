@@ -189,6 +189,7 @@ export const BEITRAEGE_QUERY = defineQuery(`
 
 /** Ein einzelner Beitrag mit Fließtext. */
 export const BEITRAG_QUERY = defineQuery(`*[_type == "beitrag" && slug.current == $slug][0]{
+  "slug": slug.current,
   titel,
   datum,
   kategorie,

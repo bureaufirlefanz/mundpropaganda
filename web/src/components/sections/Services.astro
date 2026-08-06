@@ -15,16 +15,42 @@ interface Props {
 const { titel } = Astro.props;
 import Button from "../ui/Button.astro";
 import { ladeLeistungsliste, fuerTabelle, fuerListe, pfad } from "../../lib/leistungsliste";
-import { istCmsBild, bildUrl } from "../../lib/bilder";
+import { istCmsBild, bildUrl, motivPfad } from "../../lib/bilder";
 
 const liste = await ladeLeistungsliste();
 const zeilen = fuerTabelle(liste);
 const weitere = fuerListe(liste);
 
+/* Klasse 3: die gestalteten Motive für die Zeilen, an denen im CMS kein
+   Vorschaubild hängt.
+
+   Ohne sie stand `data-preview` leer da, und `services.js` ließ folgerichtig
+   immer dasselbe Bild stehen: Beim Überfahren der Tabelle wechselte die
+   Beschriftung, das Bild nie. Gemessen an allen sechs Zeilen der Startseite,
+   alle sechs ohne Wert. Das Preview war damit nicht kaputt, sondern hatte
+   nichts zu zeigen. */
+const MOTIVE = [
+  "treatment-01",
+  "lab-veneers",
+  "teeth-macro",
+  "treatment-03",
+  "praxis-03",
+  "treatment-02",
+] as const;
+
 /* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
    Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
-const vorschauPfad = (v: (typeof zeilen)[number]["vorschau"]) =>
-  istCmsBild(v) ? bildUrl(v, 640) : (v as string | undefined);
+const vorschauPfad = (l: (typeof zeilen)[number], i: number) => {
+  const v = l.vorschau;
+  if (istCmsBild(v)) return bildUrl(v, 640);
+  if (typeof v === "string" && v) return v;
+  /* Hier ausnahmsweise über die Position und nicht über einen Streuwert aus
+     dem Slug: Das Preview gibt es nur in dieser einen Tabelle, es kann also
+     mit keiner zweiten Darstellung uneins werden. Und die Position ist das
+     einzige, was sechs verschiedene Motive garantiert — der Streuwert traf
+     bei sechs Zeilen nur drei davon. */
+  return motivPfad(MOTIVE[i % MOTIVE.length]);
+};
 
 /* Die Linkliste steht in einem Raster mit drei Spalten und fließt zeilenweise.
    Vorher wurde sie hier in drei Spalten VORSORTIERT (jeder dritte Eintrag in
@@ -53,13 +79,13 @@ const vorschauPfad = (v: (typeof zeilen)[number]["vorschau"]) =>
           </div>
 
           <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
-            {zeilen.map((l) => (
+            {zeilen.map((l, i) => (
               <a
                 class="s-services__row"
                 href={pfad(l)}
                 data-service-row
                 data-reveal-child
-                data-preview={vorschauPfad(l.vorschau)}
+                data-preview={vorschauPfad(l, i)}
                 data-preview-label="Mehr Info"
               >
                 <span class="s-services__name">{l.name}</span>

@@ -22,7 +22,7 @@ import Inhaltsverzeichnis from "../components/ui/Inhaltsverzeichnis.astro";
 import TextTitel from "../components/ui/TextTitel.astro";
 import { istCmsBild } from "../lib/bilder";
 import { markenAus, mitKennungen } from "../lib/inhaltsverzeichnis";
-import { kategorieText, datumText, type Beitrag, type BeitragVoll } from "../lib/magazin";
+import { kategorieText, datumText, motivFuer, type Beitrag, type BeitragVoll } from "../lib/magazin";
 
 interface Props {
   daten: BeitragVoll | undefined;
@@ -52,6 +52,11 @@ const bloecke = mitKennungen(d?.text, marken);
   <article class="s-beitrag">
     {/* --- Kopf: Bild über die volle Breite, Titel darauf ----------------- */}
     <header class="s-beitrag__kopf">
+      {/* Ohne Bild im CMS dasselbe Ersatzmotiv wie auf der Karte im Raster
+          und im Karussell. Vorher stand hier ein festes `teeth-macro`: Ein
+          Beitrag zeigte in der Übersicht ein Bild und auf seiner eigenen
+          Seite ein anderes, und wer geklickt hatte, landete sichtbar
+          woanders. */}
       <div class="s-beitrag__kopfbild">
         {istCmsBild(d?.vorschaubild) ? (
           <CmsImage
@@ -62,7 +67,7 @@ const bloecke = mitKennungen(d?.text, marken);
             eager
           />
         ) : (
-          <Picture name="teeth-macro" alt="" sizes="100vw" eager />
+          <Picture name={motivFuer(d?.slug)} alt="" sizes="100vw" eager />
         )}
       </div>
 
@@ -131,9 +136,7 @@ const bloecke = mitKennungen(d?.text, marken);
         {aehnliche.map((p, i) => (
           <PostKarte
             beitrag={p}
-            position={i}
             sizes="(max-width: 700px) 100vw, 30vw"
-            mitDatum
             mitKnopf
             data-reveal-child
           />

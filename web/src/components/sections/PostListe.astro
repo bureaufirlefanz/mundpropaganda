@@ -12,6 +12,7 @@
  * Karten.
  */
 import PostKarte from "../ui/PostKarte.astro";
+import Filter from "../ui/Filter.astro";
 import type { Beitrag } from "../../lib/magazin";
 
 interface Props {
@@ -19,16 +20,24 @@ interface Props {
 }
 
 const { beitraege } = Astro.props;
+
+/* Nur die Kategorien, unter denen wirklich etwas liegt — in der Reihenfolge,
+   in der sie zuerst auftauchen, also nach Datum. Eine feste Reihenfolge aus
+   dem Schema abzuschreiben wäre die zweite Stelle, an der dieselbe Liste
+   steht. */
+const kategorien = [...new Set(beitraege.map((b) => b.kategorie).filter(Boolean))] as string[];
 ---
 
 <section class="container s-postliste">
+  <div class="s-postliste__leiste">
+    <Filter kategorien={kategorien} gesamt={beitraege.length} />
+  </div>
+
   <div class="s-postliste__raster" data-reveal-stagger="0.06">
     {beitraege.map((p, i) => (
       <PostKarte
         beitrag={p}
-        position={i}
         sizes="(max-width: 700px) 100vw, 30vw"
-        mitDatum
         mitKnopf
         ueberschrift="h2"
         data-reveal-child
@@ -40,6 +49,17 @@ const { beitraege } = Astro.props;
 <style>
   .s-postliste {
     padding-block: var(--section-space-sm) var(--section-space);
+  }
+
+  /* Die Leiste steht über dem Raster und behält ihre Höhe, auch wenn kein
+     Filter gerendert wird (eine einzige Kategorie) — sonst rückte das Raster
+     auf manchen Seiten hoch und auf anderen nicht. */
+  .s-postliste__leiste {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 44px;
+    margin-bottom: var(--sp-8);
   }
 
   /* Drei Spalten. Auf 1440px Fenster sind das rund 400px je Karte — zu wenig

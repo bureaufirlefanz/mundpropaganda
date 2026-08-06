@@ -117,11 +117,36 @@ const MITTE = Math.floor(SPALTEN / 2);
     stroke-linecap: round;
   }
 
+  /* Jede Spalte malt einen Pixel über ihre linke Kante hinaus.
+     
+     Fünf Spalten teilen sich die Fensterbreite, und die geht selten glatt
+     auf: Bei 1440px sind es 287,36 / 288,17 / 288,16 / 288,16 / 288,16. An
+     den gebrochenen Kanten rundet der Browser, und dabei bleibt ein Streifen
+     übrig, den keine der beiden Nachbarinnen bedeckt. Gemessen bei 1440px an
+     der Kante x=575: rgb(215,213,210), also der Seitengrund — die drei
+     übrigen Kanten zeigten rgb(83,71,62), die richtige Trennlinie. Bei
+     1280px derselbe Befund, bei 1366px und 818px zufällig nicht. Genau
+     deshalb sah es aus wie eine durchsichtige Linie und nicht wie ein
+     Fehler: Es war einer, aber nur bei bestimmten Fensterbreiten und nur an
+     einer Kante.
+
+     Der Schatten liegt hinter dem eigenen Grund und über der Nachbarin links
+     — die Lücke ist damit unabhängig von der Rundung zu. */
+  .c-transition__panel {
+    box-shadow: -1px 0 0 0 var(--c-dark);
+  }
+
   /* Die Trennlinien sitzen auf den Spalten selbst, nicht auf einer eigenen
      Ebene darüber. Als eigene Ebene lägen sie dauerhaft über der ganzen
-     Seite — sichtbar auch dann, wenn gar kein Wechsel läuft. */
+     Seite — sichtbar auch dann, wenn gar kein Wechsel läuft.
+
+     `inset` statt `border-left`: Ein Rahmen wird mitgerundet und wanderte
+     dabei mit der Kante, die er gerade abdecken soll. Der Innenschatten wird
+     auf den fertigen Grund gemalt und sitzt deshalb immer bündig. */
   .c-transition__panel + .c-transition__panel {
-    border-left: var(--bw) solid color-mix(in srgb, var(--c-white) 10%, transparent);
+    box-shadow:
+      -1px 0 0 0 var(--c-dark),
+      inset 1px 0 0 0 color-mix(in srgb, var(--c-white) 10%, transparent);
   }
 </style>
 

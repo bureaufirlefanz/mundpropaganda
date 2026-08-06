@@ -1,5 +1,6 @@
 import { sanityClient } from "sanity:client";
 import { ohneNull, type OhneNull } from "./ohne-null";
+import { stabilesMotiv } from "./bilder";
 import type {
   BEITRAEGE_QUERY_RESULT,
   BEITRAG_QUERY_RESULT,
@@ -42,6 +43,17 @@ const KATEGORIEN: Record<string, string> = {
 export const kategorieText = (wert?: string) => (wert ? (KATEGORIEN[wert] ?? wert) : "");
 
 export const beitragPfad = (slug: string) => `/magazin/${slug}`;
+
+/**
+ * Das Ersatzmotiv eines Beitrags, solange kein Vorschaubild hängt.
+ *
+ * Die Regel dahinter steht in `bilder.ts`: am Beitrag festgemacht und nicht
+ * an seiner Position in einer Liste, damit Raster, Karussell und die eigene
+ * Seite dasselbe Bild zeigen.
+ */
+const MOTIVE = ["motion-04", "teeth-macro", "lab-veneers", "treatment-03"] as const;
+
+export const motivFuer = (slug?: string) => stabilesMotiv(MOTIVE, slug);
 
 /* Einmal je Build und je Filter. Start- und Leistungsseiten fragen dieselbe
    Liste ab — auf der Startseite alle, auf einer Leistungsseite die zu ihr

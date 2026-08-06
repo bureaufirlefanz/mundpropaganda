@@ -131,10 +131,20 @@ const zusatzSpalten = (
      Rand und ist gerundet wie die übrigen Flächen der Seite. Position, Größe
      und Milchglas-Grund sind über die ganze Seite hinweg konstant. */
   .c-nav {
+    /* Die Leiste steht auf beiden Seiten etwas weiter außen als der Inhalt
+       darunter. Vorher lag sie exakt auf derselben Kante (bei 1440px beide
+       bei x=40), und dadurch las sie sich als erste Zeile des Inhalts statt
+       als etwas, das darüber liegt.
+
+       Der Überstand ist ein Wert und keine zwei: Er wird vom Außenabstand
+       abgezogen UND zur Innenbreite addiert, sonst verschöbe sich nur eine
+       der beiden Kanten. */
+    --nav-ueberstand: clamp(8px, 1vw, 20px);
+
     position: fixed;
     inset: 0 0 auto 0;
     z-index: var(--z-nav);
-    padding: var(--sp-4) var(--site-margin);
+    padding: var(--sp-4) max(8px, calc(var(--site-margin) - var(--nav-ueberstand)));
     color: var(--c-dark);
     pointer-events: none;
   }
@@ -150,7 +160,13 @@ const zusatzSpalten = (
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-5);
-    max-width: var(--site-max);
+    /* Nicht `--site-max`: Das ist die Breite des Rahmens SAMT Außenabstand.
+       Verglichen wird die Leiste aber mit dem, was man sieht — der Spalte
+       innerhalb des Rahmens. Ohne diese Rechnung wüchse der Überstand mit
+       dem Fenster: bei 1440px wären es 14px, bei 2000px schon 68. */
+    max-width: calc(
+      var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-ueberstand)
+    );
     margin-inline: auto;
     padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
     border-radius: var(--r-round);

@@ -1,0 +1,226 @@
+---
+/**
+ * Filter für die Magazin-Übersicht: ein Knopf, der die Kategorien ausklappt.
+ *
+ * Ausgeklappt statt dauerhaft sichtbar, weil die Liste bei sechs Beiträgen
+ * mehr Platz nähme als sie einspart. Ein Knopf sagt „hier lässt sich etwas
+ * einschränken", ohne die Übersicht vorwegzunehmen.
+ *
+ * **Nur die Kategorien, die tatsächlich belegt sind.** Eine Option, die zu
+ * null Treffern führt, ist derselbe Vertrauensbruch wie ein Feld im Studio,
+ * das nichts bewirkt: Man klickt sie einmal, bekommt eine leere Seite und
+ * traut danach keiner der übrigen mehr.
+ *
+ * **Ohne JavaScript unsichtbar.** Das Filtern passiert im Browser; ein
+ * Bedienelement, das ohne Skript dasteht und nichts tut, wäre schlimmer als
+ * keines. Deshalb hängt die Anzeige an `.js` — dieselbe Sperre, mit der
+ * `base.css` die verborgenen Startzustände absichert.
+ */
+import { kategorieText } from "../../lib/magazin";
+
+interface Props {
+  /** Die Kategoriewerte, die unter den Beiträgen vorkommen. */
+  kategorien: string[];
+  /** Wie viele Beiträge es insgesamt gibt. */
+  gesamt: number;
+}
+
+const { kategorien, gesamt } = Astro.props;
+---
+
+{kategorien.length > 1 && (
+  <div class="c-filter" data-filter>
+    {/* Nur das Zeichen. Ein Wort daneben erklärte nichts, was das Zeichen
+        nicht schon sagt, und stünde bei jeder Kategorie in anderer Länge da —
+        der Knopf änderte seine Breite bei jeder Auswahl. Was gewählt ist,
+        steht im Panel und am Zustand des Knopfes.
+        `aria-label`, weil es keine sichtbare Beschriftung gibt: Ohne das
+        liest ein Vorlesegerät nur „Schaltfläche". */}
+    <button
+      class="c-filter__knopf"
+      type="button"
+      aria-expanded="false"
+      aria-controls="filter-optionen"
+      aria-label="Nach Kategorie filtern"
+      data-filter-knopf
+    >
+      <svg class="c-filter__icon" aria-hidden="true"><use href="#i-filter" /></svg>
+      {/* Der Punkt zeigt, dass ein Filter aktiv ist — sonst sähe der Knopf
+          zugeklappt genauso aus wie ohne Auswahl. */}
+      <span class="c-filter__punkt" data-filter-punkt hidden></span>
+    </button>
+
+    {/* `hidden` im Markup, nicht nur per CSS: Ohne das wären die Optionen für
+        Vorlesegeräte von Anfang an in der Vorlesereihenfolge, obwohl niemand
+        sie sieht. Das Modul nimmt es beim Aufklappen weg. */}
+    <div class="c-filter__panel" id="filter-optionen" role="group" aria-label="Nach Kategorie filtern" hidden>
+      <button class="c-filter__tag" type="button" data-filter-wert="" aria-pressed="true">
+        Alle
+      </button>
+      {kategorien.map((k) => (
+        <button class="c-filter__tag" type="button" data-filter-wert={k} aria-pressed="false">
+          {kategorieText(k)}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  /* Ohne JavaScript gibt es nichts zu bedienen — dann steht hier auch nichts.
+     `html.js`, nicht `.js`: Astro hängt sein Scope-Attribut an jeden
+     Selektorteil, und `.js[data-astro-cid-…]` träfe das <html> nie.
+     (Steht so in web/STRUKTUR.md.) */
+  .c-filter {
+    display: none;
+    position: relative;
+  }
+
+  :global(html.js) .c-filter {
+    display: block;
+  }
+
+  /* Rund und so groß wie die übrigen Bedienelemente der Seite. 44px ist
+     nicht gerundet, sondern die Untergrenze aus WCAG 2.5.5 für eine
+     Zielfläche — bei einem 16px-Zeichen ohne Beschriftung ist das die
+     Fläche, die man mit dem Daumen trifft. */
+  .c-filter__knopf {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: var(--bw) solid var(--c-line);
+    border-radius: var(--r-round);
+    background: transparent;
+    color: var(--c-text);
+    cursor: pointer;
+    transition:
+      border-color var(--d-base) var(--e-out),
+      background var(--d-base) var(--e-out),
+      color var(--d-base) var(--e-out);
+  }
+
+  /* Der Punkt sitzt auf dem Rand, nicht daneben — sonst verschöbe er den
+     Knopf, sobald er auftaucht. */
+  .c-filter__punkt {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+  }
+
+  .c-filter__punkt[hidden] {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .c-filter__knopf:hover {
+      border-color: var(--c-text);
+    }
+  }
+
+  /* Aufgeklappt bleibt der Knopf sichtbar gedrückt — sonst sieht man beim
+     Blick auf das Panel nicht mehr, wozu es gehört. */
+  .c-filter__knopf[aria-expanded="true"] {
+    background: var(--c-dark);
+    border-color: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+  .c-filter__icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+  }
+
+  /* Fährt seitlich aus dem Knopf heraus, nicht nach unten.
+
+     Der Knopf steht am rechten Rand, und darunter beginnt unmittelbar das
+     Raster: Ein Panel, das dort aufklappt, deckt die erste Karte ab. Nach
+     links liegt dagegen die ganze leere Leiste, und die Tags stehen in der
+     Zeile, in der man sie erwartet.
+
+     `right: calc(100% + …)` heißt: rechte Kante an der linken Kante des
+     Knopfes. `translate` zentriert es auf dessen Mitte. */
+  .c-filter__panel {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + var(--sp-3));
+    translate: 0 -50%;
+    z-index: var(--z-sticky);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--sp-2);
+  }
+
+  .c-filter__panel[hidden] {
+    display: none;
+  }
+
+  /* Ein Tag, kein Knopf. Der Knopf der Seite ist zweiteilig, hat einen Pfeil
+     und ein großzügiges Polster — als Filteroption wirkte er wie eine
+     Handlung („los") statt wie eine Eigenschaft („Vorsorge").
+
+     `--r-sm` statt `--r-round`: Der volle Radius gehört den Bedienelementen
+     (Knopf, Pille, Punkt). Ein leicht gerundetes Rechteck liest sich als
+     Etikett, und genau das ist es. */
+  .c-filter__tag {
+    padding: 4px var(--sp-2) 5px;
+    border: var(--bw) solid var(--c-line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--c-text);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background var(--d-fast) var(--e-out),
+      border-color var(--d-fast) var(--e-out),
+      color var(--d-fast) var(--e-out);
+  }
+
+  @media (hover: hover) {
+    .c-filter__tag:hover {
+      border-color: var(--c-text);
+    }
+  }
+
+  .c-filter__tag[aria-pressed="true"] {
+    background: var(--c-dark);
+    border-color: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+  /* Auf schmalen Fenstern ist links kein Platz mehr für vier Tags nebeneinander.
+     Dann klappt das Panel doch nach unten und darf umbrechen — es liegt über
+     dem Raster, schiebt also nichts. Der weiße Grund kommt erst hier dazu:
+     In der Leiste stehen die Tags auf dem Seitengrund und brauchen keinen. */
+  @media (max-width: 900px) {
+    .c-filter__panel {
+      top: calc(100% + var(--sp-2));
+      right: 0;
+      translate: none;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: min(88vw, 420px);
+      padding: var(--sp-3);
+      border-radius: var(--r-md);
+      background: var(--c-white);
+      box-shadow: 0 12px 32px color-mix(in srgb, var(--c-dark) 18%, transparent);
+    }
+
+    .c-filter__tag {
+      border-color: color-mix(in srgb, var(--c-neutral-800) 20%, transparent);
+      color: var(--c-neutral-800);
+    }
+  }
+</style>

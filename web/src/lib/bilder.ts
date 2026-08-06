@@ -37,6 +37,52 @@ export interface CmsBild {
  */
 export type Bildquelle = CmsBild | string;
 
+/* --- Ersatzmotive ------------------------------------------------------- */
+
+import BREITEN from "./bild-breiten.json";
+
+/**
+ * Welches gestaltete Motiv vertritt einen Inhalt, solange kein Bild im CMS
+ * liegt?
+ *
+ * **Am Inhalt festgemacht, nicht an seiner Position in einer Liste.** Der
+ * Index war der naheliegende Weg und an drei Stellen falsch: Ein Beitrag
+ * stand im Raster an erster, im Karussell an dritter Stelle und bekam dort
+ * zwei verschiedene Bilder; auf seiner eigenen Seite gab es gar keine Liste
+ * und damit ein festes drittes. Der Streuwert kommt deshalb aus einem
+ * stabilen Schlüssel — dem Slug.
+ *
+ * Zwei Inhalte können sich ein Motiv teilen. Bei vier Motiven und sechs
+ * Beiträgen ist das unvermeidlich, und ein wiederkehrendes Motiv ist
+ * harmloser als eines, das je nach Seite wechselt.
+ */
+export function stabilesMotiv(motive: readonly string[], schluessel?: string): string {
+  if (!schluessel) return motive[0];
+  let summe = 0;
+  for (let i = 0; i < schluessel.length; i++) {
+    summe = (summe * 31 + schluessel.charCodeAt(i)) >>> 0;
+  }
+  return motive[summe % motive.length];
+}
+
+/**
+ * Die fertige Adresse eines lokalen Motivs — für die Stellen, die kein
+ * `<picture>` bauen können, sondern eine einzelne URL brauchen (das
+ * Zeiger-Preview der Services-Tabelle hängt sie an ein data-Attribut).
+ *
+ * Die Breite wird nicht angenommen, sondern aus dem Verzeichnis gewählt: Die
+ * Pipeline deckelt jede Stufe auf die Breite der Quelle, `praxis-01` hört bei
+ * 800 auf und `smile-portrait` bei 563. Eine fest hingeschriebene 640 ergäbe
+ * dort einen 404 — genau der Fehler, der auf der Veneers-Seite das Bild der
+ * ersten Zeile verschluckt hat.
+ */
+export function motivPfad(name: string, mindestens = 640): string | undefined {
+  const breiten = (BREITEN as Record<string, number[]>)[name];
+  if (!breiten?.length) return undefined;
+  const passend = breiten.find((b) => b >= mindestens) ?? breiten.at(-1);
+  return `/img/${name}-${passend}.webp`;
+}
+
 /**
  * Projekt und Dataset kommen aus der Konfiguration der Integration, nicht
  * erneut aus der Umgebung — sonst gibt es zwei Stellen, an denen sie

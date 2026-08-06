@@ -26,6 +26,7 @@ import { initToothRings } from "./modules/rings.js";
 import { initThread } from "./modules/thread.js";
 import { initAccordion, initBeforeAfter, initForm } from "./modules/ui.js";
 import { initToc } from "./modules/toc.js";
+import { initFilter } from "./modules/filter.js";
 
 // Signalisiert dem CSS, dass JS läuft — erst dann werden Reveal-Elemente
 // versteckt. Ohne JS bleibt alles sichtbar.
@@ -105,6 +106,7 @@ export function init() {
     initBeforeAfter();
     initForm();
     initToc();
+    initFilter();
 
     wennGescrolltWird(() => {
       /* Der durchlaufende Pfad misst seine Länge Stützstelle für Stützstelle

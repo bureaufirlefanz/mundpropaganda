@@ -19,17 +19,13 @@ import Button from "./Button.astro";
 import Picture from "./Picture.astro";
 import CmsImage from "./CmsImage.astro";
 import { istCmsBild } from "../../lib/bilder";
-import { kategorieText, beitragPfad, datumText, type Beitrag } from "../../lib/magazin";
+import { kategorieText, beitragPfad, motivFuer, type Beitrag } from "../../lib/magazin";
 
 interface Props {
   beitrag: Beitrag;
-  /** Entscheidet über das Ersatzmotiv, solange kein Vorschaubild hängt. */
-  position: number;
   sizes: string;
   /** Tiefe des Parallax auf dem Bild. Ohne Wert steht es still. */
   parallax?: string;
-  /** Das Datum trägt die Übersicht, nicht das Karussell. */
-  mitDatum?: boolean;
   /** Der Knopf trägt das Karussell, nicht die Übersicht. */
   mitKnopf?: boolean;
   /**
@@ -46,27 +42,30 @@ interface Props {
 
 const {
   beitrag: p,
-  position,
   sizes,
   parallax,
-  mitDatum = false,
   mitKnopf = false,
   ueberschrift: Titel = "h3",
   ...rest
 } = Astro.props;
 
-/* Klasse 3: die gestalteten Motive, positionsgenau, solange an einem Beitrag
-   kein Vorschaubild hängt.
+/* Klasse 3: das gestaltete Ersatzmotiv, solange kein Vorschaubild hängt.
+   Es hängt am Beitrag und nicht an seiner Position in dieser Liste — sonst
+   zeigte derselbe Beitrag im Raster, im Karussell und auf seiner eigenen
+   Seite drei verschiedene Bilder (siehe `motivFuer` in lib/magazin.ts).
 
    Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
    WebP als <source> samt srcset. CmsImage kann das für lokale Pfade nicht —
    es kennt nur die eine Datei, die im Pfad steht, und lieferte damit jedem
    Telefon das Bild in voller Breite aus. */
-const MOTIVE = ["motion-04", "teeth-macro", "lab-veneers", "treatment-03"];
-const motiv = MOTIVE[position % MOTIVE.length];
+const motiv = motivFuer(p.slug);
 ---
 
-<article class="c-post" {...rest}>
+<!-- `data-kategorie` trägt den Rohwert, nicht den Klartext: Der Filter
+     vergleicht ihn mit dem Wert aus dem Schema, und „Material & Technik"
+     gegen „technik" zu prüfen hieße, die Zuordnung ein zweites Mal zu
+     pflegen. -->
+<article class="c-post" data-kategorie={p.kategorie ?? ""} {...rest}>
   <div class="c-post__media">
     {istCmsBild(p.vorschaubild) ? (
       <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
@@ -76,12 +75,7 @@ const motiv = MOTIVE[position % MOTIVE.length];
   </div>
 
   <div class="c-post__card">
-    <div class="c-post__meta">
-      {p.kategorie && <span class="c-post__kicker">{kategorieText(p.kategorie)}</span>}
-      {mitDatum && p.datum && (
-        <time class="c-post__kicker" datetime={p.datum}>{datumText(p.datum)}</time>
-      )}
-    </div>
+    {p.kategorie && <span class="c-post__tag">{kategorieText(p.kategorie)}</span>}
 
     <Titel class="c-post__title">
       <a class="c-post__link" href={beitragPfad(p.slug)}>{p.titel}</a>
@@ -162,19 +156,20 @@ const motiv = MOTIVE[position % MOTIVE.length];
     color: var(--c-neutral-800);
   }
 
-  .c-post__meta {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-3);
-  }
-
-  .c-post__kicker {
+  /* Die Kategorie als Zeile, nicht als Pille. Sie steht in der weißen
+     Fläche über dem Titel und ist dort schon durch Schnitt und Laufweite
+     abgesetzt; eine gefüllte Form daneben nähme dem Titel den Vorrang und
+     machte aus dem Hinweis einen Knopf, der keiner ist. */
+  .c-post__tag {
+    align-self: flex-start;
+    color: var(--c-dark);
     font-family: var(--f-mono);
     font-weight: 300;
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
+    line-height: 1.2;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+    white-space: nowrap;
   }
 
   .c-post__title {
@@ -204,6 +199,18 @@ const motiv = MOTIVE[position % MOTIVE.length];
   /* :global(.c-btn), weil der Knopf aus Button.astro kommt. */
   .c-post :global(.c-btn) {
     margin-top: var(--sp-4);
+  }
+
+  /* Der Knopf reagiert mit, egal wo auf der Karte der Zeiger steht.
+     Er kann es nicht selbst: Über ihm liegt die Klickfläche des Titellinks
+     (`.c-post__link::after`, inset 0), er bekommt also nie einen eigenen
+     Hover. Und da er in dieser Karte ein <span> ist und kein <a>, wäre das
+     auch kein zweites Ziel, sondern ein Anzeigeelement, das stillstand,
+     während offensichtlich etwas anklickbar war. */
+  @media (hover: hover) {
+    .c-post:hover :global(.c-btn__icon) {
+      transform: translateX(5px);
+    }
   }
 
   /* --- Schmale Karte ----------------------------------------------------
