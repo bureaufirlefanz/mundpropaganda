@@ -14,11 +14,11 @@ import { istCmsBild, type Bildquelle } from "../../lib/bilder";
    wahlfrei mit Rückfall auf die gestalteten Motive. */
 interface Props {
   topline: string;
-  vorher?: Bildquelle;
-  nachher?: Bildquelle;
+  before?: Bildquelle;
+  after?: Bildquelle;
 }
 
-const { topline, vorher, nachher } = Astro.props;
+const { topline, before, after } = Astro.props;
 
 /* Klasse 3: die Motive aus der lokalen Bildpipeline. Sie zeigen Veneers —
    deshalb steht im Studio an diesem Abschnitt ausdrücklich, dass eigene
@@ -32,14 +32,14 @@ const MOTIV_NACHHER = "teeth-macro-after";
     <span class="c-topline s-ba__topline" data-reveal="fade">{topline}</span>
 
     <div class="s-ba__frame" data-ba data-reveal="scale">
-      {istCmsBild(vorher) ? (
-        <CmsImage quelle={vorher} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+      {istCmsBild(before) ? (
+        <CmsImage quelle={before} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
       ) : (
         <Picture name={MOTIV_VORHER} alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
       )}
       <div class="s-ba__after">
-        {istCmsBild(nachher) ? (
-          <CmsImage quelle={nachher} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
+        {istCmsBild(after) ? (
+          <CmsImage quelle={after} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
         ) : (
           <Picture name={MOTIV_NACHHER} alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
         )}
@@ -52,11 +52,11 @@ const MOTIV_NACHHER = "teeth-macro-after";
         data-ba-handle
         role="slider"
         tabindex="0"
-        aria-label="Vergleich zwischen vorher und nachher"
+        aria-label="Vergleich zwischen before und after"
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow="50"
-        aria-valuetext="50 % nachher"
+        aria-valuetext="50 % after"
       >
         <span class="s-ba__grip">
           <svg aria-hidden="true"><use href="#i-arrow" /></svg>

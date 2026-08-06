@@ -37,7 +37,7 @@ const lauf = spawnSync(
 /* Erwartet werden mindestens die Dokumenttypen, die es sicher gibt. Eine reine
    Existenzprüfung reichte nicht: Eine leere oder halb geschriebene Datei
    bestünde sie. */
-const PFLICHT = ["startseite", "leistung", "einstellungen", "navigation", "footer"];
+const PFLICHT = ["homepage", "service", "settings", "navigation", "footer"];
 
 let schema;
 try {

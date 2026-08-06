@@ -23,9 +23,9 @@ export type Karriere = NonNullable<OhneNull<KARRIERE_QUERY_RESULT>>;
 export type Stelle = NonNullable<OhneNull<STELLEN_QUERY_RESULT>>[number];
 
 /** Adresse für Bewerbungen mit vorbereitetem Betreff. */
-export const bewerbungLink = (mail: string, stelle?: { titel?: string }) =>
+export const bewerbungLink = (mail: string, stelle?: { title?: string }) =>
   `mailto:${mail}?subject=${encodeURIComponent(
-    stelle?.titel ? `Bewerbung: ${stelle.titel}` : "Initiativbewerbung"
+    stelle?.title ? `Bewerbung: ${stelle.title}` : "Initiativbewerbung"
   )}`;
 
 let gemerkt: Promise<Karriere | undefined> | null = null;
@@ -43,7 +43,7 @@ export function ladeKarriere(): Promise<Karriere | undefined> {
 /**
  * Die ausgeschriebenen Stellen.
  *
- * `aktiv != false` und nicht `aktiv == true`: Ein Dokument, das vor dem Feld
+ * `active != false` und nicht `active == true`: Ein Dokument, das vor dem Feld
  * angelegt wurde, hat es gar nicht — und wäre mit der strengen Prüfung
  * unsichtbar, obwohl niemand es abgeschaltet hat.
  */

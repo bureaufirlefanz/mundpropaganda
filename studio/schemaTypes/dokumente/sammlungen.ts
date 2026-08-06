@@ -16,7 +16,7 @@ import { fliesstext } from "../objekte/fliesstext";
  */
 
 const gruppen = [
-  { name: "inhalt", title: "Inhalt", default: true },
+  { name: "content", title: "Inhalt", default: true },
   { name: "seo", title: "SEO" },
 ];
 
@@ -25,13 +25,13 @@ const seoFeld = defineField({ name: "seo", title: "Suchmaschine", type: "seo", g
 /* --- Magazinbeitrag ----------------------------------------------------- */
 
 export const beitrag = defineType({
-  name: "beitrag",
+  name: "post",
   title: "Magazinbeitrag",
   type: "document",
   icon: DocumentTextIcon,
   groups: gruppen,
   fields: [
-    defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required(), group: "inhalt" }),
+    defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required(), group: "content" }),
     defineField({
       name: "slug",
       title: "URL-Teil",
@@ -39,18 +39,18 @@ export const beitrag = defineType({
       description: "Ergibt /magazin/<slug>. Kleinschreibung, Bindestriche, keine Umlaute.",
       options: { source: "titel", maxLength: 72 },
       validation: (r) => r.required(),
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
-      name: "datum",
+      name: "date",
       title: "Veröffentlicht am",
       type: "date",
       description: "Bestimmt die Reihenfolge im Magazin - neueste zuerst.",
       validation: (r) => r.required(),
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
-      name: "kategorie",
+      name: "category",
       title: "Kategorie",
       type: "string",
       options: {
@@ -61,32 +61,32 @@ export const beitrag = defineType({
           { title: "Praxis", value: "praxis" },
         ],
       },
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
-      name: "leistung",
+      name: "service",
       title: "Gehört zu Leistung",
       type: "reference",
-      to: [{ type: "leistung" }],
+      to: [{ type: "service" }],
       description:
         "Verknüpft den Beitrag mit einer Leistung. Dadurch kann die Leistungsseite passende Beiträge zeigen, ohne dass jemand sie dort einzeln einträgt.",
-      group: "inhalt",
+      group: "content",
     }),
-    defineField({ name: "vorschaubild", title: "Vorschaubild", type: "bild", group: "inhalt" }),
+    defineField({ name: "previewImage", title: "Vorschaubild", type: "picture", group: "content" }),
     defineField({
-      name: "einleitung",
+      name: "lead",
       title: "Anrisstext",
       type: "text",
       rows: 3,
       description: "Steht auf der Karte im Magazin. Zwei Sätze.",
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
       name: "text",
       title: "Beitrag",
       type: "array",
-      of: [fliesstext, { type: "bild" }],
-      group: "inhalt",
+      of: [fliesstext, { type: "picture" }],
+      group: "content",
     }),
     seoFeld,
   ],
@@ -94,8 +94,8 @@ export const beitrag = defineType({
     { title: "Neueste zuerst", name: "datumNeu", by: [{ field: "datum", direction: "desc" }] },
   ],
   preview: {
-    select: { title: "titel", datum: "datum", media: "vorschaubild" },
-    prepare: ({ title, datum, media }) => ({
+    select: { title: "title", date: "date", media: "previewImage" },
+    prepare: ({ title, date, media }) => ({
       title,
       subtitle: datum ? new Date(datum).toLocaleDateString("de-DE") : "ohne Datum",
       media,
@@ -113,11 +113,11 @@ export const pillar = defineType({
   groups: gruppen,
   fields: [
     defineField({
-      name: "titel",
+      name: "title",
       title: "Überschrift",
       type: "string",
       validation: (r) => r.required(),
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
       name: "slug",
@@ -132,22 +132,22 @@ export const pillar = defineType({
             ? true
             : `„${wert?.current}“ ist ein fester Pfad der Website. Reserviert: ${RESERVIERTE_SLUGS.join(", ")}.`
         ),
-      group: "inhalt",
+      group: "content",
     }),
-    defineField({ name: "topline", title: "Topline", type: "string", group: "inhalt" }),
-    defineField({ name: "einleitung", title: "Einleitung", type: "text", rows: 4, group: "inhalt" }),
-    defineField({ name: "bild", title: "Kopfbild", type: "bild", group: "inhalt" }),
+    defineField({ name: "topline", title: "Topline", type: "string", group: "content" }),
+    defineField({ name: "lead", title: "Einleitung", type: "text", rows: 4, group: "content" }),
+    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "content" }),
     defineField({
-      name: "abschnitte",
+      name: "sections",
       title: "Abschnitte",
-      type: "abschnitte",
+      type: "sections",
       description: "Der Aufbau der Seite. Abschnitte lassen sich ziehen und umstellen.",
-      group: "inhalt",
+      group: "content",
     }),
     seoFeld,
   ],
   preview: {
-    select: { title: "titel", slug: "slug.current", media: "bild" },
+    select: { title: "title", slug: "slug.current", media: "image" },
     prepare: ({ title, slug, media }) => ({ title, subtitle: slug ? `/${slug}` : "ohne URL", media }),
   },
 });
@@ -155,13 +155,13 @@ export const pillar = defineType({
 /* --- Rechtstexte -------------------------------------------------------- */
 
 export const rechtstext = defineType({
-  name: "rechtstext",
+  name: "legalPage",
   title: "Rechtstext",
   type: "document",
   icon: DocumentTextIcon,
   groups: gruppen,
   fields: [
-    defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required(), group: "inhalt" }),
+    defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required(), group: "content" }),
     defineField({
       name: "slug",
       title: "URL-Teil",
@@ -172,23 +172,23 @@ export const rechtstext = defineType({
         r.required().custom((wert) =>
           slugFrei(wert?.current) ? true : `„${wert?.current}“ ist ein fester Pfad der Website.`
         ),
-      group: "inhalt",
+      group: "content",
     }),
     defineField({
       name: "text",
       title: "Text",
       type: "array",
       of: [fliesstext],
-      group: "inhalt",
+      group: "content",
     }),
     /* Rechtstexte gehören nicht in den Suchindex — sie ziehen Suchanfragen
        auf sich, die niemandem nützen, und verdünnen die Relevanz der Seite.
        Voreingestellt auf „ausschließen“, änderbar bleibt es trotzdem. */
     seoFeld,
   ],
-  initialValue: { seo: { nichtIndexieren: true } },
+  initialValue: { seo: { noIndex: true } },
   preview: {
-    select: { title: "titel", slug: "slug.current" },
+    select: { title: "title", slug: "slug.current" },
     prepare: ({ title, slug }) => ({ title, subtitle: slug ? `/${slug}` : "ohne URL" }),
   },
 });
@@ -202,23 +202,23 @@ export const person = defineType({
   icon: UserIcon,
   fields: [
     defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "rolle", title: "Rolle", type: "string" }),
-    defineField({ name: "bild", title: "Porträt", type: "bild" }),
+    defineField({ name: "role", title: "Rolle", type: "string" }),
+    defineField({ name: "image", title: "Porträt", type: "picture" }),
     defineField({ name: "text", title: "Kurzprofil", type: "text", rows: 4 }),
     defineField({
-      name: "schwerpunkte",
+      name: "focusAreas",
       title: "Schwerpunkte",
       type: "array",
-      of: [{ type: "reference", to: [{ type: "leistung" }] }],
+      of: [{ type: "reference", to: [{ type: "service" }] }],
     }),
   ],
-  preview: { select: { title: "name", subtitle: "rolle", media: "bild" } },
+  preview: { select: { title: "name", subtitle: "role", media: "image" } },
 });
 
 /* --- Stellenanzeigen ---------------------------------------------------- */
 
 export const stelle = defineType({
-  name: "stelle",
+  name: "job",
   title: "Stelle",
   type: "document",
   icon: CaseIcon,
@@ -231,52 +231,52 @@ export const stelle = defineType({
      man schreibt und ändert; die Eckdaten sind das, was man einmal setzt.
      Getrennt, damit man beim Redigieren nicht an der Kennung vorbeiscrollt. */
   groups: [
-    { name: "ausschreibung", title: "Ausschreibung", default: true },
-    { name: "eckdaten", title: "Eckdaten" },
+    { name: "posting", title: "Ausschreibung", default: true },
+    { name: "facts", title: "Eckdaten" },
   ],
   fields: [
-    orderRankField({ type: "stelle" }),
-    defineField({ name: "titel", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required(), group: "ausschreibung" }),
+    orderRankField({ type: "job" }),
+    defineField({ name: "title", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required(), group: "posting" }),
     defineField({
-      name: "kennung",
+      name: "handle",
       title: "Kennung",
       type: "slug",
       description: "Wird zur Sprungmarke auf der Karriereseite und zum Betreff der Bewerbungsmail.",
       options: { source: "titel", maxLength: 40 },
       validation: (r) => r.required(),
-      group: "eckdaten"
+      group: "facts"
     }),
     defineField({
-      name: "art",
+      name: "kind",
       title: "Art",
       type: "string",
       description: "Steht als Marke neben dem Titel, z. B. „Vollzeit oder Teilzeit“.",
-      group: "eckdaten"
+      group: "facts"
     }),
-    defineField({ name: "standort", title: "Standort", type: "string", group: "eckdaten" }),
-    defineField({ name: "umfang", title: "Beginn oder Umfang", type: "string", group: "eckdaten" }),
-    defineField({ name: "einleitung", title: "Einleitung", type: "text", rows: 4, group: "ausschreibung" }),
-    defineField({ name: "aufgaben", title: "Deine Aufgaben", type: "array", of: [{ type: "string" }], group: "ausschreibung" }),
-    defineField({ name: "profil", title: "Das bringst du mit", type: "array", of: [{ type: "string" }], group: "ausschreibung" }),
+    defineField({ name: "location", title: "Standort", type: "string", group: "facts" }),
+    defineField({ name: "hours", title: "Beginn oder Umfang", type: "string", group: "facts" }),
+    defineField({ name: "lead", title: "Einleitung", type: "text", rows: 4, group: "posting" }),
+    defineField({ name: "duties", title: "Deine Aufgaben", type: "array", of: [{ type: "string" }], group: "posting" }),
+    defineField({ name: "profile", title: "Das bringst du mit", type: "array", of: [{ type: "string" }], group: "posting" }),
     defineField({
-      name: "besonderheit",
+      name: "highlight",
       title: "Besonderheit",
       type: "string",
       description: "Ein Satz, der hervorgehoben unter den Aufzählungen steht.",
-      group: "ausschreibung"
+      group: "posting"
     }),
     defineField({
-      name: "aktiv",
+      name: "active",
       title: "Ausgeschrieben",
       type: "boolean",
       description: "Abwählen, statt zu löschen - dann verschwindet die Stelle von der Seite, bleibt aber erhalten.",
       initialValue: true,
-      group: "eckdaten"
+      group: "facts"
     }),
   ],
   preview: {
-    select: { title: "titel", art: "art", aktiv: "aktiv" },
-    prepare: ({ title, art, aktiv }) => ({
+    select: { title: "title", kind: "kind", active: "active" },
+    prepare: ({ title, kind, active }) => ({
       title,
       subtitle: [aktiv === false ? "nicht ausgeschrieben" : null, art].filter(Boolean).join(" · "),
     }),

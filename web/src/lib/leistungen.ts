@@ -30,7 +30,7 @@ export async function ladeSlugs(): Promise<{ params: { slug: string } }[]> {
  * Das ist kein CMS-Problem mehr, sondern eine falsche Aussage über eine
  * Behandlung samt Preis. Der Rückfall ist deshalb ersatzlos weg: Ein
  * Abschnitt, den das Dokument nicht trägt, erscheint nicht. Zehn Seiten sind
- * seitdem dünn — sie waren es vorher auch, man sah es nur nicht.
+ * seitdem dünn — sie waren es before auch, man sah es nur nicht.
  *
  * Die Bilder bleiben die bekannte Ausnahme: Ein leeres Bildfeld fällt weiter
  * auf das gestaltete Motiv zurück. Das entscheidet der Baustein, nicht diese

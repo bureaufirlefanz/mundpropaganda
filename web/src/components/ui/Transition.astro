@@ -154,11 +154,11 @@ const MITTE = Math.floor(SPALTEN / 2);
   import { gsap } from "../../js/lib/gsap.js";
 
   const wrap = document.querySelector("[data-transition]");
-  const spalten = wrap ? [...wrap.querySelectorAll(".c-transition__panel")] : [];
+  const columns = wrap ? [...wrap.querySelectorAll(".c-transition__panel")] : [];
   const AUS = 0.55;
   const EIN = 0.6;
 
-  if (spalten.length) {
+  if (columns.length) {
     /* Der Router hält an, bis das übergebene Versprechen erfüllt ist —
        dadurch deckt der Vorhang wirklich ab, bevor getauscht wird, statt
        parallel zum Austausch zu laufen. */
@@ -168,8 +168,8 @@ const MITTE = Math.floor(SPALTEN / 2);
       ereignis.loader = async () => {
         await gsap
           .timeline()
-          .set(spalten, { yPercent: 0 })
-          .to(spalten, {
+          .set(columns, { yPercent: 0 })
+          .to(columns, {
             yPercent: 100,
             duration: AUS,
             ease: "power3.inOut",
@@ -183,12 +183,12 @@ const MITTE = Math.floor(SPALTEN / 2);
     // Nach dem Austausch nach unten durchlaufen lassen — nicht zurück nach
     // oben. Sonst liefe die Bewegung sichtbar rückwärts.
     document.addEventListener("astro:after-swap", () => {
-      gsap.to(spalten, {
+      gsap.to(columns, {
         yPercent: 200,
         duration: EIN,
         ease: "power3.inOut",
         stagger: { each: 0.05, from: "start" },
-        onComplete: () => gsap.set(spalten, { yPercent: 0 }),
+        onComplete: () => gsap.set(columns, { yPercent: 0 }),
       });
     });
   }

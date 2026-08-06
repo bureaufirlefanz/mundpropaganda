@@ -17,20 +17,20 @@ import type { Rechtstext } from "../lib/rechtstexte";
 interface Props {
   daten: Rechtstext | undefined;
   /** Aus der Liste, falls das Dokument selbst nicht geladen werden konnte. */
-  titel: string;
+  title: string;
 }
 
-const { daten: d, titel } = Astro.props;
+const { daten: d, title } = Astro.props;
 ---
 
 <Base
-  title={d?.seo?.titel || `${titel} - Mundpropaganda`}
-  description={d?.seo?.beschreibung || ""}
-  nichtIndexieren={d?.seo?.nichtIndexieren ?? true}
+  title={d?.seo?.title || `${title} - Mundpropaganda`}
+  description={d?.seo?.description || ""}
+  noIndex={d?.seo?.noIndex ?? true}
 >
   <article class="s-recht">
     <header class="container s-recht__kopf">
-      <h1 class="s-recht__titel" data-split="lines">{titel}</h1>
+      <h1 class="s-recht__titel" data-split="lines">{title}</h1>
     </header>
 
     {d?.text && (

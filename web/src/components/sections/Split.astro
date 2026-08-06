@@ -16,12 +16,12 @@ import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 interface Props {
   topline: string;
-  titel: string;
+  title: string;
   absaetze: string[];
-  bild?: Bildquelle;
+  image?: Bildquelle;
 }
 
-const { topline, titel, absaetze, bild } = Astro.props;
+const { topline, title, absaetze, image } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -31,8 +31,8 @@ const { topline, titel, absaetze, bild } = Astro.props;
         <!-- Bild von rechts, braune Fläche von links: die beiden fahren
              gegeneinander ein und schließen die Komposition. -->
         <div class="s-split__media" data-reveal="right" data-reveal-trigger=".s-split">
-          {istCmsBild(bild) ? (
-            <CmsImage quelle={bild} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
+          {istCmsBild(image) ? (
+            <CmsImage quelle={image} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
           ) : (
             <Picture name="portrait-hero" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
           )}
@@ -40,7 +40,7 @@ const { topline, titel, absaetze, bild } = Astro.props;
 
         <div class="s-split__head">
           <span class="c-topline" data-reveal="fade">{topline}</span>
-          <h2 class="s-split__title" data-split="lines" data-split-delay="0.1">{titel}</h2>
+          <h2 class="s-split__title" data-split="lines" data-split-delay="0.1">{title}</h2>
         </div>
 
         <div class="s-split__panel" data-reveal="left" data-reveal-trigger=".s-split">

@@ -82,13 +82,13 @@ const S = (p) => lies(`web/src/components/sections/${p}.astro`);
 
 const liste = lies("web/src/lib/leistungsliste.ts");
 const eintraege = [...liste.matchAll(
-  /\{ slug: "([^"]+)", name: "([^"]+)"(?:, titel: "([^"]+)")?, platzierung: "([^"]+)"(?:, gruppe: "([^"]+)")?(?:, tag: "([^"]+)")?/g
+  /\{ slug: "([^"]+)", name: "([^"]+)"(?:, title: "([^"]+)")?, placement: "([^"]+)"(?:, group: "([^"]+)")?(?:, tag: "([^"]+)")?/g
 )];
 if (!eintraege.length) throw new Error("Keine Leistungen gefunden — Form von beispielListe geändert?");
 
 const zeilen = eintraege.map(([, slug, name, titel, platzierung, gruppe, tag], i) => ({
   _id: `leistung-${slug}`,
-  _type: "leistung",
+  _type: "service",
   titel: titel || name,
   kurzname: titel ? name : undefined,
   slug: { _type: "slug", current: slug },
@@ -105,10 +105,10 @@ const zeilen = eintraege.map(([, slug, name, titel, platzierung, gruppe, tag], i
 
 const einst = vorgabe(lies("web/src/lib/einstellungen.ts"), "beispielEinstellungen: Einstellungen");
 zeilen.push({
-  _id: "einstellungen",
-  _type: "einstellungen",
+  _id: "settings",
+  _type: "settings",
   ...einst,
-  standorte: einst.standorte.map((o, i) => ({ _key: `standort-${i}`, ...o })),
+  locations: einst.standorte.map((o, i) => ({ _key: `standort-${i}`, ...o })),
 });
 
 /* --- Die Startseite ----------------------------------------------------- */
@@ -126,30 +126,30 @@ const index = lies("web/src/pages/index.astro");
 const schluessel = (praefix) => (o, i) => ({ _key: `${praefix}-${i}`, ...o });
 
 zeilen.push({
-  _id: "startseite",
-  _type: "startseite",
+  _id: "homepage",
+  _type: "homepage",
 
-  heroZeilen: vorgabe(hero, "zeilen"),
+  heroLines: vorgabe(hero, "zeilen"),
 
   splitTopline: vorgabe(split, "topline"),
-  splitTitel: vorgabe(split, "titel"),
-  splitAbsaetze: vorgabe(split, "absaetze"),
+  splitTitle: vorgabe(split, "titel"),
+  splitParagraphs: vorgabe(split, "absaetze"),
 
-  servicesTitel: vorgabe(services, "titel"),
+  servicesTitle: vorgabe(services, "titel"),
 
-  standardsTitel: vorgabe(standards, "titel"),
-  standardsEintraege: vorgabe(standards, "eintraege").map(schluessel("standard")),
+  standardsTitle: vorgabe(standards, "titel"),
+  standardsItems: vorgabe(standards, "eintraege").map(schluessel("standard")),
 
-  standorteTitel: vorgabe(gallery, "titel"),
+  locationsTitle: vorgabe(gallery, "titel"),
 
-  expertenTitel: vorgabe(experts, "titel"),
-  expertenNamen: vorgabe(experts, "namen"),
+  expertsTitle: vorgabe(experts, "titel"),
+  expertsNames: vorgabe(experts, "namen"),
   expertenText: vorgabe(experts, "absaetze").join("\n\n"),
 
   /* Die Stories tragen im Markup Bildnamen aus der lokalen Pipeline. Ins CMS
      wandern Name und Zitat; das Bild pflegt der Kunde dort selbst, sonst
      zeigte das Studio einen Dateinamen, mit dem er nichts anfangen kann. */
-  storiesEintraege: vorgabe(stories, "eintraege")
+  storiesItems: vorgabe(stories, "eintraege")
     .map(({ name, zitat }) => ({ name, zitat }))
     .map(schluessel("story")),
 

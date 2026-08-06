@@ -8,8 +8,8 @@ import type { Eintrag } from "../../lib/formen";
 import CmsImage from "../ui/CmsImage.astro";
 import { istCmsBild } from "../../lib/bilder";
 
-interface Props { topline: string; headline: string; eintraege: Eintrag[] }
-const { topline, headline, eintraege } = Astro.props;
+interface Props { topline: string; headline: string; items: Eintrag[] }
+const { topline, headline, items } = Astro.props;
 
 /* Klasse 3: die gestalteten Motive, positionsgenau. Sie kamen bis Aufgabe 4
    aus `mitRueckfall` in der Datenschicht — dort waren sie falsch aufgehoben,
@@ -32,7 +32,7 @@ const MOTIVE = [
     </div>
 
     <div class="s-benefits__list" data-standards-list>
-      {eintraege.map((e, i) => (
+      {items.map((e, i) => (
         <div class="s-benefits__row" data-standards-row data-active={i === 0 ? "true" : undefined}>
           <span class="s-benefits__num">{i + 1}</span>
           <div class="s-benefits__body">
@@ -49,8 +49,8 @@ const MOTIVE = [
         {/* Alle Motive liegen übereinander, sichtbar ist immer genau eines —
             das Modul blendet um. Deshalb ohne Alternativtext: die Bühne
             trägt keine eigene Information, der Text steht in der Liste. */}
-        {eintraege.map((e, i) => (
-          <CmsImage quelle={istCmsBild(e.bild) ? e.bild : MOTIVE[i % MOTIVE.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
+        {items.map((e, i) => (
+          <CmsImage quelle={istCmsBild(e.image) ? e.image : MOTIVE[i % MOTIVE.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
         ))}
       </div>
     </div>

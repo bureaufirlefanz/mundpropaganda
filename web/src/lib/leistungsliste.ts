@@ -19,21 +19,21 @@ export interface LeistungsEintrag {
   slug: string;
   /** Der kurze Name für Tabelle, Menü und Footer. */
   name: string;
-  platzierung?: Platzierung;
-  gruppe?: Gruppe;
+  placement?: Platzierung;
+  group?: Gruppe;
   tag?: string;
   /** Bild am Zeiger in der Services-Tabelle. Aus dem CMS oder lokal. */
-  vorschau?: CmsBild | string;
+  preview?: CmsBild | string;
 }
 
-/** Überschriften der Menüspalten. Reihenfolge = Reihenfolge im Menü. */
-export const GRUPPEN: { wert: Gruppe; titel: string }[] = [
-  { wert: "aesthetik", titel: "Ästhetik" },
-  { wert: "zahnersatz", titel: "Zahnersatz" },
-  { wert: "behandlung", titel: "Behandlung" },
+/** Überschriften der Menücolumns. Reihenfolge = Reihenfolge im Menü. */
+export const GRUPPEN: { value: Gruppe; title: string }[] = [
+  { value: "aesthetik", title: "Ästhetik" },
+  { value: "zahnersatz", title: "Zahnersatz" },
+  { value: "behandlung", title: "Behandlung" },
 ];
 
-/* Einmal je Build holen. Drei Bausteine auf mehreren Seiten fragen dieselbe
+/* Einmal je Build holen. Drei Bausteine auf mehreren Seiten questions dieselbe
    Liste ab — ohne das Merken wären es entsprechend viele Anfragen für dieselbe
    Antwort. */
 let gemerkt: Promise<LeistungsEintrag[]> | null = null;
@@ -46,7 +46,7 @@ let gemerkt: Promise<LeistungsEintrag[]> | null = null;
  * schon „genug" enthielt. Das war zur Einrichtung richtig und ist es jetzt
  * nicht mehr: Der Startbestand ist eingespielt, die Collection trägt. Eine
  * Leistung, die der Kunde im Studio löscht, verschwindet damit auch aus
- * Tabelle, Menü und Fuß — vorher wäre die ganze Liste auf den alten Stand
+ * Tabelle, Menü und Fuß — before wäre die ganze Liste auf den alten Stand
  * zurückgefallen, also auf elf Leistungen, die er dort nicht mehr sieht.
  */
 export function ladeLeistungsliste(): Promise<LeistungsEintrag[]> {
@@ -61,14 +61,14 @@ export function ladeLeistungsliste(): Promise<LeistungsEintrag[]> {
 
 /** Die Zeilen der Services-Tabelle — mit Vorschaubild. */
 export const fuerTabelle = (liste: LeistungsEintrag[]) =>
-  liste.filter((l) => (l.platzierung ?? "tabelle") === "tabelle");
+  liste.filter((l) => (l.placement ?? "tabelle") === "tabelle");
 
 /** Die schlichten Links darunter. */
 export const fuerListe = (liste: LeistungsEintrag[]) =>
-  liste.filter((l) => l.platzierung === "liste");
+  liste.filter((l) => l.placement === "liste");
 
 /** Eine Menüspalte. „versteckt" meint nur die Startseite, nicht das Menü. */
-export const fuerGruppe = (liste: LeistungsEintrag[], gruppe: Gruppe) =>
-  liste.filter((l) => l.gruppe === gruppe);
+export const fuerGruppe = (liste: LeistungsEintrag[], group: Gruppe) =>
+  liste.filter((l) => l.group === group);
 
 export const pfad = (eintrag: LeistungsEintrag) => `/leistungen/${eintrag.slug}`;

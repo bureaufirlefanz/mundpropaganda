@@ -18,10 +18,10 @@ const e = await ladeEinstellungen();
 // ließen. Ein Platzhalter, der die Prüfung besteht, ist schlimmer als ein
 // leeres Feld.
 const PROFILE = [
-  { schluessel: "facebook", titel: "Facebook", symbol: "#i-facebook" },
-  { schluessel: "instagram", titel: "Instagram", symbol: "#i-instagram" },
-  { schluessel: "linkedin", titel: "LinkedIn", symbol: "#i-linkedin" },
-  { schluessel: "youtube", titel: "YouTube", symbol: "#i-youtube" },
+  { schluessel: "facebook", title: "Facebook", symbol: "#i-facebook" },
+  { schluessel: "instagram", title: "Instagram", symbol: "#i-instagram" },
+  { schluessel: "linkedin", title: "LinkedIn", symbol: "#i-linkedin" },
+  { schluessel: "youtube", title: "YouTube", symbol: "#i-youtube" },
 ] as const;
 const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filter(
   (p) => p.url && p.url !== "#"
@@ -33,23 +33,23 @@ const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.schluessel] })).filt
 const jahr = new Date().getFullYear();
 
 /* Spalten, Knopf und Rechtliches seit Aufgabe 8 aus dem CMS. Die vier
-   Rechtstext-Links standen vorher auf `href="#"` — sie sahen aus wie ein
+   Rechtstext-Links standen before auf `href="#"` — sie sahen aus wie ein
    Angebot und führten nirgendwohin. Jetzt zeigen sie auf Rechtstext-
    Dokumente, und solange es die nicht gibt, steht die Zeile leer. */
 const f = await ladeFooter();
 const hier = Astro.url.pathname;
 
-const aktion = (await aufgeloest([f?.aktion ?? null], hier))[0];
-const rechtliches = await aufgeloest(f?.rechtliches, hier);
+const action = (await aufgeloest([f?.action ?? null], hier))[0];
+const legalLinks = await aufgeloest(f?.legalLinks, hier);
 
-const spalten = (
+const columns = (
   await Promise.all(
-    (f?.spalten ?? []).map(async (sp) => ({
-      titel: sp?.titel ?? "",
+    (f?.columns ?? []).map(async (sp) => ({
+      title: sp?.title ?? "",
       links: await aufgeloest(sp?.links, hier),
     }))
   )
-).filter((sp) => sp.titel && sp.links.length > 0);
+).filter((sp) => sp.title && sp.links.length > 0);
 ---
 
 <footer class="c-footer">
@@ -61,7 +61,7 @@ const spalten = (
     <div class="c-footer__contact">
       <div class="c-footer__social">
         {profile.map((p) => (
-          <a href={p.url} aria-label={p.titel}><svg><use href={p.symbol} /></svg></a>
+          <a href={p.url} aria-label={p.title}><svg><use href={p.symbol} /></svg></a>
         ))}
       </div>
 
@@ -69,35 +69,35 @@ const spalten = (
           sondern ein Link, der beim Antippen die Wählmaske mit nichts darin
           öffnet. Was fehlt, steht deshalb gar nicht erst da. */}
       <div class="c-footer__lines">
-        {e.telefon && <a class="c-link" href={telLink(e.telefon)}>{e.telefon}</a>}
+        {e.phone && <a class="c-link" href={telLink(e.phone)}>{e.phone}</a>}
         {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
       </div>
 
-      {aktion && <Button label={aktion.text} href={aktion.href} />}
+      {action && <Button label={action.text} href={action.href} />}
 
       {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
           Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
           breit genug für zwei nebeneinander. Quelle sind dieselben
           Einstellungen wie in der Standorte-Section. */}
       <div class="c-footer__standorte">
-        {e.standorte.map((o) => (
+        {e.locations.map((o) => (
           <div>
             {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
                 ohnehin die Straße, und „Praxis Prenzlauer Allee /
                 Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
                 Halbgeviertstrich wie sonst auch auf der Seite. */}
-            <p class="c-footer__standort-name">Praxis – {o.kuerzel}</p>
+            <p class="c-footer__standort-name">Praxis – {o.shortCode}</p>
             {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
                 solche an. Der Browser setzt das Element kursiv, das wird
                 unten zurückgenommen. */}
-            <address>{o.strasse}<br />{o.ort}</address>
+            <address>{o.street}<br />{o.city}</address>
           </div>
         ))}
       </div>
     </div>
 
-    <nav class="c-footer__nav" aria-label={f?.leistungenTitel ?? "Leistungen"}>
-      <p class="c-footer__nav-title">{f?.leistungenTitel}</p>
+    <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
+      <p class="c-footer__nav-title">{f?.servicesHeading}</p>
       {leistungen.map((l) => (
         <a class="c-link" href={pfad(l)}>{l.name}</a>
       ))}
@@ -106,9 +106,9 @@ const spalten = (
     {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
         Zeile höher als die anderen — drei Spalten, von denen eine ohne
         Anlass aus der Reihe fällt. */}
-    {spalten.map((spalte) => (
-      <nav class="c-footer__nav" aria-label={spalte.titel}>
-        <p class="c-footer__nav-title">{spalte.titel}</p>
+    {columns.map((spalte) => (
+      <nav class="c-footer__nav" aria-label={spalte.title}>
+        <p class="c-footer__nav-title">{spalte.title}</p>
         {spalte.links.map((l) => (
           <a class="c-link" href={l.href}>{l.text}</a>
         ))}
@@ -118,9 +118,9 @@ const spalten = (
 
   <div class="c-footer__bottom">
     <p>© {jahr}{f?.copyright ? ` ${f.copyright}` : ""}</p>
-    {rechtliches.length > 0 && (
+    {legalLinks.length > 0 && (
       <div class="c-footer__legal">
-        {rechtliches.map((l) => (
+        {legalLinks.map((l) => (
           <a class="c-link" href={l.href}>{l.text}</a>
         ))}
       </div>

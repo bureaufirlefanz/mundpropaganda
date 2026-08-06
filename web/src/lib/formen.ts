@@ -18,25 +18,25 @@ import type { Bildquelle } from "./bilder";
 
 /** Ein Eintrag im Akkordeon. Die Antwort ist wahlfrei, die Frage nicht. */
 export interface Frage {
-  frage: string;
-  antwort?: string;
+  question: string;
+  answer?: string;
 }
 
 /** Ein Schritt im Behandlungsablauf. */
 export interface Schritt {
-  titel: string;
+  title: string;
   text: string;
 }
 
 /** Eine Preiskarte. */
 export interface Preis {
   name: string;
-  preis: string;
+  price: string;
 }
 
 /** Ein aufklappbarer Punkt mit Bild — Standards und Benefits teilen die Form. */
 export interface Eintrag {
   name: string;
   text: string;
-  bild?: Bildquelle;
+  image?: Bildquelle;
 }

@@ -24,16 +24,16 @@ const daten = await ladeLeistung(slug!);
    sonst stünde über der Seite nichts. Alles Weitere kommt aus dem Dokument
    oder erscheint nicht: Seit Aufgabe 4 füllt kein Beispielinhalt mehr auf. */
 const eintrag = (await ladeLeistungsliste()).find((l) => l.slug === slug);
-const titel = daten?.titel || eintrag?.name || "";
+const title = daten?.title || eintrag?.name || "";
 
 /* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
    deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4
    standen sie als Vorgabe im Baustein, sodass jede Seite ihre eigene Kopie
    bekam; wer eine Geschichte änderte, änderte sie nirgends sichtbar. */
-const { storiesEintraege } = await ladeStartseite();
+const { storiesItems } = await ladeStartseite();
 
 /* Nur die Beiträge, die auf diese Leistung verweisen. */
 const beitraege = await ladeBeitraege(slug!);
 ---
 
-<Leistung daten={daten} titel={titel} stories={storiesEintraege} beitraege={beitraege} />
+<Leistung daten={daten} title={title} stories={storiesItems} beitraege={beitraege} />

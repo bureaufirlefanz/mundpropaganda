@@ -37,12 +37,12 @@
       const a = (e.target as HTMLElement)?.closest?.("a");
       if (!a) return;
 
-      const ziel = a.getAttribute("href");
-      if (!ziel?.startsWith("/") || ziel.startsWith(PRAEFIX + "/") || ziel === PRAEFIX) return;
+      const target = a.getAttribute("href");
+      if (!target?.startsWith("/") || target.startsWith(PRAEFIX + "/") || target === PRAEFIX) return;
 
       e.preventDefault();
       /* Über den Astro-Router, damit die Module nicht neu anlaufen müssen. */
-      window.location.assign(PRAEFIX + ziel);
+      window.location.assign(PRAEFIX + target);
     },
     /* In der Capture-Phase: Der Router von Astro hängt selbst am Klick, und
        wer später kommt, sieht das Ereignis nicht mehr. */

@@ -27,14 +27,14 @@ import { kategorieText, datumText, motivFuer, type Beitrag, type BeitragVoll } f
 interface Props {
   daten: BeitragVoll | undefined;
   /** Aus der Liste, falls das Dokument fehlt. */
-  titel: string;
+  title: string;
   /** Beiträge derselben Kategorie. Leer, wenn es keine gibt. */
   aehnliche?: Beitrag[];
 }
 
-const { daten: d, titel, aehnliche = [] } = Astro.props;
+const { daten: d, title, aehnliche = [] } = Astro.props;
 
-const beschreibung = d?.seo?.beschreibung || d?.einleitung || "";
+const description = d?.seo?.description || d?.lead || "";
 
 /* Ab drei Zwischentiteln lohnt sich ein Verzeichnis. Bei zweien ist es keine
    Orientierung, sondern eine Dopplung der Überschriften, die man beim
@@ -45,9 +45,9 @@ const bloecke = mitKennungen(d?.text, marken);
 ---
 
 <Base
-  title={d?.seo?.titel || `${titel} - Mundpropaganda`}
-  description={beschreibung}
-  nichtIndexieren={d?.seo?.nichtIndexieren}
+  title={d?.seo?.title || `${title} - Mundpropaganda`}
+  description={description}
+  noIndex={d?.seo?.noIndex}
 >
   <article class="s-beitrag">
     {/* --- Kopf: Bild über die volle Breite, Titel darauf ----------------- */}
@@ -58,9 +58,9 @@ const bloecke = mitKennungen(d?.text, marken);
           Seite ein anderes, und wer geklickt hatte, landete sichtbar
           woanders. */}
       <div class="s-beitrag__kopfbild">
-        {istCmsBild(d?.vorschaubild) ? (
+        {istCmsBild(d?.previewImage) ? (
           <CmsImage
-            quelle={d.vorschaubild}
+            quelle={d.previewImage}
             alt=""
             widths={[640, 1024, 1600, 2200]}
             sizes="100vw"
@@ -73,11 +73,11 @@ const bloecke = mitKennungen(d?.text, marken);
 
       <div class="container s-beitrag__kopftext">
         <div class="s-beitrag__meta">
-          {d?.kategorie && <span class="c-topline">{kategorieText(d.kategorie)}</span>}
-          {d?.datum && <time datetime={d.datum}>{datumText(d.datum)}</time>}
+          {d?.category && <span class="c-topline">{kategorieText(d.category)}</span>}
+          {d?.date && <time datetime={d.date}>{datumText(d.date)}</time>}
         </div>
-        <h1 class="s-beitrag__titel" data-split="lines">{titel}</h1>
-        {d?.einleitung && <p class="s-beitrag__lead" data-reveal="up">{d.einleitung}</p>}
+        <h1 class="s-beitrag__titel" data-split="lines">{title}</h1>
+        {d?.lead && <p class="s-beitrag__lead" data-reveal="up">{d.lead}</p>}
       </div>
     </header>
 
@@ -105,11 +105,11 @@ const bloecke = mitKennungen(d?.text, marken);
               Das ist der Gewinn der Referenz im Schema: Sie trägt in beide
               Richtungen — die Leistungsseite zeigt passende Beiträge, der
               Beitrag führt zurück. */}
-          {d?.leistung?.slug && (
+          {d?.service?.slug && (
             <div class="s-beitrag__zurueck">
               <Button
-                label={`Zur Leistung: ${d.leistung.titel}`}
-                href={`/leistungen/${d.leistung.slug}`}
+                label={`Zur Leistung: ${d.service.title}`}
+                href={`/leistungen/${d.service.slug}`}
                 variant="dark"
               />
             </div>
@@ -128,7 +128,7 @@ const bloecke = mitKennungen(d?.text, marken);
       <div class="s-weiter__kopf">
         <span class="c-topline" data-reveal="fade">Weiterlesen</span>
         <h2 class="s-weiter__titel" data-split="lines">
-          Mehr aus {kategorieText(d?.kategorie)}
+          Mehr aus {kategorieText(d?.category)}
         </h2>
       </div>
 

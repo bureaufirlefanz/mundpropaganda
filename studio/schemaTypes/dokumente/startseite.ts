@@ -36,10 +36,10 @@ const gruppen = [
   { name: "split", title: "Über uns" },
   { name: "services", title: "Leistungen" },
   { name: "standards", title: "Standards" },
-  { name: "standorte", title: "Standorte" },
-  { name: "experten", title: "Team" },
+  { name: "locations", title: "Standorte" },
+  { name: "experts", title: "Team" },
   { name: "stories", title: "Geschichten" },
-  { name: "magazin", title: "Magazin" },
+  { name: "magazine", title: "Magazin" },
   { name: "faq", title: "Fragen" },
   { name: "seo", title: "SEO" },
 ];
@@ -49,27 +49,27 @@ const gruppen = [
    Ansage. Beide sind deshalb Pflicht (Klasse 1). Bis Aufgabe 4 waren sie
    wahlfrei, und ein geleertes Feld fiel still auf den Text im Baustein
    zurück; der Kunde löschte eine Überschrift und sah sie weiter stehen. */
-const kopf = (gruppe: string, mitTopline = true) =>
+const heading = (group: string, withTopline = true) =>
   [
-    mitTopline &&
+    withTopline &&
       defineField({
-        name: `${gruppe}Topline`,
+        name: `${group}Topline`,
         title: "Topline",
         type: "string",
-        group: gruppe,
+        group,
         validation: (r) => r.required(),
       }),
     defineField({
-      name: `${gruppe}Titel`,
+      name: `${group}Title`,
       title: "Überschrift",
       type: "string",
-      group: gruppe,
+      group,
       validation: (r) => r.required(),
     }),
   ].filter(Boolean) as ReturnType<typeof defineField>[];
 
 export const startseite = defineType({
-  name: "startseite",
+  name: "homepage",
   title: "Startseite",
   type: "document",
   icon: HomeIcon,
@@ -77,7 +77,7 @@ export const startseite = defineType({
   fields: [
     /* --- Hero ---------------------------------------------------------- */
     defineField({
-      name: "heroZeilen",
+      name: "heroLines",
       title: "Meta-Zeilen",
       type: "array",
       of: [{ type: "text", rows: 3 }],
@@ -92,20 +92,20 @@ export const startseite = defineType({
     }),
 
     /* --- Über uns ------------------------------------------------------- */
-    ...kopf("split"),
+    ...heading("split"),
     defineField({
-      name: "splitAbsaetze",
+      name: "splitParagraphs",
       title: "Absätze",
       type: "array",
       of: [{ type: "text", rows: 5 }],
       group: "split",
       validation: (r) => r.required(),
     }),
-    defineField({ name: "splitBild", title: "Bild", type: "bild", group: "split" }),
+    defineField({ name: "splitImage", title: "Bild", type: "picture", group: "split" }),
 
     /* --- Leistungen ----------------------------------------------------- */
     defineField({
-      name: "servicesTitel",
+      name: "servicesTitle",
       title: "Überschrift",
       type: "string",
       description: "Die Leistungen selbst kommen aus der Collection „Leistungen“ - hier steht nur der Rahmen.",
@@ -123,9 +123,9 @@ export const startseite = defineType({
        `servicesZusatz.ziel` in Aufgabe 11 der Umbauliste. */
 
     /* --- Standards ------------------------------------------------------ */
-    ...kopf("standards", false),
+    ...heading("standards", false),
     defineField({
-      name: "standardsEintraege",
+      name: "standardsItems",
       title: "Punkte",
       type: "array",
       description: "Nummeriert in dieser Reihenfolge. Fünf passen gut.",
@@ -144,9 +144,9 @@ export const startseite = defineType({
                Abschnitt. Das konnte der Baustein nicht bedienen — fünf Motive
                lassen sich nicht aus einem Feld speisen, und deshalb tat es
                nichts. Hier hängt es richtig. */
-            defineField({ name: "bild", title: "Bild in der Zahnmaske", type: "bild" }),
+            defineField({ name: "image", title: "Bild in der Zahnmaske", type: "picture" }),
           ],
-          preview: { select: { title: "name", subtitle: "text", media: "bild" } },
+          preview: { select: { title: "name", subtitle: "text", media: "image" } },
         }),
       ],
       /* Klasse 1: Die Punkte SIND der Abschnitt. Ohne sie bliebe eine
@@ -156,35 +156,35 @@ export const startseite = defineType({
 
     /* --- Standorte ------------------------------------------------------ */
     defineField({
-      name: "standorteTitel",
+      name: "locationsTitle",
       title: "Überschrift",
       type: "string",
       description: "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Seitenfuß.",
-      group: "standorte",
+      group: "locations",
       validation: (r) => r.required(),
     }),
     defineField({
-      name: "standorteBilder",
+      name: "locationsImages",
       title: "Bilder im Karussell",
       type: "array",
       description:
         "Die Motive auf dem Ring. Fünf sind ein guter Stand - der Ring füllt sich von selbst auf, bis er rund ist. Ohne eigene Bilder stehen hier die gestalteten Motive.",
-      group: "standorte",
+      group: "locations",
       of: [
         defineArrayMember({
           type: "object",
           name: "ringBild",
           fields: [
-            defineField({ name: "bild", title: "Bild", type: "bild", validation: (r) => r.required() }),
+            defineField({ name: "image", title: "Bild", type: "picture", validation: (r) => r.required() }),
             defineField({
-              name: "beschriftung",
+              name: "caption",
               title: "Beschriftung",
               type: "string",
               description: "Die Pille im Bild, z. B. der Standortname. Leer lassen für keine.",
             }),
           ],
           preview: {
-            select: { title: "beschriftung", media: "bild" },
+            select: { title: "caption", media: "image" },
             prepare: ({ title, media }) => ({ title: title || "ohne Beschriftung", media }),
           },
         }),
@@ -192,26 +192,26 @@ export const startseite = defineType({
     }),
 
     /* --- Team ----------------------------------------------------------- */
-    ...kopf("experten", false),
-    defineField({ name: "expertenNamen", title: "Namenszeile", type: "string", group: "experten", validation: (r) => r.required() }),
+    ...heading("experts", false),
+    defineField({ name: "expertsNames", title: "Namenszeile", type: "string", group: "experts", validation: (r) => r.required() }),
     /* Vorher `expertenText`, ein einzelnes Textfeld — und ebenfalls tot: Die
        Seite reichte es nie durch, `Experts.astro` erwartet ZWEI Absätze und
        hatte sie als Vorgabe im Frontmatter stehen. Jetzt als Array wie
        `splitAbsaetze`, damit die gesetzte Zweiteilung des Entwurfs erhalten
        bleibt und die Redaktion sie in der Hand hat. */
     defineField({
-      name: "expertenAbsaetze",
+      name: "expertsParagraphs",
       title: "Absätze",
       type: "array",
       of: [{ type: "text", rows: 4 }],
-      group: "experten",
+      group: "experts",
       validation: (r) => r.required(),
     }),
-    defineField({ name: "expertenBild", title: "Bild", type: "bild", group: "experten" }),
+    defineField({ name: "expertsImage", title: "Bild", type: "picture", group: "experts" }),
 
     /* --- Geschichten ---------------------------------------------------- */
     defineField({
-      name: "storiesEintraege",
+      name: "storiesItems",
       title: "Geschichten",
       type: "array",
       description: "Bild, Name und Zitat gehören zusammen - sie wechseln gemeinsam.",
@@ -222,10 +222,10 @@ export const startseite = defineType({
           name: "story",
           fields: [
             defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "bild", title: "Bild", type: "bild" }),
-            defineField({ name: "zitat", title: "Zitat", type: "text", rows: 6 }),
+            defineField({ name: "image", title: "Bild", type: "picture" }),
+            defineField({ name: "quote", title: "Zitat", type: "text", rows: 6 }),
           ],
-          preview: { select: { title: "name", subtitle: "zitat", media: "bild" } },
+          preview: { select: { title: "name", subtitle: "quote", media: "image" } },
         }),
       ],
       /* Klasse 1. Der Abschnitt ist ein Kartenfächer mit gekoppeltem
@@ -240,7 +240,7 @@ export const startseite = defineType({
        Beiträge. Wohin der Knopf führt, entscheidet jetzt die Redaktion; ohne
        Verweis erscheint er nicht. */
     defineField({
-      name: "storiesAktion",
+      name: "storiesAction",
       title: "Knopf unter den Geschichten",
       type: "link",
       description: "Leer lassen, wenn es nichts weiterzulesen gibt - dann steht dort kein Knopf.",
@@ -248,11 +248,11 @@ export const startseite = defineType({
     }),
 
     /* --- Magazin -------------------------------------------------------- */
-    ...kopf("magazin"),
-    defineField({ name: "magazinText", title: "Zusatzzeile", type: "text", rows: 3, group: "magazin", validation: (r) => r.required() }),
+    ...heading("magazine"),
+    defineField({ name: "magazineText", title: "Zusatzzeile", type: "text", rows: 3, group: "magazine", validation: (r) => r.required() }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitel", title: "Überschrift", type: "string", group: "faq", validation: (r) => r.required() }),
+    defineField({ name: "faqTitle", title: "Überschrift", type: "string", group: "faq", validation: (r) => r.required() }),
     /* Klasse 2: Die Zusatzzeile unter der Überschrift darf fehlen. Dann steht
        sie nicht da — `Panel.astro` rendert den Absatz nur, wenn Text kommt.
        Kein Ersatztext. */
@@ -268,12 +268,12 @@ export const startseite = defineType({
       of: [
         defineArrayMember({
           type: "object",
-          name: "frageAntwort",
+          name: "questionAnswer",
           fields: [
-            defineField({ name: "frage", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "antwort", title: "Antwort", type: "text", rows: 4 }),
+            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
           ],
-          preview: { select: { title: "frage" } },
+          preview: { select: { title: "question" } },
         }),
       ],
     }),

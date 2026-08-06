@@ -13,7 +13,7 @@ import { defineType, defineField } from "sanity";
  * Zufall zu überlassen.
  */
 export const bild = defineType({
-  name: "bild",
+  name: "picture",
   title: "Bild",
   type: "image",
   options: { hotspot: true },
@@ -27,7 +27,7 @@ export const bild = defineType({
       hidden: ({ parent }) => parent?.schmuck === true,
     }),
     defineField({
-      name: "schmuck",
+      name: "decorative",
       title: "Rein dekorativ",
       type: "boolean",
       description:

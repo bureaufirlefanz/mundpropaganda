@@ -14,25 +14,25 @@ import { ladeLeistungsliste, fuerGruppe, pfad, GRUPPEN } from "../../lib/leistun
 import { ladeNavigation, aufgeloest } from "../../lib/navigation";
 
 const liste = await ladeLeistungsliste();
-const leistungsSpalten = GRUPPEN.map((g) => ({ titel: g.titel, eintraege: fuerGruppe(liste, g.wert) }));
+const leistungsSpalten = GRUPPEN.map((g) => ({ title: g.title, items: fuerGruppe(liste, g.value) }));
 
 const nav = await ladeNavigation();
 const hier = Astro.url.pathname;
 
-const hauptmenue = await aufgeloest(nav?.hauptmenue, hier);
-const aktion = (await aufgeloest([nav?.aktion ?? null], hier))[0];
+const mainMenu = await aufgeloest(nav?.mainMenu, hier);
+const action = (await aufgeloest([nav?.action ?? null], hier))[0];
 
 /* Die Zusatzspalten, jede für sich aufgelöst. Ein Verweis ohne Ziel fällt
    dabei heraus, eine Spalte ohne Verweise ebenfalls — statt eine leere
    Überschrift stehen zu lassen. */
 const zusatzSpalten = (
   await Promise.all(
-    (nav?.menueSpalten ?? []).map(async (sp) => ({
-      titel: sp?.titel ?? "",
+    (nav?.menuColumns ?? []).map(async (sp) => ({
+      title: sp?.title ?? "",
       links: await aufgeloest(sp?.links, hier),
     }))
   )
-).filter((sp) => sp.titel && sp.links.length > 0);
+).filter((sp) => sp.title && sp.links.length > 0);
 
 ---
 
@@ -53,7 +53,7 @@ const zusatzSpalten = (
         nach `[data-megamenu="true"]` — findet nichts, schadet nichts,
         behauptet aber einen Namen, den es nicht gibt. */}
     <nav class="c-nav__menu" aria-label="Hauptnavigation">
-      {hauptmenue.map((eintrag, i) => (
+      {mainMenu.map((eintrag, i) => (
         <div class="c-nav__item" data-nav-item={i === 0 ? "leistungen" : ""} data-open={i === 0 ? "false" : undefined}>
           <a class="c-nav__link" href={eintrag.href}>{eintrag.text}</a>
         </div>
@@ -61,7 +61,7 @@ const zusatzSpalten = (
     </nav>
 
     <div class="c-nav__actions">
-      {aktion && <Button label={aktion.text} href={aktion.href} />}
+      {action && <Button label={action.text} href={action.href} />}
 
       <button
         class="c-nav__burger"
@@ -79,8 +79,8 @@ const zusatzSpalten = (
     <div class="c-megamenu__inner">
       {leistungsSpalten.map((spalte) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.titel}</p>
-          {spalte.eintraege.map((l) => (
+          <p class="c-megamenu__col-title">{spalte.title}</p>
+          {spalte.items.map((l) => (
             <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
           ))}
         </div>
@@ -88,7 +88,7 @@ const zusatzSpalten = (
 
       {zusatzSpalten.map((spalte) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          <p class="c-megamenu__col-title">{spalte.title}</p>
           {spalte.links.map((l) => (
             <a class="c-megamenu__link" href={l.href}>{l.text}</a>
           ))}
@@ -99,21 +99,21 @@ const zusatzSpalten = (
 
   <div class="c-megamenu" data-mobile-menu>
     <div class="c-megamenu__inner">
-      {/* Alle Gruppen, nicht nur die erste. Vorher stand hier `spalten[0]` —
+      {/* Alle Gruppen, nicht nur die erste. Vorher stand hier `columns[0]` —
           das Menü zeigte damit vier von elf Leistungen, und welche vier war
           reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt
           dieselbe Auswahl wie am Schreibtisch. */}
       {leistungsSpalten.map((spalte) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.titel}</p>
-          {spalte.eintraege.map((l) => (
+          <p class="c-megamenu__col-title">{spalte.title}</p>
+          {spalte.items.map((l) => (
             <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
           ))}
         </div>
       ))}
       {zusatzSpalten.map((spalte) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.titel}</p>
+          <p class="c-megamenu__col-title">{spalte.title}</p>
           {spalte.links.map((l) => (
             <a class="c-megamenu__link" href={l.href}>{l.text}</a>
           ))}

@@ -47,20 +47,20 @@ function kontrast(a: string, b: string) {
 
 /* Jede Farbe gegen den Grund, auf dem sie tatsächlich vorkommt. */
 const FARBEN = [
-  { name: "--c-brand", hex: HEX.brand, rolle: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-dark", hex: HEX.dark, rolle: "Schrift, dunkle Bänder, Knopffüllung", gegen: HEX.grey, gegenName: "--c-grey" },
-  { name: "--c-taupe", hex: HEX.taupe, rolle: "Grund der Leistungs- und Geschichten-Section", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-grey", hex: HEX.grey, rolle: "Seitengrund", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-neutral-800", hex: HEX["neutral-800"], rolle: "Schrift auf hellen Flächen (Formular, Magazin)", gegen: HEX["neutral-200"], gegenName: "--c-neutral-200" },
-  { name: "--c-neutral-200", hex: HEX["neutral-200"], rolle: "Flächen: Karten, Eingabefelder", gegen: HEX["neutral-800"], gegenName: "--c-neutral-800" },
+  { name: "--c-brand", hex: HEX.brand, role: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-dark", hex: HEX.dark, role: "Schrift, dunkle Bänder, Knopffüllung", gegen: HEX.grey, gegenName: "--c-grey" },
+  { name: "--c-taupe", hex: HEX.taupe, role: "Grund der Leistungs- und Geschichten-Section", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-grey", hex: HEX.grey, role: "Seitengrund", gegen: HEX.dark, gegenName: "--c-dark" },
+  { name: "--c-neutral-800", hex: HEX["neutral-800"], role: "Schrift auf hellen Flächen (Formular, Magazin)", gegen: HEX["neutral-200"], gegenName: "--c-neutral-200" },
+  { name: "--c-neutral-200", hex: HEX["neutral-200"], role: "Flächen: Karten, Eingabefelder", gegen: HEX["neutral-800"], gegenName: "--c-neutral-800" },
 ];
 
 /* Abgeleitete Töne. Die Deckungswerte sind gerechnet — siehe tokens.css. */
 const ABGELEITET = [
-  { name: "--c-text-muted", regel: "--c-dark auf 75 %", zweck: "Nebentext auf Grau", wert: 4.53 },
-  { name: "--c-text-muted (Taupe)", regel: "--c-dark auf 82 %", zweck: "Nebentext auf Taupe", wert: 4.55 },
-  { name: "--c-text-muted (dunkel)", regel: "--c-grey auf 65 %", zweck: "Nebentext auf Braun", wert: 4.62 },
-  { name: "--c-line", regel: "--c-dark auf 28 %", zweck: "Trennlinien - Schmuck, kein Bedienelement", wert: null },
+  { name: "--c-text-muted", regel: "--c-dark auf 75 %", zweck: "Nebentext auf Grau", value: 4.53 },
+  { name: "--c-text-muted (Taupe)", regel: "--c-dark auf 82 %", zweck: "Nebentext auf Taupe", value: 4.55 },
+  { name: "--c-text-muted (dunkel)", regel: "--c-grey auf 65 %", zweck: "Nebentext auf Braun", value: 4.62 },
+  { name: "--c-line", regel: "--c-dark auf 28 %", zweck: "Trennlinien - Schmuck, kein Bedienelement", value: null },
 ];
 
 const GRADE = [
@@ -83,22 +83,22 @@ const KURVEN = [
   { token: "--e-swift", zweck: "Kurze Zustandswechsel: Farbe, Deckkraft." },
 ];
 const DAUERN = [
-  { token: "--d-fast", wert: "0.25 s", zweck: "Farbwechsel beim Überfahren" },
-  { token: "--d-base", wert: "0.45 s", zweck: "Standard für Bewegung" },
-  { token: "--d-slow", wert: "0.8 s", zweck: "Aufklappen, Umblenden" },
+  { token: "--d-fast", value: "0.25 s", zweck: "Farbwechsel beim Überfahren" },
+  { token: "--d-base", value: "0.45 s", zweck: "Standard für Bewegung" },
+  { token: "--d-slow", value: "0.8 s", zweck: "Aufklappen, Umblenden" },
 ];
 
 const SYMBOLE = ["i-arrow", "i-chevron", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
 
 const BEISPIEL_FRAGEN = [
-  { frage: "Wie bekomme ich einen Termin?", antwort: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
-  { frage: "Behandeln Sie gesetzlich Versicherte?", antwort: "Ja. Die Regelleistungen rechnen wir über die Kasse ab." },
+  { question: "Wie bekomme ich einen Termin?", answer: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
+  { question: "Behandeln Sie gesetzlich Versicherte?", answer: "Ja. Die Regelleistungen rechnen wir über die Kasse ab." },
 ];
 
 const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 ---
 
-<Design title="Styleguide" aktiv="styleguide">
+<Design title="Styleguide" active="styleguide">
   <section class="d-teil">
     <div class="d-teil__kopf">
       <span class="d-teil__nummer">00</span>
@@ -135,11 +135,11 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
               <div class="d-farbe__feld" style={`background: ${f.hex}`}></div>
               <p class="d-farbe__name">{f.name}</p>
               <p class="d-farbe__hex">{f.hex}</p>
-              <p class="d-farbe__rolle">{f.rolle}</p>
+              <p class="d-farbe__rolle">{f.role}</p>
               <p class="d-farbe__wert">
                 {zahl(v)}:1 auf <code>{f.gegenName}</code>
                 {" "}
-                <span class={v >= 4.5 ? "d-marke d-marke--gut" : v >= 3 ? "d-marke d-marke--teils" : "d-marke d-marke--schwach"}>
+                <span class={v >= 4.5 ? "d-marker d-marker--gut" : v >= 3 ? "d-marker d-marker--teils" : "d-marker d-marker--schwach"}>
                   {v >= 4.5 ? "Fließtext" : v >= 3 ? "nur groß" : "nur Fläche"}
                 </span>
               </p>
@@ -169,7 +169,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
               <td><code>{a.name}</code></td>
               <td>{a.regel}</td>
               <td>{a.zweck}</td>
-              <td>{a.wert ? `${zahl(a.wert)}:1` : "-"}</td>
+              <td>{a.value ? `${zahl(a.value)}:1` : "-"}</td>
             </tr>
           ))}
         </tbody>
@@ -298,7 +298,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
           {DAUERN.map((d) => (
-            <tr><td><code>{d.token}</code></td><td>{d.wert}</td><td>{d.zweck}</td></tr>
+            <tr><td><code>{d.token}</code></td><td>{d.value}</td><td>{d.zweck}</td></tr>
           ))}
         </tbody>
       </table>
@@ -365,7 +365,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
         <span class="d-probe__pfad">components/ui/Accordion.astro</span>
       </div>
       <div class="d-buehne">
-        <Accordion fragen={BEISPIEL_FRAGEN} />
+        <Accordion questions={BEISPIEL_FRAGEN} />
       </div>
     </div>
 
@@ -455,7 +455,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
 
     /* Nicht nur farbig, sondern beschriftet: eine Ampel allein sagt denen
        nichts, die die Farbe nicht unterscheiden (WCAG 1.4.1). */
-    .d-marke {
+    .d-marker {
       display: inline-block;
       padding: 0.1em 0.5em;
       border-radius: var(--r-sm);
@@ -465,9 +465,9 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       text-transform: uppercase;
     }
 
-    .d-marke--gut { background: var(--c-dark); color: var(--c-grey); }
-    .d-marke--teils { background: var(--c-brand); color: var(--c-dark); }
-    .d-marke--schwach { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
+    .d-marker--gut { background: var(--c-dark); color: var(--c-grey); }
+    .d-marker--teils { background: var(--c-brand); color: var(--c-dark); }
+    .d-marker--schwach { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
 
     /* --- Tabellen --- */
     .d-tabelle {

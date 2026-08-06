@@ -29,17 +29,17 @@ export type OhneNull<T> = T extends null
       ? { [K in keyof T]: OhneNull<T[K]> }
       : T;
 
-export function ohneNull<T>(wert: T): OhneNull<T> {
-  if (wert === null) return undefined as OhneNull<T>;
-  if (Array.isArray(wert)) return wert.map(ohneNull) as OhneNull<T>;
+export function ohneNull<T>(value: T): OhneNull<T> {
+  if (value === null) return undefined as OhneNull<T>;
+  if (Array.isArray(value)) return value.map(ohneNull) as OhneNull<T>;
 
   /* Nur einfache Objekte. Datumsangaben und alles mit eigener Klasse bleiben
      unangetastet — sie durchzuiterieren würde sie in leere Hüllen verwandeln. */
-  if (typeof wert === "object" && Object.getPrototypeOf(wert) === Object.prototype) {
+  if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
     return Object.fromEntries(
-      Object.entries(wert as Record<string, unknown>).map(([k, v]) => [k, ohneNull(v)])
+      Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, ohneNull(v)])
     ) as OhneNull<T>;
   }
 
-  return wert as OhneNull<T>;
+  return value as OhneNull<T>;
 }

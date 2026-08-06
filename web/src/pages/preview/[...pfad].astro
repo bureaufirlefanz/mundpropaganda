@@ -31,7 +31,7 @@ import Karriere from "../../seiten/Karriere.astro";
 import Rechtstext from "../../seiten/Rechtstext.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
-import { vorschauClient, zielVon, VORSCHAU_COOKIE } from "../../lib/vorschau";
+import { vorschauClient, zielVon, VORSCHAU_COOKIE } from "../../lib/preview";
 import {
   STARTSEITE_QUERY,
   LEISTUNG_QUERY,
@@ -71,8 +71,8 @@ if (!client) {
   );
 }
 
-const ziel = zielVon(Astro.params.pfad ?? "");
-if (!ziel) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+const target = zielVon(Astro.params.pfad ?? "");
+if (!target) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
 
 /* Kein Zwischenspeichern wie in den Ladefunktionen unter `lib/`: Die Vorschau
    läuft je Aufruf frisch, das ist ihr Zweck. */
@@ -84,59 +84,59 @@ async function hole<T>(abfrage: string, params: Record<string, unknown> = {}) {
    einmal. */
 let inhalt: {
   startseite?: StartseiteInhalt;
-  leistung?: LeistungDaten;
+  service?: LeistungDaten;
   magazinKopf?: MagazinKopf;
   beitrag?: BeitragVoll;
   karriere?: KarriereDaten;
   rechtstext?: RechtstextDaten;
   beitraege: BeitragKarte[];
   stellen: Stelle[];
-  titel: string;
-} = { beitraege: [], stellen: [], titel: "" };
+  title: string;
+} = { beitraege: [], stellen: [], title: "" };
 
-if (ziel.art === "startseite") {
+if (target.kind === "homepage") {
   const [daten, beitraege] = await Promise.all([
     hole<StartseiteInhalt>(STARTSEITE_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: null }),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
   ]);
   inhalt = { ...inhalt, startseite: daten, beitraege: beitraege ?? [] };
-} else if (ziel.art === "leistung") {
+} else if (target.kind === "service") {
   const [daten, liste, start, beitraege] = await Promise.all([
-    hole<LeistungDaten>(LEISTUNG_QUERY, { slug: ziel.slug }),
+    hole<LeistungDaten>(LEISTUNG_QUERY, { slug: target.slug }),
     hole<LeistungsEintrag[]>(LEISTUNGSLISTE_QUERY),
     hole<StartseiteInhalt>(STARTSEITE_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: ziel.slug }),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: target.slug }),
   ]);
   inhalt = {
     ...inhalt,
-    leistung: daten,
+    service: daten,
     beitraege: beitraege ?? [],
-    titel: daten?.titel || (liste ?? []).find((l) => l.slug === ziel.slug)?.name || "",
+    title: daten?.title || (liste ?? []).find((l) => l.slug === target.slug)?.name || "",
     startseite: start,
   };
-} else if (ziel.art === "magazinIndex") {
+} else if (target.kind === "magazineIndex") {
   const [kopf, beitraege] = await Promise.all([
     hole<MagazinKopf>(MAGAZIN_INDEX_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { leistung: null }),
+    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
   ]);
   inhalt = { ...inhalt, magazinKopf: kopf, beitraege: beitraege ?? [] };
-} else if (ziel.art === "beitrag") {
-  const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: ziel.slug });
+} else if (target.kind === "post") {
+  const daten = await hole<BeitragVoll>(BEITRAG_QUERY, { slug: target.slug });
   /* Erst nach dem Beitrag, nicht parallel: Die Kategorie steht in ihm, und
      ohne sie gibt es nichts Ähnliches zu holen. */
-  const aehnliche = daten?.kategorie
+  const aehnliche = daten?.category
     ? ((await hole<BeitragKarte[]>(AEHNLICHE_QUERY, {
-        kategorie: daten.kategorie,
-        slug: ziel.slug,
+        category: daten.category,
+        slug: target.slug,
       })) ?? [])
     : [];
-  inhalt = { ...inhalt, beitrag: daten, titel: daten?.titel ?? "", beitraege: aehnliche };
-} else if (ziel.art === "rechtstext") {
-  const daten = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: ziel.slug });
+  inhalt = { ...inhalt, beitrag: daten, title: daten?.title ?? "", beitraege: aehnliche };
+} else if (target.kind === "legalPage") {
+  const daten = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: target.slug });
   /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
      wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
   if (!daten) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
-  inhalt = { ...inhalt, rechtstext: daten, titel: daten.titel ?? "" };
+  inhalt = { ...inhalt, rechtstext: daten, title: daten.title ?? "" };
 } else {
   const [daten, stellen] = await Promise.all([
     hole<KarriereDaten>(KARRIERE_QUERY),
@@ -146,31 +146,31 @@ if (ziel.art === "startseite") {
 }
 ---
 
-{ziel.art === "startseite" && inhalt.startseite && (
+{target.kind === "homepage" && inhalt.startseite && (
   <Startseite daten={inhalt.startseite} beitraege={inhalt.beitraege} />
 )}
 
-{ziel.art === "leistung" && (
+{target.kind === "service" && (
   <Leistung
-    daten={inhalt.leistung}
-    titel={inhalt.titel}
-    stories={inhalt.startseite?.storiesEintraege ?? []}
+    daten={inhalt.service}
+    title={inhalt.title}
+    stories={inhalt.startseite?.storiesItems ?? []}
     beitraege={inhalt.beitraege}
   />
 )}
 
-{ziel.art === "magazinIndex" && (
+{target.kind === "magazineIndex" && (
   <Magazin kopf={inhalt.magazinKopf} beitraege={inhalt.beitraege} />
 )}
 
-{ziel.art === "beitrag" && (
-  <Beitrag daten={inhalt.beitrag} titel={inhalt.titel} aehnliche={inhalt.beitraege} />
+{target.kind === "post" && (
+  <Beitrag daten={inhalt.beitrag} title={inhalt.title} aehnliche={inhalt.beitraege} />
 )}
 
-{ziel.art === "karriere" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
+{target.kind === "careers" && <Karriere daten={inhalt.karriere} stellen={inhalt.stellen} />}
 
-{ziel.art === "rechtstext" && (
-  <Rechtstext daten={inhalt.rechtstext} titel={inhalt.titel} />
+{target.kind === "legalPage" && (
+  <Rechtstext daten={inhalt.rechtstext} title={inhalt.title} />
 )}
 
 <VisualEditing />

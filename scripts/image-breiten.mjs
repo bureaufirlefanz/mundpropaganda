@@ -25,7 +25,7 @@ import { readdir, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 const ORDNER = "web/public/img";
-const ZIEL = "web/src/lib/bild-breiten.json";
+const ZIEL = "web/src/lib/image-breiten.json";
 
 export async function schreibeBreiten() {
   const dateien = await readdir(ORDNER);

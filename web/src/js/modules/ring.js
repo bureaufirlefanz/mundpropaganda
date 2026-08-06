@@ -41,7 +41,7 @@ const RUHE = 3;
  * Höchstausschlag der Bildverschiebung, als Anteil der KARTENBREITE.
  *
  * Der Wert muss zum Vorrat passen, den das CSS bereitstellt
- * (`--bild-vorrat`), sonst liefe an einer Kante der Grund durch. Deshalb
+ * (`--image-vorrat`), sonst liefe an einer Kante der Grund durch. Deshalb
  * wird er unten in Pixel umgerechnet und nicht als Prozentwert gesetzt:
  * `translateX` in Prozent bezieht sich auf die Breite des BILDES, und das
  * ist mit dem Vorrat auf beiden Seiten 18 % breiter als der Rahmen. 9 %
@@ -150,10 +150,10 @@ function baueRing(wurzel) {
          nachläuft statt ihr vorauszueilen. Genau daraus entsteht der
          Eindruck von Tiefe: Was hinter einem Fenster liegt, wandert
          langsamer als das Fenster selbst. */
-      const bild = bilder[i];
-      if (bild && !ruhig) {
+      const image = bilder[i];
+      if (image && !ruhig) {
         const seitlich = Math.sin((eigen * Math.PI) / 180);
-        bild.style.transform = `translateX(${(-seitlich * ausschlag).toFixed(1)}px)`;
+        image.style.transform = `translateX(${(-seitlich * ausschlag).toFixed(1)}px)`;
       }
     });
   }
@@ -233,8 +233,8 @@ function baueRing(wurzel) {
      Bereichs und nicht an den einzelnen Karten, damit das Ausrollen nicht
      flackert, während die Karten unter dem stehenden Zeiger durchwandern. */
 
-  const tempoAuf = (ziel, dauer) => {
-    gsap.to(lauf, { tempo: ziel, duration: ruhig ? 0 : dauer, ease: "power2.out", overwrite: true });
+  const tempoAuf = (target, dauer) => {
+    gsap.to(lauf, { tempo: target, duration: ruhig ? 0 : dauer, ease: "power2.out", overwrite: true });
   };
 
   /* Auslaufen ist kürzer als Anlaufen: Anhalten soll auf den Zeiger

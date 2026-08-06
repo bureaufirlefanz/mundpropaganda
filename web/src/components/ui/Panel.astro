@@ -10,18 +10,18 @@
 interface Props {
   id?: string;
   topline: string;
-  titel: string;
+  title: string;
   /** Zusatzzeile unter der Headline. Nicht jedes Panel hat eine. */
   text?: string;
 }
 
-const { id, topline, titel, text } = Astro.props;
+const { id, topline, title, text } = Astro.props;
 ---
 
 <section class="container s-panel" id={id}>
   <div class="s-panel__head">
     <span class="c-topline">{topline}</span>
-    <h2 class="s-panel__title" data-split="lines">{titel}</h2>
+    <h2 class="s-panel__title" data-split="lines">{title}</h2>
     {text && <p class="t-body t-muted">{text}</p>}
   </div>
 

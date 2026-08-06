@@ -11,30 +11,30 @@ import { CogIcon } from "@sanity/icons/Cog";
  * Liste auf, in der man ein zweites anlegen könnte.
  */
 export const einstellungen = defineType({
-  name: "einstellungen",
+  name: "settings",
   title: "Einstellungen",
   type: "document",
   icon: CogIcon,
   groups: [
-    { name: "kontakt", title: "Kontakt", default: true },
-    { name: "bewertungen", title: "Bewertungen" },
-    { name: "standorte", title: "Standorte" },
+    { name: "contact", title: "Kontakt", default: true },
+    { name: "reviews", title: "Bewertungen" },
+    { name: "locations", title: "Standorte" },
     { name: "social", title: "Soziale Netzwerke" },
   ],
   fields: [
     defineField({
-      name: "telefon",
+      name: "phone",
       title: "Telefonnummer",
       type: "string",
       description: "Wie sie dastehen soll, z. B. „+49 3051 9999 580“.",
-      group: "kontakt",
+      group: "contact",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "email",
       title: "E-Mail-Adresse",
       type: "string",
-      group: "kontakt",
+      group: "contact",
       validation: (rule) => rule.required().email(),
     }),
 
@@ -45,52 +45,52 @@ export const einstellungen = defineType({
        braucht kein eigenes Feld — sie war bis dahin ein fest verdrahtetes
        Array aus fünf Namen, das mit der Collection nichts zu tun hatte. */
     defineField({
-      name: "kontaktTitel",
+      name: "contactTitle",
       title: "Überschrift im Kontaktbereich",
       type: "string",
-      group: "kontakt",
+      group: "contact",
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "kontaktText",
+      name: "contactText",
       title: "Einstieg im Kontaktbereich",
       type: "text",
       rows: 3,
       description: "Steht unter der Überschrift, links neben dem Formular.",
-      group: "kontakt",
+      group: "contact",
     }),
 
     defineField({
-      name: "bewertungenAnbieter",
+      name: "reviewsProvider",
       title: "Quelle",
       type: "string",
       description: "Steht links im Bewertungsbalken, z. B. „Google Reviews“.",
-      group: "bewertungen",
+      group: "reviews",
       initialValue: "Google Reviews",
     }),
     defineField({
-      name: "bewertungenAnzahl",
+      name: "reviewsCount",
       title: "Anzahl",
       type: "number",
-      group: "bewertungen",
+      group: "reviews",
       validation: (rule) => rule.min(0).integer(),
     }),
     defineField({
-      name: "bewertungenSchnitt",
+      name: "reviewsAverage",
       title: "Durchschnitt",
       type: "number",
       description: "Von 5. Eine Nachkommastelle genügt.",
-      group: "bewertungen",
+      group: "reviews",
       validation: (rule) => rule.min(0).max(5),
     }),
 
     defineField({
-      name: "standorte",
+      name: "locations",
       title: "Praxen",
       type: "array",
       description:
         "Erscheinen in der Standorte-Section und im Seitenfuß - eine Quelle für beides.",
-      group: "standorte",
+      group: "locations",
       /* Klasse 1: Ohne Anschrift ist eine Praxis-Website kaputt, nicht leer.
          Bis Aufgabe 4 fiel eine leere Liste auf zwei Beispieladressen aus dem
          Prototyp zurück — Straßen, die im Studio nirgends standen. */
@@ -100,7 +100,7 @@ export const einstellungen = defineType({
           type: "object",
           fields: [
             defineField({
-              name: "kuerzel",
+              name: "shortCode",
               title: "Kürzel",
               type: "string",
               description:
@@ -114,19 +114,19 @@ export const einstellungen = defineType({
               validation: (rule) => rule.required(),
             }),
             defineField({
-              name: "strasse",
+              name: "street",
               title: "Straße und Hausnummer",
               type: "string",
               validation: (rule) => rule.required(),
             }),
             defineField({
-              name: "ort",
+              name: "city",
               title: "Postleitzahl und Ort",
               type: "string",
               validation: (rule) => rule.required(),
             }),
             defineField({
-              name: "beschreibung",
+              name: "description",
               title: "Beschreibung",
               type: "text",
               rows: 3,
@@ -134,8 +134,8 @@ export const einstellungen = defineType({
             }),
           ],
           preview: {
-            select: { title: "name", subtitle: "strasse", kuerzel: "kuerzel" },
-            prepare: ({ title, subtitle, kuerzel }) => ({
+            select: { title: "name", subtitle: "street", shortCode: "shortCode" },
+            prepare: ({ title, subtitle, shortCode }) => ({
               title: `${kuerzel ? kuerzel + " · " : ""}${title ?? ""}`,
               subtitle,
             }),

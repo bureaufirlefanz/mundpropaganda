@@ -5,22 +5,22 @@
 import type { Schritt } from "../../lib/formen";
 
 interface Props {
-  titel: string;
-  schritte: Schritt[];
+  title: string;
+  steps: Schritt[];
 }
 
-const { titel, schritte } = Astro.props;
+const { title, steps } = Astro.props;
 ---
 
 <section class="s-steps">
   <div class="container">
-    <h2 class="s-steps__title" data-split="lines">{titel}</h2>
+    <h2 class="s-steps__title" data-split="lines">{title}</h2>
 
     <div class="s-steps__grid" data-reveal-stagger="0.08">
-      {schritte.map((s, i) => (
+      {steps.map((s, i) => (
         <article class="c-step" data-reveal-child>
           <span class="c-step__num">{i + 1}</span>
-          <h3 class="c-step__title">{s.titel}</h3>
+          <h3 class="c-step__title">{s.title}</h3>
           <p class="c-step__text">{s.text}</p>
         </article>
       ))}

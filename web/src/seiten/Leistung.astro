@@ -31,14 +31,14 @@ import type { Beitrag } from "../lib/magazin";
 interface Props {
   daten: Leistung | undefined;
   /** Aus der Liste, falls das Dokument fehlt — sonst stünde oben nichts. */
-  titel: string;
+  title: string;
   /** Dieselben Stimmen wie auf der Startseite, dort gepflegt. */
-  stories: StartseiteInhalt["storiesEintraege"];
+  stories: StartseiteInhalt["storiesItems"];
   /** Beiträge, die im Studio auf genau diese Leistung verweisen. */
   beitraege: Beitrag[];
 }
 
-const { daten: d, titel, stories, beitraege } = Astro.props;
+const { daten: d, title, stories, beitraege } = Astro.props;
 
 /* Ein Abschnitt ist wahlfrei, aber nicht halb.
  *
@@ -49,13 +49,13 @@ const { daten: d, titel, stories, beitraege } = Astro.props;
  * einzelne `&&`. Fehlt ein Teil, erscheint der Abschnitt gar nicht — eine
  * Überschrift ohne Text wäre die halbe Wahrheit statt keiner. */
 const intro =
-  d?.intro?.topline && d.intro.headline && d.intro.spalten?.length
-    ? { topline: d.intro.topline, headline: d.intro.headline, spalten: d.intro.spalten }
+  d?.intro?.topline && d.intro.headline && d.intro.columns?.length
+    ? { topline: d.intro.topline, headline: d.intro.headline, columns: d.intro.columns }
     : undefined;
 
 const benefits =
-  d?.benefits?.topline && d.benefits.headline && d.benefits.eintraege?.length
-    ? { topline: d.benefits.topline, headline: d.benefits.headline, eintraege: d.benefits.eintraege }
+  d?.benefits?.topline && d.benefits.headline && d.benefits.items?.length
+    ? { topline: d.benefits.topline, headline: d.benefits.headline, items: d.benefits.items }
     : undefined;
 
 const statement =
@@ -63,38 +63,38 @@ const statement =
     ? { topline: d.statement.topline, text: d.statement.text }
     : undefined;
 
-const schritte =
-  d?.schritte?.titel && d.schritte.eintraege?.length
-    ? { titel: d.schritte.titel, eintraege: d.schritte.eintraege }
+const steps =
+  d?.steps?.title && d.steps.items?.length
+    ? { title: d.steps.title, items: d.steps.items }
     : undefined;
 ---
 
-<Base title={`${titel} - Mundpropaganda`} description={d?.seoBeschreibung ?? d?.hero?.text}>
+<Base title={`${title} - Mundpropaganda`} description={d?.seoDescription ?? d?.hero?.text}>
   <ServiceHero
     topline={d?.topline}
-    titel={titel}
+    title={title}
     text={d?.hero?.text}
-    bild={d?.hero?.bild}
-    alt={d?.hero?.bild?.alt ?? ""}
+    image={d?.hero?.image}
+    alt={d?.hero?.image?.alt ?? ""}
   />
 
   {intro && <Intro {...intro} />}
 
   {benefits && <Benefits {...benefits} />}
 
-  {d?.vorherNachher?.topline && (
-    <BeforeAfter topline={d.vorherNachher.topline} vorher={d.vorherNachher.vorher} nachher={d.vorherNachher.nachher} />
+  {d?.beforeAfter?.topline && (
+    <BeforeAfter topline={d.beforeAfter.topline} before={d.beforeAfter.before} after={d.beforeAfter.after} />
   )}
 
   {statement && <Statement {...statement} />}
 
-  {schritte && <Steps titel={schritte.titel} schritte={schritte.eintraege} />}
+  {steps && <Steps title={steps.title} steps={steps.items} />}
 
-  <Stories eintraege={stories} />
+  <Stories items={stories} />
 
-  {d?.preise?.length ? <Prices preise={d.preise} /> : null}
+  {d?.pricing?.length ? <Prices pricing={d.pricing} /> : null}
 
-  {d?.features?.length ? <Features zeilen={d.features} /> : null}
+  {d?.features?.length ? <Features lines={d.features} /> : null}
 
   {/* Nur Beiträge, die im Studio auf diese Leistung verweisen — dafür ist die
       Referenz im Schema da. Gibt es keine, entfällt der Abschnitt; ein
@@ -103,13 +103,13 @@ const schritte =
   {beitraege.length > 0 && (
     <Magazine
       topline="Passend zum Thema"
-      titel="Magazin"
-      text={`Weiterlesen zu ${titel} und allem, was damit zusammenhängt.`}
+      title="Magazin"
+      text={`Weiterlesen zu ${title} und allem, was damit zusammenhängt.`}
       beitraege={beitraege}
     />
   )}
 
-  {d?.faq?.length ? <Faq titel={`Häufige Fragen zu ${titel}`} fragen={d.faq} /> : null}
+  {d?.faq?.length ? <Faq title={`Häufige Fragen zu ${title}`} questions={d.faq} /> : null}
 
-  <Contact leistung={titel} />
+  <Contact service={title} />
 </Base>

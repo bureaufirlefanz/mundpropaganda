@@ -5,10 +5,10 @@
 interface Props {
   topline: string;
   headline: string;
-  spalten: string[];
+  columns: string[];
 }
 
-const { topline, headline, spalten } = Astro.props;
+const { topline, headline, columns } = Astro.props;
 ---
 
 <section class="container s-intro">
@@ -16,7 +16,7 @@ const { topline, headline, spalten } = Astro.props;
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-intro__title" data-split="lines">{headline}</h2>
   </div>
-  {spalten.map((t, i) => (
+  {columns.map((t, i) => (
     <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>
   ))}
 </section>

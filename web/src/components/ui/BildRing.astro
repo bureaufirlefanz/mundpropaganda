@@ -17,14 +17,14 @@ import CmsImage from "./CmsImage.astro";
 import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 /**
- * Eine Karte auf dem Ring. Entweder ein Bild aus dem CMS (`bild`) oder ein
+ * Eine Karte auf dem Ring. Entweder ein Bild aus dem CMS (`image`) oder ein
  * Motiv aus der lokalen Bildpipeline (`name`; die Breiten kennt `Picture`
  * selbst) — der Name muss hier
  * ankommen können, weil der Ring seinen Rückfall braucht, solange im Studio
  * nichts hochgeladen ist.
  */
 export interface RingBild {
-  bild?: Bildquelle;
+  image?: Bildquelle;
   /** Nur für den Rückfall: Name aus public/img, ohne Größe und Endung. */
   name?: string;
   alt?: string;
@@ -58,7 +58,7 @@ const anzahl =
   Math.ceil(Math.max(mindestens, bilder.length) / bilder.length) * bilder.length;
 
 const karten = Array.from({ length: anzahl }, (_, i) => ({
-  bild: bilder[i % bilder.length],
+  image: bilder[i % bilder.length],
   wiederholung: i >= bilder.length,
 }));
 ---
@@ -76,24 +76,24 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
     tabindex="0"
   >
     <div class="c-ring__rotor" data-ring-rotor>
-      {karten.map(({ bild, wiederholung }) => (
+      {karten.map(({ image, wiederholung }) => (
         <figure class="c-ring__card" data-ring-card aria-hidden={wiederholung ? "true" : undefined}>
-          {istCmsBild(bild.bild) ? (
+          {istCmsBild(image.image) ? (
             <CmsImage
-              quelle={bild.bild}
-              alt={wiederholung ? "" : (bild.alt ?? "")}
+              quelle={image.image}
+              alt={wiederholung ? "" : (image.alt ?? "")}
               widths={[640, 1024]}
               sizes="(max-width: 700px) 80vw, 38vw"
             />
           ) : (
             <Picture
-              name={bild.name ?? "praxis-01"}
-              alt={wiederholung ? "" : (bild.alt ?? "")}
+              name={image.name ?? "praxis-01"}
+              alt={wiederholung ? "" : (image.alt ?? "")}
               sizes="(max-width: 700px) 80vw, 38vw"
             />
           )}
-          {bild.caption && !wiederholung && (
-            <figcaption class="c-ring__caption">{bild.caption}</figcaption>
+          {image.caption && !wiederholung && (
+            <figcaption class="c-ring__caption">{image.caption}</figcaption>
           )}
         </figure>
       ))}
@@ -198,7 +198,7 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
        ring.js liest den Wert nicht, braucht ihn aber als Obergrenze für den
        Parallax-Ausschlag — er steht deshalb hier oben bei den übrigen
        Maßen der Karte und nicht in einem zweiten Block weiter unten. */
-    --bild-vorrat: 19%;
+    --image-vorrat: 19%;
 
     position: absolute;
     top: 50%;
@@ -237,8 +237,8 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
   .c-ring__card :global(img) {
     position: absolute;
     top: 0;
-    left: calc(-1 * var(--bild-vorrat));
-    width: calc(100% + 2 * var(--bild-vorrat));
+    left: calc(-1 * var(--image-vorrat));
+    width: calc(100% + 2 * var(--image-vorrat));
     /* base.css deckelt jedes Bild mit `max-width: 100%` — eine sinnvolle
        Grundregel, die hier aber genau das abschneidet, was den Vorrat
        ausmacht. Ohne diese Zeile blieb das Bild rahmenbreit, und beim

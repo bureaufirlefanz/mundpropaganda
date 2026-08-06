@@ -25,7 +25,7 @@ const { beitraege } = Astro.props;
    in der sie zuerst auftauchen, also nach Datum. Eine feste Reihenfolge aus
    dem Schema abzuschreiben wäre die zweite Stelle, an der dieselbe Liste
    steht. */
-const kategorien = [...new Set(beitraege.map((b) => b.kategorie).filter(Boolean))] as string[];
+const kategorien = [...new Set(beitraege.map((b) => b.category).filter(Boolean))] as string[];
 ---
 
 <section class="container s-postliste">

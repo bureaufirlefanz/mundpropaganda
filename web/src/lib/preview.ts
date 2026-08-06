@@ -69,7 +69,7 @@ export function vorschauClient(): SanityClient | null {
 }
 
 /** Name des Cookies, das die Vorschau freischaltet. */
-export const VORSCHAU_COOKIE = "mp-vorschau";
+export const VORSCHAU_COOKIE = "mp-preview";
 
 /**
  * Welche Seite steckt hinter einem Pfad?
@@ -82,32 +82,32 @@ export const VORSCHAU_COOKIE = "mp-vorschau";
  * Routen-Deckung gegen dieselbe Quelle.
  */
 export type Ziel =
-  | { art: "startseite" }
-  | { art: "leistung"; slug: string }
-  | { art: "magazinIndex" }
-  | { art: "beitrag"; slug: string }
-  | { art: "karriere" }
-  | { art: "rechtstext"; slug: string };
+  | { kind: "homepage" }
+  | { kind: "service"; slug: string }
+  | { kind: "magazineIndex" }
+  | { kind: "post"; slug: string }
+  | { kind: "careers" }
+  | { kind: "legalPage"; slug: string };
 
 export function zielVon(pfad: string): Ziel | null {
   /* Führende und schließende Schrägstriche weg — Astro liefert den Rest-Pfad
      mal mit, mal ohne, je nachdem ob die URL auf / endet. */
   const teile = pfad.split("/").filter(Boolean);
 
-  if (teile.length === 0) return { art: "startseite" };
-  if (teile[0] === "karriere" && teile.length === 1) return { art: "karriere" };
+  if (teile.length === 0) return { kind: "homepage" };
+  if (teile[0] === "karriere" && teile.length === 1) return { kind: "careers" };
   if (teile[0] === "magazin") {
-    if (teile.length === 1) return { art: "magazinIndex" };
-    if (teile.length === 2) return { art: "beitrag", slug: teile[1] };
+    if (teile.length === 1) return { kind: "magazineIndex" };
+    if (teile.length === 2) return { kind: "post", slug: teile[1] };
   }
   if (teile[0] === "leistungen" && teile.length === 2) {
-    return { art: "leistung", slug: teile[1] };
+    return { kind: "service", slug: teile[1] };
   }
   /* Zuletzt, nicht zuerst: Rechtstexte liegen auf der obersten Ebene, und
      `/karriere` läge dort auch. Erst die festen Pfade prüfen, dann den Rest
      als Slug lesen — sonst verdeckte ein Rechtstext namens „karriere" die
      Karriereseite. Im Studio verhindert `slugFrei()` genau diesen Fall, aber
      die Reihenfolge hier darf sich nicht darauf verlassen. */
-  if (teile.length === 1) return { art: "rechtstext", slug: teile[0] };
+  if (teile.length === 1) return { kind: "legalPage", slug: teile[0] };
   return null;
 }

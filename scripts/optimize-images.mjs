@@ -11,7 +11,7 @@
 import sharp from "sharp";
 import { readdir, mkdir, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
-import { schreibeBreiten } from "./bild-breiten.mjs";
+import { schreibeBreiten } from "./image-breiten.mjs";
 
 const SRC = "assets/raw";
 const OUT = "web/public/img";

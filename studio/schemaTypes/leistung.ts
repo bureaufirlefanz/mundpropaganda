@@ -22,25 +22,25 @@ import { TagIcon } from "@sanity/icons/Tag";
  *     jetzt kommen sie aus diesem Dokument. Dafür die Gruppe „Listeneintrag".
  */
 export const leistung = defineType({
-  name: "leistung",
+  name: "service",
   title: "Leistung",
   type: "document",
   icon: TagIcon,
   groups: [
-    { name: "inhalt", title: "Inhalt", default: true },
-    { name: "liste", title: "Listeneintrag" },
+    { name: "content", title: "Inhalt", default: true },
+    { name: "list", title: "Listeneintrag" },
     { name: "seo", title: "SEO" },
   ],
   // Reihenfolge aus der Drag-Liste im Studio.
   orderings: [orderRankOrdering],
   fields: [
-    orderRankField({ type: "leistung" }),
+    orderRankField({ type: "service" }),
     defineField({
-      name: "titel",
+      name: "title",
       title: "Titel",
       type: "string",
       description: "Steht als Überschrift im Hero, z. B. „Veneers“.",
-      group: "inhalt",
+      group: "content",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -56,7 +56,7 @@ export const leistung = defineType({
       title: "Topline",
       type: "string",
       description: "Kurze Zeile über der Überschrift, z. B. „Veneers in Berlin“.",
-      group: "inhalt",
+      group: "content",
     }),
 
     /* --- Listeneintrag ---------------------------------------------------
@@ -64,21 +64,21 @@ export const leistung = defineType({
        Startseite und im Rahmen aufzutauchen. */
 
     defineField({
-      name: "kurzname",
+      name: "shortName",
       title: "Name in Listen",
       type: "string",
       description:
         "Wie die Leistung in Services-Tabelle, Menü und Footer heißt. Leer lassen, wenn der Titel passt.",
-      group: "liste",
+      group: "list",
     }),
 
     defineField({
-      name: "platzierung",
+      name: "placement",
       title: "Wo taucht sie auf?",
       type: "string",
       description:
         "Die Tabelle trägt die Hauptleistungen mit Bildvorschau, darunter steht eine schlichtere Linkliste.",
-      group: "liste",
+      group: "list",
       initialValue: "tabelle",
       options: {
         list: [
@@ -91,11 +91,11 @@ export const leistung = defineType({
     }),
 
     defineField({
-      name: "gruppe",
+      name: "group",
       title: "Spalte im Menü",
       type: "string",
       description: "Bestimmt, unter welcher Überschrift sie im Navigationsmenü steht.",
-      group: "liste",
+      group: "list",
       options: {
         list: [
           { title: "Ästhetik", value: "aesthetik" },
@@ -111,28 +111,28 @@ export const leistung = defineType({
       title: "Kürzel",
       type: "string",
       description: "Steht rechts in der Tabellenzeile, z. B. das Standortkürzel „P25“.",
-      group: "liste",
+      group: "list",
       initialValue: "P25",
     }),
 
     defineField({
-      name: "vorschau",
+      name: "preview",
       title: "Vorschaubild",
-      type: "bild",
+      type: "picture",
       description:
         "Hängt am Zeiger, wenn man in der Services-Tabelle über die Zeile fährt. Hochformat wirkt am besten.",
-      group: "liste",
+      group: "list",
     }),
 
     defineField({
       name: "hero",
       title: "Hero",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: false },
       fields: [
         defineField({ name: "text", title: "Einleitung", type: "text", rows: 4 }),
-        defineField({ name: "bild", title: "Bild", type: "bild" }),
+        defineField({ name: "image", title: "Bild", type: "picture" }),
       ],
     }),
 
@@ -140,7 +140,7 @@ export const leistung = defineType({
       name: "intro",
       title: "Intro",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       /* Wahlfrei, aber nicht halb: Der Abschnitt darf fehlen — wer ihn
          anlegt, füllt ihn auch. Eine Überschrift ohne Text wäre die halbe
@@ -149,7 +149,7 @@ export const leistung = defineType({
         defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
         defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
         defineField({
-          name: "spalten",
+          name: "columns",
           title: "Textspalten",
           description: "Genau zwei - die Section ist zweispaltig angelegt.",
           type: "array",
@@ -163,20 +163,20 @@ export const leistung = defineType({
       name: "benefits",
       title: "Merkmale und Vorteile",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
         defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
         defineField({
-          name: "eintraege",
+          name: "items",
           title: "Einträge",
           description: "Werden nacheinander aufgeklappt, dazu wechselt das Bild.",
           type: "array",
           of: [
             defineArrayMember({
               type: "object",
-              name: "eintrag",
+              name: "item",
               fields: [
                 defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
                 defineField({
@@ -190,9 +190,9 @@ export const leistung = defineType({
                      aufgedeckt. */
                   validation: (r) => r.required(),
                 }),
-                defineField({ name: "bild", title: "Bild", type: "bild" }),
+                defineField({ name: "image", title: "Bild", type: "picture" }),
               ],
-              preview: { select: { title: "name", media: "bild" } },
+              preview: { select: { title: "name", media: "image" } },
             }),
           ],
           validation: (rule) => rule.required().min(2).max(5),
@@ -201,18 +201,18 @@ export const leistung = defineType({
     }),
 
     defineField({
-      name: "preise",
+      name: "pricing",
       title: "Kosten",
       type: "array",
-      group: "inhalt",
+      group: "content",
       of: [
         defineArrayMember({
           type: "object",
-          name: "preis",
+          name: "price",
           fields: [
             defineField({ name: "name", title: "Bezeichnung", type: "string", validation: (r) => r.required() }),
             defineField({
-              name: "preis",
+              name: "price",
               title: "Preisangabe",
               type: "string",
               description: "Frei formuliert, z. B. „€ 450,– / Zahn“.",
@@ -220,7 +220,7 @@ export const leistung = defineType({
               validation: (r) => r.required(),
             }),
           ],
-          preview: { select: { title: "name", subtitle: "preis" } },
+          preview: { select: { title: "name", subtitle: "price" } },
         }),
       ],
     }),
@@ -229,16 +229,16 @@ export const leistung = defineType({
       name: "faq",
       title: "Häufige Fragen",
       type: "array",
-      group: "inhalt",
+      group: "content",
       of: [
         defineArrayMember({
           type: "object",
-          name: "frageAntwort",
+          name: "questionAnswer",
           fields: [
-            defineField({ name: "frage", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "antwort", title: "Antwort", type: "text", rows: 4 }),
+            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
           ],
-          preview: { select: { title: "frage" } },
+          preview: { select: { title: "question" } },
         }),
       ],
     }),
@@ -259,17 +259,17 @@ export const leistung = defineType({
        wie bei Split, Experts und Stories auch. */
 
     defineField({
-      name: "vorherNachher",
+      name: "beforeAfter",
       title: "Vorher / Nachher",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       description:
         "Zwei Aufnahmen mit Schieberegler. Ohne eigene Bilder stehen hier die gestalteten Motive - laden Sie für diese Behandlung eigene hoch, sonst zeigt der Vergleich fremde Zähne.",
       fields: [
         defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-        defineField({ name: "vorher", title: "Aufnahme vorher", type: "bild" }),
-        defineField({ name: "nachher", title: "Aufnahme nachher", type: "bild" }),
+        defineField({ name: "before", title: "Aufnahme vorher", type: "picture" }),
+        defineField({ name: "after", title: "Aufnahme nachher", type: "picture" }),
       ],
     }),
 
@@ -277,7 +277,7 @@ export const leistung = defineType({
       name: "statement",
       title: "Kernaussage",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       description: "Ein einzelner Absatz, größer gesetzt. Trägt eine Aussage, ohne Überschrift zu sein.",
       fields: [
@@ -287,22 +287,22 @@ export const leistung = defineType({
     }),
 
     defineField({
-      name: "schritte",
+      name: "steps",
       title: "Ablauf",
       type: "object",
-      group: "inhalt",
+      group: "content",
       options: { collapsible: true, collapsed: true },
       description: "Der Ablauf der Behandlung als nummerierte Karten.",
       fields: [
         defineField({
-          name: "titel",
+          name: "title",
           title: "Überschrift",
           type: "string",
           description: "Zum Beispiel „In vier Schritten zu neuen Veneers“.",
           validation: (r) => r.required(),
         }),
         defineField({
-          name: "eintraege",
+          name: "items",
           title: "Schritte",
           type: "array",
           of: [
@@ -310,10 +310,10 @@ export const leistung = defineType({
               type: "object",
               name: "schritt",
               fields: [
-                defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required() }),
+                defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
                 defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
               ],
-              preview: { select: { title: "titel", subtitle: "text" } },
+              preview: { select: { title: "title", subtitle: "text" } },
             }),
           ],
           validation: (r) => r.required().min(2),
@@ -325,7 +325,7 @@ export const leistung = defineType({
       name: "features",
       title: "Bild-Text-Zeilen",
       type: "array",
-      group: "inhalt",
+      group: "content",
       description: "Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt von selbst.",
       of: [
         defineArrayMember({
@@ -333,17 +333,17 @@ export const leistung = defineType({
           name: "featureZeile",
           fields: [
             defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "titel", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
-            defineField({ name: "bild", title: "Bild", type: "bild" }),
+            defineField({ name: "image", title: "Bild", type: "picture" }),
           ],
-          preview: { select: { title: "titel", subtitle: "topline", media: "bild" } },
+          preview: { select: { title: "title", subtitle: "topline", media: "image" } },
         }),
       ],
     }),
 
     defineField({
-      name: "seoBeschreibung",
+      name: "seoDescription",
       title: "Meta-Beschreibung",
       type: "text",
       rows: 2,
@@ -357,17 +357,17 @@ export const leistung = defineType({
      obwohl das Dokument ein Bild hat. */
   preview: {
     select: {
-      title: "titel",
-      kurzname: "kurzname",
-      platzierung: "platzierung",
-      vorschau: "vorschau",
-      hero: "hero.bild",
+      title: "title",
+      shortName: "shortName",
+      placement: "placement",
+      preview: "preview",
+      hero: "hero.image",
     },
-    prepare: ({ title, kurzname, platzierung, vorschau, hero }) => {
+    prepare: ({ title, shortName, placement, preview, hero }) => {
       const wo = { tabelle: "Tabelle", liste: "nur Link", versteckt: "nur Menü" };
       return {
         title: title ?? "Ohne Titel",
-        subtitle: [kurzname && kurzname !== title ? kurzname : null, wo[platzierung as keyof typeof wo]]
+        subtitle: [kurzname && kurzname !== title ? shortName : null, wo[platzierung as keyof typeof wo]]
           .filter(Boolean)
           .join(" · "),
         media: vorschau ?? hero,

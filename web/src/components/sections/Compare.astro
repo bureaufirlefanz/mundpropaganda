@@ -27,7 +27,7 @@ export interface VergleichSpalte {
   name: string;
   meta?: string;
   /** Hebt eine Spalte hervor — hier die eigene. */
-  betont?: boolean;
+  emphasised?: boolean;
 }
 
 /**
@@ -41,28 +41,28 @@ export interface VergleichSpalte {
  * TypeScript-Union eingeben; er wählt eine Darstellung aus vier.
  */
 export interface VergleichWert {
-  art: "text" | "ja" | "nein" | "pille";
+  kind: "text" | "ja" | "nein" | "pille";
   text?: string;
 }
 
 export interface VergleichZeile {
   name: string;
-  werte: VergleichWert[];
+  values: VergleichWert[];
 }
 
 interface Props {
   topline: string;
   headline: string;
-  spalten: VergleichSpalte[];
-  zeilen: VergleichZeile[];
+  columns: VergleichSpalte[];
+  lines: VergleichZeile[];
   /** Kleingedrucktes unter der Tabelle. */
-  hinweis?: string;
+  note?: string;
 }
 
-const { topline, headline, spalten, zeilen, hinweis } = Astro.props;
+const { topline, headline, columns, lines, note } = Astro.props;
 
-const beschriftung = (w: VergleichWert) =>
-  w.art === "ja" ? "enthalten" : w.art === "nein" ? "nicht enthalten" : undefined;
+const caption = (w: VergleichWert) =>
+  w.kind === "ja" ? "enthalten" : w.kind === "nein" ? "nicht enthalten" : undefined;
 ---
 
 <section class="s-compare container">
@@ -75,15 +75,15 @@ const beschriftung = (w: VergleichWert) =>
     aria-label={headline}
     role="table"
     class="comparison-wrap"
-    style={`--columns-in-view: ${spalten.length}`}
+    style={`--columns-in-view: ${columns.length}`}
     data-reveal="up"
   >
     <div role="row" class="comparison-header">
       <div aria-hidden="true" class="comparison-header__corner"></div>
       <div class="comparison-header__inner">
         <div class="comparison-header__list">
-          {spalten.map((s) => (
-            <div role="columnheader" class:list={["comparison-header__col", s.betont && "is-betont"]}>
+          {columns.map((s) => (
+            <div role="columnheader" class:list={["comparison-header__col", s.emphasised && "is-emphasised"]}>
               <p class="comparison-header__name">{s.name}</p>
               <p class="comparison-header__meta">{s.meta}</p>
             </div>
@@ -93,19 +93,19 @@ const beschriftung = (w: VergleichWert) =>
     </div>
 
     <div class="comparison-body">
-      {zeilen.map((z) => (
+      {lines.map((z) => (
         <div role="row" class="comparison-row">
           <div role="rowheader" class="comparison-row__name">
             <h3 class="comparison-row__h">{z.name}</h3>
           </div>
           <div class="comparison-row__cells">
-            {z.werte.map((w, i) => (
+            {z.values.map((w, i) => (
               <div
                 role="cell"
-                aria-label={beschriftung(w)}
-                class:list={["comparison-row__cell", spalten[i]?.betont && "is-betont"]}
+                aria-label={caption(w)}
+                class:list={["comparison-row__cell", columns[i]?.emphasised && "is-emphasised"]}
               >
-                {w.art === "ja" || w.art === "nein" ? (
+                {w.kind === "ja" || w.kind === "nein" ? (
                   /* Die Zeichen tragen keine eigene Bedeutung — die steht im
                      aria-label der Zelle. Deshalb aria-hidden, sonst hörte
                      man die Angabe zweimal. */
@@ -119,9 +119,9 @@ const beschriftung = (w: VergleichWert) =>
                     stroke-linejoin="round"
                     aria-hidden="true"
                   >
-                    {w.art === "ja" ? <polyline points="5 12 10 17 19 7" /> : <line x1="6" y1="12" x2="18" y2="12" />}
+                    {w.kind === "ja" ? <polyline points="5 12 10 17 19 7" /> : <line x1="6" y1="12" x2="18" y2="12" />}
                   </svg>
-                ) : w.art === "pille" ? (
+                ) : w.kind === "pille" ? (
                   <div class="comparison-row__pill">{w.text}</div>
                 ) : (
                   <p class="comparison-row__label">{w.text}</p>
@@ -134,7 +134,7 @@ const beschriftung = (w: VergleichWert) =>
     </div>
   </div>
 
-  {hinweis && <p class="s-compare__hinweis">{hinweis}</p>}
+  {note && <p class="s-compare__hinweis">{note}</p>}
 </section>
 
 <style>
@@ -336,16 +336,16 @@ const beschriftung = (w: VergleichWert) =>
   /* Die eigene Spalte durchgehend hinterlegt — eine senkrechte Bahn, die
      über alle Zeilen läuft. Deshalb an Kopf UND Zellen, nicht am Kopf
      allein. */
-  .comparison-header__col.is-betont,
-  .comparison-row__cell.is-betont {
+  .comparison-header__col.is-emphasised,
+  .comparison-row__cell.is-emphasised {
     background: color-mix(in srgb, var(--c-brand) 16%, transparent);
   }
 
-  .comparison-header__col.is-betont .comparison-header__meta {
+  .comparison-header__col.is-emphasised .comparison-header__meta {
     color: var(--c-text);
   }
 
-  .comparison-row__cell.is-betont .comparison-row__icon {
+  .comparison-row__cell.is-emphasised .comparison-row__icon {
     color: var(--c-dark);
   }
 

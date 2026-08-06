@@ -7,7 +7,7 @@ import ToothLines from "../ui/ToothLines.astro";
 
 interface Props {
   /** Die beiden kleinen Blöcke unter der Wortmarke. Zeilenumbrüche zählen. */
-  zeilen: string[];
+  lines: string[];
 }
 
 /* Keine Vorgabe: Die Zeilen sind im Schema Pflicht, die Seite reicht sie
@@ -15,7 +15,7 @@ interface Props {
    abgeschafft hat.
    Die Wortmarke selbst bleibt fest im Markup — sie ist die Marke, kein
    Inhalt. Das ist Klasse 3 und ehrlich so. */
-const { zeilen } = Astro.props;
+const { lines } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -67,7 +67,7 @@ const { zeilen } = Astro.props;
               {/* set:html, weil die Umbrüche aus dem Text kommen: Die
                   Redaktion schreibt drei Zeilen, und drei Zeilen sollen es
                   bleiben. Nur \n wird zu <br /> — sonst nichts. */}
-              {zeilen.map((z) => (
+              {lines.map((z) => (
                 <p data-hero-meta data-highlight-marker-reveal data-marker-theme="brand" data-marker-stagger="90" data-marker-delay="1.1" set:html={z.split("\n").join("<br />")} />
               ))}
             </div>
@@ -314,7 +314,7 @@ const { zeilen } = Astro.props;
      angehobene Sättigung und Helligkeit sowie ein Lichtverlauf. */
   .s-hero__tooth-glass {
     /* Alle drei Filteranteile hängen an Variablen. Sättigung und Helligkeit
-       waren vorher feste Werte — sie standen damit ab dem Sichtbarwerden
+       waren before feste Werte — sie standen damit ab dem Sichtbarwerden
        sofort auf voller Stärke und erzeugten ein Aufblitzen, während die
        Unschärfe noch bei null lag. */
     --glass-blur: 16px;
@@ -608,7 +608,7 @@ const { zeilen } = Astro.props;
     display: block;
   }
 
-    /* Nur die Größe: Lage und Staffelung stimmen schon, sie kommen aus der
+    /* Nur die Größe: Lage und Staffelung voices schon, sie kommen aus der
        Regel weiter oben und beziehen sich auf die Wortmarke. Auf 390px ist
        die zwei Zeilen hoch — 124 % davon wären zu wenig, um den Zahn als
        Objekt zu lesen. */

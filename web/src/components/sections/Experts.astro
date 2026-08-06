@@ -11,16 +11,16 @@ import { istCmsBild, type Bildquelle } from "../../lib/bilder";
  * die niemand je übergab — im Studio stand daneben ein Feld `expertenText`,
  * das die Seite nie durchreichte. Der Kunde konnte es füllen, ohne dass sich
  * etwas änderte. Beides ist zusammengeführt: Das Feld heißt jetzt
- * `expertenAbsaetze`, ist ein Array wie bei Split und landet hier.
+ * `expertsParagraphs`, ist ein Array wie bei Split und landet hier.
  */
 interface Props {
-  titel: string;
+  title: string;
   namen: string;
   absaetze: string[];
-  bild?: Bildquelle;
+  image?: Bildquelle;
 }
 
-const { titel, namen, absaetze, bild } = Astro.props;
+const { title, namen, absaetze, image } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -30,8 +30,8 @@ const { titel, namen, absaetze, bild } = Astro.props;
         <!-- Bild sitzt links und läuft über den Seitenrand hinaus, der Text
              steht rechts auf einer schmalen Spalte — so im Entwurf. -->
         <div class="s-experts__media" data-reveal="fade">
-          {istCmsBild(bild) ? (
-            <CmsImage quelle={bild} alt={namen.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
+          {istCmsBild(image) ? (
+            <CmsImage quelle={image} alt={namen.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
           ) : (
             <Picture name="experten" alt="Dr. Hannes Schulte-Ostermann und Dr. Kerrin Gratecap" sizes="(max-width: 900px) 100vw, 62vw" parallax="9" />
           )}
@@ -39,7 +39,7 @@ const { titel, namen, absaetze, bild } = Astro.props;
 
         <div class="container grid">
           <div class="s-experts__body">
-            <h2 class="s-experts__title" data-split="lines">{titel}</h2>
+            <h2 class="s-experts__title" data-split="lines">{title}</h2>
             {/* Zeilenumbrüche aus dem CMS übernehmen: Die Namenszeile ist
                 gesetzt, nicht umgebrochen — sie soll da brechen, wo die
                 Redaktion es schreibt. */}

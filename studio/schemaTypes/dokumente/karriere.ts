@@ -30,68 +30,68 @@ import { CaseIcon } from "@sanity/icons/Case";
    SEO steht zuletzt. Sonst füllt der Kunde erst Meta-Beschreibungen aus und
    verliert die Lust, bevor er beim Text ist. */
 const gruppen = [
-  { name: "kopf", title: "Kopf", default: true },
+  { name: "header", title: "Kopf", default: true },
   { name: "intro", title: "Haltung" },
-  { name: "zahlen", title: "Zahlen" },
-  { name: "vergleich", title: "Vergleich" },
-  { name: "stellen", title: "Stellen" },
-  { name: "stimmen", title: "Stimmen" },
-  { name: "ablauf", title: "Ablauf" },
-  { name: "bewerbung", title: "Bewerbung" },
+  { name: "figures", title: "Zahlen" },
+  { name: "comparison", title: "Vergleich" },
+  { name: "jobs", title: "Stellen" },
+  { name: "voices", title: "Stimmen" },
+  { name: "process", title: "Ablauf" },
+  { name: "application", title: "Bewerbung" },
   { name: "faq", title: "Fragen" },
   { name: "seo", title: "SEO" },
 ];
 
 /** Topline und Überschrift, wie sie jeder Abschnitt der Seite trägt. */
-const kopf = (gruppe: string, praefix: string) => [
+const heading = (group: string, prefix: string) => [
   defineField({
-    name: `${praefix}Topline`,
+    name: `${prefix}Topline`,
     title: "Topline",
     type: "string",
-    group: gruppe,
+    group,
     validation: (r) => r.required(),
   }),
   defineField({
-    name: `${praefix}Headline`,
+    name: `${prefix}Headline`,
     title: "Überschrift",
     type: "string",
-    group: gruppe,
+    group,
     validation: (r) => r.required(),
   }),
 ];
 
 export const karriere = defineType({
-  name: "karriere",
+  name: "careers",
   title: "Karriere",
   type: "document",
   icon: CaseIcon,
   groups: gruppen,
   fields: [
     /* --- Kopf ----------------------------------------------------------- */
-    defineField({ name: "topline", title: "Topline", type: "string", group: "kopf", validation: (r) => r.required() }),
-    defineField({ name: "titel", title: "Überschrift", type: "string", group: "kopf", validation: (r) => r.required() }),
+    defineField({ name: "topline", title: "Topline", type: "string", group: "header", validation: (r) => r.required() }),
+    defineField({ name: "title", title: "Überschrift", type: "string", group: "header", validation: (r) => r.required() }),
     defineField({
-      name: "einleitung",
+      name: "lead",
       title: "Einleitung",
       type: "text",
       rows: 4,
       description: "Der Absatz unter der Überschrift im Kopf der Seite.",
-      group: "kopf",
+      group: "header",
     }),
-    defineField({ name: "bild", title: "Kopfbild", type: "bild", group: "kopf" }),
+    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "header" }),
     defineField({
-      name: "aktion",
+      name: "action",
       title: "Knopf im Kopf",
       type: "link",
       description:
         "Führt üblicherweise zu den offenen Stellen weiter unten - dafür diese Seite als Ziel wählen und als Sprungmarke „stellen“ eintragen.",
-      group: "kopf",
+      group: "header",
     }),
 
     /* --- Haltung -------------------------------------------------------- */
-    ...kopf("intro", "intro"),
+    ...heading("intro", "intro"),
     defineField({
-      name: "introSpalten",
+      name: "introColumns",
       title: "Textspalten",
       type: "array",
       of: [defineArrayMember({ type: "text", rows: 5 })],
@@ -101,22 +101,22 @@ export const karriere = defineType({
     }),
 
     /* --- Zahlen --------------------------------------------------------- */
-    ...kopf("zahlen", "zahlen"),
+    ...heading("figures", "figures"),
     defineField({
-      name: "zahlenEintraege",
+      name: "figuresItems",
       title: "Zahlen",
       type: "array",
       description:
         "Wenige und überprüfbare Angaben. Eine Karriereseite, die mit „100 % Zufriedenheit“ wirbt, glaubt niemand.",
-      group: "zahlen",
+      group: "figures",
       of: [
         defineArrayMember({
           type: "object",
-          name: "zahl",
+          name: "figure",
           fields: [
-            defineField({ name: "wert", title: "Zahl", type: "number", validation: (r) => r.required() }),
+            defineField({ name: "value", title: "Zahl", type: "number", validation: (r) => r.required() }),
             defineField({
-              name: "einheit",
+              name: "unit",
               title: "Einheit",
               type: "string",
               description: "Steht direkt hinter der Zahl, z. B. „ min“ oder „ %“. Leer lassen für nichts.",
@@ -124,8 +124,8 @@ export const karriere = defineType({
             defineField({ name: "text", title: "Erläuterung", type: "string", validation: (r) => r.required() }),
           ],
           preview: {
-            select: { wert: "wert", einheit: "einheit", text: "text" },
-            prepare: ({ wert, einheit, text }) => ({ title: `${wert ?? "?"}${einheit ?? ""}`, subtitle: text }),
+            select: { value: "value", unit: "unit", text: "text" },
+            prepare: ({ value, unit, text }) => ({ title: `${wert ?? "?"}${einheit ?? ""}`, subtitle: text }),
           },
         }),
       ],
@@ -133,22 +133,22 @@ export const karriere = defineType({
     }),
 
     /* --- Vergleich ------------------------------------------------------ */
-    ...kopf("vergleich", "vergleich"),
+    ...heading("comparison", "comparison"),
     defineField({
-      name: "vergleichSpalten",
+      name: "comparisonColumns",
       title: "Spalten",
       type: "array",
       description: "Genau zwei: links das Übliche, rechts der eigene Stand.",
-      group: "vergleich",
+      group: "comparison",
       of: [
         defineArrayMember({
           type: "object",
-          name: "vergleichSpalte",
+          name: "comparisonColumn",
           fields: [
             defineField({ name: "name", title: "Überschrift", type: "string", validation: (r) => r.required() }),
             defineField({ name: "meta", title: "Zusatz", type: "string", description: "Die kleine Zeile darunter." }),
             defineField({
-              name: "betont",
+              name: "emphasised",
               title: "Hervorgehoben",
               type: "boolean",
               description: "Für die eigene Spalte.",
@@ -161,28 +161,28 @@ export const karriere = defineType({
       validation: (r) => r.required().length(2),
     }),
     defineField({
-      name: "vergleichZeilen",
+      name: "comparisonRows",
       title: "Zeilen",
       type: "array",
-      group: "vergleich",
+      group: "comparison",
       of: [
         defineArrayMember({
           type: "object",
-          name: "vergleichZeile",
+          name: "comparisonRow",
           fields: [
             defineField({ name: "name", title: "Merkmal", type: "string", validation: (r) => r.required() }),
             defineField({
-              name: "werte",
+              name: "values",
               title: "Werte",
               type: "array",
               description: "Einer je Spalte, in derselben Reihenfolge.",
               of: [
                 defineArrayMember({
                   type: "object",
-                  name: "vergleichWert",
+                  name: "comparisonValue",
                   fields: [
                     defineField({
-                      name: "art",
+                      name: "kind",
                       title: "Darstellung",
                       type: "string",
                       initialValue: "text",
@@ -201,13 +201,13 @@ export const karriere = defineType({
                       name: "text",
                       title: "Text",
                       type: "string",
-                      hidden: ({ parent }) => parent?.art === "ja" || parent?.art === "nein",
+                      hidden: ({ parent }) => parent?.kind === "ja" || parent?.kind === "nein",
                     }),
                   ],
                   preview: {
-                    select: { art: "art", text: "text" },
-                    prepare: ({ art, text }) => ({
-                      title: art === "ja" ? "✓ enthalten" : art === "nein" ? "— nicht enthalten" : text || "(leer)",
+                    select: { kind: "kind", text: "text" },
+                    prepare: ({ kind, text }) => ({
+                      title: kind === "ja" ? "✓ enthalten" : kind === "nein" ? "— nicht enthalten" : text || "(leer)",
                     }),
                   },
                 }),
@@ -221,37 +221,37 @@ export const karriere = defineType({
       validation: (r) => r.required().min(1),
     }),
     defineField({
-      name: "vergleichHinweis",
+      name: "comparisonNote",
       title: "Hinweis unter der Tabelle",
       type: "text",
       rows: 4,
       description:
         "Das Kleingedruckte. Ohne ihn läse sich die linke Spalte wie eine Behauptung über den Wettbewerb - und die wäre weder belegbar noch fair.",
-      group: "vergleich",
+      group: "comparison",
     }),
 
     /* --- Stellen -------------------------------------------------------- */
-    ...kopf("stellen", "stellen"),
+    ...heading("jobs", "jobs"),
 
     /* --- Stimmen -------------------------------------------------------- */
-    ...kopf("stimmen", "stimmen"),
+    ...heading("voices", "voices"),
     defineField({
-      name: "stimmenEintraege",
+      name: "voicesItems",
       title: "Stimmen",
       type: "array",
-      group: "stimmen",
+      group: "voices",
       of: [
         defineArrayMember({
           type: "object",
-          name: "stimme",
+          name: "voice",
           fields: [
-            defineField({ name: "zitat", title: "Zitat", type: "text", rows: 5, validation: (r) => r.required() }),
+            defineField({ name: "quote", title: "Zitat", type: "text", rows: 5, validation: (r) => r.required() }),
             defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "rolle", title: "Rolle", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "dabeiSeit", title: "Dabei seit", type: "string", description: "Zum Beispiel „seit 2021“." }),
-            defineField({ name: "bild", title: "Bild", type: "bild" }),
+            defineField({ name: "role", title: "Rolle", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "since", title: "Dabei seit", type: "string", description: "Zum Beispiel „seit 2021“." }),
+            defineField({ name: "image", title: "Bild", type: "picture" }),
             defineField({
-              name: "versatz",
+              name: "offset",
               title: "Versatz",
               type: "number",
               description:
@@ -260,51 +260,51 @@ export const karriere = defineType({
               validation: (r) => r.min(0).max(1),
             }),
           ],
-          preview: { select: { title: "name", subtitle: "rolle", media: "bild" } },
+          preview: { select: { title: "name", subtitle: "role", media: "image" } },
         }),
       ],
       validation: (r) => r.required().min(1),
     }),
 
     /* --- Ablauf --------------------------------------------------------- */
-    ...kopf("ablauf", "ablauf"),
+    ...heading("process", "process"),
     defineField({
-      name: "ablaufEtappen",
+      name: "processStages",
       title: "Etappen",
       type: "array",
-      group: "ablauf",
+      group: "process",
       of: [
         defineArrayMember({
           type: "object",
-          name: "etappe",
+          name: "stage",
           fields: [
-            defineField({ name: "marke", title: "Marke", type: "string", description: "Zum Beispiel „Tag 0“ oder „Woche 2–3“.", validation: (r) => r.required() }),
-            defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "marker", title: "Marke", type: "string", description: "Zum Beispiel „Tag 0“ oder „Woche 2–3“.", validation: (r) => r.required() }),
+            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
           ],
-          preview: { select: { title: "titel", subtitle: "marke" } },
+          preview: { select: { title: "title", subtitle: "marker" } },
         }),
       ],
       validation: (r) => r.required().min(2),
     }),
 
     /* --- Initiativbewerbung --------------------------------------------- */
-    defineField({ name: "initiativTopline", title: "Topline", type: "string", group: "bewerbung", validation: (r) => r.required() }),
-    defineField({ name: "initiativTitel", title: "Überschrift", type: "string", group: "bewerbung", validation: (r) => r.required() }),
-    defineField({ name: "initiativText", title: "Zusatzzeile", type: "text", rows: 3, group: "bewerbung" }),
-    defineField({ name: "initiativAbsatz", title: "Absatz im Panel", type: "text", rows: 4, group: "bewerbung" }),
+    defineField({ name: "speculativeTopline", title: "Topline", type: "string", group: "application", validation: (r) => r.required() }),
+    defineField({ name: "speculativeTitle", title: "Überschrift", type: "string", group: "application", validation: (r) => r.required() }),
+    defineField({ name: "speculativeText", title: "Zusatzzeile", type: "text", rows: 3, group: "application" }),
+    defineField({ name: "speculativeParagraph", title: "Absatz im Panel", type: "text", rows: 4, group: "application" }),
     defineField({
-      name: "bewerbungMail",
+      name: "applicationEmail",
       title: "Adresse für Bewerbungen",
       type: "string",
       description:
         "Steht an mehreren Stellen der Seite und trägt den Betreff der Bewerbungsmail. Eigene Adresse, nicht die der Praxis aus den Einstellungen.",
-      group: "bewerbung",
+      group: "application",
       validation: (r) => r.required().email(),
     }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitel", title: "Überschrift der Fragen", type: "string", group: "faq", validation: (r) => r.required() }),
+    defineField({ name: "faqTitle", title: "Überschrift der Fragen", type: "string", group: "faq", validation: (r) => r.required() }),
     defineField({
       name: "faq",
       title: "Häufige Fragen",
@@ -313,12 +313,12 @@ export const karriere = defineType({
       of: [
         defineArrayMember({
           type: "object",
-          name: "frageAntwort",
+          name: "questionAnswer",
           fields: [
-            defineField({ name: "frage", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "antwort", title: "Antwort", type: "text", rows: 4 }),
+            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
           ],
-          preview: { select: { title: "frage" } },
+          preview: { select: { title: "question" } },
         }),
       ],
       validation: (r) => r.required().min(1),

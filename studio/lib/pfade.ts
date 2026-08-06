@@ -28,7 +28,15 @@
  * Deshalb die Liste unten und die Prüfung, die daran hängt.
  */
 
-/** Feste Pfade der obersten Ebene. Kein freier Slug darf so heißen. */
+/**
+ * Feste Pfade der obersten Ebene. Kein freier Slug darf so heißen.
+ *
+ * **Das sind Adressen, keine Typnamen.** Die Website ist deutsch und ihre
+ * URLs sind es auch — `/karriere` und nicht `/careers`. Bei der Umstellung
+ * der Bezeichner auf Englisch war das kurzzeitig verwechselt, und die
+ * Prüfung schützte `/careers` statt `/karriere`: Ein Rechtstext mit dem Slug
+ * „karriere" wäre damit durchgegangen und hätte die Karriereseite verdeckt.
+ */
 export const RESERVIERTE_SLUGS = [
   "leistungen",
   "praxis",
@@ -44,23 +52,24 @@ export const RESERVIERTE_SLUGS = [
 ] as const;
 
 /** Dokumenttypen, die auf der obersten Ebene liegen. */
-const OBERSTE_EBENE = ["pillar", "rechtstext"];
+const OBERSTE_EBENE = ["pillar", "legalPage"];
 
-/** Dokumenttypen mit eigenem Verzeichnis. */
+/* Links der Typname, rechts das Verzeichnis in der URL. Der Typ ist
+   englisch, die Adresse bleibt deutsch. */
 const VERZEICHNIS: Record<string, string> = {
-  leistung: "leistungen",
-  beitrag: "magazin",
+  service: "leistungen",
+  post: "magazin",
 };
 
 /** Einzeldokumente und ihr fester Pfad. */
 const FESTE_PFADE: Record<string, string> = {
-  startseite: "/",
-  leistungenIndex: "/leistungen",
-  praxis: "/praxis",
-  magazinIndex: "/magazin",
-  karriere: "/karriere",
-  kontakt: "/kontakt",
-  notdienst: "/notdienst",
+  homepage: "/",
+  servicesIndex: "/leistungen",
+  practice: "/praxis",
+  magazineIndex: "/magazin",
+  careers: "/karriere",
+  contactPage: "/kontakt",
+  emergency: "/notdienst",
 };
 
 /**

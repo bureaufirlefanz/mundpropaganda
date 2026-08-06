@@ -22,9 +22,9 @@ interface Props {
   headline: string;
   stellen: Stelle[];
   /** Adresse für Bewerbungen. Steht im Karriere-Dokument, nicht hier. */
-  bewerbungMail: string;
+  applicationEmail: string;
 }
-const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
+const { id, topline, headline, stellen, applicationEmail } = Astro.props;
 ---
 
 <section class="s-jobs container" id={id}>
@@ -35,11 +35,11 @@ const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
 
   <div class="s-jobs__list" data-accordion="single" data-reveal-stagger="0.06">
     {stellen.map((s, i) => (
-      <article class="s-jobs__item" data-accordion-item data-reveal-child id={`stelle-${s.kennung}`}>
+      <article class="s-jobs__item" data-accordion-item data-reveal-child id={`stelle-${s.handle}`}>
         {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
             geben dann beim Ansteuern der Zeile den Stellentitel aus und
             nicht nur „Schaltfläche". */}
-        <h3 class="s-jobs__zeile-titel">
+        <h3 class="s-jobs__zeile-title">
           <button class="s-jobs__zeile" data-accordion-trigger type="button">
             {/* Reine Ordnungszahl. `aria-hidden`, weil sie sonst der
                 Überschrift vorangestellt vorgelesen würde — „null eins
@@ -47,12 +47,12 @@ const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
                 sich für Vorlesegeräte ohnehin aus der Liste. */}
             <span class="s-jobs__nummer" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
 
-            <span class="s-jobs__name">{s.titel}</span>
+            <span class="s-jobs__name">{s.title}</span>
 
             <span class="s-jobs__meta">
-              <span class="s-jobs__marke">{s.art}</span>
-              <span class="s-jobs__ort">{s.standort}</span>
-              <span class="s-jobs__zeit">{s.umfang}</span>
+              <span class="s-jobs__marke">{s.kind}</span>
+              <span class="s-jobs__ort">{s.location}</span>
+              <span class="s-jobs__zeit">{s.hours}</span>
             </span>
 
             <span class="s-jobs__icon" aria-hidden="true">
@@ -63,29 +63,29 @@ const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
 
         <div class="s-jobs__panel" data-accordion-panel>
           <div class="s-jobs__inhalt">
-            <p class="s-jobs__einleitung">{s.einleitung}</p>
+            <p class="s-jobs__einleitung">{s.lead}</p>
 
             <div class="s-jobs__spalten">
               <div>
                 <h4 class="s-jobs__untertitel">Deine Aufgaben</h4>
                 <ul class="s-jobs__punkte">
-                  {(s.aufgaben ?? []).map((a) => <li>{a}</li>)}
+                  {(s.duties ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
               <div>
                 <h4 class="s-jobs__untertitel">Das bringst du mit</h4>
                 <ul class="s-jobs__punkte">
-                  {(s.profil ?? []).map((a) => <li>{a}</li>)}
+                  {(s.profile ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
             </div>
 
-            {s.besonderheit && <p class="s-jobs__hinweis">{s.besonderheit}</p>}
+            {s.highlight && <p class="s-jobs__hinweis">{s.highlight}</p>}
 
             <div class="s-jobs__aktion">
               {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
                   einem Postfach unter „Bewerbung". */}
-              <Button label="Auf diese Stelle bewerben" href={bewerbungLink(bewerbungMail, s)} />
+              <Button label="Auf diese Stelle bewerben" href={bewerbungLink(applicationEmail, s)} />
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ const { id, topline, headline, stellen, bewerbungMail } = Astro.props;
 
   /* Die Überschrift trägt keine eigene Gestalt — sie ist nur die Ebene, die
      Vorlesegeräten die Gliederung gibt. Ausgesehen wird der Knopf darin. */
-  .s-jobs__zeile-titel {
+  .s-jobs__zeile-title {
     margin: 0;
     font: inherit;
     letter-spacing: inherit;

@@ -18,11 +18,11 @@ import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
 export function initTimeline() {
   document.querySelectorAll("[data-timeline]").forEach((wurzel) => {
     const fuellung = wurzel.querySelector("[data-timeline-fill]");
-    const etappen = [...wurzel.querySelectorAll(".s-timeline__etappe")];
-    if (!fuellung || !etappen.length) return;
+    const stages = [...wurzel.querySelectorAll(".s-timeline__etappe")];
+    if (!fuellung || !stages.length) return;
 
     if (prefersReducedMotion) {
-      etappen.forEach((e) => (e.dataset.erreicht = ""));
+      stages.forEach((e) => (e.dataset.erreicht = ""));
       return;
     }
 
@@ -35,7 +35,7 @@ export function initTimeline() {
     const anteile = () => {
       const b = bahn.getBoundingClientRect();
       const senkrecht = b.height > b.width;
-      return etappen.map((e) => {
+      return stages.map((e) => {
         const p = e.querySelector(".s-timeline__punkt").getBoundingClientRect();
         return senkrecht
           ? (p.top + p.height / 2 - b.top) / b.height
@@ -64,7 +64,7 @@ export function initTimeline() {
             marken = anteile();
           },
           onUpdate: (selbst) => {
-            etappen.forEach((e, i) => {
+            stages.forEach((e, i) => {
               if (selbst.progress >= marken[i]) e.dataset.erreicht = "";
               else delete e.dataset.erreicht;
             });
@@ -73,7 +73,7 @@ export function initTimeline() {
       }
     );
 
-    /* Nach dem Umbruch stimmen die Anteile nicht mehr — waagerecht und
+    /* Nach dem Umbruch voices die Anteile nicht mehr — waagerecht und
        senkrecht liegen die Punkte woanders. ScrollTrigger misst bei
        `refresh` neu, das oben angehängte `onRefresh` zieht die Marken mit. */
     ScrollTrigger.refresh();

@@ -6,20 +6,20 @@
 import type { Preis } from "../../lib/formen";
 
 interface Props {
-  titel?: string;
-  preise: Preis[];
+  title?: string;
+  pricing: Preis[];
 }
 
-const { titel = "Kosten", preise } = Astro.props;
+const { title = "Kosten", pricing } = Astro.props;
 ---
 
 <section class="s-prices container" id="kosten">
-  <h2 class="s-prices__title" data-split="lines">{titel}</h2>
+  <h2 class="s-prices__title" data-split="lines">{title}</h2>
   <div class="s-prices__grid" data-reveal-stagger="0.08">
-    {preise.map((p) => (
+    {pricing.map((p) => (
       <article class="c-price" data-reveal-child>
         <h3 class="c-price__name">{p.name}</h3>
-        <span class="c-price__tag">{p.preis}</span>
+        <span class="c-price__tag">{p.price}</span>
       </article>
     ))}
   </div>

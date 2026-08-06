@@ -42,8 +42,8 @@ const vorschau = (
   feld = "headline",
   extra: { media?: string; icon?: ComponentType } = {}
 ) => ({
-  select: { titel: feld, unter: "topline", ...(extra.media ? { bild: extra.media } : {}) },
-  prepare: ({ titel, unter, bild }: { titel?: string; unter?: string; bild?: unknown }) => ({
+  select: { title: feld, unter: "topline", ...(extra.media ? { image: extra.media } : {}) },
+  prepare: ({ title, unter, image }: { titel?: string; unter?: string; bild?: unknown }) => ({
     title: titel || art,
     subtitle: unter ? `${art} · ${unter}` : art,
     media: bild ?? extra.icon,
@@ -56,14 +56,14 @@ const headline = defineField({ name: "headline", title: "Überschrift", type: "s
 /* --- Einleitung -------------------------------------------------------- */
 
 export const abschnittIntro = defineType({
-  name: "abschnittIntro",
+  name: "sectionIntro",
   title: "Einleitung",
   type: "object",
   fields: [
     topline,
     headline,
     defineField({
-      name: "spalten",
+      name: "columns",
       title: "Textspalten",
       type: "array",
       of: [{ type: "text", rows: 5 }],
@@ -78,24 +78,24 @@ export const abschnittIntro = defineType({
 /* --- Zahlen ------------------------------------------------------------ */
 
 export const abschnittFacts = defineType({
-  name: "abschnittFacts",
+  name: "sectionFacts",
   title: "Zahlen",
   type: "object",
   fields: [
     topline,
     headline,
     defineField({
-      name: "zahlen",
+      name: "figures",
       title: "Zahlen",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "zahl",
+          name: "figure",
           fields: [
-            defineField({ name: "wert", title: "Zahl", type: "number", validation: (r) => r.required() }),
+            defineField({ name: "value", title: "Zahl", type: "number", validation: (r) => r.required() }),
             defineField({
-              name: "einheit",
+              name: "unit",
               title: "Einheit",
               type: "string",
               description: "Steht direkt hinter der Zahl, z. B. „ h“ oder „ %“. Leer lassen, wenn keine.",
@@ -103,7 +103,7 @@ export const abschnittFacts = defineType({
             defineField({ name: "text", title: "Erklärung", type: "string", validation: (r) => r.required() }),
           ],
           preview: {
-            select: { title: "wert", subtitle: "text" },
+            select: { title: "value", subtitle: "text" },
             prepare: ({ title, subtitle }) => ({ title: String(title ?? ""), subtitle }),
           },
         }),
@@ -119,25 +119,25 @@ export const abschnittFacts = defineType({
 /* --- Vergleich --------------------------------------------------------- */
 
 export const abschnittCompare = defineType({
-  name: "abschnittCompare",
+  name: "sectionCompare",
   title: "Vergleichstabelle",
   type: "object",
   fields: [
     topline,
     headline,
     defineField({
-      name: "spalten",
+      name: "columns",
       title: "Spalten",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "spalte",
+          name: "column",
           fields: [
             defineField({ name: "name", title: "Überschrift", type: "string", validation: (r) => r.required() }),
             defineField({ name: "meta", title: "Zusatz", type: "string", description: "Kleine Zeile darunter." }),
             defineField({
-              name: "betont",
+              name: "emphasised",
               title: "Hervorheben",
               type: "boolean",
               description: "Legt die Spalte farbig hinterlegt über alle Zeilen. Höchstens eine.",
@@ -150,7 +150,7 @@ export const abschnittCompare = defineType({
       validation: (r) => r.min(2).max(4),
     }),
     defineField({
-      name: "zeilen",
+      name: "lines",
       title: "Zeilen",
       type: "array",
       of: [
@@ -160,7 +160,7 @@ export const abschnittCompare = defineType({
           fields: [
             defineField({ name: "name", title: "Merkmal", type: "string", validation: (r) => r.required() }),
             defineField({
-              name: "werte",
+              name: "values",
               title: "Werte",
               type: "array",
               description:
@@ -168,10 +168,10 @@ export const abschnittCompare = defineType({
               of: [
                 defineArrayMember({
                   type: "object",
-                  name: "wert",
+                  name: "value",
                   fields: [
                     defineField({
-                      name: "art",
+                      name: "kind",
                       title: "Art",
                       type: "string",
                       options: {
@@ -190,13 +190,13 @@ export const abschnittCompare = defineType({
                       name: "text",
                       title: "Text",
                       type: "string",
-                      hidden: ({ parent }) => parent?.art === "ja" || parent?.art === "nein",
+                      hidden: ({ parent }) => parent?.kind === "ja" || parent?.kind === "nein",
                     }),
                   ],
                   preview: {
-                    select: { art: "art", text: "text" },
-                    prepare: ({ art, text }) => ({
-                      title: art === "ja" ? "Ja" : art === "nein" ? "Nein" : text || "(leer)",
+                    select: { kind: "kind", text: "text" },
+                    prepare: ({ kind, text }) => ({
+                      title: kind === "ja" ? "Ja" : kind === "nein" ? "Nein" : text || "(leer)",
                     }),
                   },
                 }),
@@ -208,7 +208,7 @@ export const abschnittCompare = defineType({
       ],
     }),
     defineField({
-      name: "hinweis",
+      name: "note",
       title: "Kleingedrucktes",
       type: "text",
       rows: 3,
@@ -223,26 +223,26 @@ export const abschnittCompare = defineType({
 /* --- Ablauf als Zeitstrahl --------------------------------------------- */
 
 export const abschnittTimeline = defineType({
-  name: "abschnittTimeline",
+  name: "sectionTimeline",
   title: "Zeitstrahl",
   type: "object",
   fields: [
     topline,
     headline,
     defineField({
-      name: "etappen",
+      name: "stages",
       title: "Etappen",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "etappe",
+          name: "stage",
           fields: [
-            defineField({ name: "marke", title: "Zeitangabe", type: "string", description: "Z. B. „Tag 0“ oder „Woche 2“." }),
-            defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "marker", title: "Zeitangabe", type: "string", description: "Z. B. „Tag 0“ oder „Woche 2“." }),
+            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
           ],
-          preview: { select: { title: "titel", subtitle: "marke" } },
+          preview: { select: { title: "title", subtitle: "marker" } },
         }),
       ],
       description: "Vier passen nebeneinander. Mehr kippt in die Senkrechte.",
@@ -255,28 +255,28 @@ export const abschnittTimeline = defineType({
 /* --- Stimmen ----------------------------------------------------------- */
 
 export const abschnittVoices = defineType({
-  name: "abschnittVoices",
+  name: "sectionVoices",
   title: "Stimmen",
   type: "object",
   fields: [
     topline,
     headline,
     defineField({
-      name: "stimmen",
+      name: "voices",
       title: "Stimmen",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "stimme",
+          name: "voice",
           fields: [
-            defineField({ name: "zitat", title: "Zitat", type: "text", rows: 4, validation: (r) => r.required() }),
+            defineField({ name: "quote", title: "Zitat", type: "text", rows: 4, validation: (r) => r.required() }),
             defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "rolle", title: "Rolle", type: "string" }),
-            defineField({ name: "dabeiSeit", title: "Zusatz", type: "string", description: "Z. B. „seit 2019“." }),
-            defineField({ name: "bild", title: "Bild", type: "bild" }),
+            defineField({ name: "role", title: "Rolle", type: "string" }),
+            defineField({ name: "since", title: "Zusatz", type: "string", description: "Z. B. „seit 2019“." }),
+            defineField({ name: "image", title: "Bild", type: "picture" }),
             defineField({
-              name: "versatz",
+              name: "offset",
               title: "Höhenversatz",
               type: "number",
               description: "0 = oben bündig, 1 = ganz abgesenkt. Dazwischen ist erlaubt.",
@@ -284,7 +284,7 @@ export const abschnittVoices = defineType({
               validation: (r) => r.min(0).max(1),
             }),
           ],
-          preview: { select: { title: "name", subtitle: "rolle", media: "bild" } },
+          preview: { select: { title: "name", subtitle: "role", media: "image" } },
         }),
       ],
     }),
@@ -296,7 +296,7 @@ export const abschnittVoices = defineType({
 /* --- Aussage ----------------------------------------------------------- */
 
 export const abschnittStatement = defineType({
-  name: "abschnittStatement",
+  name: "sectionStatement",
   title: "Aussage",
   type: "object",
   fields: [
@@ -310,13 +310,13 @@ export const abschnittStatement = defineType({
 /* --- Schritte ---------------------------------------------------------- */
 
 export const abschnittSchritte = defineType({
-  name: "abschnittSchritte",
+  name: "sectionSteps",
   title: "Schritte",
   type: "object",
   fields: [
-    defineField({ name: "titel", title: "Überschrift", type: "string" }),
+    defineField({ name: "title", title: "Überschrift", type: "string" }),
     defineField({
-      name: "schritte",
+      name: "steps",
       title: "Schritte",
       type: "array",
       of: [
@@ -324,10 +324,10 @@ export const abschnittSchritte = defineType({
           type: "object",
           name: "schritt",
           fields: [
-            defineField({ name: "titel", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 4 }),
           ],
-          preview: { select: { title: "titel" } },
+          preview: { select: { title: "title" } },
         }),
       ],
     }),
@@ -339,24 +339,24 @@ export const abschnittSchritte = defineType({
 /* --- Preise ------------------------------------------------------------ */
 
 export const abschnittPreise = defineType({
-  name: "abschnittPreise",
+  name: "sectionPricing",
   title: "Preise",
   type: "object",
   fields: [
-    defineField({ name: "titel", title: "Überschrift", type: "string", initialValue: "Kosten" }),
+    defineField({ name: "title", title: "Überschrift", type: "string", initialValue: "Kosten" }),
     defineField({
-      name: "preise",
+      name: "pricing",
       title: "Preise",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "preis",
+          name: "price",
           fields: [
             defineField({ name: "name", title: "Bezeichnung", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "preis", title: "Preisangabe", type: "string" }),
+            defineField({ name: "price", title: "Preisangabe", type: "string" }),
           ],
-          preview: { select: { title: "name", subtitle: "preis" } },
+          preview: { select: { title: "name", subtitle: "price" } },
         }),
       ],
     }),
@@ -368,25 +368,25 @@ export const abschnittPreise = defineType({
 /* --- Häufige Fragen ---------------------------------------------------- */
 
 export const abschnittFaq = defineType({
-  name: "abschnittFaq",
+  name: "sectionFaq",
   title: "Häufige Fragen",
   type: "object",
   fields: [
-    defineField({ name: "titel", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
     defineField({ name: "text", title: "Zusatzzeile", type: "text", rows: 2 }),
     defineField({
-      name: "fragen",
+      name: "questions",
       title: "Fragen",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
-          name: "frageAntwort",
+          name: "questionAnswer",
           fields: [
-            defineField({ name: "frage", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "antwort", title: "Antwort", type: "text", rows: 4 }),
+            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
+            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
           ],
-          preview: { select: { title: "frage" } },
+          preview: { select: { title: "question" } },
         }),
       ],
     }),
@@ -398,14 +398,14 @@ export const abschnittFaq = defineType({
 /* --- Kontaktformular --------------------------------------------------- */
 
 export const abschnittKontakt = defineType({
-  name: "abschnittKontakt",
+  name: "sectionContact",
   title: "Kontaktformular",
   type: "object",
   fields: [
-    defineField({ name: "titel", title: "Überschrift", type: "string" }),
+    defineField({ name: "title", title: "Überschrift", type: "string" }),
     defineField({ name: "text", title: "Zusatzzeile", type: "text", rows: 2 }),
     defineField({
-      name: "leistung",
+      name: "service",
       title: "Vorausgewählte Leistung",
       type: "string",
       description: "Steht im Auswahlfeld voreingestellt. Leer lassen für keine Vorauswahl.",
@@ -420,20 +420,20 @@ export const abschnittKontakt = defineType({
  * denselben Baukasten benutzen, ohne die Aufzählung zu wiederholen.
  */
 export const abschnitte = defineType({
-  name: "abschnitte",
+  name: "sections",
   title: "Abschnitte",
   type: "array",
   of: [
-    { type: "abschnittIntro" },
-    { type: "abschnittFacts" },
-    { type: "abschnittCompare" },
-    { type: "abschnittTimeline" },
-    { type: "abschnittVoices" },
-    { type: "abschnittStatement" },
-    { type: "abschnittSchritte" },
-    { type: "abschnittPreise" },
-    { type: "abschnittFaq" },
-    { type: "abschnittKontakt" },
+    { type: "sectionIntro" },
+    { type: "sectionFacts" },
+    { type: "sectionCompare" },
+    { type: "sectionTimeline" },
+    { type: "sectionVoices" },
+    { type: "sectionStatement" },
+    { type: "sectionSteps" },
+    { type: "sectionPricing" },
+    { type: "sectionFaq" },
+    { type: "sectionContact" },
   ],
   options: { insertMenu: { filter: true, views: [{ name: "list" }] } },
 });

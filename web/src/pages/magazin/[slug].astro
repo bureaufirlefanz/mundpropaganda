@@ -9,13 +9,13 @@ import { ladeBeitrag, ladeBeitraege, ladeAehnliche } from "../../lib/magazin";
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
   const beitraege = await ladeBeitraege();
-  return beitraege.map((b) => ({ params: { slug: b.slug }, props: { titel: b.titel } }));
+  return beitraege.map((b) => ({ params: { slug: b.slug }, props: { title: b.title } }));
 }
 
 const { slug } = Astro.params;
-const { titel } = Astro.props;
+const { title } = Astro.props;
 const daten = await ladeBeitrag(slug!);
-const aehnliche = await ladeAehnliche(daten?.kategorie, slug);
+const aehnliche = await ladeAehnliche(daten?.category, slug);
 ---
 
-<Beitrag daten={daten} titel={daten?.titel || titel || ""} aehnliche={aehnliche} />
+<Beitrag daten={daten} title={daten?.title || title || ""} aehnliche={aehnliche} />

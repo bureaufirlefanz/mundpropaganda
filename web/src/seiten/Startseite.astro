@@ -37,51 +37,51 @@ const { daten, beitraege } = Astro.props;
    Aufgabe 4: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
    Dokument ohne <title> ist kaputt statt leer. Das Schema sagt dem Kunden
    genau das zu — „Leer lassen übernimmt die Überschrift der Seite". */
-const titel = daten.seo?.titel || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
-const beschreibung =
-  daten.seo?.beschreibung ||
+const title = daten.seo?.title || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
+const description =
+  daten.seo?.description ||
   "Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg.";
 
 /* Das Teilen-Motiv. 1200 breit im Format 1.91:1 — das ist, was Facebook,
    LinkedIn und WhatsApp erwarten; mit `ratio` beschneidet Sanity serverseitig,
    und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
-const storiesAktion = (await aufgeloest([daten.storiesAktion ?? null], Astro.url.pathname))[0];
+const storiesAction = (await aufgeloest([daten.storiesAction ?? null], Astro.url.pathname))[0];
 
-const teilenBild = istCmsBild(daten.seo?.bild)
-  ? bildUrl(daten.seo.bild, 1200, 1.91)
+const teilenBild = istCmsBild(daten.seo?.image)
+  ? bildUrl(daten.seo.image, 1200, 1.91)
   : undefined;
 ---
 
 <Base
-  title={titel}
-  description={beschreibung}
-  nichtIndexieren={daten.seo?.nichtIndexieren}
-  bild={teilenBild}
+  title={title}
+  description={description}
+  noIndex={daten.seo?.noIndex}
+  image={teilenBild}
 >
-  <Hero zeilen={daten.heroZeilen} />
+  <Hero lines={daten.heroLines} />
   <Split
     topline={daten.splitTopline}
-    titel={daten.splitTitel}
-    absaetze={daten.splitAbsaetze}
-    bild={daten.splitBild}
+    title={daten.splitTitle}
+    absaetze={daten.splitParagraphs}
+    image={daten.splitImage}
   />
-  <Services titel={daten.servicesTitel} />
-  <Standards titel={daten.standardsTitel} eintraege={daten.standardsEintraege} />
-  <Gallery variante="ring" titel={daten.standorteTitel} bilder={daten.standorteBilder} />
+  <Services title={daten.servicesTitle} />
+  <Standards title={daten.standardsTitle} items={daten.standardsItems} />
+  <Gallery variante="ring" title={daten.locationsTitle} bilder={daten.locationsImages} />
   <Experts
-    titel={daten.expertenTitel}
-    namen={daten.expertenNamen}
-    absaetze={daten.expertenAbsaetze}
-    bild={daten.expertenBild}
+    title={daten.expertsTitle}
+    namen={daten.expertsNames}
+    absaetze={daten.expertsParagraphs}
+    image={daten.expertsImage}
   />
-  <Stories eintraege={daten.storiesEintraege} aktion={storiesAktion} />
+  <Stories items={daten.storiesItems} action={storiesAction} />
   {beitraege.length > 0 && (
     <Magazine
-      topline={daten.magazinTopline}
-      titel={daten.magazinTitel}
-      text={daten.magazinText}
+      topline={daten.magazineTopline}
+      title={daten.magazineTitle}
+      text={daten.magazineText}
       beitraege={beitraege}
     />
   )}
-  <Faq titel={daten.faqTitel} text={daten.faqText} fragen={daten.faq} />
+  <Faq title={daten.faqTitle} text={daten.faqText} questions={daten.faq} />
 </Base>

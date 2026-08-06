@@ -13,7 +13,7 @@ import type { Beitrag } from "../../lib/magazin";
  */
 interface Props {
   topline: string;
-  titel: string;
+  title: string;
   text: string;
   beitraege: Beitrag[];
 }
@@ -22,7 +22,7 @@ interface Props {
    reicht sie durch. Eine Vorgabe hier wäre der stille Rückfall, den
    Aufgabe 4 abgeschafft hat — der Kunde löschte die Zeile und sähe sie
    weiter stehen. */
-const { topline, titel, text, beitraege } = Astro.props;
+const { topline, title, text, beitraege } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -44,7 +44,7 @@ const { topline, titel, text, beitraege } = Astro.props;
             </div>
 
             <div class="s-magazine__intro">
-              <h2 class="s-magazine__title" data-split="lines">{titel}</h2>
+              <h2 class="s-magazine__title" data-split="lines">{title}</h2>
               <p data-reveal="up" data-reveal-delay="0.08">{text}</p>
             </div>
           </div>

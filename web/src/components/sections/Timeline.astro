@@ -16,17 +16,17 @@
  */
 
 export interface Etappe {
-  marke: string;
-  titel: string;
+  marker: string;
+  title: string;
   text: string;
 }
 
 interface Props {
   topline: string;
   headline: string;
-  etappen: Etappe[];
+  stages: Etappe[];
 }
-const { topline, headline, etappen } = Astro.props;
+const { topline, headline, stages } = Astro.props;
 ---
 
 <section class="s-timeline container" data-timeline>
@@ -43,15 +43,15 @@ const { topline, headline, etappen } = Astro.props;
       <span class="s-timeline__fortschritt" data-timeline-fill></span>
     </div>
 
-    {etappen.map((e, i) => (
+    {stages.map((e, i) => (
       <li class="s-timeline__etappe" data-reveal-child>
         <span class="s-timeline__punkt" aria-hidden="true"></span>
-        <span class="s-timeline__marke">{e.marke}</span>
-        <h3 class="s-timeline__etappe-titel">
+        <span class="s-timeline__marke">{e.marker}</span>
+        <h3 class="s-timeline__etappe-title">
           {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
               Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
           <span class="s-timeline__nummer" aria-hidden="true">{i + 1}</span>
-          {e.titel}
+          {e.title}
         </h3>
         <p class="s-timeline__text">{e.text}</p>
       </li>
@@ -151,7 +151,7 @@ const { topline, headline, etappen } = Astro.props;
     color: var(--c-text-muted);
   }
 
-  .s-timeline__etappe-titel {
+  .s-timeline__etappe-title {
     display: flex;
     align-items: baseline;
     gap: 0.5em;

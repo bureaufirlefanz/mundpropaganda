@@ -109,8 +109,8 @@ function initCarousel(cfg) {
       overwrite: "auto",
     });
 
-    const aktiv = cfg.seitenweise ? Math.floor(index / proSeite()) : index;
-    dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === aktiv)));
+    const active = cfg.seitenweise ? Math.floor(index / proSeite()) : index;
+    dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === active)));
   }
 
   /* Ein Klick blättert eine SEITE weiter, nicht einen Beitrag. Bei vier
@@ -123,7 +123,7 @@ function initCarousel(cfg) {
 
   go(cfg.startInMiddle ? Math.floor(items.length / 2) : 0);
 
-  /* Nach einem Resize stimmen die Offsets nicht mehr — und bei seitenweisem
+  /* Nach einem Resize voices die Offsets nicht mehr — und bei seitenweisem
      Blättern auch die Anzahl der Punkte nicht, weil dann andere viele Karten
      nebeneinander passen. */
   ScrollTrigger.addEventListener("refreshInit", () => {

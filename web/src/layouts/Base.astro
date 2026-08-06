@@ -26,11 +26,11 @@ interface Props {
   title: string;
   description?: string;
   /** Setzt `noindex`. Aus dem SEO-Feld des jeweiligen Dokuments. */
-  nichtIndexieren?: boolean;
+  noIndex?: boolean;
   /** Absolute URL des Teilen-Motivs. Aus dem CMS, deshalb schon absolut. */
-  bild?: string;
+  image?: string;
 }
-const { title, description = "", nichtIndexieren = false, bild } = Astro.props;
+const { title, description = "", noIndex = false, image } = Astro.props;
 ---
 
 <!doctype html>
@@ -64,7 +64,7 @@ const { title, description = "", nichtIndexieren = false, bild } = Astro.props;
 
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    {nichtIndexieren && <meta name="robots" content="noindex, nofollow" />}
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
     {/*
       Open Graph und Twitter — was Messenger, soziale Netzwerke und Slack
@@ -85,12 +85,12 @@ const { title, description = "", nichtIndexieren = false, bild } = Astro.props;
     <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
-    {bild && <meta property="og:image" content={bild} />}
+    {image && <meta property="og:image" content={image} />}
 
-    <meta name="twitter:card" content={bild ? "summary_large_image" : "summary"} />
+    <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
     <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
-    {bild && <meta name="twitter:image" content={bild} />}
+    {image && <meta name="twitter:image" content={image} />}
 
     <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
          blitzt die Fallback-Schrift im Hero auf. -->

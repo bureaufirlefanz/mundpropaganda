@@ -45,101 +45,101 @@ interface Props {
 
 const { daten: d, stellen } = Astro.props;
 
-const aktion = (await aufgeloest([d?.aktion ?? null], Astro.url.pathname))[0];
+const action = (await aufgeloest([d?.action ?? null], Astro.url.pathname))[0];
 
 /* Wahlfrei, aber nicht halb — dieselbe Regel wie auf der Leistungsseite:
    Wer einen Abschnitt anlegt, füllt ihn. Die Abfrage kann das nicht zusagen,
    also steht die Prüfung hier an einer Stelle. */
 const intro =
-  d?.introTopline && d.introHeadline && d.introSpalten?.length
-    ? { topline: d.introTopline, headline: d.introHeadline, spalten: d.introSpalten }
+  d?.introTopline && d.introHeadline && d.introColumns?.length
+    ? { topline: d.introTopline, headline: d.introHeadline, columns: d.introColumns }
     : undefined;
 
-const zahlen =
-  d?.zahlenTopline && d.zahlenHeadline && d.zahlenEintraege?.length
-    ? { topline: d.zahlenTopline, headline: d.zahlenHeadline, zahlen: d.zahlenEintraege }
+const figures =
+  d?.figuresTopline && d.figuresHeadline && d.figuresItems?.length
+    ? { topline: d.figuresTopline, headline: d.figuresHeadline, figures: d.figuresItems }
     : undefined;
 
 const vergleich =
-  d?.vergleichTopline && d.vergleichHeadline && d.vergleichSpalten?.length && d.vergleichZeilen?.length
+  d?.comparisonTopline && d.comparisonHeadline && d.comparisonColumns?.length && d.comparisonRows?.length
     ? {
-        topline: d.vergleichTopline,
-        headline: d.vergleichHeadline,
-        spalten: d.vergleichSpalten,
-        zeilen: d.vergleichZeilen,
-        hinweis: d.vergleichHinweis ?? undefined,
+        topline: d.comparisonTopline,
+        headline: d.comparisonHeadline,
+        columns: d.comparisonColumns,
+        lines: d.comparisonRows,
+        note: d.comparisonNote ?? undefined,
       }
     : undefined;
 
-const stimmen =
-  d?.stimmenTopline && d.stimmenHeadline && d.stimmenEintraege?.length
-    ? { topline: d.stimmenTopline, headline: d.stimmenHeadline, stimmen: d.stimmenEintraege }
+const voices =
+  d?.voicesTopline && d.voicesHeadline && d.voicesItems?.length
+    ? { topline: d.voicesTopline, headline: d.voicesHeadline, voices: d.voicesItems }
     : undefined;
 
 const ablauf =
-  d?.ablaufTopline && d.ablaufHeadline && d.ablaufEtappen?.length
-    ? { topline: d.ablaufTopline, headline: d.ablaufHeadline, etappen: d.ablaufEtappen }
+  d?.processTopline && d.processHeadline && d.processStages?.length
+    ? { topline: d.processTopline, headline: d.processHeadline, stages: d.processStages }
     : undefined;
 
 /* Die Stellen sind der Zweck der Seite. Ohne ausgeschriebene Stelle entfällt
    der Abschnitt — dann trägt die Initiativbewerbung darunter die Seite. */
-const zeigeStellen = Boolean(d?.stellenTopline && d.stellenHeadline && stellen.length);
+const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && stellen.length);
 ---
 
 <Base
-  title={d?.seo?.titel || "Karriere - Mundpropaganda"}
-  description={d?.seo?.beschreibung || d?.einleitung || ""}
-  nichtIndexieren={d?.seo?.nichtIndexieren}
+  title={d?.seo?.title || "Karriere - Mundpropaganda"}
+  description={d?.seo?.description || d?.lead || ""}
+  noIndex={d?.seo?.noIndex}
 >
   <ServiceHero
     topline={d?.topline}
-    titel={d?.titel ?? ""}
-    text={d?.einleitung}
-    bild={d?.bild}
-    aktion={aktion?.text}
-    aktionZiel={aktion?.href}
+    title={d?.title ?? ""}
+    text={d?.lead}
+    image={d?.image}
+    action={action?.text}
+    aktionZiel={action?.href}
   />
 
   {intro && <Intro {...intro} />}
 
-  {zahlen && <Facts {...zahlen} />}
+  {figures && <Facts {...figures} />}
 
   {vergleich && <Compare {...vergleich} />}
 
   {zeigeStellen && d && (
     <Jobs
       id="stellen"
-      topline={d.stellenTopline!}
-      headline={d.stellenHeadline!}
+      topline={d.jobsTopline!}
+      headline={d.jobsHeadline!}
       stellen={stellen}
-      bewerbungMail={d.bewerbungMail ?? ""}
+      applicationEmail={d.applicationEmail ?? ""}
     />
   )}
 
-  {stimmen && <Voices {...stimmen} />}
+  {voices && <Voices {...voices} />}
 
   {ablauf && <Timeline {...ablauf} />}
 
-  {d?.initiativTopline && d.initiativTitel && (
+  {d?.speculativeTopline && d.speculativeTitle && (
     <Panel
       id="initiativ"
-      topline={d.initiativTopline}
-      titel={d.initiativTitel}
-      text={d.initiativText ?? undefined}
+      topline={d.speculativeTopline}
+      title={d.speculativeTitle}
+      text={d.speculativeText ?? undefined}
     >
       <div class="k-initiativ">
-        {d.initiativAbsatz && <p>{d.initiativAbsatz}</p>}
-        {d.bewerbungMail && (
+        {d.speculativeParagraph && <p>{d.speculativeParagraph}</p>}
+        {d.applicationEmail && (
           <div class="k-initiativ__aktion">
-            <Button label="Initiativ bewerben" href={bewerbungLink(d.bewerbungMail)} />
-            <a class="k-initiativ__mail" href={`mailto:${d.bewerbungMail}`}>{d.bewerbungMail}</a>
+            <Button label="Initiativ bewerben" href={bewerbungLink(d.applicationEmail)} />
+            <a class="k-initiativ__mail" href={`mailto:${d.applicationEmail}`}>{d.applicationEmail}</a>
           </div>
         )}
       </div>
     </Panel>
   )}
 
-  {d?.faqTitel && d.faq?.length ? <Faq titel={d.faqTitel} fragen={d.faq} /> : null}
+  {d?.faqTitle && d.faq?.length ? <Faq title={d.faqTitle} questions={d.faq} /> : null}
 </Base>
 
 <style>

@@ -40,7 +40,7 @@ const KATEGORIEN: Record<string, string> = {
   praxis: "Praxis",
 };
 
-export const kategorieText = (wert?: string) => (wert ? (KATEGORIEN[wert] ?? wert) : "");
+export const kategorieText = (value?: string) => (value ? (KATEGORIEN[value] ?? value) : "");
 
 export const beitragPfad = (slug: string) => `/magazin/${slug}`;
 
@@ -55,7 +55,7 @@ const MOTIVE = ["motion-04", "teeth-macro", "lab-veneers", "treatment-03"] as co
 
 export const motivFuer = (slug?: string) => stabilesMotiv(MOTIVE, slug);
 
-/* Einmal je Build und je Filter. Start- und Leistungsseiten fragen dieselbe
+/* Einmal je Build und je Filter. Start- und Leistungsseiten questions dieselbe
    Liste ab — auf der Startseite alle, auf einer Leistungsseite die zu ihr
    gehörenden. */
 const gemerkt = new Map<string, Promise<Beitrag[]>>();
@@ -63,17 +63,17 @@ const gemerkt = new Map<string, Promise<Beitrag[]>>();
 /**
  * Die Beiträge, neueste zuerst.
  *
- * Mit `leistung` nur die, die im Studio auf genau diese Leistung verweisen.
+ * Mit `service` nur die, die im Studio auf genau diese Leistung verweisen.
  * Dafür ist die Referenz im Schema da: Die Leistungsseite zeigt passende
  * Beiträge, ohne dass jemand sie dort einzeln einträgt.
  */
-export function ladeBeitraege(leistung?: string): Promise<Beitrag[]> {
-  const schluessel = leistung ?? "*";
+export function ladeBeitraege(service?: string): Promise<Beitrag[]> {
+  const schluessel = service ?? "*";
   if (!gemerkt.has(schluessel)) {
     gemerkt.set(
       schluessel,
       sanityClient
-        .fetch(BEITRAEGE_QUERY, { leistung: leistung ?? null })
+        .fetch(BEITRAEGE_QUERY, { service: service ?? null })
         .then(ohneNull)
         .then((liste) => liste ?? [])
         .catch(() => [])
@@ -98,10 +98,10 @@ export async function ladeBeitrag(slug: string): Promise<BeitragVoll | undefined
  * Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches steht, ist
  * dieselbe stille Behauptung, die Aufgabe 4 überall abgeräumt hat.
  */
-export async function ladeAehnliche(kategorie?: string, slug?: string): Promise<Beitrag[]> {
-  if (!kategorie || !slug) return [];
+export async function ladeAehnliche(category?: string, slug?: string): Promise<Beitrag[]> {
+  if (!category || !slug) return [];
   try {
-    return ohneNull(await sanityClient.fetch(AEHNLICHE_QUERY, { kategorie, slug })) ?? [];
+    return ohneNull(await sanityClient.fetch(AEHNLICHE_QUERY, { category, slug })) ?? [];
   } catch {
     return [];
   }
@@ -116,7 +116,7 @@ export async function ladeMagazinKopf(): Promise<MagazinKopf | undefined> {
 }
 
 /** Deutsches Datum, wie es unter einem Beitrag steht. */
-export const datumText = (wert?: string) =>
-  wert
-    ? new Date(wert).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })
+export const datumText = (value?: string) =>
+  value
+    ? new Date(value).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })
     : "";

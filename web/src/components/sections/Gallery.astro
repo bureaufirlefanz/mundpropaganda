@@ -17,24 +17,24 @@ import type { Bildquelle } from "../../lib/bilder";
 
 interface Props {
   variante?: "reihe" | "ring";
-  titel: string;
+  title: string;
   /** Die Motive auf dem Ring, aus dem CMS. */
-  bilder?: { bild: Bildquelle; beschriftung?: string }[];
+  bilder?: { image: Bildquelle; caption?: string }[];
 }
 
 /* Keine Vorgabe für den Titel: Pflichtfeld im Schema, die Seite reicht ihn
    durch. `variante` ist dagegen eine Gestaltungsentscheidung der Seite und
    kein Inhalt — sie behält ihre Vorgabe. */
-const { variante = "reihe", titel, bilder } = Astro.props;
+const { variante = "reihe", title, bilder } = Astro.props;
 
 /* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
-const { standorte } = await ladeEinstellungen();
+const { locations } = await ladeEinstellungen();
 
 /* Klasse 3: die gestalteten Motive, solange im Studio keine hochgeladen sind.
    Drei beschriftete Praxisaufnahmen und zwei Abstraktionen dazwischen — auf
    dem Zylinder haben alle Karten dasselbe Maß.
 
-   `standorteBilder` gab es im Schema schon einmal und es erreichte nie ein
+   `locationsImages` gab es im Schema schon einmal und es erreichte nie ein
    Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
    Standortfotos hochlädt, sieht sie hier. */
 const MOTIVE: RingBild[] = [
@@ -49,15 +49,15 @@ const MOTIVE: RingBild[] = [
    ist eine Komposition, und drei eigene Fotos zwischen zwei geliehenen
    Abstraktionen sähen aus wie ein Fehler. */
 const ringBilder: RingBild[] = bilder?.length
-  ? bilder.map((b) => ({ bild: b.bild, alt: b.beschriftung ?? "", caption: b.beschriftung }))
+  ? bilder.map((b) => ({ image: b.image, alt: b.caption ?? "", caption: b.caption }))
   : MOTIVE;
 ---
 
 <!-- ==================================================================
            UNSERE STANDORTE — horizontal laufende Bildreihe
            ================================================================== -->
-      <section class="s-gallery" id="standorte" data-gallery>
-        <h2 class="s-gallery__title" data-split="lines">{titel}</h2>
+      <section class="s-gallery" id="locations" data-gallery>
+        <h2 class="s-gallery__title" data-split="lines">{title}</h2>
 
         {variante === "ring" ? (
           <BildRing bilder={ringBilder} label="Unsere Standorte" />
@@ -99,18 +99,18 @@ const ringBilder: RingBild[] = bilder?.length
         )}
 
         <div class="container s-cols">
-          {standorte.map((o, i) => (
+          {locations.map((o, i) => (
             <div class="s-cols__item">
               {/* Konturzahl: rein grafisch, deshalb für Vorlesegeräte
                   ausgeblendet — die Anschrift steht darunter im Klartext. */}
-              <p class="s-cols__display" data-reveal="up" data-reveal-delay={i * 0.08} aria-hidden="true">{o.kuerzel}</p>
+              <p class="s-cols__display" data-reveal="up" data-reveal-delay={i * 0.08} aria-hidden="true">{o.shortCode}</p>
               <h3 data-reveal="up" data-reveal-delay={0.06 + i * 0.08} data-reveal-trigger=".s-experts">{o.name}</h3>
               {/* <address> statt <p>: das ist die Anschrift der Praxis, und
                   Vorlesegeräte kündigen sie als solche an. */}
               <address class="s-cols__adresse" data-reveal="up" data-reveal-delay={0.1 + i * 0.08} data-reveal-trigger=".s-experts">
-                {o.strasse}<br />{o.ort}
+                {o.street}<br />{o.city}
               </address>
-              <p data-reveal="up" data-reveal-delay={0.14 + i * 0.08} data-reveal-trigger=".s-experts">{o.beschreibung}</p>
+              <p data-reveal="up" data-reveal-delay={0.14 + i * 0.08} data-reveal-trigger=".s-experts">{o.description}</p>
             </div>
           ))}
         </div>

@@ -6,7 +6,7 @@
  * versteht. Der src zeigt auf die kleinste Breite, damit alte Browser ohne
  * srcset nicht das größte Bild ziehen.
  *
- * **Die Breiten kommen aus `bild-breiten.json`, nicht von außen.** Vorher
+ * **Die Breiten kommen aus `image-breiten.json`, nicht von außen.** Vorher
  * nannte sie jeder Aufrufer selbst, und das ging so lange gut, wie die
  * Pipeline die genannten Stufen auch erzeugt hatte. Sie deckelt aber auf die
  * Breite der Quelle: `treatment-02` ist 1920px breit und hat keine 2200er
@@ -19,7 +19,7 @@
  * es nicht gibt. Jetzt kann das Markup keine falsche mehr nennen, weil es
  * gar keine mehr nennt.
  */
-import BREITEN from "../../lib/bild-breiten.json";
+import BREITEN from "../../lib/image-breiten.json";
 
 interface Props {
   name: string;
@@ -38,9 +38,9 @@ const liste = (BREITEN as Record<string, number[]>)[name];
    fertigen Seite auffallen. */
 if (!liste?.length) {
   throw new Error(
-    `Picture: Motiv „${name}" steht nicht in bild-breiten.json. ` +
+    `Picture: Motiv „${name}" steht nicht in image-breiten.json. ` +
       `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
-      `\`npm run images\` (bzw. \`node scripts/bild-breiten.mjs\`).`
+      `\`npm run images\` (bzw. \`node scripts/image-breiten.mjs\`).`
   );
 }
 

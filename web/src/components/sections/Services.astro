@@ -2,23 +2,23 @@
 /**
  * Services-Tabelle. Die Zeilen kommen aus der Leistungen-Collection, nicht
  * mehr aus dem Markup — dieselbe Quelle wie Menü und Footer. Das gilt auch
- * für die kleineren Links darunter: alles mit `platzierung: "liste"`.
+ * für die kleineren Links darunter: alles mit `placement: "liste"`.
  *
  * Deshalb gibt es kein Feld „Weitere Verweise“ mehr auf der Startseite. Es gab
  * eines (`servicesZusatz`), und es hat nie etwas bewirkt.
  */
 interface Props {
-  titel: string;
+  title: string;
 }
 
 /* Keine Vorgabe: Pflichtfeld im Schema, die Seite reicht es durch. */
-const { titel } = Astro.props;
+const { title } = Astro.props;
 import Button from "../ui/Button.astro";
 import { ladeLeistungsliste, fuerTabelle, fuerListe, pfad } from "../../lib/leistungsliste";
 import { istCmsBild, bildUrl, motivPfad } from "../../lib/bilder";
 
 const liste = await ladeLeistungsliste();
-const zeilen = fuerTabelle(liste);
+const lines = fuerTabelle(liste);
 const weitere = fuerListe(liste);
 
 /* Klasse 3: die gestalteten Motive für die Zeilen, an denen im CMS kein
@@ -40,8 +40,8 @@ const MOTIVE = [
 
 /* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
    Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
-const vorschauPfad = (l: (typeof zeilen)[number], i: number) => {
-  const v = l.vorschau;
+const vorschauPfad = (l: (typeof lines)[number], i: number) => {
+  const v = l.preview;
   if (istCmsBild(v)) return bildUrl(v, 640);
   if (typeof v === "string" && v) return v;
   /* Hier ausnahmsweise über die Position und nicht über einen Streuwert aus
@@ -65,7 +65,7 @@ const vorschauPfad = (l: (typeof zeilen)[number], i: number) => {
            ================================================================== -->
       <section class="s-services" id="leistungen" data-services>
         <div class="container">
-          <h2 class="s-services__title" data-split="lines">{titel}</h2>
+          <h2 class="s-services__title" data-split="lines">{title}</h2>
 
           <div class="s-services__head" data-reveal="fade">
             <span>Leistung</span>
@@ -79,7 +79,7 @@ const vorschauPfad = (l: (typeof zeilen)[number], i: number) => {
           </div>
 
           <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
-            {zeilen.map((l, i) => (
+            {lines.map((l, i) => (
               <a
                 class="s-services__row"
                 href={pfad(l)}

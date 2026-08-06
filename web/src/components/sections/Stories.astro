@@ -20,18 +20,18 @@ import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 interface Geschichte {
   name: string;
-  zitat?: string;
+  quote?: string;
   /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
-  bild?: Bildquelle;
+  image?: Bildquelle;
 }
 
 interface Props {
-  eintraege: Geschichte[];
+  items: Geschichte[];
   /** Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner. */
-  aktion?: { text: string; href: string };
+  action?: { text: string; href: string };
 }
 
-const { eintraege, aktion } = Astro.props;
+const { items, action } = Astro.props;
 
 /* Die gestalteten Motive aus der lokalen Bildpipeline, in der Reihenfolge des
    Entwurfs. Klasse 3: Sie sind kein Inhalt, den jemand pflegt, sondern der
@@ -69,10 +69,10 @@ const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion
           <div class="s-stories__stack" data-deck-stack>
             <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
                  dahinter durchscheinen lassen. -->
-            {eintraege.map((e, i) => (
+            {items.map((e, i) => (
               <figure class="s-stories__card" data-deck-card>
-                {istCmsBild(e.bild) ? (
-                  <CmsImage quelle={e.bild} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
+                {istCmsBild(e.image) ? (
+                  <CmsImage quelle={e.image} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
                 ) : (
                   <Picture name={MOTIVE[i % MOTIVE.length]} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
                 )}
@@ -107,8 +107,8 @@ const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion
           <!-- Wechselt mit der vordersten Karte oben. Alle Zitate liegen
                übereinander, sichtbar ist immer genau eines. -->
           <div class="s-quote__stage" data-deck-quotes>
-            {eintraege.map((e, i) => (
-              <blockquote class="s-quote__text" data-deck-quote data-active={i === 0 ? "true" : undefined}>{e.zitat}</blockquote>
+            {items.map((e, i) => (
+              <blockquote class="s-quote__text" data-deck-quote data-active={i === 0 ? "true" : undefined}>{e.quote}</blockquote>
             ))}
           </div>
 
@@ -119,9 +119,9 @@ const MOTIVE = ["smile-portrait", "motion-01", "motion-02", "motion-03", "motion
             Knopf, der den Browser nach oben springen ließ. Es gibt keine
             ganze Story: Die Stimmen sind Zitate, keine Beiträge. Wohin er
             führt, entscheidet die Redaktion. */}
-        {aktion && (
+        {action && (
           <div class="s-quote__foot">
-            <Button label={aktion.text} href={aktion.href} />
+            <Button label={action.text} href={action.href} />
           </div>
         )}
       </section>

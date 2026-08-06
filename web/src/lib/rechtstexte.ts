@@ -11,7 +11,7 @@ import { RECHTSTEXTE_QUERY, RECHTSTEXT_QUERY } from "./queries";
  *
  * Der Typ `rechtstext` gab es im Studio seit Anfang an — ausgeblendet, weil
  * die Website keine Route dafür hatte. Der Seitenfuß hatte das Feld
- * `rechtliches` und ließ es leer; im Schema stand als Begründung, die Zeile
+ * `legalLinks` und ließ es leer; im Schema stand als Begründung, die Zeile
  * bleibe leer, „solange es die Rechtstexte noch nicht gibt", statt auf „#"
  * zu zeigen. Genau das ist jetzt aufgelöst.
  *

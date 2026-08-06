@@ -15,16 +15,16 @@ import { defineQuery } from "groq";
  * erwischen. Die Studio-Struktur hängt das Einzeldokument an dieselbe ID.
  */
 export const EINSTELLUNGEN_QUERY = defineQuery(`
-  *[_id == "einstellungen"][0]{
-    telefon,
+  *[_id == "settings"][0]{
+    phone,
     email,
-    kontaktTitel,
-    kontaktText,
-    bewertungenAnbieter,
-    bewertungenAnzahl,
-    bewertungenSchnitt,
+    contactTitle,
+    contactText,
+    reviewsProvider,
+    reviewsCount,
+    reviewsAverage,
     social,
-    standorte[]{ kuerzel, name, strasse, ort, beschreibung }
+    locations[]{ shortCode, name, street, city, description }
   }
 `);
 
@@ -36,17 +36,17 @@ export const EINSTELLUNGEN_QUERY = defineQuery(`
  * das `order()` käme die Reihenfolge der Datenbank heraus, und das Ziehen im
  * Studio hätte keine Wirkung.
  *
- * `kurzname` fällt auf den Titel zurück, damit die Redaktion es nur pflegen
+ * `shortName` fällt auf den Titel zurück, damit die Redaktion es nur pflegen
  * muss, wenn der Listenname vom Seitentitel abweicht.
  */
 export const LEISTUNGSLISTE_QUERY = defineQuery(`
-  *[_type == "leistung" && defined(slug.current)] | order(orderRank) {
+  *[_type == "service" && defined(slug.current)] | order(orderRank) {
     "slug": slug.current,
-    "name": coalesce(kurzname, titel),
-    platzierung,
-    gruppe,
+    "name": coalesce(shortName, title),
+    placement,
+    group,
     tag,
-    "vorschau": vorschau{ ..., asset->{ _id, url } }
+    "preview": preview{ ..., asset->{ _id, url } }
   }
 `);
 
@@ -72,51 +72,51 @@ const BILD = `{
  * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
  * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
  */
-export const LEISTUNG_QUERY = defineQuery(`*[_type == "leistung" && slug.current == $slug][0]{
-  titel,
+export const LEISTUNG_QUERY = defineQuery(`*[_type == "service" && slug.current == $slug][0]{
+  title,
   topline,
-  seoBeschreibung,
-  hero{ text, bild${BILD} },
-  intro{ topline, headline, spalten },
-  benefits{ topline, headline, eintraege[]{ name, text, bild${BILD} } },
-  preise[]{ name, preis },
-  faq[]{ frage, antwort },
-  vorherNachher{ topline, vorher${BILD}, nachher${BILD} },
+  seoDescription,
+  hero{ text, image${BILD} },
+  intro{ topline, headline, columns },
+  benefits{ topline, headline, items[]{ name, text, image${BILD} } },
+  pricing[]{ name, price },
+  faq[]{ question, answer },
+  beforeAfter{ topline, before${BILD}, after${BILD} },
   statement{ topline, text },
-  schritte{ titel, eintraege[]{ titel, text } },
-  features[]{ topline, titel, text, bild${BILD} }
+  steps{ title, items[]{ title, text } },
+  features[]{ topline, title, text, image${BILD} }
 }`);
 
 /**
  * Ein Verweis, aufgelöst so weit GROQ es kann.
  *
- * `ziel->` holt Typ und Slug des Zieldokuments — daraus baut `linkZiel()` in
+ * `target->` holt Typ und Slug des Zieldokuments — daraus baut `linkZiel()` in
  * `lib/navigation.ts` den Pfad, über dieselbe Regel wie das Studio. Der Pfad
  * steht nirgends als Text im Datensatz; er entsteht an einer Stelle.
  */
 const LINK = `{
     text,
-    art,
-    anker,
+    kind,
+    anchor,
     url,
-    ziel->{ _type, "slug": slug.current }
+    target->{ _type, "slug": slug.current }
   }`;
 
 /** Navigation und Seitenfuß — der Rahmen, der auf jeder Seite gleich ist. */
 export const NAVIGATION_QUERY = defineQuery(`
   *[_id == "navigation"][0]{
-    hauptmenue[]${LINK},
-    menueSpalten[]{ titel, links[]${LINK} },
-    aktion${LINK}
+    mainMenu[]${LINK},
+    menuColumns[]{ title, links[]${LINK} },
+    action${LINK}
   }
 `);
 
 export const FOOTER_QUERY = defineQuery(`
   *[_id == "footer"][0]{
-    leistungenTitel,
-    spalten[]{ titel, links[]${LINK} },
-    aktion${LINK},
-    rechtliches[]${LINK},
+    servicesHeading,
+    columns[]{ title, links[]${LINK} },
+    action${LINK},
+    legalLinks[]${LINK},
     copyright
   }
 `);
@@ -125,41 +125,41 @@ export const FOOTER_QUERY = defineQuery(`
  * Die Karriereseite und die ausgeschriebenen Stellen.
  *
  * Die Stellen kommen aus ihrer eigenen Sammlung, nicht aus dem Dokument:
- * `aktiv` schaltet eine ab, ohne sie zu löschen, und die Kennung trägt
+ * `active` schaltet eine ab, ohne sie zu löschen, und die Kennung trägt
  * Sprungmarke und Mail-Betreff. Beides gäbe es in einem eingebetteten Array
  * nicht.
  */
 export const KARRIERE_QUERY = defineQuery(`
-  *[_id == "karriere"][0]{
-    topline, titel, einleitung, bild${BILD}, aktion${LINK},
-    introTopline, introHeadline, introSpalten,
-    zahlenTopline, zahlenHeadline, zahlenEintraege[]{ wert, einheit, text },
-    vergleichTopline, vergleichHeadline,
-    vergleichSpalten[]{ name, meta, betont },
-    vergleichZeilen[]{ name, werte[]{ art, text } },
-    vergleichHinweis,
-    stellenTopline, stellenHeadline,
-    stimmenTopline, stimmenHeadline,
-    stimmenEintraege[]{ zitat, name, rolle, dabeiSeit, bild${BILD}, versatz },
-    ablaufTopline, ablaufHeadline, ablaufEtappen[]{ marke, titel, text },
-    initiativTopline, initiativTitel, initiativText, initiativAbsatz,
-    bewerbungMail,
-    faqTitel, faq[]{ frage, antwort },
-    seo{ titel, beschreibung, nichtIndexieren, bild${BILD} }
+  *[_id == "careers"][0]{
+    topline, title, lead, image${BILD}, action${LINK},
+    introTopline, introHeadline, introColumns,
+    figuresTopline, figuresHeadline, figuresItems[]{ value, unit, text },
+    comparisonTopline, comparisonHeadline,
+    comparisonColumns[]{ name, meta, emphasised },
+    comparisonRows[]{ name, values[]{ kind, text } },
+    comparisonNote,
+    jobsTopline, jobsHeadline,
+    voicesTopline, voicesHeadline,
+    voicesItems[]{ quote, name, role, since, image${BILD}, offset },
+    processTopline, processHeadline, processStages[]{ marker, title, text },
+    speculativeTopline, speculativeTitle, speculativeText, speculativeParagraph,
+    applicationEmail,
+    faqTitle, faq[]{ question, answer },
+    seo{ title, description, noIndex, image${BILD} }
   }
 `);
 
 export const STELLEN_QUERY = defineQuery(`
-  *[_type == "stelle" && aktiv != false] | order(orderRank) {
-    titel,
-    "kennung": kennung.current,
-    art,
-    standort,
-    umfang,
-    einleitung,
-    aufgaben,
-    profil,
-    besonderheit
+  *[_type == "job" && active != false] | order(orderRank) {
+    title,
+    "handle": handle.current,
+    kind,
+    location,
+    hours,
+    lead,
+    duties,
+    profile,
+    highlight
   }
 `);
 
@@ -171,32 +171,32 @@ export const STELLEN_QUERY = defineQuery(`
  * wird für die Karte nicht gebraucht und wäre bei zwölf Beiträgen der
  * größte Posten der Antwort.
  *
- * `$leistung` filtert auf Beiträge, die auf eine Leistung verweisen — dafür
+ * `$service` filtert auf Beiträge, die auf eine Leistung verweisen — dafür
  * ist die Referenz im Schema da. Ohne Wert (null) kommen alle.
  */
 export const BEITRAEGE_QUERY = defineQuery(`
-  *[_type == "beitrag" && defined(slug.current)
-    && ($leistung == null || leistung->slug.current == $leistung)]
-    | order(datum desc) {
+  *[_type == "post" && defined(slug.current)
+    && ($service == null || service->slug.current == $service)]
+    | order(date desc) {
     "slug": slug.current,
-    titel,
-    datum,
-    kategorie,
-    einleitung,
-    vorschaubild${BILD}
+    title,
+    date,
+    category,
+    lead,
+    previewImage${BILD}
   }
 `);
 
 /** Ein einzelner Beitrag mit Fließtext. */
-export const BEITRAG_QUERY = defineQuery(`*[_type == "beitrag" && slug.current == $slug][0]{
+export const BEITRAG_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]{
   "slug": slug.current,
-  titel,
-  datum,
-  kategorie,
-  einleitung,
-  vorschaubild${BILD},
-  text[]{ ..., _type == "bild" => ${BILD} },
-  "leistung": leistung->{ titel, "slug": slug.current },
+  title,
+  date,
+  category,
+  lead,
+  previewImage${BILD},
+  text[]{ ..., _type == "image" => ${BILD} },
+  "service": service->{ title, "slug": slug.current },
   seo
 }`);
 
@@ -210,15 +210,15 @@ export const BEITRAG_QUERY = defineQuery(`*[_type == "beitrag" && slug.current =
  * Seite, auf der er gar nicht steht.
  */
 export const RECHTSTEXTE_QUERY = defineQuery(`
-  *[_type == "rechtstext" && defined(slug.current)] | order(titel asc) {
+  *[_type == "legalPage" && defined(slug.current)] | order(title asc) {
     "slug": slug.current,
-    titel
+    title
   }
 `);
 
-export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "rechtstext" && slug.current == $slug][0]{
-  titel,
-  text[]{ ..., _type == "bild" => ${BILD} },
+export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "legalPage" && slug.current == $slug][0]{
+  title,
+  text[]{ ..., _type == "image" => ${BILD} },
   seo
 }`);
 
@@ -226,7 +226,7 @@ export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "rechtstext" && slug.cur
  * Beiträge aus derselben Kategorie — der Weiterlesen-Block unter einem
  * Beitrag.
  *
- * Über `kategorie` und nicht über ein eigenes Tag-System: Die vier Werte
+ * Über `category` und nicht über ein eigenes Tag-System: Die vier Werte
  * (Behandlung, Vorsorge, Material & Technik, Praxis) stehen schon im Schema,
  * jeder Beitrag trägt genau einen davon, und eine zweite Ordnung daneben
  * hieße, dass der Kunde beim Anlegen zweimal dasselbe entscheidet.
@@ -235,21 +235,21 @@ export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "rechtstext" && slug.cur
  * sich selbst.
  */
 export const AEHNLICHE_QUERY = defineQuery(`
-  *[_type == "beitrag" && defined(slug.current)
-    && kategorie == $kategorie && slug.current != $slug]
-    | order(datum desc) [0...3] {
+  *[_type == "post" && defined(slug.current)
+    && category == $category && slug.current != $slug]
+    | order(date desc) [0...3] {
     "slug": slug.current,
-    titel,
-    datum,
-    kategorie,
-    einleitung,
-    vorschaubild${BILD}
+    title,
+    date,
+    category,
+    lead,
+    previewImage${BILD}
   }
 `);
 
 /** Der Kopf der Magazin-Übersicht. Die Beiträge kommen aus der Collection. */
 export const MAGAZIN_INDEX_QUERY = defineQuery(`
-  *[_id == "magazinIndex"][0]{ titel, topline, einleitung, seo }
+  *[_id == "magazineIndex"][0]{ title, topline, lead, seo }
 `);
 
 /**
@@ -265,23 +265,23 @@ export const MAGAZIN_INDEX_QUERY = defineQuery(`
  *
  *   `servicesZusatz`   entfernt. Die Links unter der Tabelle kommen aus der
  *                      Leistungen-Collection, und die ist die bessere Quelle.
- *   `expertenText`     angeschlossen, heißt jetzt `expertenAbsaetze`.
+ *   `expertenText`     angeschlossen, heißt jetzt `expertsParagraphs`.
  *   `standardsBild`    an die richtige Stelle gerückt: Das Motiv hängt am
  *                      einzelnen Punkt, nicht am Abschnitt.
- *   `standorteBilder`  angeschlossen — der Ring liest jetzt daraus.
+ *   `locationsImages`  angeschlossen — der Ring liest jetzt daraus.
  */
 export const STARTSEITE_QUERY = defineQuery(`
-  *[_id == "startseite"][0]{
-    heroZeilen,
-    splitTopline, splitTitel, splitAbsaetze, splitBild,
-    servicesTitel,
-    standardsTitel, standardsEintraege[]{ name, text, bild${BILD} },
-    standorteTitel, standorteBilder[]{ bild${BILD}, beschriftung },
-    expertenTitel, expertenAbsaetze, expertenNamen, expertenBild,
-    storiesEintraege[]{ name, bild, zitat },
-    storiesAktion${LINK},
-    magazinTopline, magazinTitel, magazinText,
-    faqTitel, faqText, faq[]{ frage, antwort },
-    seo{ titel, beschreibung, nichtIndexieren, bild${BILD} }
+  *[_id == "homepage"][0]{
+    heroLines,
+    splitTopline, splitTitle, splitParagraphs, splitImage,
+    servicesTitle,
+    standardsTitle, standardsItems[]{ name, text, image${BILD} },
+    locationsTitle, locationsImages[]{ image${BILD}, caption },
+    expertsTitle, expertsParagraphs, expertsNames, expertsImage,
+    storiesItems[]{ name, image, quote },
+    storiesAction${LINK},
+    magazineTopline, magazineTitle, magazineText,
+    faqTitle, faqText, faq[]{ question, answer },
+    seo{ title, description, noIndex, image${BILD} }
   }
 `);

@@ -15,7 +15,7 @@ export const seo = defineType({
   options: { collapsible: true, collapsed: true },
   fields: [
     defineField({
-      name: "titel",
+      name: "title",
       title: "Seitentitel",
       type: "string",
       description:
@@ -23,7 +23,7 @@ export const seo = defineType({
       validation: (r) => r.max(65).warning("Über 65 Zeichen wird meist abgeschnitten."),
     }),
     defineField({
-      name: "beschreibung",
+      name: "description",
       title: "Beschreibung",
       type: "text",
       rows: 3,
@@ -37,7 +37,7 @@ export const seo = defineType({
        niemanden, der ihn hört, und der Dekorativ-Haken wäre eine Frage ohne
        Antwort. Das ist die eine Ausnahme von Aufgabe 12. */
     defineField({
-      name: "bild",
+      name: "image",
       title: "Vorschaubild",
       type: "image",
       description:
@@ -45,7 +45,7 @@ export const seo = defineType({
       options: { hotspot: true },
     }),
     defineField({
-      name: "nichtIndexieren",
+      name: "noIndex",
       title: "Von Suchmaschinen ausschließen",
       type: "boolean",
       description:

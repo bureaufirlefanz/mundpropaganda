@@ -22,13 +22,13 @@ import Icons from "../components/ui/Icons.astro";
 
 interface Props {
   title: string;
-  aktiv: "styleguide" | "komponenten";
+  active: "styleguide" | "komponenten";
 }
-const { title, aktiv } = Astro.props;
+const { title, active } = Astro.props;
 
 const SEITEN = [
-  { pfad: "/design/styleguide", name: "Styleguide", hinweis: "Farben, Typografie, Abstände, Bausteine" },
-  { pfad: "/design/komponenten", name: "Komponenten", hinweis: "Jeder Baustein mit Beschreibung" },
+  { pfad: "/design/styleguide", name: "Styleguide", note: "Farben, Typografie, Abstände, Bausteine" },
+  { pfad: "/design/komponenten", name: "Komponenten", note: "Jeder Baustein mit Beschreibung" },
 ] as const;
 ---
 
@@ -54,7 +54,7 @@ const SEITEN = [
       <a class="d-kopf__marke" href="/">Mundpropaganda</a>
       <nav class="d-kopf__nav" aria-label="Design">
         {SEITEN.map((s) => (
-          <a href={s.pfad} aria-current={s.name.toLowerCase().startsWith(aktiv.slice(0, 4)) ? "page" : undefined}>
+          <a href={s.pfad} aria-current={s.name.toLowerCase().startsWith(active.slice(0, 4)) ? "page" : undefined}>
             {s.name}
           </a>
         ))}

@@ -16,14 +16,14 @@ import type { Marke } from "../../lib/inhaltsverzeichnis";
 
 interface Props {
   marken: Marke[];
-  titel?: string;
+  title?: string;
 }
 
-const { marken, titel = "Inhalt" } = Astro.props;
+const { marken, title = "Inhalt" } = Astro.props;
 ---
 
-<nav class="c-toc" aria-labelledby="toc-titel" data-toc>
-  <p class="c-toc__kopf" id="toc-titel">{titel}</p>
+<nav class="c-toc" aria-labelledby="toc-title" data-toc>
+  <p class="c-toc__kopf" id="toc-title">{title}</p>
 
   <ol class="c-toc__liste">
     {marken.map((m) => (

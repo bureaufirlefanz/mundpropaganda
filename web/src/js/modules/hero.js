@@ -116,7 +116,7 @@ export function initHero() {
       /* Die Wortmarke erst hier freigeben: die Zeichen stecken jetzt in ihren
          Masken, und der `from`-Tween unten legt seine Startwerte schon beim
          Anlegen an (yPercent 100). Zu sehen ist dadurch noch nichts — anders
-         als vorher, wo die Zeilen bis zu diesem Moment fertig dastanden. */
+         als before, wo die Zeilen bis zu diesem Moment fertig dastanden. */
       .set(words, { visibility: "visible" }, 0)
       // Zeichen steigen hinter der Maske hoch und kippen dabei aus der
       // Tiefe in die Fläche.
@@ -138,7 +138,7 @@ export function initHero() {
       // Maßstabswechsel genügt für die Tiefe. Die Deckkraft läuft als
       // eigener, kurzer Tween — als Teil der langen Bewegung wäre das
       // Einblenden zäh.
-      // Erst hier aus der Verborgenheit holen — vorher zeigte das CSS die
+      // Erst hier aus der Verborgenheit holen — before zeigte das CSS die
       // Glasebene bereits in voller Stärke, während der Zahn noch fehlte.
       .set(tooth ?? {}, { visibility: "visible" }, 0.85)
       .from(

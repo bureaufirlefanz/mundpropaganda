@@ -29,40 +29,40 @@ import type { Verweis } from "./navigation";
  */
 
 export interface StartseiteInhalt {
-  heroZeilen: string[];
+  heroLines: string[];
 
   splitTopline: string;
-  splitTitel: string;
-  splitAbsaetze: string[];
-  splitBild?: Bildquelle;
+  splitTitle: string;
+  splitParagraphs: string[];
+  splitImage?: Bildquelle;
 
-  servicesTitel: string;
+  servicesTitle: string;
 
-  standardsTitel: string;
+  standardsTitle: string;
   /* Das Motiv hängt am Punkt: Die Zahnmaske zeigt zu jedem Punkt ein anderes
      Bild und blendet beim Weiterwandern um. */
-  standardsEintraege: { name: string; text?: string; bild?: Bildquelle }[];
+  standardsItems: { name: string; text?: string; image?: Bildquelle }[];
 
-  standorteTitel: string;
-  standorteBilder?: { bild: Bildquelle; beschriftung?: string }[];
+  locationsTitle: string;
+  locationsImages?: { image: Bildquelle; caption?: string }[];
 
-  expertenTitel: string;
-  expertenNamen: string;
-  expertenAbsaetze: string[];
-  expertenBild?: Bildquelle;
+  expertsTitle: string;
+  expertsNames: string;
+  expertsParagraphs: string[];
+  expertsImage?: Bildquelle;
 
-  storiesEintraege: { name: string; bild?: Bildquelle; zitat?: string }[];
-  /* Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner — vorher stand
+  storiesItems: { name: string; image?: Bildquelle; quote?: string }[];
+  /* Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner — before stand
      dort einer mit `href="#"`. Die Form kommt aus lib/navigation.ts. */
-  storiesAktion?: Verweis;
+  storiesAction?: Verweis;
 
-  magazinTopline: string;
-  magazinTitel: string;
-  magazinText: string;
+  magazineTopline: string;
+  magazineTitle: string;
+  magazineText: string;
 
-  faqTitel: string;
+  faqTitle: string;
   faqText?: string;
-  faq: { frage: string; antwort?: string }[];
+  faq: { question: string; answer?: string }[];
 
   /**
    * Suchmaschinen- und Teilen-Angaben. Kein sichtbarer Seiteninhalt, deshalb
@@ -71,10 +71,10 @@ export interface StartseiteInhalt {
    * das sagt das Schema dem Kunden auch zu.
    */
   seo?: {
-    titel?: string;
-    beschreibung?: string;
-    nichtIndexieren?: boolean;
-    bild?: Bildquelle;
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+    image?: Bildquelle;
   };
 }
 
@@ -90,24 +90,24 @@ export interface StartseiteInhalt {
    Satzes, den niemand mehr im Studio findet. */
 const PFLICHT_TEXT = [
   "splitTopline",
-  "splitTitel",
-  "servicesTitel",
-  "standardsTitel",
-  "standorteTitel",
-  "expertenTitel",
-  "expertenNamen",
-  "magazinTopline",
-  "magazinTitel",
-  "magazinText",
-  "faqTitel",
+  "splitTitle",
+  "servicesTitle",
+  "standardsTitle",
+  "locationsTitle",
+  "expertsTitle",
+  "expertsNames",
+  "magazineTopline",
+  "magazineTitle",
+  "magazineText",
+  "faqTitle",
 ] as const;
 
 const PFLICHT_LISTE = [
-  "heroZeilen",
-  "splitAbsaetze",
-  "standardsEintraege",
-  "expertenAbsaetze",
-  "storiesEintraege",
+  "heroLines",
+  "splitParagraphs",
+  "standardsItems",
+  "expertsParagraphs",
+  "storiesItems",
   "faq",
 ] as const;
 

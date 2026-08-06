@@ -17,7 +17,7 @@ import { ladeEinstellungen, telLink } from "./einstellungen";
 
 export type Navigation = NonNullable<OhneNull<NAVIGATION_QUERY_RESULT>>;
 export type Footer = NonNullable<OhneNull<FOOTER_QUERY_RESULT>>;
-export type Verweis = NonNullable<Navigation["hauptmenue"]>[number];
+export type Verweis = NonNullable<Navigation["mainMenu"]>[number];
 
 /**
  * Der Pfad eines Dokuments — dieselbe Regel wie `studio/lib/pfade.ts`.
@@ -29,7 +29,7 @@ export type Verweis = NonNullable<Navigation["hauptmenue"]>[number];
  * Routen-Deckung.
  */
 const VERZEICHNIS: Record<string, string> = {
-  leistung: "leistungen",
+  service: "leistungen",
   beitrag: "magazin",
 };
 
@@ -62,24 +62,24 @@ function dokumentPfad(typ?: string, slug?: string): string | null {
 export function linkZiel(
   v: Verweis | undefined | null,
   aktuellerPfad: string,
-  kontakt: { telefon: string; email: string }
+  kontakt: { phone: string; email: string }
 ): string | null {
   if (!v) return null;
 
-  if (v.art === "email") return kontakt.email ? `mailto:${kontakt.email}` : null;
-  if (v.art === "telefon") return kontakt.telefon ? telLink(kontakt.telefon) : null;
-  if (v.art === "extern") return v.url || null;
+  if (v.kind === "email") return kontakt.email ? `mailto:${kontakt.email}` : null;
+  if (v.kind === "phone") return kontakt.phone ? telLink(kontakt.phone) : null;
+  if (v.kind === "external") return v.url || null;
 
-  const pfad = dokumentPfad(v.ziel?._type, v.ziel?.slug ?? undefined);
+  const pfad = dokumentPfad(v.target?._type, v.target?.slug ?? undefined);
   if (!pfad) return null;
-  if (!v.anker) return pfad;
+  if (!v.anchor) return pfad;
 
   /* Trailing slash abziehen, damit „/karriere" und „/karriere/" als dieselbe
      Seite gelten — Astro legt jede Seite als Verzeichnis ab, und der Browser
      steht danach auf der Fassung mit Schrägstrich. */
   const hier = aktuellerPfad.replace(/\/+$/, "") || "/";
   const dort = pfad.replace(/\/+$/, "") || "/";
-  return hier === dort ? `#${v.anker}` : `${pfad}#${v.anker}`;
+  return hier === dort ? `#${v.anchor}` : `${pfad}#${v.anchor}`;
 }
 
 /** Verweise mit Ziel, fertig zum Rendern. Was kein Ziel hat, fällt raus. */
@@ -87,10 +87,10 @@ export async function aufgeloest(
   verweise: (Verweis | null)[] | undefined | null,
   aktuellerPfad: string
 ): Promise<{ text: string; href: string }[]> {
-  const { telefon, email } = await ladeEinstellungen();
+  const { phone, email } = await ladeEinstellungen();
   return (verweise ?? [])
     .filter((v): v is Verweis => Boolean(v))
-    .map((v) => ({ text: v.text ?? "", href: linkZiel(v, aktuellerPfad, { telefon, email }) }))
+    .map((v) => ({ text: v.text ?? "", href: linkZiel(v, aktuellerPfad, { phone, email }) }))
     .filter((v): v is { text: string; href: string } => Boolean(v.text && v.href));
 }
 

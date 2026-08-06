@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { validatePreviewUrl } from "@sanity/preview-url-secret";
-import { vorschauClient, VORSCHAU_COOKIE } from "../../../lib/vorschau";
+import { vorschauClient, VORSCHAU_COOKIE } from "../../../lib/preview";
 
 /**
  * Schaltet die Vorschau frei.
@@ -46,9 +46,9 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
      liefert den Pfad der Location, also `/leistungen/veneers`; ruft jemand
      den Endpunkt aber mit einem bereits präfigierten Pfad auf, entstünde
      sonst `/preview/preview/…` und damit ein 404. */
-  const ziel = redirectTo.startsWith("/preview")
+  const target = redirectTo.startsWith("/preview")
     ? redirectTo
     : `/preview${redirectTo === "/" ? "" : redirectTo}`;
 
-  return redirect(ziel, 307);
+  return redirect(target, 307);
 };

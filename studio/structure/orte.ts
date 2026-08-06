@@ -41,9 +41,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     rechtstext: defineLocations({
-      select: { titel: "titel", slug: "slug.current" },
+      select: { title: "title", slug: "slug.current" },
       resolve: (doc) => {
-        const pfad = pfadVon("rechtstext", doc?.slug ?? undefined);
+        const pfad = pfadVon("legalPage", doc?.slug ?? undefined);
         return {
           locations: [
             ...(pfad ? [{ title: doc?.titel ?? "Der Rechtstext", href: pfad }] : []),
@@ -56,9 +56,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     leistung: defineLocations({
-      select: { titel: "titel", kurzname: "kurzname", slug: "slug.current" },
+      select: { title: "title", shortName: "shortName", slug: "slug.current" },
       resolve: (doc) => {
-        const pfad = pfadVon("leistung", doc?.slug ?? undefined);
+        const pfad = pfadVon("service", doc?.slug ?? undefined);
         return {
           locations: [
             /* Die eigene Seite zuerst — sie ist gemeint, wenn jemand die
@@ -74,10 +74,10 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     beitrag: defineLocations({
-      select: { titel: "titel", slug: "slug.current", leistung: "leistung->slug.current" },
+      select: { title: "title", slug: "slug.current", service: "leistung->slug.current" },
       resolve: (doc) => {
-        const pfad = pfadVon("beitrag", doc?.slug ?? undefined);
-        const zurLeistung = pfadVon("leistung", doc?.leistung ?? undefined);
+        const pfad = pfadVon("post", doc?.slug ?? undefined);
+        const zurLeistung = pfadVon("service", doc?.leistung ?? undefined);
         return {
           locations: [
             ...(pfad ? [{ title: doc?.titel ?? "Der Beitrag", href: pfad }] : []),
@@ -94,7 +94,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     /* --- Dokumente ohne eigene Seite ---------------------------------- */
 
     stelle: defineLocations({
-      select: { titel: "titel" },
+      select: { title: "title" },
       resolve: () => ({ locations: [{ title: "Karriere (Offene Stellen)", href: "/karriere" }] }),
     }),
 

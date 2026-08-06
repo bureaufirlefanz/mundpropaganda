@@ -16,12 +16,12 @@ import { ladeRechtstext, ladeRechtstexte } from "../lib/rechtstexte";
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
   const texte = await ladeRechtstexte();
-  return texte.map((t) => ({ params: { slug: t.slug }, props: { titel: t.titel } }));
+  return texte.map((t) => ({ params: { slug: t.slug }, props: { title: t.title } }));
 }
 
 const { slug } = Astro.params;
-const { titel } = Astro.props;
+const { title } = Astro.props;
 const daten = await ladeRechtstext(slug!);
 ---
 
-<Rechtstext daten={daten} titel={daten?.titel || titel || ""} />
+<Rechtstext daten={daten} title={daten?.title || title || ""} />

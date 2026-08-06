@@ -61,27 +61,27 @@ const {
 const motiv = motivFuer(p.slug);
 ---
 
-<!-- `data-kategorie` trägt den Rohwert, nicht den Klartext: Der Filter
+<!-- `data-category` trägt den Rohwert, nicht den Klartext: Der Filter
      vergleicht ihn mit dem Wert aus dem Schema, und „Material & Technik"
      gegen „technik" zu prüfen hieße, die Zuordnung ein zweites Mal zu
      pflegen. -->
-<article class="c-post" data-kategorie={p.kategorie ?? ""} {...rest}>
+<article class="c-post" data-category={p.category ?? ""} {...rest}>
   <div class="c-post__media">
-    {istCmsBild(p.vorschaubild) ? (
-      <CmsImage quelle={p.vorschaubild} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
+    {istCmsBild(p.previewImage) ? (
+      <CmsImage quelle={p.previewImage} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
     ) : (
       <Picture name={motiv} alt="" sizes={sizes} parallax={parallax} />
     )}
   </div>
 
   <div class="c-post__card">
-    {p.kategorie && <span class="c-post__tag">{kategorieText(p.kategorie)}</span>}
+    {p.category && <span class="c-post__tag">{kategorieText(p.category)}</span>}
 
     <Titel class="c-post__title">
-      <a class="c-post__link" href={beitragPfad(p.slug)}>{p.titel}</a>
+      <a class="c-post__link" href={beitragPfad(p.slug)}>{p.title}</a>
     </Titel>
 
-    {p.einleitung && <p class="c-post__text">{p.einleitung}</p>}
+    {p.lead && <p class="c-post__text">{p.lead}</p>}
   </div>
 
   {mitKnopf && <Button label="Beitrag lesen" static />}

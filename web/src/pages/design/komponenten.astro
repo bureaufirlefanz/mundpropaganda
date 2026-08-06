@@ -157,7 +157,7 @@ const RING_BILDER = [
 ];
 ---
 
-<Design title="Komponenten" aktiv="komponenten">
+<Design title="Komponenten" active="komponenten">
   <section class="d-teil">
     <div class="d-teil__kopf">
       <span class="d-teil__nummer">00</span>
@@ -215,7 +215,7 @@ const RING_BILDER = [
         Aufklappen zusammenzuckt, wirkt wie ein Ruckeln.
       </p>
       <div class="d-buehne">
-        <Accordion fragen={FRAGEN_KURZ} />
+        <Accordion questions={FRAGEN_KURZ} />
       </div>
     </div>
 
@@ -253,7 +253,7 @@ const RING_BILDER = [
         steht, steckt darin.
       </p>
       <div class="d-buehne d-buehne--randlos">
-        <Panel topline="Beispiel" titel="Ein Panel" text="Die Zusatzzeile ist wahlfrei.">
+        <Panel topline="Beispiel" title="Ein Panel" text="Die Zusatzzeile ist wahlfrei.">
           <p style="max-width: 60ch">Beliebiger Inhalt im Schlitz.</p>
         </Panel>
       </div>
@@ -334,7 +334,7 @@ const RING_BILDER = [
         beschleunigten Kindern zeigte sich sonst eine Haarlinie an der Kante.
       </p>
       <div class="d-live">
-        <Split topline={inhalt.splitTopline} titel={inhalt.splitTitel} absaetze={inhalt.splitAbsaetze} bild={inhalt.splitBild} />
+        <Split topline={inhalt.splitTopline} title={inhalt.splitTitle} absaetze={inhalt.splitParagraphs} image={inhalt.splitImage} />
       </div>
     </div>
 
@@ -348,7 +348,7 @@ const RING_BILDER = [
         im Studio, dieselbe Quelle wie Menü und Fuß. Beim Überfahren färbt sich
         die Linie mit, und eine Bildvorschau folgt dem Zeiger.
       </p>
-      <div class="d-live"><Services titel={inhalt.servicesTitel} /></div>
+      <div class="d-live"><Services title={inhalt.servicesTitle} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -360,7 +360,7 @@ const RING_BILDER = [
         Nummerierte Auswahlliste links, Bild rechts in der Zahnmaske. Die Liste
         klappt immer genau einen Eintrag auf und wandert von selbst weiter.
       </p>
-      <div class="d-live"><Standards titel={inhalt.standardsTitel} eintraege={inhalt.standardsEintraege} /></div>
+      <div class="d-live"><Standards title={inhalt.standardsTitle} items={inhalt.standardsItems} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -374,7 +374,7 @@ const RING_BILDER = [
         hat eine feste Höhe - mit Mindesthöhe trug der längste Eintrag sie über
         das Maß hinaus und das ganze Band sprang beim Durchlaufen.
       </p>
-      <div class="d-live">{bl?.benefits?.topline && bl.benefits.headline && bl.benefits.eintraege?.length ? <Benefits topline={bl.benefits.topline} headline={bl.benefits.headline} eintraege={bl.benefits.eintraege} /> : null}</div>
+      <div class="d-live">{bl?.benefits?.topline && bl.benefits.headline && bl.benefits.items?.length ? <Benefits topline={bl.benefits.topline} headline={bl.benefits.headline} items={bl.benefits.items} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -389,7 +389,7 @@ const RING_BILDER = [
         Zylinder. Darunter die beiden Praxen mit Anschrift, aus den
         Einstellungen. Hier steht die Reihe - den Ring zeigt der Baustein oben.
       </p>
-      <div class="d-live"><Gallery titel={inhalt.standorteTitel} bilder={inhalt.standorteBilder} /></div>
+      <div class="d-live"><Gallery title={inhalt.locationsTitle} bilder={inhalt.locationsImages} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -399,7 +399,7 @@ const RING_BILDER = [
       </div>
       <p class="d-probe__text d-eingerueckt">Das Team - Bild, Namen, Kurzprofil.</p>
       <div class="d-live">
-        <Experts titel={inhalt.expertenTitel} namen={inhalt.expertenNamen} absaetze={inhalt.expertenAbsaetze} bild={inhalt.expertenBild} />
+        <Experts title={inhalt.expertsTitle} namen={inhalt.expertsNames} absaetze={inhalt.expertsParagraphs} image={inhalt.expertsImage} />
       </div>
     </div>
 
@@ -415,7 +415,7 @@ const RING_BILDER = [
         ein pinkes Zeichen auf Taupe lag bei 1,26:1 und damit weit unter den
         3:1, die WCAG für Bedienelemente verlangt.
       </p>
-      <div class="d-live"><Stories eintraege={inhalt.storiesEintraege} /></div>
+      <div class="d-live"><Stories items={inhalt.storiesItems} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -426,7 +426,7 @@ const RING_BILDER = [
       <p class="d-probe__text d-eingerueckt">
         Einstiegstext: Überschrift links, zwei Textspalten daneben.
       </p>
-      <div class="d-live">{bl?.intro?.topline && bl.intro.headline && bl.intro.spalten?.length ? <Intro topline={bl.intro.topline} headline={bl.intro.headline} spalten={bl.intro.spalten} /> : null}</div>
+      <div class="d-live">{bl?.intro?.topline && bl.intro.headline && bl.intro.columns?.length ? <Intro topline={bl.intro.topline} headline={bl.intro.headline} columns={bl.intro.columns} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -450,7 +450,7 @@ const RING_BILDER = [
         Zwei Aufnahmen übereinander, dazwischen ein Schieberegler. Über
         Tastatur bedienbar, nicht nur per Zeiger.
       </p>
-      <div class="d-live">{bl?.vorherNachher?.topline ? <BeforeAfter topline={bl.vorherNachher.topline} vorher={bl.vorherNachher.vorher} nachher={bl.vorherNachher.nachher} /> : null}</div>
+      <div class="d-live">{bl?.beforeAfter?.topline ? <BeforeAfter topline={bl.beforeAfter.topline} before={bl.beforeAfter.before} after={bl.beforeAfter.after} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -460,7 +460,7 @@ const RING_BILDER = [
       </div>
       <p class="d-probe__text d-eingerueckt">Der Behandlungsablauf als nummerierte Folge.</p>
       <div class="d-live">
-        {bl?.schritte?.titel && bl.schritte.eintraege?.length ? <Steps titel={bl.schritte.titel} schritte={bl.schritte.eintraege} /> : null}
+        {bl?.steps?.title && bl.steps.items?.length ? <Steps title={bl.steps.title} steps={bl.steps.items} /> : null}
       </div>
     </div>
 
@@ -470,7 +470,7 @@ const RING_BILDER = [
         <span class="d-probe__pfad">components/sections/Prices.astro</span>
       </div>
       <p class="d-probe__text d-eingerueckt">Die Preiskarten einer Leistung.</p>
-      <div class="d-live">{bl?.preise?.length ? <Prices preise={bl.preise} /> : null}</div>
+      <div class="d-live">{bl?.pricing?.length ? <Prices pricing={bl.pricing} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -481,7 +481,7 @@ const RING_BILDER = [
       <p class="d-probe__text d-eingerueckt">
         Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt.
       </p>
-      <div class="d-live">{bl?.features?.length ? <Features zeilen={bl.features} /> : null}</div>
+      <div class="d-live">{bl?.features?.length ? <Features lines={bl.features} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -494,7 +494,7 @@ const RING_BILDER = [
         Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
       </p>
       <div class="d-live">
-        <Magazine topline={inhalt.magazinTopline} titel={inhalt.magazinTitel} text={inhalt.magazinText} beitraege={beitraege} />
+        <Magazine topline={inhalt.magazineTopline} title={inhalt.magazineTitle} text={inhalt.magazineText} beitraege={beitraege} />
       </div>
     </div>
 
@@ -507,7 +507,7 @@ const RING_BILDER = [
         Das Akkordeon im Panel. Die Fragen kommen je Seite von woanders - auf
         den Leistungsseiten aus dem CMS, auf der Startseite aus der Seite selbst.
       </p>
-      <div class="d-live"><Faq titel={inhalt.faqTitel} text={inhalt.faqText} fragen={inhalt.faq} /></div>
+      <div class="d-live"><Faq title={inhalt.faqTitle} text={inhalt.faqText} questions={inhalt.faq} /></div>
     </div>
 
     <div class="d-abschnitt">
@@ -520,7 +520,7 @@ const RING_BILDER = [
         steht im Markup, das Skript setzt ihn nur kurz auf null. Ohne
         JavaScript und ohne Bewegung steht sofort die richtige Zahl da.
       </p>
-      <div class="d-live">{kr?.zahlenEintraege?.length ? <Facts topline="Beispiel" headline="Was sich nachrechnen lässt" zahlen={kr.zahlenEintraege} /> : null}</div>
+      <div class="d-live">{kr?.figuresItems?.length ? <Facts topline="Beispiel" headline="Was sich nachrechnen lässt" figures={kr.figuresItems} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -534,7 +534,7 @@ const RING_BILDER = [
         damit greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
         Vorlesegeräte beim Ansteuern den Stellentitel ausgeben.
       </p>
-      <div class="d-live">{stellen.length ? <Jobs topline="Beispiel" headline="Offene Stellen" stellen={stellen.slice(0, 2)} bewerbungMail={kr?.bewerbungMail ?? ""} /> : null}</div>
+      <div class="d-live">{stellen.length ? <Jobs topline="Beispiel" headline="Offene Stellen" stellen={stellen.slice(0, 2)} applicationEmail={kr?.applicationEmail ?? ""} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -551,7 +551,7 @@ const RING_BILDER = [
         Text, ein Ja/Nein-Zeichen oder eine Pille.
       </p>
       <div class="d-live">
-        {kr?.vergleichSpalten?.length && kr.vergleichZeilen?.length ? <Compare topline="Beispiel" headline="Vergleich" spalten={kr.vergleichSpalten} zeilen={kr.vergleichZeilen.slice(0, 5)} hinweis={kr.vergleichHinweis ?? undefined} /> : null}
+        {kr?.comparisonColumns?.length && kr.comparisonRows?.length ? <Compare topline="Beispiel" headline="Vergleich" columns={kr.comparisonColumns} lines={kr.comparisonRows.slice(0, 5)} note={kr.comparisonNote ?? undefined} /> : null}
       </div>
     </div>
 
@@ -565,7 +565,7 @@ const RING_BILDER = [
         Daten, nicht in <code>:nth-child</code> - bei einer vierten Stimme
         bräuchte eine Regel nach Position sonst eine neue Ausnahme.
       </p>
-      <div class="d-live">{kr?.stimmenEintraege?.length ? <Voices topline="Beispiel" headline="Stimmen" stimmen={kr.stimmenEintraege} /> : null}</div>
+      <div class="d-live">{kr?.voicesItems?.length ? <Voices topline="Beispiel" headline="Stimmen" voices={kr.voicesItems} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -580,7 +580,7 @@ const RING_BILDER = [
         Zustand - ohne JavaScript steht sie vollständig da, eine leere Bahn
         wäre eine falsche Aussage über den Ablauf.
       </p>
-      <div class="d-live">{kr?.ablaufEtappen?.length ? <Timeline topline="Beispiel" headline="Ablauf" etappen={kr.ablaufEtappen} /> : null}</div>
+      <div class="d-live">{kr?.processStages?.length ? <Timeline topline="Beispiel" headline="Ablauf" stages={kr.processStages} /> : null}</div>
     </div>
 
     <div class="d-abschnitt">
@@ -592,7 +592,7 @@ const RING_BILDER = [
         Das Kontaktformular im Panel, mit Vorauswahl der Leistung und einem
         Feld für ein Foto.
       </p>
-      <div class="d-live"><Contact leistung={bl?.titel} /></div>
+      <div class="d-live"><Contact service={bl?.title} /></div>
     </div>
   </section>
 

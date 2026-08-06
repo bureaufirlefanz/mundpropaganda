@@ -7,7 +7,7 @@
  * Zitat trägt die Karte, nicht das Foto: Das Bild ist klein und rund,
  * daneben der Name — die Ordnung eines Zitats, nicht die eines Profils.
  *
- * Der Versatz steckt in den Daten (`versatz`), nicht in `:nth-child`. Bei
+ * Der Versatz steckt in den Daten (`offset`), nicht in `:nth-child`. Bei
  * vier statt drei Stimmen bräuchte eine Regel nach Position sonst eine neue
  * Ausnahme; so bringt jede Stimme ihre Lage selbst mit.
  */
@@ -16,23 +16,23 @@ import CmsImage from "../ui/CmsImage.astro";
 import { istCmsBild, type Bildquelle } from "../../lib/bilder";
 
 export interface Stimme {
-  zitat: string;
+  quote: string;
   name: string;
-  rolle: string;
-  dabeiSeit?: string;
+  role: string;
+  since?: string;
   /** Bildname aus der Bildpipeline (public/img), ohne Größe und Endung. */
   /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
-  bild?: Bildquelle;
+  image?: Bildquelle;
   /** Wie tief die Karte hängt: 0 = oben bündig, 1 = ganz abgesenkt. */
-  versatz?: number;
+  offset?: number;
 }
 
 interface Props {
   topline: string;
   headline: string;
-  stimmen: Stimme[];
+  voices: Stimme[];
 }
-const { topline, headline, stimmen } = Astro.props;
+const { topline, headline, voices } = Astro.props;
 
 /* Klasse 3: die gestalteten Porträts, positionsgenau, solange an einer
    Stimme kein Bild hängt. */
@@ -46,10 +46,10 @@ const MOTIVE = ["praxis-01", "praxis-02", "praxis-03"];
   </div>
 
   <div class="s-voices__feld">
-    {stimmen.map((s, i) => (
+    {voices.map((s, i) => (
       <figure
         class="s-voices__karte"
-        style={`--versatz: ${s.versatz ?? 0}`}
+        style={`--offset: ${s.offset ?? 0}`}
         data-reveal="up"
         data-reveal-delay={i * 0.1}
       >
@@ -57,21 +57,21 @@ const MOTIVE = ["praxis-01", "praxis-02", "praxis-03"];
             Zitat der Person, und Vorlesegeräte geben beides zusammen aus.
             Ein <p> mit Anführungszeichen täte das nicht. */}
         <blockquote class="s-voices__zitat">
-          <p>{s.zitat}</p>
+          <p>{s.quote}</p>
         </blockquote>
 
         <figcaption class="s-voices__person">
           <span class="s-voices__bild">
-            {istCmsBild(s.bild) ? (
-              <CmsImage quelle={s.bild} alt="" widths={[640]} sizes="72px" />
+            {istCmsBild(s.image) ? (
+              <CmsImage quelle={s.image} alt="" widths={[640]} sizes="72px" />
             ) : (
               <Picture name={MOTIVE[i % MOTIVE.length]} alt="" sizes="72px" />
             )}
           </span>
           <span class="s-voices__daten">
             <span class="s-voices__name">{s.name}</span>
-            <span class="s-voices__rolle">{s.rolle}</span>
-            <span class="s-voices__seit">{s.dabeiSeit}</span>
+            <span class="s-voices__rolle">{s.role}</span>
+            <span class="s-voices__seit">{s.since}</span>
           </span>
         </figcaption>
       </figure>
@@ -115,7 +115,7 @@ const MOTIVE = ["praxis-01", "praxis-02", "praxis-03"];
      kleinen Schirmen nicht zur Treppe wird. */
   .s-voices__karte {
     margin: 0;
-    margin-top: calc(var(--versatz, 0) * clamp(24px, 6vw, 96px));
+    margin-top: calc(var(--offset, 0) * clamp(24px, 6vw, 96px));
     display: flex;
     flex-direction: column;
     gap: var(--sp-5);

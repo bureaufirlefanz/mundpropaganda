@@ -8,15 +8,15 @@ import Accordion from "../ui/Accordion.astro";
 import type { Frage } from "../../lib/formen";
 
 interface Props {
-  titel: string;
-  fragen: Frage[];
+  title: string;
+  questions: Frage[];
   topline?: string;
   text?: string;
 }
 
-const { titel, fragen, topline = "FAQ", text } = Astro.props;
+const { title, questions, topline = "FAQ", text } = Astro.props;
 ---
 
-<Panel id="faq" topline={topline} titel={titel} text={text}>
-  <Accordion fragen={fragen} />
+<Panel id="faq" topline={topline} title={title} text={text}>
+  <Accordion questions={questions} />
 </Panel>

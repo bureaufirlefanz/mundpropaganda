@@ -13,10 +13,10 @@ import { ladeLeistungsliste, fuerTabelle } from "../../lib/leistungsliste";
 
 interface Props {
   /** Vorauswahl im Feld „Leistung". */
-  leistung?: string;
+  service?: string;
 }
 
-const { leistung } = Astro.props;
+const { service } = Astro.props;
 
 /* Überschrift und Einstieg kommen aus den Einstellungen — der Kontaktbereich
    steht auf mehreren Seiten und ist überall derselbe. Der Baustein holt sie
@@ -25,7 +25,7 @@ const { leistung } = Astro.props;
 
    Vorher standen beide Sätze fest hier. Das war der letzte Textblock der
    Seite, den der Kunde nicht ändern konnte. */
-const { kontaktTitel, kontaktText } = await ladeEinstellungen();
+const { contactTitle, contactText } = await ladeEinstellungen();
 
 /* Die Auswahlliste kommt aus der Leistungen-Collection. Sie war ein fest
    verdrahtetes Array aus fünf Namen — mit eigener Schreibweise („Keramik
@@ -35,7 +35,7 @@ const { kontaktTitel, kontaktText } = await ladeEinstellungen();
 const LEISTUNGEN = fuerTabelle(await ladeLeistungsliste()).map((l) => l.name);
 ---
 
-<Panel id="kontakt" topline="Kontakt" titel={kontaktTitel} text={kontaktText}>
+<Panel id="kontakt" topline="Kontakt" title={contactTitle} text={contactText}>
   <form class="c-form" data-form novalidate data-reveal-stagger="0.06">
     <div class="c-field" data-field data-reveal-child>
       <label class="c-field__label" for="f-name">Name <span>*</span></label>
@@ -77,7 +77,7 @@ const LEISTUNGEN = fuerTabelle(await ladeLeistungsliste()).map((l) => l.name);
       <div class="c-field__control">
         <select id="f-service" name="service" required>
           <option value="">Leistung auswählen</option>
-          {LEISTUNGEN.map((l) => <option selected={l === leistung}>{l}</option>)}
+          {LEISTUNGEN.map((l) => <option selected={l === service}>{l}</option>)}
         </select>
       </div>
     </div>

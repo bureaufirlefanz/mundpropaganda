@@ -17,18 +17,18 @@
  * woanders stehen.
  */
 interface Zahl {
-  wert: number;
+  value: number;
   /** Was hinter der Zahl steht: „+", „%", „ min". Leer lassen für nichts. */
-  einheit?: string;
+  unit?: string;
   text: string;
 }
 
 interface Props {
   topline: string;
   headline: string;
-  zahlen: Zahl[];
+  figures: Zahl[];
 }
-const { topline, headline, zahlen } = Astro.props;
+const { topline, headline, figures } = Astro.props;
 ---
 
 <section class="s-facts container">
@@ -38,14 +38,14 @@ const { topline, headline, zahlen } = Astro.props;
   </div>
 
   <dl class="s-facts__grid" data-reveal-stagger="0.08">
-    {zahlen.map((z) => (
+    {figures.map((z) => (
       <div class="s-facts__item" data-reveal-child>
         {/* <dt>/<dd> statt zweier <p>: Zahl und Erklärung gehören zusammen,
             und Vorlesegeräte geben das Paar auch als Paar aus. */}
         <dt class="s-facts__wert">
           {/* Der Zielwert steht als Text da — facts.js zählt ihn nur hoch.
               aria-hidden am Zähler wäre falsch: die Zahl IST die Angabe. */}
-          <span data-zaehler={z.wert}>{z.wert}</span>{z.einheit}
+          <span data-zaehler={z.value}>{z.value}</span>{z.unit}
         </dt>
         <dd class="s-facts__text">{z.text}</dd>
       </div>

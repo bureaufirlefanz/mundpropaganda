@@ -5,7 +5,7 @@
  * schon alle auf der Seite, ein Seitenwechsel je Kategorie lüde dieselben
  * Karten noch einmal.
  *
- * Die Auswahl landet trotzdem in der Adresse (`?kategorie=vorsorge`). Ohne
+ * Die Auswahl landet trotzdem in der Adresse (`?category=vorsorge`). Ohne
  * das ist eine gefilterte Ansicht nicht teilbar und beim Zurückkommen aus
  * einem Beitrag wieder weg — beides fällt genau dann auf, wenn man den Filter
  * benutzt hat, weil man etwas Bestimmtes suchte.
@@ -19,13 +19,13 @@ export function initFilter() {
   const knopf = box.querySelector("[data-filter-knopf]");
   const panel = box.querySelector("#filter-optionen");
   const punkt = box.querySelector("[data-filter-punkt]");
-  const optionen = [...box.querySelectorAll("[data-filter-wert]")];
-  const karten = [...document.querySelectorAll("[data-kategorie]")];
+  const optionen = [...box.querySelectorAll("[data-filter-value]")];
+  const karten = [...document.querySelectorAll("[data-category]")];
   if (!knopf || !panel || !karten.length) return;
 
   /* --- Auf- und Zuklappen ------------------------------------------------ */
 
-  const tags = [...panel.querySelectorAll("[data-filter-wert]")];
+  const tags = [...panel.querySelectorAll("[data-filter-value]")];
 
   /**
    * Auf- und Zuklappen.
@@ -97,9 +97,9 @@ export function initFilter() {
 
   /* --- Filtern ----------------------------------------------------------- */
 
-  function wende(wert, { animieren = true } = {}) {
+  function wende(value, { animieren = true } = {}) {
     for (const karte of karten) {
-      const passt = !wert || karte.dataset.kategorie === wert;
+      const passt = !value || karte.dataset.category === value;
 
       /* `hidden` und nicht nur Deckkraft: Eine ausgeblendete Karte darf weder
          im Tabulatorlauf noch in der Vorleseordnung stehen bleiben. */
@@ -131,16 +131,16 @@ export function initFilter() {
     }
 
     for (const o of optionen) {
-      o.setAttribute("aria-pressed", String((o.dataset.filterWert || "") === (wert || "")));
+      o.setAttribute("aria-pressed", String((o.dataset.filterWert || "") === (value || "")));
     }
 
-    if (punkt) punkt.hidden = !wert;
+    if (punkt) punkt.hidden = !value;
   }
 
   for (const o of optionen) {
     o.addEventListener("click", () => {
-      const wert = o.dataset.filterWert || "";
-      wende(wert);
+      const value = o.dataset.filterWert || "";
+      wende(value);
       klappe(false);
       knopf.focus();
 
@@ -148,8 +148,8 @@ export function initFilter() {
          jede einzelne Filterauswahl, und wer dreimal geklickt hat, muss
          dreimal zurück, um die Seite zu verlassen. */
       const url = new URL(location.href);
-      if (wert) url.searchParams.set("kategorie", wert);
-      else url.searchParams.delete("kategorie");
+      if (value) url.searchParams.set("category", value);
+      else url.searchParams.delete("category");
       history.replaceState(null, "", url);
     });
   }
@@ -157,7 +157,7 @@ export function initFilter() {
   /* Der Zustand aus der Adresse, falls jemand einen gefilterten Link öffnet.
      Ohne Animation — beim ersten Bild soll nichts eingeblendet werden, was
      ohnehin schon dasteht. */
-  const start = new URL(location.href).searchParams.get("kategorie");
+  const start = new URL(location.href).searchParams.get("category");
   if (start && optionen.some((o) => o.dataset.filterWert === start)) {
     wende(start, { animieren: false });
   }

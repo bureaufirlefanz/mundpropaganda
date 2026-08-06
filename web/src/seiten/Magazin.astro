@@ -3,7 +3,7 @@
  * Der Zusammenbau der Magazin-Übersicht.
  *
  * Der Kopf kommt aus dem Einzeldokument „Magazin (Übersicht)", die Beiträge
- * aus der Collection. Der Baukasten (`abschnitte`), den das Dokument
+ * aus der Collection. Der Baukasten (`sections`), den das Dokument
  * ebenfalls hat, bleibt vorerst ungenutzt — er braucht einen Renderer für
  * frei zusammensteckbare Abschnitte, und das ist ein eigener Schritt. Bis
  * dahin trägt der Kopf die Seite, und das steht auch so im Studio.
@@ -23,15 +23,15 @@ const { kopf, beitraege } = Astro.props;
 /* Wie auf der Startseite: Suchmaschinenangaben sind kein sichtbarer
    Seiteninhalt, deshalb darf der Seitentitel auf die Überschrift der Seite
    zurückfallen. Das sagt das Schema dem Kunden auch zu. */
-const titel = kopf?.seo?.titel || `${kopf?.titel || "Magazin"} - Mundpropaganda`;
-const beschreibung = kopf?.seo?.beschreibung || kopf?.einleitung || "";
+const title = kopf?.seo?.title || `${kopf?.title || "Magazin"} - Mundpropaganda`;
+const description = kopf?.seo?.description || kopf?.lead || "";
 ---
 
-<Base title={titel} description={beschreibung} nichtIndexieren={kopf?.seo?.nichtIndexieren}>
+<Base title={title} description={description} noIndex={kopf?.seo?.noIndex}>
   <section class="container s-magazinkopf">
     {kopf?.topline && <span class="c-topline" data-reveal="fade">{kopf.topline}</span>}
-    <h1 class="s-magazinkopf__titel" data-split="lines">{kopf?.titel}</h1>
-    {kopf?.einleitung && <p class="s-magazinkopf__text" data-reveal="up">{kopf.einleitung}</p>}
+    <h1 class="s-magazinkopf__titel" data-split="lines">{kopf?.title}</h1>
+    {kopf?.lead && <p class="s-magazinkopf__text" data-reveal="up">{kopf.lead}</p>}
   </section>
 
   {beitraege.length > 0 && <PostListe beitraege={beitraege} />}

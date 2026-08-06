@@ -39,7 +39,7 @@ export type Bildquelle = CmsBild | string;
 
 /* --- Ersatzmotive ------------------------------------------------------- */
 
-import BREITEN from "./bild-breiten.json";
+import BREITEN from "./image-breiten.json";
 
 /**
  * Welches gestaltete Motiv vertritt einen Inhalt, solange kein Bild im CMS
@@ -120,9 +120,9 @@ export const istCmsBild = (quelle: Bildquelle | undefined | null): quelle is Cms
  * Hotspot angewandt werden könnte.
  */
 export function bildUrl(quelle: CmsBild, breite: number, ratio?: number): string {
-  let bild = holeBauer().image(quelle).width(breite).auto("format").quality(78);
-  if (ratio) bild = bild.height(Math.round(breite / ratio)).fit("crop");
-  return bild.url();
+  let image = holeBauer().image(quelle).width(breite).auto("format").quality(78);
+  if (ratio) image = image.height(Math.round(breite / ratio)).fit("crop");
+  return image.url();
 }
 
 /** srcset über mehrere Breiten — dasselbe Prinzip wie im lokalen Partial. */

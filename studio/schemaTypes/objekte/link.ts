@@ -31,16 +31,16 @@ export const link = defineType({
     }),
 
     defineField({
-      name: "art",
+      name: "kind",
       title: "Art",
       type: "string",
-      initialValue: "intern",
+      initialValue: "internal",
       options: {
         list: [
-          { title: "Seite dieser Website", value: "intern" },
-          { title: "Andere Website", value: "extern" },
+          { title: "Seite dieser Website", value: "internal" },
+          { title: "Andere Website", value: "external" },
           { title: "E-Mail an die Praxis", value: "email" },
-          { title: "Anruf in der Praxis", value: "telefon" },
+          { title: "Anruf in der Praxis", value: "phone" },
         ],
         layout: "radio",
       },
@@ -48,44 +48,44 @@ export const link = defineType({
     }),
 
     defineField({
-      name: "ziel",
+      name: "target",
       title: "Seite",
       type: "reference",
       to: [
-        { type: "startseite" },
-        { type: "leistung" },
-        { type: "magazinIndex" },
-        { type: "beitrag" },
-        { type: "karriere" },
-        { type: "rechtstext" },
+        { type: "homepage" },
+        { type: "service" },
+        { type: "magazineIndex" },
+        { type: "post" },
+        { type: "careers" },
+        { type: "legalPage" },
       ],
       description: "Nur Seiten, die es wirklich gibt - die Liste kommt aus dem Datensatz.",
-      hidden: ({ parent }) => parent?.art !== "intern",
+      hidden: ({ parent }) => parent?.kind !== "internal",
       validation: (r) =>
         r.custom((wert, ctx) =>
-          (ctx.parent as { art?: string })?.art === "intern" && !wert
+          (ctx.parent as { kind?: string })?.kind === "internal" && !wert
             ? "Bitte eine Seite auswählen."
             : true
         ),
     }),
 
     defineField({
-      name: "anker",
+      name: "anchor",
       title: "Sprungmarke",
       type: "string",
       description:
         "Springt auf der Zielseite zu einem Abschnitt, z. B. kontakt, standorte, faq oder experten. Ohne Raute. Leer lassen für den Seitenanfang.",
-      hidden: ({ parent }) => parent?.art !== "intern",
+      hidden: ({ parent }) => parent?.kind !== "internal",
     }),
 
     defineField({
       name: "url",
       title: "Adresse",
       type: "url",
-      hidden: ({ parent }) => parent?.art !== "extern",
+      hidden: ({ parent }) => parent?.kind !== "external",
       validation: (r) =>
         r.custom((wert, ctx) =>
-          (ctx.parent as { art?: string })?.art === "extern" && !wert
+          (ctx.parent as { kind?: string })?.kind === "external" && !wert
             ? "Bitte eine Adresse eintragen."
             : true
         ),
@@ -96,14 +96,14 @@ export const link = defineType({
   ],
 
   preview: {
-    select: { title: "text", art: "art", ziel: "ziel.titel", url: "url", anker: "anker" },
-    prepare: ({ title, art, ziel, url, anker }) => {
+    select: { title: "text", kind: "kind", target: "target.title", url: "url", anchor: "anchor" },
+    prepare: ({ title, kind, target, url, anchor }) => {
       const wohin =
-        art === "extern"
+        kind === "external"
           ? url
-          : art === "email"
+          : kind === "email"
             ? "E-Mail"
-            : art === "telefon"
+            : kind === "phone"
               ? "Telefon"
               : [ziel, anker && `#${anker}`].filter(Boolean).join(" ");
       return { title, subtitle: wohin || "ohne Ziel" };

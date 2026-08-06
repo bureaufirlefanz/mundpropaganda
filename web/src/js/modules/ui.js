@@ -72,7 +72,7 @@ export function initBeforeAfter() {
       /* Der Wert muss auch angesagt werden, nicht nur gezeichnet: ohne
          aria-valuenow liest ein Vorlesegerät den Regler als leer vor. */
       griff.setAttribute("aria-valuenow", String(Math.round(stand)));
-      griff.setAttribute("aria-valuetext", `${Math.round(stand)} % nachher`);
+      griff.setAttribute("aria-valuetext", `${Math.round(stand)} % after`);
     };
 
     const setPos = (clientX) => {

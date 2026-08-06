@@ -22,18 +22,18 @@ export function initToc() {
   }
   if (!links.size) return;
 
-  const ziele = [...document.querySelectorAll("[data-toc-ziel]")].filter((el) =>
+  const ziele = [...document.querySelectorAll("[data-toc-target]")].filter((el) =>
     links.has(el.dataset.tocZiel)
   );
   if (!ziele.length) return;
 
-  let aktiv = null;
+  let active = null;
 
   function setze(id) {
-    if (id === aktiv) return;
-    aktiv = id;
-    for (const [kennung, a] of links) {
-      a.setAttribute("aria-current", String(kennung === id));
+    if (id === active) return;
+    active = id;
+    for (const [handle, a] of links) {
+      a.setAttribute("aria-current", String(handle === id));
     }
     if (id) haltePunktImBild(links.get(id));
   }
@@ -70,7 +70,7 @@ export function initToc() {
          eines Zwischentitels. Mit „bottom bottom" lag es davor: Der Text
          endete bei 2444, seine Unterkante erreichte die Fensterunterkante
          also schon bei scrollY 1444 — der letzte Zwischentitel begann aber
-         erst bei 1767. Ende vor Anfang heißt: nie aktiv, und der letzte
+         erst bei 1767. Ende vor Anfang heißt: nie active, und der letzte
          Abschnitt blieb im Verzeichnis dauerhaft unmarkiert. */
       endTrigger: ziele[i + 1] ?? el.closest("[data-toc-bereich]") ?? el,
       end: ziele[i + 1] ? "top 33%" : "bottom 33%",
@@ -79,7 +79,7 @@ export function initToc() {
     })
   );
 
-  /* Über dem ersten Zwischentitel ist keiner aktiv — dann soll auch keiner
+  /* Über dem ersten Zwischentitel ist keiner active — dann soll auch keiner
      hervorgehoben sein, statt dass der erste dort schon leuchtet. */
   ScrollTrigger.create({
     trigger: ziele[0],
@@ -94,11 +94,11 @@ export function initToc() {
   const lenis = window.__lenis;
   for (const [id, a] of links) {
     a.addEventListener("click", (e) => {
-      const ziel = document.getElementById(id);
-      if (!ziel || !lenis) return;
+      const target = document.getElementById(id);
+      if (!target || !lenis) return;
       e.preventDefault();
       setze(id);
-      lenis.scrollTo(ziel, { offset: -120 });
+      lenis.scrollTo(target, { offset: -120 });
       history.replaceState(null, "", `#${id}`);
     });
   }

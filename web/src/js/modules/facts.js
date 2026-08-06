@@ -15,12 +15,12 @@ export function initFacts() {
   if (prefersReducedMotion) return;
 
   gsap.utils.toArray("[data-zaehler]").forEach((el) => {
-    const ziel = Number(el.dataset.zaehler);
-    if (!Number.isFinite(ziel)) return;
+    const target = Number(el.dataset.zaehler);
+    if (!Number.isFinite(target)) return;
 
     /* Ein Zwischenwert im Objekt, nicht am Element: GSAP kann keinen
        Textknoten interpolieren. Gerundet wird erst beim Schreiben. */
-    const stand = { wert: 0 };
+    const stand = { value: 0 };
 
     /* Nur auf null setzen, was noch unterhalb des Sichtfelds steht. Eine
        Zahl, die beim Laden schon im Bild ist, würde sonst erst auf null
@@ -30,16 +30,16 @@ export function initFacts() {
     if (nochNichtImBild) el.textContent = "0";
 
     gsap.to(stand, {
-      wert: ziel,
+      value: target,
       duration: 1.4,
       ease: "power2.out",
       onUpdate: () => {
-        el.textContent = String(Math.round(stand.wert));
+        el.textContent = String(Math.round(stand.value));
       },
       /* Auf den Endwert festnageln: bei einer abgebrochenen Animation bliebe
          sonst die zuletzt gerundete Zahl stehen, und die kann daneben liegen. */
       onComplete: () => {
-        el.textContent = String(ziel);
+        el.textContent = String(target);
       },
       scrollTrigger: {
         trigger: el,

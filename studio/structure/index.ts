@@ -43,7 +43,7 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = ["startseite", "magazinIndex", "karriere", "einstellungen", "navigation", "footer"];
+export const EINZELDOKUMENTE = ["homepage", "magazineIndex", "careers", "settings", "navigation", "footer"];
 
 /**
  * Einzeldokumente ohne Seite. Sie stehen weiterhin in den Vorlagen-Sperren
@@ -51,10 +51,10 @@ export const EINZELDOKUMENTE = ["startseite", "magazinIndex", "karriere", "einst
  * Auflistung wieder hereinholt — sichtbar sind sie nicht.
  */
 export const OHNE_ROUTE = [
-  "leistungenIndex",
-  "praxis",
-  "kontakt",
-  "notdienst",
+  "servicesIndex",
+  "practice",
+  "contactPage",
+  "emergency",
   "pillar",
 ];
 
@@ -62,11 +62,11 @@ export const OHNE_ROUTE = [
 const AUSGESCHRIEBEN = [
   ...EINZELDOKUMENTE,
   ...OHNE_ROUTE,
-  "leistung",
-  "beitrag",
+  "service",
+  "post",
   "person",
-  "stelle",
-  "rechtstext",
+  "job",
+  "legalPage",
 ];
 
 function einzeldokument(
@@ -86,12 +86,12 @@ export const structure: StructureResolver = (S, context) =>
     .title("Mundpropaganda")
     .items([
       /* --- Die Seiten, in der Reihenfolge der Navigation --------------- */
-      einzeldokument(S, "startseite", "Startseite", HomeIcon),
+      einzeldokument(S, "homepage", "Startseite", HomeIcon),
 
       /* Nur die Leistungen selbst, ohne Übersichtsseite: `/leistungen` gibt
          es nicht, `/leistungen/<slug>` schon. */
       orderableDocumentListDeskItem({
-        type: "leistung",
+        type: "service",
         title: "Leistungen",
         icon: TagsIcon,
         S,
@@ -103,17 +103,17 @@ export const structure: StructureResolver = (S, context) =>
          umgekehrt. Beide waren bis hierher ausgeblendet — der Typ `beitrag`
          hatte keine Route, und die vier Beiträge standen fest im Markup des
          Karussells. Jetzt gibt es /magazin und /magazin/<slug>. */
-      einzeldokument(S, "magazinIndex", "Magazin", DocumentsIcon),
-      S.documentTypeListItem("beitrag").title("Beiträge").icon(DocumentTextIcon),
+      einzeldokument(S, "magazineIndex", "Magazin", DocumentsIcon),
+      S.documentTypeListItem("post").title("Beiträge").icon(DocumentTextIcon),
 
-      einzeldokument(S, "karriere", "Karriere", CaseIcon),
+      einzeldokument(S, "careers", "Karriere", CaseIcon),
 
       S.divider(),
 
       /* --- Bausteine, die auf mehreren Seiten auftauchen ---------------- */
       S.documentTypeListItem("person").title("Team").icon(UserIcon),
       orderableDocumentListDeskItem({
-        type: "stelle",
+        type: "job",
         title: "Stellen",
         icon: CaseIcon,
         S,
@@ -127,14 +127,14 @@ export const structure: StructureResolver = (S, context) =>
          man ihn sucht. Bis Aufgabe 8 stand beides fest im Markup. */
       einzeldokument(S, "navigation", "Navigation", MenuIcon),
       einzeldokument(S, "footer", "Seitenfuß", StackCompactIcon),
-      einzeldokument(S, "einstellungen", "Einstellungen", CogIcon),
+      einzeldokument(S, "settings", "Einstellungen", CogIcon),
 
       /* Rechtstexte. Standen bis hierher in OHNE_ROUTE — nicht weil sie
          niemand braucht, sondern weil es `/impressum` nicht gab und die Zeile
          im Seitenfuß deshalb leer blieb. Mit der Route `/[slug]` ist beides
          aufgelöst. Ganz unten, weil man sie einmal schreibt und dann jahrelang
          nicht mehr anfasst. */
-      S.documentTypeListItem("rechtstext").title("Rechtstexte").icon(DocumentTextIcon),
+      S.documentTypeListItem("legalPage").title("Rechtstexte").icon(DocumentTextIcon),
 
       /* Was künftig dazukommt, erscheint hier von selbst — ohne dass jemand
          diese Datei anfassen muss. Erst wenn ein Typ eine eigene Ordnung

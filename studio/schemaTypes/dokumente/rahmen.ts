@@ -19,9 +19,9 @@ import { StackCompactIcon } from "@sanity/icons/StackCompact";
 /** Eine Spalte im Menü oder im Fuß: Überschrift plus Verweise. */
 const spalte = defineArrayMember({
   type: "object",
-  name: "spalte",
+  name: "column",
   fields: [
-    defineField({ name: "titel", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+    defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
     defineField({
       name: "links",
       title: "Verweise",
@@ -31,7 +31,7 @@ const spalte = defineArrayMember({
     }),
   ],
   preview: {
-    select: { title: "titel", links: "links" },
+    select: { title: "title", links: "links" },
     prepare: ({ title, links }) => ({
       title,
       subtitle: `${links?.length ?? 0} Verweise`,
@@ -46,7 +46,7 @@ export const navigation = defineType({
   icon: MenuIcon,
   fields: [
     defineField({
-      name: "hauptmenue",
+      name: "mainMenu",
       title: "Hauptmenü",
       type: "array",
       description:
@@ -56,7 +56,7 @@ export const navigation = defineType({
     }),
 
     defineField({
-      name: "menueSpalten",
+      name: "menuColumns",
       title: "Zusätzliche Spalten im großen Menü",
       type: "array",
       description:
@@ -65,7 +65,7 @@ export const navigation = defineType({
     }),
 
     defineField({
-      name: "aktion",
+      name: "action",
       title: "Knopf in der Leiste",
       type: "link",
       description: "Der pinke Knopf rechts oben.",
@@ -83,7 +83,7 @@ export const footer = defineType({
   icon: StackCompactIcon,
   fields: [
     defineField({
-      name: "leistungenTitel",
+      name: "servicesHeading",
       title: "Überschrift über den Leistungen",
       type: "string",
       description: "Die Leistungen darunter kommen aus der Collection.",
@@ -91,21 +91,21 @@ export const footer = defineType({
     }),
 
     defineField({
-      name: "spalten",
+      name: "columns",
       title: "Weitere Spalten",
       type: "array",
       of: [spalte],
     }),
 
     defineField({
-      name: "aktion",
+      name: "action",
       title: "Knopf",
       type: "link",
       validation: (r) => r.required(),
     }),
 
     defineField({
-      name: "rechtliches",
+      name: "legalLinks",
       title: "Rechtliches",
       type: "array",
       description:

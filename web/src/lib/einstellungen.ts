@@ -12,7 +12,7 @@ import { EINSTELLUNGEN_QUERY } from "./queries";
  *
  * Die Klassen wie bei der Startseite:
  *
- *   Klasse 1  telefon, email, standorte — im Schema Pflicht. Ohne Anschrift
+ *   Klasse 1  phone, email, locations — im Schema Pflicht. Ohne Anschrift
  *             und Rufnummer ist eine Praxis-Website kaputt, nicht leer.
  *   Klasse 2  Bewertungen und Profile. Was nicht gepflegt ist, verschwindet:
  *             der Balken ganz, ein Profil einzeln. Eine Praxis ohne
@@ -31,13 +31,13 @@ export interface Social {
  * („P25"), es steckt zugleich die Hausnummer — daher stammt die Adresse.
  */
 export interface Standort {
-  kuerzel: string;
+  shortCode: string;
   name: string;
-  strasse: string;
-  ort: string;
+  street: string;
+  city: string;
   /* Klasse 2: Im Schema steht keine Pflichtregel. Fehlt der Text, steht unter
      der Anschrift nichts — es tritt keiner an seine Stelle. */
-  beschreibung?: string;
+  description?: string;
 }
 
 /**
@@ -53,18 +53,18 @@ export interface Bewertungen {
 }
 
 export interface Einstellungen {
-  telefon: string;
+  phone: string;
   email: string;
-  standorte: Standort[];
+  locations: Standort[];
   bewertungen?: Bewertungen;
   social: Social;
   /* Der Kontaktbereich steht auf mehreren Seiten und ist überall derselbe —
      deshalb hier und nicht je Seite. */
-  kontaktTitel: string;
-  kontaktText?: string;
+  contactTitle: string;
+  contactText?: string;
 }
 
-/* Einmal je Build. Rahmen und Hero fragen dasselbe Dokument ab. */
+/* Einmal je Build. Rahmen und Hero questions dasselbe Dokument ab. */
 let gemerkt: Promise<Einstellungen> | null = null;
 
 export function ladeEinstellungen(): Promise<Einstellungen> {
@@ -77,20 +77,20 @@ export function ladeEinstellungen(): Promise<Einstellungen> {
          gelöschtes Feld kommt an der Pflichtregel vorbei. Dann steht die
          Stelle leer, und die Bausteine blenden sie aus. Ein Ersatzwert wäre
          hier besonders teuer: Eine erfundene Rufnummer sieht richtig aus. */
-      telefon: d?.telefon || "",
+      phone: d?.phone || "",
       email: d?.email || "",
-      standorte: d?.standorte ?? [],
-      kontaktTitel: d?.kontaktTitel || "",
-      kontaktText: d?.kontaktText || undefined,
+      locations: d?.locations ?? [],
+      contactTitle: d?.contactTitle || "",
+      contactText: d?.contactText || undefined,
 
       /* Klasse 2, alles oder nichts. `!= null` und nicht `||`: Ein Schnitt von
          0 ist ein gepflegter Wert und keine Lücke. */
       bewertungen:
-        d?.bewertungenAnbieter && d?.bewertungenAnzahl != null && d?.bewertungenSchnitt != null
+        d?.reviewsProvider && d?.reviewsCount != null && d?.reviewsAverage != null
           ? {
-              anbieter: d.bewertungenAnbieter,
-              anzahl: d.bewertungenAnzahl,
-              schnitt: d.bewertungenSchnitt,
+              anbieter: d.reviewsProvider,
+              anzahl: d.reviewsCount,
+              schnitt: d.reviewsAverage,
             }
           : undefined,
 
@@ -101,14 +101,14 @@ export function ladeEinstellungen(): Promise<Einstellungen> {
     /* Kein Rückfall mehr im Fehlerfall. Ist das CMS nicht erreichbar, soll der
        Build eine sichtbar leere Seite ergeben und nicht eine, die mit alten
        Daten aus dem Prototyp vollständig aussieht. */
-    .catch(() => ({ telefon: "", email: "", standorte: [], social: {}, kontaktTitel: "" }));
+    .catch(() => ({ phone: "", email: "", locations: [], social: {}, contactTitle: "" }));
 
   return gemerkt;
 }
 
 /** „5,0 von 5" — deutsches Dezimalkomma, immer eine Nachkommastelle. */
-export const schnittText = (wert: number) =>
-  `${wert.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} von 5`;
+export const schnittText = (value: number) =>
+  `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} von 5`;
 
 /** Telefonnummer als wählbarer Link: alles außer Ziffern und führendem Plus. */
 export const telLink = (nummer: string) => `tel:${nummer.replace(/(?!^\+)[^\d]/g, "")}`;

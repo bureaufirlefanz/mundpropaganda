@@ -45,7 +45,7 @@ const { kategorien, gesamt } = Astro.props;
       data-filter-knopf
     >
       <svg class="c-filter__icon" aria-hidden="true"><use href="#i-filter" /></svg>
-      {/* Der Punkt zeigt, dass ein Filter aktiv ist — sonst sähe der Knopf
+      {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Knopf
           zugeklappt genauso aus wie ohne Auswahl. */}
       <span class="c-filter__punkt" data-filter-punkt hidden></span>
     </button>
@@ -54,11 +54,11 @@ const { kategorien, gesamt } = Astro.props;
         Vorlesegeräte von Anfang an in der Vorlesereihenfolge, obwohl niemand
         sie sieht. Das Modul nimmt es beim Aufklappen weg. */}
     <div class="c-filter__panel" id="filter-optionen" role="group" aria-label="Nach Kategorie filtern" hidden>
-      <button class="c-filter__tag" type="button" data-filter-wert="" aria-pressed="true">
+      <button class="c-filter__tag" type="button" data-filter-value="" aria-pressed="true">
         Alle
       </button>
       {kategorien.map((k) => (
-        <button class="c-filter__tag" type="button" data-filter-wert={k} aria-pressed="false">
+        <button class="c-filter__tag" type="button" data-filter-value={k} aria-pressed="false">
           {kategorieText(k)}
         </button>
       ))}
