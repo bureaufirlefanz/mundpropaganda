@@ -1,6 +1,7 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
 import { SETTINGS_QUERY } from "./queries";
+import { imageUrl, isCmsImage } from "./images";
 
 /**
  * Die Angaben, die auf jeder Seite gleich sind. Ein Einzeldokument im Studio.
@@ -30,6 +31,12 @@ export interface Social {
  * Ein Standort. Das Kürzel ist die große Konturzahl auf der Startseite
  * („P25"), es steckt zugleich die Hausnummer — daher stammt die Adresse.
  */
+/** Eine Zeile Öffnungszeit: „Mo–Do" links, „8–19 Uhr" rechts. */
+export interface Oeffnungszeit {
+  days: string;
+  time: string;
+}
+
 export interface Standort {
   shortCode: string;
   name: string;
@@ -38,6 +45,10 @@ export interface Standort {
   /* Klasse 2: Im Schema steht keine Pflichtregel. Fehlt der Text, steht unter
      der Anschrift nichts — es tritt keiner an seine Stelle. */
   description?: string;
+  /* Klasse 2, je Standort. Eine leere Liste heißt: kein Zeitenblock. Erfundene
+     Zeiten wären hier so teuer wie eine erfundene Rufnummer — jemand steht
+     dann vor einer verschlossenen Tür. */
+  hours?: Oeffnungszeit[];
 }
 
 /**
@@ -52,6 +63,26 @@ export interface Bewertungen {
   schnitt: number;
 }
 
+/**
+ * Was die ganze Website betrifft und nicht eine einzelne Seite. Anderswo
+ * heißt das Site Settings; bis hierher stand es fest in `Base.astro`,
+ * `public/robots.txt` und `public/_headers`.
+ */
+export interface WebsiteEinstellungen {
+  /** Hinter jedem Seitentitel im Tab und als `og:site_name`. */
+  siteName: string;
+  /** Symbol im Browser-Tab. Fehlt es, bleibt es bei der Wortmarke. */
+  faviconUrl?: string;
+  /** Springt ein, wenn eine Seite keine eigene SEO-Beschreibung hat. */
+  defaultDescription?: string;
+  /** Springt als Teilen-Motiv ein. Absolute URL vom Sanity-CDN. */
+  shareImageUrl?: string;
+  /** Aus heißt: robots.txt sperrt, X-Robots-Tag sperrt, jede Seite trägt noindex. */
+  searchEngines: boolean;
+  googleVerification?: string;
+  plausibleDomain?: string;
+}
+
 export interface Settings {
   phone: string;
   email: string;
@@ -62,6 +93,7 @@ export interface Settings {
      deshalb hier und nicht je Seite. */
   contactTitle: string;
   contactText?: string;
+  website: WebsiteEinstellungen;
 }
 
 /* Einmal je Build. Rahmen und Hero questions dasselbe Dokument ab. */
@@ -97,11 +129,37 @@ export function loadSettings(): Promise<Settings> {
       /* Klasse 2 je Profil. Ein Symbol ohne Ziel führt nirgends hin und sieht
          trotzdem nach Angebot aus — Footer.astro filtert leere heraus. */
       social: d?.social ?? {},
+
+      /* Der Name ist Klasse 1: Ohne ihn stünde im Tab nur der Seitentitel und
+         beim Teilen gar kein Absender. Der Rückfall steht hier und nicht im
+         Schema, weil ein leeres Pflichtfeld aus einem Import kommen kann.
+
+         `searchEngines` fällt bewusst auf `false`: Fehlt das Feld, ist die
+         sichere Antwort „nicht indexieren". Ein Rückfall auf `true` hieße,
+         dass ein vergessenes Feld die Seite in den Index schiebt. */
+      website: {
+        siteName: d?.siteName || "Mundpropaganda",
+        faviconUrl: isCmsImage(d?.favicon) ? imageUrl(d.favicon, 512) : undefined,
+        defaultDescription: d?.defaultDescription || undefined,
+        shareImageUrl: isCmsImage(d?.shareImage)
+          ? imageUrl(d.shareImage, 1200, 1.91)
+          : undefined,
+        searchEngines: d?.searchEngines === true,
+        googleVerification: d?.googleVerification || undefined,
+        plausibleDomain: d?.plausibleDomain || undefined,
+      },
     }))
     /* Kein Rückfall mehr im Fehlerfall. Ist das CMS nicht erreichbar, soll der
        Build eine sichtbar leere Seite ergeben und nicht eine, die mit alten
        Daten aus dem Prototyp vollständig aussieht. */
-    .catch(() => ({ phone: "", email: "", locations: [], social: {}, contactTitle: "" }));
+    .catch(() => ({
+      phone: "",
+      email: "",
+      locations: [],
+      social: {},
+      contactTitle: "",
+      website: { siteName: "Mundpropaganda", searchEngines: false },
+    }));
 
   return cached;
 }

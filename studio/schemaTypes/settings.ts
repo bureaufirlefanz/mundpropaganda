@@ -2,13 +2,17 @@ import { defineType, defineField } from "sanity";
 import { CogIcon } from "@sanity/icons/Cog";
 
 /**
- * Die Angaben, die auf jeder Seite gleich sind: Kontakt, soziale Netzwerke,
- * Bewertungen.
+ * Die Angaben, die auf jeder Seite gleich sind: Website, Kontakt, Standorte,
+ * soziale Netzwerke, Bewertungen, Suchmaschine.
  *
  * Ein Einzeldokument, kein Sammeltyp — es gibt genau eine Praxis. Erzwungen
  * wird das nicht im Schema (die Option dafür gibt es nicht), sondern in der
  * Studio-Struktur: dort hängt es an einer festen ID und taucht nirgends als
  * Liste auf, in der man ein zweites anlegen könnte.
+ *
+ * Die Gruppe „Website" ist der Ersatz für das, was anderswo Site Settings
+ * heißt. Sie steht zuerst, weil sie das ganze Haus betrifft und nicht einen
+ * Raum darin.
  */
 export const einstellungen = defineType({
   name: "settings",
@@ -16,12 +20,41 @@ export const einstellungen = defineType({
   type: "document",
   icon: CogIcon,
   groups: [
-    { name: "contact", title: "Kontakt", default: true },
-    { name: "reviews", title: "Bewertungen" },
+    { name: "site", title: "Website", default: true },
+    { name: "contact", title: "Kontakt" },
     { name: "locations", title: "Standorte" },
+    { name: "reviews", title: "Bewertungen" },
     { name: "social", title: "Soziale Netzwerke" },
+    { name: "seo", title: "Suchmaschine" },
   ],
   fields: [
+    /* --- Website ---------------------------------------------------------
+       Was den Browser-Tab und die Vorschau beim Teilen bestimmt. Bis hierher
+       stand beides fest in `web/src/layouts/Base.astro`. */
+
+    defineField({
+      name: "siteName",
+      title: "Name der Website",
+      type: "string",
+      description:
+        "Steht hinter jedem Seitentitel im Browser-Tab und als Absender, wenn jemand einen Link teilt.",
+      group: "site",
+      initialValue: "Mundpropaganda",
+      validation: (rule) => rule.required(),
+    }),
+
+    /* Ein rohes `image` und nicht der `picture`-Typ — dieselbe Begründung wie
+       beim Teilen-Motiv in `objects/seo.ts`: Ein Favicon wird nie vorgelesen,
+       ein Alternativtext hätte dort niemanden, der ihn hört. */
+    defineField({
+      name: "favicon",
+      title: "Symbol im Browser-Tab",
+      type: "image",
+      description:
+        "Quadratisch, mindestens 512 × 512 px. Leer lassen: dann steht dort die Wortmarke der Praxis.",
+      group: "site",
+    }),
+
     defineField({
       name: "phone",
       title: "Telefonnummer",
@@ -132,6 +165,48 @@ export const einstellungen = defineType({
               rows: 3,
               description: "Zwei bis drei Zeilen. Steht unter der Anschrift.",
             }),
+
+            /* Klasse 2: Wer keine Zeiten pflegt, bekommt keine erfundenen.
+               Der Block im Footer entfällt dann an diesem Standort ganz —
+               „Öffnungszeiten: keine Angabe" wäre schlechter als nichts.
+
+               Zwei Felder je Zeile statt einer freien Zeichenkette, weil die
+               Zeiten im Footer in zwei Spalten stehen und rechtsbündig
+               ausgerichtet werden. Aus „Mo–Do 8–19 Uhr" ließe sich das nur
+               raten. */
+            defineField({
+              name: "hours",
+              title: "Öffnungszeiten",
+              type: "array",
+              description:
+                "Je Zeile ein Zeitraum. Leer lassen: dann stehen an diesem Standort keine Zeiten.",
+              of: [
+                {
+                  type: "object",
+                  name: "openingHours",
+                  fields: [
+                    defineField({
+                      name: "days",
+                      title: "Tage",
+                      type: "string",
+                      description: "z. B. „Mo–Do“ oder „Sa“.",
+                      validation: (rule) => rule.required(),
+                    }),
+                    defineField({
+                      name: "time",
+                      title: "Zeit",
+                      type: "string",
+                      description: "z. B. „8–19 Uhr“ oder „nach Vereinbarung“.",
+                      validation: (rule) => rule.required(),
+                    }),
+                  ],
+                  preview: {
+                    select: { days: "days", time: "time" },
+                    prepare: ({ days, time }) => ({ title: days, subtitle: time }),
+                  },
+                },
+              ],
+            }),
           ],
           preview: {
             select: { title: "name", subtitle: "street", shortCode: "shortCode" },
@@ -158,10 +233,73 @@ export const einstellungen = defineType({
         defineField({ name: "youtube", title: "YouTube", type: "url" }),
       ],
     }),
+
+    /* --- Suchmaschine ----------------------------------------------------
+       Gilt für die ganze Website. Was eine einzelne Seite betrifft, steht im
+       SEO-Feld dieser Seite; hier steht nur, was überall gilt oder wofür sie
+       einspringt. */
+
+    defineField({
+      name: "searchEngines",
+      title: "Von Suchmaschinen finden lassen",
+      type: "boolean",
+      description:
+        "Aus, solange die Seite ein Prototyp ist: Adressen, Preise und Stellenanzeigen sind echt genug, um Schaden anzurichten, und eine zweite Fassung im Index macht der späteren echten Seite Konkurrenz. Der Schalter setzt robots.txt, die Kopfzeile X-Robots-Tag und das noindex auf jeder Seite zugleich.",
+      group: "seo",
+      initialValue: false,
+    }),
+
+    defineField({
+      name: "defaultDescription",
+      title: "Beschreibung als Rückfall",
+      type: "text",
+      rows: 3,
+      description:
+        "Springt ein, wenn eine Seite keine eigene Beschreibung im SEO-Feld hat. 120–155 Zeichen.",
+      group: "seo",
+      validation: (rule) => rule.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
+    }),
+
+    defineField({
+      name: "shareImage",
+      title: "Teilen-Bild als Rückfall",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Erscheint in Messengern und sozialen Netzwerken, wenn die geteilte Seite kein eigenes Motiv hat. Querformat, mindestens 1200 × 630 px.",
+      group: "seo",
+    }),
+
+    defineField({
+      name: "googleVerification",
+      title: "Google-Bestätigungscode",
+      type: "string",
+      description:
+        "Aus der Google Search Console, Methode „HTML-Tag“. Nur der Wert des content-Attributs, nicht die ganze Zeile. Beweist Google, dass die Seite uns gehört.",
+      group: "seo",
+    }),
+
+    /* Plausible und nicht Google Analytics, und das ist keine Vorliebe:
+       Plausible setzt keine Cookies und speichert nichts Personenbezogenes,
+       braucht also kein Einwilligungsbanner. Google Analytics braucht eines,
+       und die Seite hat keines. Ein Feld dafür wäre ein Versprechen, das
+       rechtlich nicht eingelöst ist — sobald ein Banner steht, kommt es
+       dazu. */
+    defineField({
+      name: "plausibleDomain",
+      title: "Plausible-Domain",
+      type: "string",
+      description:
+        "Die Domain, wie sie im Plausible-Konto steht, z. B. „mundpropaganda.de“. Leer lassen: dann wird nichts gemessen und kein fremdes Skript geladen. Plausible setzt keine Cookies und braucht daher kein Einwilligungsbanner.",
+      group: "seo",
+    }),
   ],
 
   // Ein Einzeldokument braucht keinen Titel aus den Daten.
   preview: {
-    prepare: () => ({ title: "Einstellungen", subtitle: "Kontakt, Bewertungen, Profile" }),
+    prepare: () => ({
+      title: "Einstellungen",
+      subtitle: "Website, Kontakt, Standorte, Suchmaschine",
+    }),
   },
 });

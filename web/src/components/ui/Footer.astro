@@ -91,6 +91,23 @@ const columns = (
                 solche an. Der Browser setzt das Element kursiv, das wird
                 unten zurückgenommen. */}
             <address>{o.street}<br />{o.city}</address>
+
+            {/* Nur wenn Zeiten gepflegt sind. Ein Block mit der Überschrift
+                „Öffnungszeiten" und nichts darunter wäre schlimmer als
+                keiner: Wer davorsteht, hält es für einen Fehler und ruft an.
+
+                <dl> und nicht <p>: Tage und Zeit sind Begriff und Erklärung,
+                und Vorlesegeräte lesen das Paar dann zusammen vor. */}
+            {o.hours && o.hours.length > 0 && (
+              <dl class="c-footer__hours">
+                {o.hours.map((z) => (
+                  <>
+                    <dt>{z.days}</dt>
+                    <dd>{z.time}</dd>
+                  </>
+                ))}
+              </dl>
+            )}
           </div>
         ))}
       </div>
@@ -282,6 +299,29 @@ const columns = (
   .c-footer__locations address {
     font-style: normal;
     line-height: 1.5;
+  }
+
+  /* Tage links, Zeit rechts. `max-content 1fr` und keine zwei gleichen
+     Spalten: „Mo–Do" und „Sa" sind unterschiedlich breit, und bei 1fr 1fr
+     stünde die Zeit je nach Zeile an anderer Stelle. So beginnt sie überall
+     gleich weit rechts.
+
+     Die Beschriftung „Öffnungszeiten" steht bewusst nicht darüber: Über der
+     Anschrift steht bereits das Kürzel, und eine zweite Überschrift in einem
+     vierzeiligen Block macht ihn zu einem eigenen Kapitel. Zwei Spalten aus
+     Tagen und Uhrzeiten liest ohnehin jeder als Öffnungszeiten. */
+  .c-footer__hours {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0 var(--sp-3);
+    margin-top: var(--sp-3);
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  .c-footer__hours dd {
+    margin: 0;
   }
 
   /* 12px statt 24px. Mit dem doppelten Abstand fiel eine Spalte aus sechs

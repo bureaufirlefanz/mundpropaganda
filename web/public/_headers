@@ -1,12 +1,13 @@
 # Netlify liest diese Datei aus dem Auslieferungsverzeichnis.
 #
-# `noindex` als Kopfzeile statt nur als Meta-Tag: So gilt es auch für PDFs,
-# Bilder und alles andere, was kein <head> hat. `nofollow` verhindert, dass
-# ein Crawler von hier aus weiterläuft.
+# Die Sperre für Suchmaschinen steht NICHT mehr hier. Sie hing an dieser Datei
+# und an public/robots.txt, beide mit dem Vermerk „vor dem Livegang entfernen"
+# — zwei Handgriffe im Code, die niemand sieht, wenn er sie vergisst. Jetzt
+# entscheidet der Schalter „Von Suchmaschinen finden lassen" in den
+# Einstellungen des Studios, und die Integration in `astro.config.mjs` hängt
+# den X-Robots-Tag beim Build vorne an diese Datei an, solange er aus ist.
 #
-# Gehört zusammen mit robots.txt entfernt, wenn die Seite echt live geht.
-/*
-  X-Robots-Tag: noindex, nofollow
+# Was hier steht, ist deshalb nur noch, was sich nie ändert: Cache-Regeln.
 
 # Bilder, Schriften und die gehashten Astro-Bundles ändern sich nie unter
 # demselben Namen — die dürfen dauerhaft im Cache bleiben. Die HTML-Dateien

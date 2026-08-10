@@ -1,5 +1,7 @@
 import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
+import { readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import sanity from "@sanity/astro";
 import netlify from "@astrojs/netlify";
 
@@ -31,6 +33,57 @@ const STUDIO = PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 // und die Module aus dem Prototyp an der Wurzel eingebunden wurden. Seit A2
 // liegen sie unter `src/styles/` und `src/js/` in diesem Ordner — der Zugriff
 // nach oben ist damit weder nötig noch erwünscht.
+/**
+ * Hängt die Suchmaschinen-Sperre als Kopfzeile an `dist/_headers`, solange der
+ * Schalter im Studio aus ist.
+ *
+ * Warum überhaupt eine Kopfzeile, wo doch jede Seite `noindex` im <head>
+ * trägt: Der Meta-Tag wirkt nur in HTML. PDFs, Bilder und alles andere ohne
+ * <head> wären ohne den X-Robots-Tag weiterhin indexierbar.
+ *
+ * Warum eine Integration und keine Datei unter `public/`: Der Wert steht im
+ * CMS, und `public/` wird unverändert kopiert. Astro-Routen wiederum können
+ * `_headers` nicht erzeugen — Dateien mit führendem Unterstrich sind vom
+ * Routing ausgenommen. Bleibt der Griff nach dem fertigen Build.
+ *
+ * Der Abruf läuft ohne Token, weil der Datensatz öffentlich lesbar ist. Wenn
+ * er scheitert, wird gesperrt und nicht freigegeben: Bei einer Störung ist
+ * ein nicht indexierter Prototyp der harmlosere Ausgang.
+ */
+function suchmaschinenSperre({ projectId, dataset, apiVersion }) {
+  return {
+    name: "mundpropaganda:suchmaschinen-sperre",
+    hooks: {
+      "astro:build:done": async ({ dir, logger }) => {
+        const abfrage = encodeURIComponent('*[_id == "settings"][0].searchEngines');
+        const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${abfrage}`;
+
+        let freigegeben = false;
+        try {
+          const antwort = await fetch(url);
+          if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`);
+          freigegeben = (await antwort.json()).result === true;
+        } catch (fehler) {
+          logger.warn(
+            `Einstellungen nicht erreichbar (${fehler.message}) — die Seite wird gesperrt ausgeliefert.`
+          );
+        }
+
+        if (freigegeben) {
+          logger.info("Suchmaschinen sind freigegeben, keine Sperre in _headers.");
+          return;
+        }
+
+        const pfad = fileURLToPath(new URL("_headers", dir));
+        const bestand = await readFile(pfad, "utf8").catch(() => "");
+        const sperre = "/*\n  X-Robots-Tag: noindex, nofollow\n\n";
+        await writeFile(pfad, sperre + bestand, "utf8");
+        logger.info("Suchmaschinen gesperrt: X-Robots-Tag in _headers gesetzt.");
+      },
+    },
+  };
+}
+
 export default defineConfig({
   output: "static",
 
@@ -67,6 +120,12 @@ export default defineConfig({
          landeten die Markierungen im ausgelieferten HTML — unsichtbar zwar,
          aber sie stehen in Textinhalten und damit im Suchindex. */
       stega: { studioUrl: STUDIO, enabled: false },
+    }),
+
+    suchmaschinenSperre({
+      projectId: PUBLIC_SANITY_PROJECT_ID,
+      dataset: PUBLIC_SANITY_DATASET,
+      apiVersion: "2026-07-28",
     }),
   ],
 

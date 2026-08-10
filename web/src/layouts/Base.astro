@@ -21,6 +21,7 @@ import Transition from "../components/ui/Transition.astro";
 import Nav from "../components/ui/Nav.astro";
 import Footer from "../components/ui/Footer.astro";
 import { ClientRouter } from "astro:transitions";
+import { loadSettings } from "../lib/settings";
 
 interface Props {
   title: string;
@@ -31,6 +32,30 @@ interface Props {
   image?: string;
 }
 const { title, description = "", noIndex = false, image } = Astro.props;
+
+/* Die Angaben zur ganzen Website holt der Rahmen selbst und nicht über Props:
+   Sie sind auf jeder Seite dieselben, und ein Durchreichen durch elf Templates
+   hätte elf Gelegenheiten, eine zu vergessen. `loadSettings` merkt sich das
+   Ergebnis, die Abfrage läuft also einmal je Build. */
+const { website } = await loadSettings();
+
+/* Der Titel bekommt den Websitenamen angehängt — außer er steht schon darin.
+   Ohne diese Prüfung stünde „Karriere - Mundpropaganda - Mundpropaganda" im
+   Tab, sobald jemand im SEO-Feld den vollständigen Titel gepflegt hat. */
+const vollerTitel = title.includes(website.siteName)
+  ? title
+  : `${title} - ${website.siteName}`;
+
+/* Reihenfolge der Rückfälle: was die Seite mitbringt, sonst was global
+   gepflegt ist, sonst nichts. Kein eingebauter Text — fehlt beides, entfällt
+   die Zeile. */
+const beschreibung = description || website.defaultDescription || "";
+const teilenBild = image || website.shareImageUrl;
+
+/* Zwei Wege in denselben Zustand: Der Schalter im Studio sperrt die ganze
+   Website, das SEO-Feld sperrt eine einzelne Seite. Beides zusammen mit ODER,
+   weil „nicht indexieren" die stärkere Aussage ist. */
+const nichtIndexieren = noIndex || !website.searchEngines;
 ---
 
 <!doctype html>
@@ -62,9 +87,12 @@ const { title, description = "", noIndex = false, image } = Astro.props;
       document.documentElement.classList.add("js");
     </script>
 
-    <title>{title}</title>
-    {description && <meta name="description" content={description} />}
-    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <title>{vollerTitel}</title>
+    {beschreibung && <meta name="description" content={beschreibung} />}
+    {nichtIndexieren && <meta name="robots" content="noindex, nofollow" />}
+    {website.googleVerification && (
+      <meta name="google-site-verification" content={website.googleVerification} />
+    )}
 
     {/*
       Open Graph und Twitter — was Messenger, soziale Netzwerke und Slack
@@ -81,23 +109,42 @@ const { title, description = "", noIndex = false, image } = Astro.props;
       URL vom Sanity-CDN. Ein lokales Motiv ginge hier nicht ohne `site`.
     */}
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Mundpropaganda" />
+    <meta property="og:site_name" content={website.siteName} />
     <meta property="og:locale" content="de_DE" />
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
-    {image && <meta property="og:image" content={image} />}
+    <meta property="og:title" content={vollerTitel} />
+    {beschreibung && <meta property="og:description" content={beschreibung} />}
+    {teilenBild && <meta property="og:image" content={teilenBild} />}
 
-    <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
-    <meta name="twitter:title" content={title} />
-    {description && <meta name="twitter:description" content={description} />}
-    {image && <meta name="twitter:image" content={image} />}
+    <meta name="twitter:card" content={teilenBild ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={vollerTitel} />
+    {beschreibung && <meta name="twitter:description" content={beschreibung} />}
+    {teilenBild && <meta name="twitter:image" content={teilenBild} />}
 
     <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
          blitzt die Fallback-Schrift im Hero auf. -->
     <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/svg/tooth-3d-mask.png" as="image" />
-    <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+    {/* Gepflegtes Favicon oder die Wortmarke. Kein `type` beim CMS-Motiv:
+        Das Format hängt daran, was hochgeladen wurde, und eine falsche
+        Angabe ist schlechter als keine. */}
+    {website.faviconUrl ? (
+      <link rel="icon" href={website.faviconUrl} />
+    ) : (
+      <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+    )}
+
+    {/* Plausible misst ohne Cookies und ohne personenbezogene Daten, braucht
+        also kein Einwilligungsbanner. Ohne gepflegte Domain wird gar nichts
+        geladen — kein leerer Aufruf, kein fremder Host im Netzwerk. */}
+    {website.plausibleDomain && (
+      <script
+        is:inline
+        defer
+        data-domain={website.plausibleDomain}
+        src="https://plausible.io/js/script.js"
+      />
+    )}
 
     <!-- Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
          modules/transition.js: er tauscht nur den geänderten Teil des

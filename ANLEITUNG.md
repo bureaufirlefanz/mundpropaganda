@@ -24,8 +24,34 @@ Von oben nach unten, in der Reihenfolge der Website:
 | **Team** | Personen, die auf mehreren Seiten auftauchen |
 | **Stellen** | Offene Stellen. Ziehbar |
 | **Navigation** | Das Menü oben |
-| **Seitenfuß** | Der Bereich ganz unten |
-| **Einstellungen** | Telefon, E-Mail, Adressen, Bewertungen, Profile |
+| **Footer** | Der Bereich ganz unten |
+| **Einstellungen** | Alles, was auf jeder Seite gleich ist. Siehe unten |
+| **Rechtstexte** | Impressum, Datenschutz, Barrierefreiheit |
+
+## Die Einstellungen
+
+Der einzige Eintrag, der nicht eine Seite betrifft, sondern alle. Sechs
+Reiter:
+
+| Reiter | Was Sie dort einstellen |
+|---|---|
+| **Website** | Der Name, der im Browser-Tab hinter jedem Seitentitel steht, und das kleine Symbol daneben |
+| **Kontakt** | Telefon, E-Mail und der Text über dem Kontaktformular |
+| **Standorte** | Die Praxen mit Anschrift und Öffnungszeiten |
+| **Bewertungen** | Quelle, Anzahl und Durchschnitt für den Balken auf der Startseite |
+| **Soziale Netzwerke** | Die Profile. Was leer bleibt, bekommt kein Symbol |
+| **Suchmaschine** | Ob Google die Seite finden darf, und was beim Teilen eines Links erscheint |
+
+**Öffnungszeiten** stehen je Standort, nicht einmal für alle: Wenn die zweite
+Praxis andere Zeiten hat, tragen Sie sie dort ein. Ein Standort ohne Zeiten
+zeigt keine an — es wird nichts erfunden.
+
+**Der wichtigste Schalter** liegt unter *Suchmaschine* und heißt **Von
+Suchmaschinen finden lassen**. Er steht auf aus, solange die Seite ein
+Entwurf ist. Erst wenn alles stimmt und die Seite wirklich öffentlich sein
+soll, schalten Sie ihn ein. Vorher findet Google die Seite nicht, und das ist
+Absicht: Eine halbfertige Fassung im Suchindex macht der fertigen später
+Konkurrenz.
 
 ## Etwas ändern
 

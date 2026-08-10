@@ -10,12 +10,32 @@ import { defineQuery } from "groq";
  * Quelle, aus der auch Tabelle, Menü und Footer entstehen.
  */
 /**
+ * Bildfelder werden als Objekt übernommen, nicht auf `asset->url` verkürzt.
+ * Nur so bleiben Beschnitt und Bildmittelpunkt aus dem Studio erhalten — der
+ * URL-Bauer rechnet die Größen daraus.
+ *
+ * `metadata.lqip` kommt nicht von selbst mit und muss ausgeschrieben werden:
+ * das ist der winzige Platzhalter, der den Rahmen füllt, bis das Bild da ist.
+ * Der Alternativtext liegt als Feld am Bild und wandert über `...` mit.
+ *
+ * Steht bewusst ganz oben: Die Abfragen darunter binden es in ihre
+ * Zeichenkette ein, und eine `const` weiter unten wäre zum Zeitpunkt der
+ * Auswertung noch nicht belegt.
+ */
+const BILD = `{
+    ...,
+    asset->{ _id, url, metadata { lqip, dimensions { width, height } } }
+  }`;
+
+/**
  * Die praxisweiten Angaben. Über die feste ID statt über den Typ: das ist die
  * schnellere Abfrage, und sie kann nicht versehentlich ein zweites Dokument
  * erwischen. Die Studio-Struktur hängt das Einzeldokument an dieselbe ID.
  */
 export const SETTINGS_QUERY = defineQuery(`
   *[_id == "settings"][0]{
+    siteName,
+    favicon ${BILD},
     phone,
     email,
     contactTitle,
@@ -24,7 +44,12 @@ export const SETTINGS_QUERY = defineQuery(`
     reviewsCount,
     reviewsAverage,
     social,
-    locations[]{ shortCode, name, street, city, description }
+    searchEngines,
+    defaultDescription,
+    shareImage ${BILD},
+    googleVerification,
+    plausibleDomain,
+    locations[]{ shortCode, name, street, city, description, hours[]{ days, time } }
   }
 `);
 
@@ -49,20 +74,6 @@ export const SERVICE_LIST_QUERY = defineQuery(`
     "preview": preview{ ..., asset->{ _id, url } }
   }
 `);
-
-/**
- * Bildfelder werden als Objekt übernommen, nicht auf `asset->url` verkürzt.
- * Nur so bleiben Beschnitt und Bildmittelpunkt aus dem Studio erhalten — der
- * URL-Bauer rechnet die Größen daraus.
- *
- * `metadata.lqip` kommt nicht von selbst mit und muss ausgeschrieben werden:
- * das ist der winzige Platzhalter, der den Rahmen füllt, bis das Bild da ist.
- * Der Alternativtext liegt als Feld am Bild und wandert über `...` mit.
- */
-const BILD = `{
-    ...,
-    asset->{ _id, url, metadata { lqip, dimensions { width, height } } }
-  }`;
 
 /**
  * Eine Leistung mit allem, was ihre Seite baut.
