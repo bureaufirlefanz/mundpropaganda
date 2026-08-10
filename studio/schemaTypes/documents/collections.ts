@@ -72,7 +72,7 @@ export const beitrag = defineType({
         "Verknüpft den Beitrag mit einer Leistung. Dadurch kann die Leistungsseite passende Beiträge zeigen, ohne dass jemand sie dort einzeln einträgt.",
       group: "content",
     }),
-    defineField({ name: "previewImage", title: "Vorschaupicture", type: "picture", group: "content" }),
+    defineField({ name: "previewImage", title: "Vorschaubild", type: "picture", group: "content" }),
     defineField({
       name: "lead",
       title: "Anrisstext",
@@ -136,7 +136,7 @@ export const pillar = defineType({
     }),
     defineField({ name: "topline", title: "Topline", type: "string", group: "content" }),
     defineField({ name: "lead", title: "Einleitung", type: "text", rows: 4, group: "content" }),
-    defineField({ name: "image", title: "Kopfpicture", type: "picture", group: "content" }),
+    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "content" }),
     defineField({
       name: "sections",
       title: "Abschnitte",

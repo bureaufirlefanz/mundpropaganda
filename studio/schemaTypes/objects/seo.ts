@@ -38,7 +38,7 @@ export const seo = defineType({
        Antwort. Das ist die eine Ausnahme von Aufgabe 12. */
     defineField({
       name: "image",
-      title: "Vorschaupicture",
+      title: "Vorschaubild",
       type: "image",
       description:
         "Wird beim Teilen in sozialen Netzwerken und Messengern gezeigt. Querformat, mindestens 1200 × 630 px.",

@@ -74,7 +74,7 @@ export const link = defineType({
       title: "Sprungmarke",
       type: "string",
       description:
-        "Springt auf der Zielseite zu einem Abschnitt, z. B. kontakt, standlocations, faq oder experten. Ohne Raute. Leer lassen für den Seitenanfang.",
+        "Springt auf der Zielseite zu einem Abschnitt, z. B. kontakt, standorte, faq oder experten. Ohne Raute. Leer lassen für den Seitenanfang.",
       hidden: ({ parent }) => parent?.kind !== "internal",
     }),
 

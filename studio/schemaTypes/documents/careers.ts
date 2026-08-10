@@ -78,7 +78,7 @@ export const karriere = defineType({
       description: "Der Absatz unter der Überschrift im Kopf der Seite.",
       group: "header",
     }),
-    defineField({ name: "image", title: "Kopfpicture", type: "picture", group: "header" }),
+    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "header" }),
     defineField({
       name: "action",
       title: "Knopf im Kopf",

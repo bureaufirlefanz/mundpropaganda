@@ -6,7 +6,7 @@ import { TagIcon } from "@sanity/icons/Tag";
  * Eine Leistung (Veneers, Implantate, ...).
  *
  * Alle Bildfelder sind vom Typ `picture`, nicht rohe `image`-Felder. Drei waren
- * es bis Aufgabe 12: Vorschaupicture, Hero-Bild und das Bild am Benefits-Eintrag.
+ * es bis Aufgabe 12: Vorschaubild, Hero-Bild und das Bild am Benefits-Eintrag.
  * Sie hatten keinen Alternativtext, keinen Dekorativ-Haken, und eines nicht
  * einmal einen Bildmittelpunkt. Ein Typ, der an drei von acht Stellen nicht
  * benutzt wird, ist schlimmer als keiner — er weckt den Eindruck, das Thema
@@ -77,12 +77,12 @@ export const leistung = defineType({
       title: "Wo taucht sie auf?",
       type: "string",
       description:
-        "Die Tabelle trägt die Hauptservices mit Bildvorschau, darunter steht eine schlichtere Linkliste.",
+        "Die Tabelle trägt die Hauptleistungen mit Bildvorschau, darunter steht eine schlichtere Linkliste.",
       group: "list",
       initialValue: "tabelle",
       options: {
         list: [
-          { title: "Services-Tabelle (mit Vorschaupicture)", value: "tabelle" },
+          { title: "Services-Tabelle (mit Vorschaubild)", value: "tabelle" },
           { title: "Nur als Link darunter", value: "liste" },
           { title: "Gar nicht", value: "versteckt" },
         ],
@@ -117,7 +117,7 @@ export const leistung = defineType({
 
     defineField({
       name: "preview",
-      title: "Vorschaupicture",
+      title: "Vorschaubild",
       type: "picture",
       description:
         "Hängt am Zeiger, wenn man in der Services-Tabelle über die Zeile fährt. Hochformat wirkt am besten.",
@@ -161,7 +161,7 @@ export const leistung = defineType({
 
     defineField({
       name: "benefits",
-      title: "Merkmale und Vlocationsile",
+      title: "Merkmale und Vorteile",
       type: "object",
       group: "content",
       options: { collapsible: true, collapsed: true },
@@ -352,7 +352,7 @@ export const leistung = defineType({
     }),
   ],
 
-  /* Das Vorschaupicture der Liste zeigt, was die Redaktion in der Tabelle sieht.
+  /* Das Vorschaubild der Liste zeigt, was die Redaktion in der Tabelle sieht.
      Fehlt es, tritt das Hero-Bild ein — sonst bliebe die Zeile im Studio grau,
      obwohl das Dokument ein Bild hat. */
   preview: {

@@ -55,7 +55,7 @@ const kopfFelder = [
     description: "Zwei bis drei Sätze unter der Überschrift.",
     group: "content",
   }),
-  defineField({ name: "image", title: "Kopfpicture", type: "picture", group: "content" }),
+  defineField({ name: "image", title: "Kopfbild", type: "picture", group: "content" }),
 ];
 
 const baukasten = defineField({
