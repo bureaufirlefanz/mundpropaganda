@@ -1,4 +1,5 @@
 ---
+import Button from "../ui/Button.astro";
 /**
  * Einstiegstext: Überschrift links, daneben zwei Textspalten.
  */
@@ -6,15 +7,30 @@ interface Props {
   topline: string;
   headline: string;
   columns: string[];
+  /**
+   * Der Einstiegstext, der vorher im Kopf der Seite stand.
+   *
+   * Er gehört hierher: Im Kopf war er ein dritter Anfang zwischen Bild und
+   * Überschrift, hier trägt er die Aussage, die der Abschnitt ausbuchstabiert.
+   */
+  lead?: string;
+  action?: string;
+  actionHref?: string;
 }
 
-const { topline, headline, columns } = Astro.props;
+const { topline, headline, columns, lead, action, actionHref } = Astro.props;
 ---
 
 <section class="container s-intro">
   <div class="s-intro__head">
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-intro__title" data-split="lines">{headline}</h2>
+    {lead && <p class="s-intro__lead" data-reveal="up">{lead}</p>}
+    {action && (
+      <div class="s-intro__action" data-reveal="up" data-reveal-delay="0.08">
+        <Button label={action} href={actionHref ?? "#stellen"} />
+      </div>
+    )}
   </div>
   {columns.map((t, i) => (
     <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>
@@ -29,6 +45,17 @@ const { topline, headline, columns } = Astro.props;
     /* Unten knapper: direkt darunter beginnt das farbige Benefits-Band, das
        seinen eigenen Innenabstand mitbringt. */
     padding-block: var(--section-space) var(--section-space-sm);
+  }
+
+  .s-intro__lead {
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-large);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  .s-intro__action {
+    margin-top: var(--sp-6);
   }
 
   .s-intro__head {

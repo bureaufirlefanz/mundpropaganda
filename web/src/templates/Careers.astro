@@ -94,14 +94,11 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
   <CareersHero
     title={d?.title ?? "Karriere"}
     topline={d?.topline}
-    lead={d?.lead}
     image={d?.image}
     alt={d?.image?.alt ?? ""}
-    action={action?.text}
-    actionHref={action?.href}
   />
 
-  {intro && <Intro {...intro} />}
+  {intro && <Intro {...intro} lead={d?.lead} action={action?.text} actionHref={action?.href} />}
 
   {figures && <Facts {...figures} />}
 
