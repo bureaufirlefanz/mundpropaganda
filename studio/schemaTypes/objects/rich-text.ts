@@ -76,7 +76,11 @@ export const fliesstextBild = defineArrayMember({
     select: { title: "caption", subtitle: "width", media: "image" },
     prepare: ({ title, subtitle, media }) => ({
       title: title || "Bild",
-      subtitle: { column: "In der Spalte", wide: "Über die Spalte hinaus", full: "Volle Breite" }[subtitle] ?? "",
+      subtitle:
+        ({ column: "In der Spalte", wide: "Über die Spalte hinaus", full: "Volle Breite" } as Record<
+          string,
+          string
+        >)[subtitle] ?? "",
       media,
     }),
   },

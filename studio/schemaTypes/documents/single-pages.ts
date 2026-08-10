@@ -77,7 +77,7 @@ function einzelseite(name: string, title: string, icon: any, untertitel: string)
     fields: [...kopfFelder, baukasten, seoFeld],
     preview: {
       select: { title: "title" },
-      prepare: ({ title }) => ({ title, subtitle: titel || untertitel }),
+      prepare: ({ title }) => ({ title: title || untertitel, subtitle: untertitel }),
     },
   });
 }

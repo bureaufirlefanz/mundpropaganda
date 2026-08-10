@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "check": "tsc --noEmit && sanity schema validate",
     "dev": "sanity dev",
     "start": "sanity start",
     "build": "sanity build",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@sanity/vision": "^6.6.0",
+    "@types/node": "^26.2.0",
     "typescript": "^5.9.3"
   }
 }

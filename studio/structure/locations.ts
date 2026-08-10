@@ -28,25 +28,28 @@ export const resolve: PresentationPluginOptions["resolve"] = {
   locations: {
     /* --- Dokumente mit eigener Seite ---------------------------------- */
 
-    startseite: defineLocations({
+    homepage: defineLocations({
+      select: {},
       resolve: () => ({ locations: [{ title: "Startseite", href: "/" }] }),
     }),
 
-    karriere: defineLocations({
+    careers: defineLocations({
+      select: {},
       resolve: () => ({ locations: [{ title: "Karriere", href: "/karriere" }] }),
     }),
 
-    magazinIndex: defineLocations({
+    magazineIndex: defineLocations({
+      select: {},
       resolve: () => ({ locations: [{ title: "Magazin", href: "/magazin" }] }),
     }),
 
-    rechtstext: defineLocations({
+    legalPage: defineLocations({
       select: { title: "title", slug: "slug.current" },
       resolve: (doc) => {
         const pfad = pathFor("legalPage", doc?.slug ?? undefined);
         return {
           locations: [
-            ...(pfad ? [{ title: doc?.titel ?? "Der Rechtstext", href: pfad }] : []),
+            ...(pfad ? [{ title: doc?.title ?? "Der Rechtstext", href: pfad }] : []),
             /* Und die Zeile im Seitenfuß, die auf ihn verweist — sie steht
                auf jeder Seite. */
             { title: "Footer (überall)", href: "/" },
@@ -55,7 +58,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
       },
     }),
 
-    leistung: defineLocations({
+    service: defineLocations({
       select: { title: "title", shortName: "shortName", slug: "slug.current" },
       resolve: (doc) => {
         const pfad = pathFor("service", doc?.slug ?? undefined);
@@ -63,7 +66,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
           locations: [
             /* Die eigene Seite zuerst — sie ist gemeint, wenn jemand die
                Leistung bearbeitet. */
-            ...(pfad ? [{ title: doc?.titel ?? "Die Leistung", href: pfad }] : []),
+            ...(pfad ? [{ title: doc?.title ?? "Die Leistung", href: pfad }] : []),
             /* Und die drei Aufzählungen, die denselben Namen tragen. Wer hier
                umbenennt, ändert sie alle mit — das soll man sehen, bevor man
                publiziert. */
@@ -73,14 +76,14 @@ export const resolve: PresentationPluginOptions["resolve"] = {
       },
     }),
 
-    beitrag: defineLocations({
+    post: defineLocations({
       select: { title: "title", slug: "slug.current", service: "service->slug.current" },
       resolve: (doc) => {
         const pfad = pathFor("post", doc?.slug ?? undefined);
-        const zurLeistung = pathFor("service", doc?.leistung ?? undefined);
+        const zurLeistung = pathFor("service", doc?.service ?? undefined);
         return {
           locations: [
-            ...(pfad ? [{ title: doc?.titel ?? "Der Beitrag", href: pfad }] : []),
+            ...(pfad ? [{ title: doc?.title ?? "Der Beitrag", href: pfad }] : []),
             { title: "Magazin (Übersicht)", href: "/magazin" },
             { title: "Startseite (Karussell)", href: "/" },
             /* Nur wenn der Beitrag auf eine Leistung verweist: dort steht er
@@ -93,12 +96,13 @@ export const resolve: PresentationPluginOptions["resolve"] = {
 
     /* --- Dokumente ohne eigene Seite ---------------------------------- */
 
-    stelle: defineLocations({
+    job: defineLocations({
       select: { title: "title" },
       resolve: () => ({ locations: [{ title: "Karriere (Offene Stellen)", href: "/karriere" }] }),
     }),
 
-    einstellungen: defineLocations({
+    settings: defineLocations({
+      select: {},
       resolve: () => ({
         locations: UEBERALL,
         message: "Kontakt, Bewertungen, Standorte und die Profile stehen auf jeder Seite.",
@@ -106,6 +110,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     navigation: defineLocations({
+      select: {},
       resolve: () => ({
         locations: UEBERALL,
         message: "Die Leiste und das große Menü stehen auf jeder Seite.",
@@ -113,6 +118,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     footer: defineLocations({
+      select: {},
       resolve: () => ({
         locations: UEBERALL,
         message: "Der Footer steht auf jeder Seite.",

@@ -37,7 +37,7 @@ export const beitrag = defineType({
       title: "URL-Teil",
       type: "slug",
       description: "Ergibt /magazin/<slug>. Kleinschreibung, Bindestriche, keine Umlaute.",
-      options: { source: "titel", maxLength: 72 },
+      options: { source: "title", maxLength: 72 },
       validation: (r) => r.required(),
       group: "content",
     }),
@@ -101,13 +101,13 @@ export const beitrag = defineType({
     seoFeld,
   ],
   orderings: [
-    { title: "Neueste zuerst", name: "datumNeu", by: [{ field: "datum", direction: "desc" }] },
+    { title: "Neueste zuerst", name: "dateDesc", by: [{ field: "date", direction: "desc" }] },
   ],
   preview: {
     select: { title: "title", date: "date", media: "previewImage" },
     prepare: ({ title, date, media }) => ({
       title,
-      subtitle: datum ? new Date(datum).toLocaleDateString("de-DE") : "ohne Datum",
+      subtitle: date ? new Date(date).toLocaleDateString("de-DE") : "ohne Datum",
       media,
     }),
   },
@@ -135,7 +135,7 @@ export const pillar = defineType({
       type: "slug",
       description:
         "Liegt auf der obersten Ebene: /<slug>. Das ist Absicht - eine Pillar Page ist auf ein Suchwort gebaut, jedes Verzeichnis davor verwässert es.",
-      options: { source: "titel", maxLength: 72 },
+      options: { source: "title", maxLength: 72 },
       validation: (r) =>
         r.required().custom((wert) =>
           slugAvailable(wert?.current)
@@ -177,7 +177,7 @@ export const rechtstext = defineType({
       title: "URL-Teil",
       type: "slug",
       description: "Liegt auf der obersten Ebene: /impressum, /datenschutz, /agb.",
-      options: { source: "titel", maxLength: 40 },
+      options: { source: "title", maxLength: 40 },
       validation: (r) =>
         r.required().custom((wert) =>
           slugAvailable(wert?.current) ? true : `„${wert?.current}“ ist ein fester Pfad der Website.`
@@ -252,7 +252,7 @@ export const stelle = defineType({
       title: "Kennung",
       type: "slug",
       description: "Wird zur Sprungmarke auf der Karriereseite und zum Betreff der Bewerbungsmail.",
-      options: { source: "titel", maxLength: 40 },
+      options: { source: "title", maxLength: 40 },
       validation: (r) => r.required(),
       group: "facts"
     }),
@@ -288,7 +288,7 @@ export const stelle = defineType({
     select: { title: "title", kind: "kind", active: "active" },
     prepare: ({ title, kind, active }) => ({
       title,
-      subtitle: [aktiv === false ? "nicht ausgeschrieben" : null, art].filter(Boolean).join(" · "),
+      subtitle: [active === false ? "nicht ausgeschrieben" : null, kind].filter(Boolean).join(" · "),
     }),
   },
 });

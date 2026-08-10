@@ -18,6 +18,7 @@
     "web:check": "npm run types && npm --prefix web run check && node scripts/check-web.mjs",
     "web:styles": "node scripts/styles.mjs",
     "studio": "npm --prefix studio run dev",
+  "studio:check": "npm --prefix studio run check",
     "web": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
     "web:preview": "node scripts/preview.mjs",

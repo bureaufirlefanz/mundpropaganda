@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import type { PreviewValue } from "sanity";
 import type { ComponentType } from "react";
 import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { BarChartIcon } from "@sanity/icons/BarChart";
@@ -60,7 +61,7 @@ const vorschau = (
   }: {
     title?: string;
     subtitle?: string;
-    media?: unknown;
+    media?: PreviewValue["media"];
   }) => ({
     title: title || art,
     subtitle: subtitle ? `${art} · ${subtitle}` : art,
@@ -351,7 +352,7 @@ export const abschnittSchritte = defineType({
     }),
   ],
   icon: OlistIcon,
-  preview: vorschau("Schritte", "titel", { icon: OlistIcon }),
+  preview: vorschau("Schritte", "title", { icon: OlistIcon }),
 });
 
 /* --- Preise ------------------------------------------------------------ */
@@ -380,7 +381,7 @@ export const abschnittPreise = defineType({
     }),
   ],
   icon: TagIcon,
-  preview: vorschau("Preise", "titel", { icon: TagIcon }),
+  preview: vorschau("Preise", "title", { icon: TagIcon }),
 });
 
 /* --- Häufige Fragen ---------------------------------------------------- */
@@ -410,7 +411,7 @@ export const abschnittFaq = defineType({
     }),
   ],
   icon: HelpCircleIcon,
-  preview: vorschau("Häufige Fragen", "titel", { icon: HelpCircleIcon }),
+  preview: vorschau("Häufige Fragen", "title", { icon: HelpCircleIcon }),
 });
 
 /* --- Kontaktformular --------------------------------------------------- */
@@ -430,7 +431,7 @@ export const abschnittKontakt = defineType({
     }),
   ],
   icon: EnvelopeIcon,
-  preview: vorschau("Kontaktformular", "titel", { icon: EnvelopeIcon }),
+  preview: vorschau("Kontaktformular", "title", { icon: EnvelopeIcon }),
 });
 
 /**

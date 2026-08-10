@@ -136,7 +136,7 @@ export const einstellungen = defineType({
           preview: {
             select: { title: "name", subtitle: "street", shortCode: "shortCode" },
             prepare: ({ title, subtitle, shortCode }) => ({
-              title: `${kuerzel ? kuerzel + " · " : ""}${title ?? ""}`,
+              title: `${shortCode ? shortCode + " · " : ""}${title ?? ""}`,
               subtitle,
             }),
           },

@@ -47,7 +47,7 @@ export const leistung = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      options: { source: "titel", maxLength: 96 },
+      options: { source: "title", maxLength: 96 },
       group: "seo",
       validation: (rule) => rule.required(),
     }),
@@ -367,10 +367,10 @@ export const leistung = defineType({
       const wo = { tabelle: "Tabelle", liste: "nur Link", versteckt: "nur Menü" };
       return {
         title: title ?? "Ohne Titel",
-        subtitle: [kurzname && kurzname !== title ? shortName : null, wo[platzierung as keyof typeof wo]]
+        subtitle: [shortName && shortName !== title ? shortName : null, wo[placement as keyof typeof wo]]
           .filter(Boolean)
           .join(" · "),
-        media: vorschau ?? hero,
+        media: preview ?? hero,
       };
     },
   },

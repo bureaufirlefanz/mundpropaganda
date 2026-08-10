@@ -125,7 +125,7 @@ export const karriere = defineType({
           ],
           preview: {
             select: { value: "value", unit: "unit", text: "text" },
-            prepare: ({ value, unit, text }) => ({ title: `${wert ?? "?"}${einheit ?? ""}`, subtitle: text }),
+            prepare: ({ value, unit, text }) => ({ title: `${value ?? "?"}${unit ?? ""}`, subtitle: text }),
           },
         }),
       ],

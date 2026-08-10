@@ -8,9 +8,16 @@ Project `a6bjftwf`, dataset `production`.
 
 ```bash
 npm run dev      # port 3333
+npm run check    # tsc --noEmit && sanity schema validate
 ```
 
-From the project root: `npm run studio`.
+From the project root: `npm run studio` and `npm run studio:check`.
+
+**Run `check` before every commit that touches this folder.** `sanity schema
+validate` alone is not enough — it validates the *shape* of the schema and
+passes happily while a `prepare()` body reads a variable that does not exist.
+Only `tsc` sees that. Until this script existed, `studio/` had no typecheck at
+all and carried nine such crashes.
 
 ## The principle
 
@@ -62,6 +69,16 @@ the error only shows up in the Studio, not on import.
 
 `image` is a reserved type name in Sanity. Our image object is therefore called
 `picture`, while the *field* inside it is `image`.
+
+The migration also reached `package-lock.json`, and that one hid the longest:
+`orte` → `locations` fired inside the word supp**orte**d and left the
+dependency `is-unicode-supp**locations**d`. npm cannot resolve a package that
+does not exist, so it silently kept the stale copy already in `node_modules`
+— until the next `npm install` pruned it and `sanity` died with
+`MODULE_NOT_FOUND`. A lockfile is generated, never read by a human, and
+therefore the worst possible place for a blind search-and-replace. If one ever
+looks wrong again, the cheap test is whether each package name matches the
+filename in its own `resolved` URL.
 
 ## Singleton documents
 

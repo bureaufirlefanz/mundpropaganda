@@ -22,11 +22,19 @@ Anyone working "in the prototype" was changing the live website. That trap is
 closed.
 
 ```bash
-npm run web         # Astro, port 4321
-npm run studio      # Sanity Studio, port 3333
-npm run web:check   # types, smoke test, accessibility
-npm run web:deploy  # build and publish to Netlify
+npm run web           # Astro, port 4321
+npm run studio        # Sanity Studio, port 3333
+npm run web:check     # types, smoke test, accessibility
+npm run studio:check  # types and schema of the Studio
+npm run web:deploy    # build and publish to Netlify
 ```
+
+`web:check` covers `web/` only. For a long time nothing at all typechecked
+`studio/`, and that is not a theoretical gap: it hid nine undefined variables
+in `prepare()` bodies — leftovers of the language migration, where the field
+was renamed and the line that read it was not. Each one threw the moment its
+preview rendered, so the Studio looked broken to whoever opened it while every
+website check stayed green. **Run both.**
 
 Further reading: `README.md` · `SANITY.md` · `web/STRUKTUR.md` (structure of
 the Astro app, binding) · `CMS-UMBAU.md` (the running rebuild list) ·

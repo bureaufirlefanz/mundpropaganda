@@ -105,7 +105,7 @@ export const link = defineType({
             ? "E-Mail"
             : kind === "phone"
               ? "Telefon"
-              : [ziel, anker && `#${anker}`].filter(Boolean).join(" ");
+              : [target, anchor && `#${anchor}`].filter(Boolean).join(" ");
       return { title, subtitle: wohin || "ohne Ziel" };
     },
   },
