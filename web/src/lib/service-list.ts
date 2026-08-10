@@ -1,6 +1,6 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
-import { LEISTUNGSLISTE_QUERY } from "./queries";
+import { SERVICE_LIST_QUERY } from "./queries";
 import type { CmsImageValue } from "./images";
 
 /**
@@ -51,7 +51,7 @@ let cached: Promise<ServiceEntry[]> | null = null;
  */
 export function loadServiceList(): Promise<ServiceEntry[]> {
   cached ??= sanityClient
-    .fetch(LEISTUNGSLISTE_QUERY)
+    .fetch(SERVICE_LIST_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
     .catch(() => []);

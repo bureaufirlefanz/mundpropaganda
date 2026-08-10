@@ -22,12 +22,12 @@ import { isCmsImage } from "../../lib/images";
 import { categoryLabel, postPath, motifFor, type Post } from "../../lib/magazine";
 
 interface Props {
-  beitrag: Post;
+  post: Post;
   sizes: string;
   /** Tiefe des Parallax auf dem Bild. Ohne Wert steht es still. */
   parallax?: string;
   /** Der Knopf trägt das Karussell, nicht die Übersicht. */
-  mitKnopf?: boolean;
+  withButton?: boolean;
   /**
    * Die Ebene der Überschrift.
    *
@@ -37,15 +37,15 @@ interface Props {
    * übersprungene Ebene. Der Test in `web:check` hat genau das gemeldet:
    * „h1 → h3 bei Zahngesundheit & Fitness".
    */
-  ueberschrift?: "h2" | "h3";
+  headingLevel?: "h2" | "h3";
 }
 
 const {
-  beitrag: p,
+  post: p,
   sizes,
   parallax,
-  mitKnopf = false,
-  ueberschrift: Titel = "h3",
+  withButton = false,
+  headingLevel: Titel = "h3",
   ...rest
 } = Astro.props;
 
@@ -84,7 +84,7 @@ const motif = motifFor(p.slug);
     {p.lead && <p class="c-post__text">{p.lead}</p>}
   </div>
 
-  {mitKnopf && <Button label="Beitrag lesen" static />}
+  {withButton && <Button label="Beitrag lesen" static />}
 </article>
 
 <style>

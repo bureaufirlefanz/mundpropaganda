@@ -1,7 +1,7 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
-import type { LEISTUNG_QUERY_RESULT } from "./sanity.types";
-import { LEISTUNG_QUERY } from "./queries";
+import type { SERVICE_QUERY_RESULT } from "./sanity.types";
+import { SERVICE_QUERY } from "./queries";
 import { loadServiceList } from "./service-list";
 
 /**
@@ -36,7 +36,7 @@ export async function ladeSlugs(): Promise<{ params: { slug: string } }[]> {
  * auf das gestaltete Motiv zurück. Das entscheidet der Baustein, nicht diese
  * Datei — er kennt sein Motiv, die Datenschicht nicht.
  */
-export type Service = NonNullable<WithoutNull<LEISTUNG_QUERY_RESULT>>;
+export type Service = NonNullable<WithoutNull<SERVICE_QUERY_RESULT>>;
 
 /**
  * Eine Leistung laden.
@@ -49,7 +49,7 @@ export type Service = NonNullable<WithoutNull<LEISTUNG_QUERY_RESULT>>;
  */
 export async function loadService(slug: string): Promise<Service | undefined> {
   try {
-    return withoutNull(await sanityClient.fetch(LEISTUNG_QUERY, { slug })) ?? undefined;
+    return withoutNull(await sanityClient.fetch(SERVICE_QUERY, { slug })) ?? undefined;
   } catch {
     /* Ist das CMS nicht erreichbar, soll die Seite sichtbar leer sein und
        nicht mit fremdem Inhalt gefüllt. */

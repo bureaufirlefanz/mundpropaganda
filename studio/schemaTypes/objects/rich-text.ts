@@ -24,6 +24,64 @@ import { defineArrayMember, defineField } from "sanity";
  * ein Textfeld. Die Zusage dahinter ist, dass jede Eingabe gut aussehen wird —
  * die lässt sich nur halten, wenn die Auswahl klein ist.
  */
+/**
+ * Ein Bild im Fließtext.
+ *
+ * Erst seit dem Editorial-Umbau erlaubt. Vorher war die Auswahl auf Text
+ * beschränkt, mit derselben Begründung wie bei den Überschriftengraden: Was
+ * es gibt, wird benutzt, und ein Bild ohne gestalteten Platz sieht aus wie
+ * ein Fremdkörper. Der Platz ist jetzt da — die Textspalte lässt rechts rund
+ * 350px frei, und `breite` entscheidet, ob ein Bild in der Spalte bleibt oder
+ * dorthin ausbricht.
+ */
+export const fliesstextBild = defineArrayMember({
+  /* Ein eigener Objekttyp statt eines erweiterten `picture`. Sanity lässt auf
+     Subtypen von `image` keine zusätzlichen `fields` zu — der Schema-Export
+     bricht mit „Cannot override fields of subtypes of image" ab. Also ein
+     Objekt, das ein Bild ENTHÄLT; der Alternativtext und der Haken „rein
+     dekorativ" kommen dadurch weiterhin aus `picture`. */
+  type: "object",
+  name: "inlineImage",
+  title: "Bild",
+  fields: [
+    defineField({
+      name: "image",
+      title: "Bild",
+      type: "picture",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "width",
+      title: "Breite",
+      type: "string",
+      description: "Wie weit das Bild aus der Textspalte ausbricht.",
+      options: {
+        list: [
+          { title: "In der Spalte", value: "column" },
+          { title: "Über die Spalte hinaus", value: "wide" },
+          { title: "Über die volle Seitenbreite", value: "full" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "wide",
+    }),
+    defineField({
+      name: "caption",
+      title: "Bildunterschrift",
+      type: "string",
+      description: "Wahlfrei. Steht klein unter dem Bild.",
+    }),
+  ],
+  preview: {
+    select: { title: "caption", subtitle: "width", media: "image" },
+    prepare: ({ title, subtitle, media }) => ({
+      title: title || "Bild",
+      subtitle: { column: "In der Spalte", wide: "Über die Spalte hinaus", full: "Volle Breite" }[subtitle] ?? "",
+      media,
+    }),
+  },
+});
+
 export const fliesstext = defineArrayMember({
   type: "block",
 

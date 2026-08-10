@@ -1,6 +1,6 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
-import { EINSTELLUNGEN_QUERY } from "./queries";
+import { SETTINGS_QUERY } from "./queries";
 
 /**
  * Die Angaben, die auf jeder Seite gleich sind. Ein Einzeldokument im Studio.
@@ -69,7 +69,7 @@ let cached: Promise<Settings> | null = null;
 
 export function loadSettings(): Promise<Settings> {
   cached ??= sanityClient
-    .fetch(EINSTELLUNGEN_QUERY)
+    .fetch(SETTINGS_QUERY)
     .then(withoutNull)
     .then((d) => ({
       /* Klasse 1, notfalls leer. Das Schema verlangt die drei, aber der Build

@@ -1,6 +1,6 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
-import { STARTSEITE_QUERY } from "./queries";
+import { HOMEPAGE_QUERY } from "./queries";
 import type { ImageSource } from "./images";
 import type { LinkValue } from "./navigation";
 
@@ -118,7 +118,7 @@ let cached: Promise<HomepageContent> | null = null;
 
 export function loadHomepage(): Promise<HomepageContent> {
   cached ??= sanityClient
-    .fetch(STARTSEITE_QUERY)
+    .fetch(HOMEPAGE_QUERY)
     .then(withoutNull)
     .then((d) => fillRequired(saeubere(d ?? {})))
     .catch(() => fillRequired({}));

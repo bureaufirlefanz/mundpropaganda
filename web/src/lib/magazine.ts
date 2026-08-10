@@ -2,15 +2,15 @@ import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
 import { stableMotif } from "./images";
 import type {
-  BEITRAEGE_QUERY_RESULT,
-  BEITRAG_QUERY_RESULT,
-  MAGAZIN_INDEX_QUERY_RESULT,
+  POSTS_QUERY_RESULT,
+  POST_QUERY_RESULT,
+  MAGAZINE_INDEX_QUERY_RESULT,
 } from "./sanity.types";
 import {
-  BEITRAEGE_QUERY,
-  BEITRAG_QUERY,
-  MAGAZIN_INDEX_QUERY,
-  AEHNLICHE_QUERY,
+  POSTS_QUERY,
+  POST_QUERY,
+  MAGAZINE_INDEX_QUERY,
+  RELATED_QUERY,
 } from "./queries";
 
 /**
@@ -28,9 +28,9 @@ import {
  * Patientinnen und Patienten.
  */
 
-export type Post = NonNullable<WithoutNull<BEITRAEGE_QUERY_RESULT>>[number];
-export type FullPost = NonNullable<WithoutNull<BEITRAG_QUERY_RESULT>>;
-export type MagazineIntro = NonNullable<WithoutNull<MAGAZIN_INDEX_QUERY_RESULT>>;
+export type Post = NonNullable<WithoutNull<POSTS_QUERY_RESULT>>[number];
+export type FullPost = NonNullable<WithoutNull<POST_QUERY_RESULT>>;
+export type MagazineIntro = NonNullable<WithoutNull<MAGAZINE_INDEX_QUERY_RESULT>>;
 
 /** Klartext für die Kategorie-Pille auf der Karte. */
 const CATEGORIES: Record<string, string> = {
@@ -73,7 +73,7 @@ export function loadPosts(service?: string): Promise<Post[]> {
     cached.set(
       key,
       sanityClient
-        .fetch(BEITRAEGE_QUERY, { service: service ?? null })
+        .fetch(POSTS_QUERY, { service: service ?? null })
         .then(withoutNull)
         .then((liste) => liste ?? [])
         .catch(() => [])
@@ -84,7 +84,7 @@ export function loadPosts(service?: string): Promise<Post[]> {
 
 export async function loadPost(slug: string): Promise<FullPost | undefined> {
   try {
-    return withoutNull(await sanityClient.fetch(BEITRAG_QUERY, { slug })) ?? undefined;
+    return withoutNull(await sanityClient.fetch(POST_QUERY, { slug })) ?? undefined;
   } catch {
     return undefined;
   }
@@ -101,7 +101,7 @@ export async function loadPost(slug: string): Promise<FullPost | undefined> {
 export async function loadRelated(category?: string, slug?: string): Promise<Post[]> {
   if (!category || !slug) return [];
   try {
-    return withoutNull(await sanityClient.fetch(AEHNLICHE_QUERY, { category, slug })) ?? [];
+    return withoutNull(await sanityClient.fetch(RELATED_QUERY, { category, slug })) ?? [];
   } catch {
     return [];
   }
@@ -109,10 +109,35 @@ export async function loadRelated(category?: string, slug?: string): Promise<Pos
 
 export async function loadMagazineIntro(): Promise<MagazineIntro | undefined> {
   try {
-    return withoutNull(await sanityClient.fetch(MAGAZIN_INDEX_QUERY)) ?? undefined;
+    return withoutNull(await sanityClient.fetch(MAGAZINE_INDEX_QUERY)) ?? undefined;
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Wie lange man an einem Beitrag liest.
+ *
+ * Gerechnet, nicht gepflegt: Ein Feld dafür wäre ein Wert, den die Redaktion
+ * beim Kürzen eines Absatzes vergisst — und eine angegebene Lesezeit, die
+ * nicht stimmt, ist schlechter als keine.
+ *
+ * 200 Wörter je Minute ist der übliche Ansatz für Fließtext auf Deutsch;
+ * darunter liegen Fachtexte, darüber Belletristik. Aufgerundet auf ganze
+ * Minuten, mindestens eine — „0 Minuten Lesezeit" liest niemand als kurz,
+ * sondern als kaputt.
+ */
+export function readingTime(blocks: unknown): number {
+  if (!Array.isArray(blocks)) return 1;
+  let woerter = 0;
+  for (const block of blocks) {
+    const b = block as { _type?: string; children?: { text?: string }[] };
+    if (b?._type !== "block") continue;
+    for (const kind of b.children ?? []) {
+      woerter += (kind.text ?? "").trim().split(/\s+/).filter(Boolean).length;
+    }
+  }
+  return Math.max(1, Math.round(woerter / 200));
 }
 
 /** Deutsches Datum, wie es unter einem Beitrag steht. */

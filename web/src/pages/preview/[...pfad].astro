@@ -33,16 +33,16 @@ import VisualEditing from "../../components/ui/VisualEditing.astro";
 
 import { previewClient, targetFor, PREVIEW_COOKIE } from "../../lib/preview";
 import {
-  STARTSEITE_QUERY,
-  LEISTUNG_QUERY,
-  BEITRAEGE_QUERY,
-  BEITRAG_QUERY,
-  MAGAZIN_INDEX_QUERY,
-  KARRIERE_QUERY,
-  STELLEN_QUERY,
-  LEISTUNGSLISTE_QUERY,
-  RECHTSTEXT_QUERY,
-  AEHNLICHE_QUERY,
+  HOMEPAGE_QUERY,
+  SERVICE_QUERY,
+  POSTS_QUERY,
+  POST_QUERY,
+  MAGAZINE_INDEX_QUERY,
+  CAREERS_QUERY,
+  JOBS_QUERY,
+  SERVICE_LIST_QUERY,
+  LEGAL_PAGE_QUERY,
+  RELATED_QUERY,
 } from "../../lib/queries";
 import { withoutNull } from "../../lib/without-null";
 import type { HomepageContent } from "../../lib/homepage";
@@ -96,16 +96,16 @@ let inhalt: {
 
 if (target.kind === "homepage") {
   const [data, posts] = await Promise.all([
-    hole<HomepageContent>(STARTSEITE_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
+    hole<HomepageContent>(HOMEPAGE_QUERY),
+    hole<BeitragKarte[]>(POSTS_QUERY, { service: null }),
   ]);
   inhalt = { ...inhalt, startseite: data, posts: posts ?? [] };
 } else if (target.kind === "service") {
   const [data, liste, start, posts] = await Promise.all([
-    hole<LeistungDaten>(LEISTUNG_QUERY, { slug: target.slug }),
-    hole<ServiceEntry[]>(LEISTUNGSLISTE_QUERY),
-    hole<HomepageContent>(STARTSEITE_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: target.slug }),
+    hole<LeistungDaten>(SERVICE_QUERY, { slug: target.slug }),
+    hole<ServiceEntry[]>(SERVICE_LIST_QUERY),
+    hole<HomepageContent>(HOMEPAGE_QUERY),
+    hole<BeitragKarte[]>(POSTS_QUERY, { service: target.slug }),
   ]);
   inhalt = {
     ...inhalt,
@@ -116,31 +116,31 @@ if (target.kind === "homepage") {
   };
 } else if (target.kind === "magazineIndex") {
   const [kopf, posts] = await Promise.all([
-    hole<MagazineIntro>(MAGAZIN_INDEX_QUERY),
-    hole<BeitragKarte[]>(BEITRAEGE_QUERY, { service: null }),
+    hole<MagazineIntro>(MAGAZINE_INDEX_QUERY),
+    hole<BeitragKarte[]>(POSTS_QUERY, { service: null }),
   ]);
   inhalt = { ...inhalt, magazinKopf: kopf, posts: posts ?? [] };
 } else if (target.kind === "post") {
-  const data = await hole<FullPost>(BEITRAG_QUERY, { slug: target.slug });
+  const data = await hole<FullPost>(POST_QUERY, { slug: target.slug });
   /* Erst nach dem Beitrag, nicht parallel: Die Kategorie steht in ihm, und
      ohne sie gibt es nichts Ähnliches zu holen. */
-  const aehnliche = data?.category
-    ? ((await hole<BeitragKarte[]>(AEHNLICHE_QUERY, {
+  const related = data?.category
+    ? ((await hole<BeitragKarte[]>(RELATED_QUERY, {
         category: data.category,
         slug: target.slug,
       })) ?? [])
     : [];
-  inhalt = { ...inhalt, beitrag: data, title: data?.title ?? "", posts: aehnliche };
+  inhalt = { ...inhalt, beitrag: data, title: data?.title ?? "", posts: related };
 } else if (target.kind === "legalPage") {
-  const data = await hole<RechtstextDaten>(RECHTSTEXT_QUERY, { slug: target.slug });
+  const data = await hole<RechtstextDaten>(LEGAL_PAGE_QUERY, { slug: target.slug });
   /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
      wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
   if (!data) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
   inhalt = { ...inhalt, rechtstext: data, title: data.title ?? "" };
 } else {
   const [data, jobs] = await Promise.all([
-    hole<KarriereDaten>(KARRIERE_QUERY),
-    hole<Job[]>(STELLEN_QUERY),
+    hole<KarriereDaten>(CAREERS_QUERY),
+    hole<Job[]>(JOBS_QUERY),
   ]);
   inhalt = { ...inhalt, karriere: data, jobs: jobs ?? [] };
 }
@@ -164,7 +164,7 @@ if (target.kind === "homepage") {
 )}
 
 {target.kind === "post" && (
-  <Post data={inhalt.beitrag} title={inhalt.title} aehnliche={inhalt.posts} />
+  <Post data={inhalt.beitrag} title={inhalt.title} related={inhalt.posts} />
 )}
 
 {target.kind === "careers" && <CareersContent data={inhalt.karriere} jobs={inhalt.jobs} />}

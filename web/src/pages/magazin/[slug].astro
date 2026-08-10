@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { title } = Astro.props;
 const data = await loadPost(slug!);
-const aehnliche = await loadRelated(data?.category, slug);
+const related = await loadRelated(data?.category, slug);
 ---
 
-<Post data={data} title={data?.title || title || ""} aehnliche={aehnliche} />
+<Post data={data} title={data?.title || title || ""} related={related} />

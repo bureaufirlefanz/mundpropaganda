@@ -1,10 +1,10 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
 import type {
-  RECHTSTEXTE_QUERY_RESULT,
-  RECHTSTEXT_QUERY_RESULT,
+  LEGAL_PAGES_QUERY_RESULT,
+  LEGAL_PAGE_QUERY_RESULT,
 } from "./sanity.types";
-import { RECHTSTEXTE_QUERY, RECHTSTEXT_QUERY } from "./queries";
+import { LEGAL_PAGES_QUERY, LEGAL_PAGE_QUERY } from "./queries";
 
 /**
  * Impressum, Datenschutz, Barrierefreiheit.
@@ -20,15 +20,15 @@ import { RECHTSTEXTE_QUERY, RECHTSTEXT_QUERY } from "./queries";
  * aus, steht unter fremdem Namen und ist rechtlich falsch.
  */
 
-export type LegalPageCard = NonNullable<WithoutNull<RECHTSTEXTE_QUERY_RESULT>>[number];
-export type LegalPage = NonNullable<WithoutNull<RECHTSTEXT_QUERY_RESULT>>;
+export type LegalPageCard = NonNullable<WithoutNull<LEGAL_PAGES_QUERY_RESULT>>[number];
+export type LegalPage = NonNullable<WithoutNull<LEGAL_PAGE_QUERY_RESULT>>;
 
 let cached: Promise<LegalPageCard[]> | null = null;
 
 /** Alle Rechtstexte — für `getStaticPaths` und die Zeile im Seitenfuß. */
 export function loadLegalPages(): Promise<LegalPageCard[]> {
   cached ??= sanityClient
-    .fetch(RECHTSTEXTE_QUERY)
+    .fetch(LEGAL_PAGES_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
     .catch(() => []);
@@ -38,7 +38,7 @@ export function loadLegalPages(): Promise<LegalPageCard[]> {
 /** Ein einzelner Rechtstext mit Fließtext. */
 export async function loadLegalPage(slug: string): Promise<LegalPage | undefined> {
   try {
-    return withoutNull(await sanityClient.fetch(RECHTSTEXT_QUERY, { slug })) ?? undefined;
+    return withoutNull(await sanityClient.fetch(LEGAL_PAGE_QUERY, { slug })) ?? undefined;
   } catch {
     return undefined;
   }

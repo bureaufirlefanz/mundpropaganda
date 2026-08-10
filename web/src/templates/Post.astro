@@ -2,14 +2,26 @@
 /**
  * Der Zusammenbau einer Beitragsseite.
  *
- * Drei Teile: ein großes Kopfpicture, darunter der Text mit dem
- * Inhaltsverzeichnis daneben, und am Fuß Beiträge aus derselben Kategorie.
+ * Editorial gesetzt, und das heißt hier drei Dinge:
  *
- * Der Fließtext ist Portable Text und wird mit `astro-portabletext`
- * gerendert. Die Bausteine dafür sind knapp gehalten, weil das Schema die
- * Auswahl schon begrenzt: Absatz, Zwischentitel, Unterpunkt und Bild. Kein
- * h1 — den setzt diese Seite. Die Zwischentitel laufen über `TextTitel`,
- * damit sie eine Sprungmarke bekommen; alles andere bleibt, wie es war.
+ * **Der Titel liegt auf dem Bild, nicht darunter.** Als eigene Fläche, die
+ * sich über die Unterkante schiebt. Ein Titel unter einem randlosen Bild
+ * liest sich als zweiter Anfang; so ist es einer.
+ *
+ * **Die Nebenangaben stehen im Rand, nicht in einer Zeile über dem Titel.**
+ * Das war der Auftrag: Tag, Datum und Autor voneinander trennen. In einer
+ * Reihe aus gleicher Schrift und gleicher Farbe unterscheidet sie niemand —
+ * der Tag ist eine Eigenschaft des Beitrags, das Datum eine Tatsache über
+ * ihn, der Autor ein Mensch. Drei verschiedene Dinge, drei Ebenen.
+ *
+ * **Die Textspalte bleibt bei 68 Zeichen, der Rand daneben wird benutzt.**
+ * Nicht durch Verbreitern — das kostet Lesbarkeit —, sondern durch das, was
+ * hineinragen darf: die Nebenangaben, die Nummern der Zwischentitel und
+ * Bilder, die die Redaktion auf „über die Spalte hinaus" stellt.
+ *
+ * Der Fließtext ist Portable Text. Die Bausteine sind knapp gehalten, weil
+ * das Schema die Auswahl schon begrenzt: Absatz, Zwischentitel, Unterpunkt,
+ * Aufzählung, Bild. Kein h1 — den setzt diese Seite.
  */
 import { PortableText } from "astro-portabletext";
 import Base from "../layouts/Base.astro";
@@ -17,31 +29,40 @@ import Contact from "../components/sections/Contact.astro";
 import CmsImage from "../components/ui/CmsImage.astro";
 import Picture from "../components/ui/Picture.astro";
 import Button from "../components/ui/Button.astro";
-import PostKarte from "../components/ui/PostCard.astro";
-import Inhaltsverzeichnis from "../components/ui/TableOfContents.astro";
-import TextTitel from "../components/ui/TextHeading.astro";
+import PostCard from "../components/ui/PostCard.astro";
+import TableOfContents from "../components/ui/TableOfContents.astro";
+import TextHeading from "../components/ui/TextHeading.astro";
+import PostImage from "../components/ui/PostImage.astro";
 import { isCmsImage } from "../lib/images";
 import { headingsFrom, withHeadingIds } from "../lib/table-of-contents";
-import { categoryLabel, dateLabel, motifFor, type Post, type FullPost } from "../lib/magazine";
+import {
+  categoryLabel,
+  dateLabel,
+  readingTime,
+  motifFor,
+  type Post,
+  type FullPost,
+} from "../lib/magazine";
 
 interface Props {
   data: FullPost | undefined;
   /** Aus der Liste, falls das Dokument fehlt. */
   title: string;
   /** Beiträge derselben Kategorie. Leer, wenn es keine gibt. */
-  aehnliche?: Post[];
+  related?: Post[];
 }
 
-const { data: d, title, aehnliche = [] } = Astro.props;
+const { data: d, title, related = [] } = Astro.props;
 
 const description = d?.seo?.description || d?.lead || "";
 
 /* Ab drei Zwischentiteln lohnt sich ein Verzeichnis. Bei zweien ist es keine
    Orientierung, sondern eine Dopplung der Überschriften, die man beim
-   Scrollen ohnehin sieht — und es nähme die halbe linke Spalte ein. */
+   Scrollen ohnehin sieht. */
 const headings = headingsFrom(d?.text);
-const zeigeToc = headings.length >= 3;
-const bloecke = withHeadingIds(d?.text, headings);
+const showToc = headings.length >= 3;
+const blocks = withHeadingIds(d?.text, headings);
+const minutes = readingTime(d?.text);
 ---
 
 <Base
@@ -50,70 +71,96 @@ const bloecke = withHeadingIds(d?.text, headings);
   noIndex={d?.seo?.noIndex}
 >
   <article class="s-post">
-    {/* --- Kopf: Bild über die volle Breite, Titel darauf ----------------- */}
+    {/* --- Kopf: Bild über die volle Breite, Titel darauf ---------------- */}
     <header class="s-post__header">
       {/* Ohne Bild im CMS dasselbe Ersatzmotiv wie auf der Karte im Raster
-          und im Karussell. Vorher stand hier ein festes `teeth-macro`: Ein
-          Beitrag zeigte in der Übersicht ein Bild und auf seiner eigenen
-          Seite ein anderes, und wer geklickt hatte, landete sichtbar
-          woanders. */}
+          und im Karussell — sonst zeigte ein Beitrag in der Übersicht ein
+          Bild und auf seiner eigenen Seite ein anderes. */}
       <div class="s-post__headerimage">
         {isCmsImage(d?.previewImage) ? (
-          <CmsImage
-            source={d.previewImage}
-            alt=""
-            widths={[640, 1024, 1600, 2200]}
-            sizes="100vw"
-            eager
-          />
+          <CmsImage source={d.previewImage} alt="" widths={[640, 1024, 1600, 2200]} sizes="100vw" eager />
         ) : (
           <Picture name={motifFor(d?.slug)} alt="" sizes="100vw" eager />
         )}
       </div>
 
-      <div class="container s-post__headertext">
-        <div class="s-post__meta">
-          {d?.category && <span class="c-topline">{categoryLabel(d.category)}</span>}
-          {d?.date && <time datetime={d.date}>{dateLabel(d.date)}</time>}
+      <div class="container s-post__headline">
+        <div class="s-post__titlecard">
+          {d?.category && <span class="s-post__tag">{categoryLabel(d.category)}</span>}
+          <h1 class="s-post__title" data-split="lines">{title}</h1>
+          {d?.lead && <p class="s-post__lead" data-reveal="up">{d.lead}</p>}
         </div>
-        <h1 class="s-post__title" data-split="lines">{title}</h1>
-        {d?.lead && <p class="s-post__lead" data-reveal="up">{d.lead}</p>}
+
+        {/* Die Nebenangaben stehen NEBEN der Titelkarte, nicht im Rand des
+            Fließtextes. Damit sind sie dort, wo man sie sucht — beim Titel —
+            und trotzdem vom Titel getrennt: eigene Spalte, eigene Ebene,
+            eigener Schnitt. Tag, Datum und Autor sind drei verschiedene
+            Dinge und sehen jetzt auch so aus. */}
+        <div class="s-post__facts">
+          <dl class="s-post__factlist">
+            {d?.date && (
+              <div class="s-post__fact">
+                <dt>Erschienen</dt>
+                <dd><time datetime={d.date}>{dateLabel(d.date)}</time></dd>
+              </div>
+            )}
+            <div class="s-post__fact">
+              <dt>Lesezeit</dt>
+              <dd>{minutes} {minutes === 1 ? "Minute" : "Minuten"}</dd>
+            </div>
+          </dl>
+
+          {/* Ohne Autor steht hier nichts. Kein „Redaktion" als Notbehelf:
+              Das ist eine Behauptung über eine Urheberschaft. */}
+          {d?.author?.name && (
+            <div class="s-post__author">
+              {isCmsImage(d.author.image) && (
+                <div class="s-post__authorimage">
+                  <CmsImage source={d.author.image} alt="" widths={[96, 192]} sizes="48px" />
+                </div>
+              )}
+              <div>
+                <p class="s-post__authorname">{d.author.name}</p>
+                {d.author.role && <p class="s-post__authorrole">{d.author.role}</p>}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
 
-    {/* --- Satz: Verzeichnis links, Text rechts --------------------------- */}
+    {/* --- Satz: Verzeichnis, Text, Randspalte --------------------------- */}
     {d?.text && (
-      <div class:list={["container", "s-post__body", zeigeToc && "s-beitrag__satz--mit-toc"]}>
-        {zeigeToc && (
+      <div class:list={["container", "s-post__body", showToc && "s-post__body--toc"]}>
+        {showToc && (
           <aside class="s-post__aside">
-            <Inhaltsverzeichnis headings={headings} />
+            <TableOfContents headings={headings} />
           </aside>
         )}
 
-        <div class="s-post__text" data-toc-bereich>
-          <PortableText
-            value={bloecke}
-            components={{
-              block: {
-                h2: TextTitel,
-                h3: TextTitel,
-              },
-            }}
-          />
+        <div class="s-post__column">
+          <div class="s-post__text" data-toc-bereich>
+            <PortableText
+              value={blocks}
+              components={{
+                block: { h2: TextHeading, h3: TextHeading },
+                type: { inlineImage: PostImage },
+              }}
+            />
 
-          {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist.
-              Das ist der Gewinn der Referenz im Schema: Sie trägt in beide
-              Richtungen — die Leistungsseite zeigt passende Beiträge, der
-              Beitrag führt zurück. */}
-          {d?.service?.slug && (
-            <div class="s-post__back">
-              <Button
-                label={`Zur Leistung: ${d.service.title}`}
-                href={`/leistungen/${d.service.slug}`}
-                variant="dark"
-              />
-            </div>
-          )}
+            {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist.
+                Das ist der Gewinn der Referenz im Schema: Sie trägt in beide
+                Richtungen. */}
+            {d?.service?.slug && (
+              <div class="s-post__back">
+                <Button
+                  label={`Zur Leistung: ${d.service.title}`}
+                  href={`/leistungen/${d.service.slug}`}
+                  variant="dark"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )}
@@ -123,23 +170,18 @@ const bloecke = withHeadingIds(d?.text, headings);
       Nur echte Treffer aus derselben Kategorie. Kein Auffüllen mit den
       neuesten Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches
       steht, ist dieselbe stille Behauptung, die Aufgabe 4 abgeräumt hat. */}
-  {aehnliche.length > 0 && (
-    <section class="container s-weiter">
-      <div class="s-weiter__kopf">
+  {related.length > 0 && (
+    <section class="container s-more">
+      <div class="s-more__head">
         <span class="c-topline" data-reveal="fade">Weiterlesen</span>
-        <h2 class="s-weiter__titel" data-split="lines">
+        <h2 class="s-more__title" data-split="lines">
           Mehr aus {categoryLabel(d?.category)}
         </h2>
       </div>
 
-      <div class="s-weiter__raster" data-reveal-stagger="0.06">
-        {aehnliche.map((p, i) => (
-          <PostKarte
-            beitrag={p}
-            sizes="(max-width: 700px) 100vw, 30vw"
-            mitKnopf
-            data-reveal-child
-          />
+      <div class="s-more__grid" data-reveal-stagger="0.06">
+        {related.map((p) => (
+          <PostCard post={p} sizes="(max-width: 700px) 100vw, 30vw" withButton data-reveal-child />
         ))}
       </div>
     </section>
@@ -154,48 +196,66 @@ const bloecke = withHeadingIds(d?.text, headings);
   }
 
   /* --- Kopf -------------------------------------------------------------
-     Das Bild läuft über die volle Breite und beginnt unter der Navigation.
-     Kein `container`: Ein Kopfpicture, das an derselben Kante endet wie der
-     Fließtext, liest sich als Abpictureung im Text und nicht als Auftakt.
+     Bild über die volle Breite, darauf die Titelfläche. Sie zieht sich mit
+     einer negativen Marge über die Unterkante des Bildes; die Höhe des Bildes
+     ist deshalb so bemessen, dass darunter noch Platz bleibt.
      -------------------------------------------------------------------- */
   .s-post__headerimage {
-    height: clamp(320px, 56vh, 640px);
+    height: clamp(300px, 52vh, 620px);
     overflow: hidden;
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 
-  /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt
-     und das Scope-Attribut dieser Datei nicht trägt. */
+  /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt. */
   .s-post__headerimage :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  /* `margin-inline: 0`, sonst zentriert `max-width` den Kopf innerhalb des
-     Rahmens: Der Titel begann bei 412px, der Fließtext darunter bei 332px,
-     und zwei Kanten, die um 80px auseinanderliegen, liest man als Fehler und
-     nicht als Absicht. Der Kopf steht jetzt an der linken Rahmenkante, also
-     über der Spalte des Inhaltsverzeichnisses — er gilt für die ganze Seite
-     und nicht nur für die Textspalte. */
-  .s-post__headertext {
-    max-width: 68ch;
-    margin-inline: 0;
-    padding-top: var(--sp-10);
-    padding-bottom: var(--sp-8);
+  /* Titelkarte links, Nebenangaben rechts daneben. Die Karte behält ihre
+     Lesebreite; die Angaben bekommen, was übrig bleibt, und stehen dadurch
+     im Rand statt im Satz. */
+  .s-post__headline {
+    display: grid;
+    grid-template-columns: minmax(0, 60ch) minmax(0, 1fr);
+    align-items: end;
+    column-gap: clamp(var(--sp-6), 4vw, 80px);
   }
 
-  .s-post__meta {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-4);
-    margin-bottom: var(--sp-5);
+  .s-post__titlecard {
+    position: relative;
+    z-index: 1;
+    max-width: 60ch;
+    /* Weniger tief im Bild als zuerst gesetzt. Bei -140px lag die Oberkante
+       mitten im Motiv und der Titel stand fast auf dem Bild statt davor. */
+    margin-top: clamp(-88px, -5.5vw, -44px);
+    margin-inline: 0;
+    padding: clamp(var(--sp-6), 3vw, var(--sp-10));
+    border-radius: var(--r-md);
+    /* Weiß wie die Karten in der Magazin-Übersicht — dieselbe Fläche, die
+       dort einen Beitrag trägt, trägt hier seinen Titel. Auf dem
+       Seitengrund (--c-bg) hob sie sich nicht ab und las sich als Loch im
+       Bild statt als Karte darauf. */
+    background: var(--c-white);
+    color: var(--c-neutral-800);
+  }
+
+  /* Der Tag als eigene Zeile über dem Titel, nicht als Teil einer Meta-Reihe.
+     Braun auf dem Seitengrund: 8,4:1. */
+  .s-post__tag {
+    display: inline-block;
+    margin-bottom: var(--sp-4);
+    padding: 5px var(--sp-3) 6px;
+    border-radius: var(--r-sm);
+    background: var(--c-dark);
+    color: var(--c-grey);
     font-family: var(--f-mono);
     font-weight: 300;
-    font-size: var(--fs-text-small);
+    font-size: var(--fs-label);
+    line-height: 1;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--c-text-muted);
   }
 
   .s-post__title {
@@ -205,56 +265,176 @@ const bloecke = withHeadingIds(d?.text, headings);
     letter-spacing: -0.02em;
   }
 
+  /* Eigene Abstufung statt `--c-text-muted`: Das rechnet gegen den
+     Seitengrund, die Karte ist aber weiß. */
   .s-post__lead {
-    margin-top: var(--sp-6);
+    margin-top: var(--sp-5);
     font-size: var(--fs-text-large);
     line-height: 1.45;
-    color: var(--c-text-muted);
+    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
   }
 
   /* --- Satz -------------------------------------------------------------
-     Zwei Spuren: das Verzeichnis in einer festen Breite, der Text in seiner
-     Lesebreite. Beide zusammen stehen links, nicht mittig — ein zentrierter
-     Satz mit klebendem Verzeichnis daneben wandert beim Scrollen gefühlt
-     nach rechts, weil nur eine der beiden Spalten stillsteht.
+     Zwei Ebenen. Außen das Verzeichnis neben dem Inhalt, innen der Text neben
+     seinem Rand. Zwei Raster statt eines dreispaltigen, weil die Kinder des
+     Textblocks keine Rasterzellen wären — ein Bild könnte dann nicht über die
+     Spalte hinausreichen.
      -------------------------------------------------------------------- */
-  .s-beitrag__satz--mit-toc {
+  .s-post__body {
+    padding-top: var(--sp-10);
+  }
+
+  /* Das Verzeichnis steht RECHTS, nicht links.
+     
+     Links hätte es den Text eingerückt und von der Kante weggeschoben, an der
+     die Titelkarte darüber beginnt — zwei Anfänge auf zwei Linien. Rechts
+     liegt es auf derselben Seite wie die Angaben zum Beitrag im Kopf: alles
+     Beiläufige an einem Rand, der Text an seiner Kante.
+     
+     Die Reihenfolge im Markup bleibt Verzeichnis-vor-Text. Wer mit der
+     Tastatur oder einem Vorlesegerät kommt, bekommt die Übersicht zuerst;
+     `grid-column` verschiebt nur das Bild. */
+  .s-post__body--toc {
     display: grid;
-    grid-template-columns: 220px minmax(0, 68ch);
-    gap: clamp(var(--sp-6), 5vw, 96px);
-    /* KEIN `align-items: start`. Das ließ die linke Spalte auf die Höhe des
-       Verzeichnisses schrumpfen, und ein klebendes Element kann sich nur
-       innerhalb seines Kastens bewegen — bei gleicher Höhe also gar nicht.
-       Das Verzeichnis stand dadurch oben und scrollte mit dem Text weg.
-       Gestreckt reicht die Spalte bis zum Ende des Textes, und genau diese
-       Strecke ist der Weg, den es klebend zurücklegt. */
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: clamp(var(--sp-8), 7vw, 140px);
+    /* KEIN `align-items: start`: Das ließe die linke Spalte auf die Höhe des
+       Verzeichnisses schrumpfen, und ein klebendes Element bewegt sich nur
+       innerhalb seines Kastens. */
+  }
+
+  /* Der Text bleibt bei seiner Lesebreite, das Raster daneben trägt die
+     Bilder, die darüber hinausreichen dürfen. */
+  .s-post__aside {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .s-post__body--toc .s-post__column {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s-post__column {
+    display: grid;
+    grid-template-columns: minmax(0, 68ch) minmax(0, 1fr);
+    column-gap: clamp(var(--sp-6), 3vw, 64px);
+    align-items: start;
   }
 
   .s-post__text {
-    max-width: 68ch;
+    grid-column: 1;
+    min-width: 0;
   }
 
-  /* :global(), weil PortableText das Markup zur Laufzeit erzeugt. */
+  /* Die Angaben sitzen auf der Grundlinie der Titelkarte, nicht an deren
+     Oberkante: Der Titel ist unterschiedlich hoch, die Unterkante ist die
+     einzige Linie, die beide teilen. */
+  .s-post__facts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+    padding-bottom: clamp(var(--sp-6), 3vw, var(--sp-10));
+  }
+
+  .s-post__factlist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .s-post__fact dt {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .s-post__fact dd {
+    margin-top: 2px;
+    font-size: var(--fs-text-small);
+    line-height: 1.35;
+  }
+
+  /* Der Autor ist abgesetzt, nicht eingereiht: eine Linie darüber und ein
+     Porträt daneben. Das ist der sichtbare Unterschied zwischen einer Angabe
+     über den Text und einem Menschen, der ihn geschrieben hat. */
+  .s-post__author {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-top: var(--sp-5);
+    border-top: var(--bw) solid var(--c-line);
+  }
+
+  .s-post__authorimage {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-round);
+    overflow: hidden;
+  }
+
+  .s-post__authorimage :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .s-post__authorname {
+    font-size: var(--fs-text-small);
+    line-height: 1.3;
+  }
+
+  .s-post__authorrole {
+    margin-top: 2px;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.35;
+    color: var(--c-text-muted);
+  }
+
+  /* --- Fließtext --------------------------------------------------------
+     :global(), weil PortableText das Markup zur Laufzeit erzeugt.
+     -------------------------------------------------------------------- */
   .s-post__text :global(p) {
     margin-bottom: var(--sp-5);
     font-size: var(--fs-text-main);
     line-height: 1.6;
   }
 
-  /* `scroll-margin-top`, damit ein Sprung nicht unter der Navigationsleiste
-     landet. Sie liegt fest oben und ist rund 96px hoch. */
-  .s-post__text :global(h2),
-  .s-post__text :global(h3) {
-    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
+  /* Zwischentitel bekommen eine Nummer im linken Rand. Der Zähler läuft über
+     die h2 und ignoriert die h3 — sonst zählte er Unterpunkte mit und die
+     Nummerierung entspräche nicht dem Verzeichnis daneben. */
+  .s-post__text {
+    counter-reset: abschnitt;
   }
 
   .s-post__text :global(h2) {
-    margin-top: var(--sp-10);
+    counter-increment: abschnitt;
+    position: relative;
+    margin-top: var(--sp-12);
     margin-bottom: var(--sp-4);
     font-size: var(--fs-h3);
     font-weight: 500;
     line-height: 1.15;
     letter-spacing: -0.01em;
+    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
+  }
+
+  .s-post__text :global(h2)::before {
+    content: counter(abschnitt, decimal-leading-zero);
+    position: absolute;
+    top: 0.15em;
+    left: calc(-1 * var(--sp-8));
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+    color: var(--c-text-muted);
   }
 
   .s-post__text :global(h3) {
@@ -263,6 +443,7 @@ const bloecke = withHeadingIds(d?.text, headings);
     font-size: var(--fs-h5);
     font-weight: 500;
     line-height: 1.2;
+    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
   }
 
   .s-post__text :global(ul) {
@@ -283,21 +464,28 @@ const bloecke = withHeadingIds(d?.text, headings);
     text-decoration-color: var(--c-brand);
   }
 
+  /* Ein Bild, das die Redaktion auf „über die Spalte hinaus" gestellt hat,
+     reicht bis an den rechten Rand des Satzspiegels. Das ist der einzige
+     Grund, warum der Textblock ein Raster ist. */
+  .s-post__text :global(.c-postimage[data-width="wide"]) {
+    width: calc(100% + var(--rand-breite, 0px));
+  }
+
   .s-post__back {
     margin-top: var(--sp-10);
   }
 
   /* --- Weiterlesen ------------------------------------------------------ */
 
-  .s-weiter {
+  .s-more {
     padding-block: var(--section-space-sm) 0;
   }
 
-  .s-weiter__kopf {
+  .s-more__head {
     margin-bottom: var(--sp-10);
   }
 
-  .s-weiter__titel {
+  .s-more__title {
     margin-top: var(--sp-3);
     font-size: var(--fs-h2);
     font-weight: 400;
@@ -307,29 +495,90 @@ const bloecke = withHeadingIds(d?.text, headings);
 
   /* Dieselben drei Spalten wie unter /magazin. Die Karte merkt selbst, dass
      sie hier schmal ist, und stapelt — siehe PostCard.astro. */
-  .s-weiter__raster {
+  .s-more__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
     gap: clamp(48px, 5vw, 88px) var(--site-gutter);
   }
 
+  /* --- Schmalere Fenster ------------------------------------------------
+     Erst fällt der Rand weg (die Nebenangaben rücken über den Text), dann
+     das Verzeichnis (es liegt darüber statt daneben).
+     -------------------------------------------------------------------- */
+  @media (max-width: 1200px) {
+    .s-post__headline {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .s-post__column {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .s-post__facts {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-6);
+      max-width: 68ch;
+      margin-top: var(--sp-6);
+      padding-bottom: 0;
+    }
+
+    .s-post__factlist {
+      flex-direction: row;
+      gap: var(--sp-6);
+    }
+
+    .s-post__author {
+      padding-top: 0;
+      border-top: 0;
+      margin-left: auto;
+    }
+
+    .s-post__text {
+      max-width: 68ch;
+    }
+  }
+
   @media (max-width: 1000px) {
-    /* Unter dieser Schwelle steht das Verzeichnis über dem Text statt
-       daneben — 220px Spalte plus Lesebreite passen nicht mehr nebeneinander,
-       ohne dass eine von beiden zu schmal wird. */
-    .s-beitrag__satz--mit-toc {
+    .s-post__body--toc {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-6);
     }
 
-    .s-weiter__raster {
+    /* Übereinander, und dann in der Reihenfolge des Markups: erst die
+       Übersicht, dann der Text. */
+    .s-post__aside,
+    .s-post__body--toc .s-post__column {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .s-more__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Die Nummer im Rand hat keinen Rand mehr — sie rückt über die
+       Überschrift. */
+    .s-post__text :global(h2)::before {
+      position: static;
+      display: block;
+      margin-bottom: var(--sp-2);
     }
   }
 
   @media (max-width: 640px) {
-    .s-weiter__raster {
+    .s-post__facts {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .s-post__author {
+      margin-left: 0;
+    }
+
+    .s-more__grid {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-10) 0;
     }

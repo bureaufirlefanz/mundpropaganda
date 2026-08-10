@@ -1,7 +1,7 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
-import type { KARRIERE_QUERY_RESULT, STELLEN_QUERY_RESULT } from "./sanity.types";
-import { KARRIERE_QUERY, STELLEN_QUERY } from "./queries";
+import type { CAREERS_QUERY_RESULT, JOBS_QUERY_RESULT } from "./sanity.types";
+import { CAREERS_QUERY, JOBS_QUERY } from "./queries";
 
 /**
  * Die Karriereseite aus dem CMS.
@@ -19,8 +19,8 @@ import { KARRIERE_QUERY, STELLEN_QUERY } from "./queries";
  * eine erfundene Stellenausschreibung wäre die teuerste Slocations Platzhalter.
  */
 
-export type CareersContent = NonNullable<WithoutNull<KARRIERE_QUERY_RESULT>>;
-export type Job = NonNullable<WithoutNull<STELLEN_QUERY_RESULT>>[number];
+export type CareersContent = NonNullable<WithoutNull<CAREERS_QUERY_RESULT>>;
+export type Job = NonNullable<WithoutNull<JOBS_QUERY_RESULT>>[number];
 
 /** Adresse für Bewerbungen mit vorbereitetem Betreff. */
 export const applicationLink = (mail: string, stelle?: { title?: string }) =>
@@ -33,7 +33,7 @@ let cachedJobs: Promise<Job[]> | null = null;
 
 export function loadCareers(): Promise<CareersContent | undefined> {
   cached ??= sanityClient
-    .fetch(KARRIERE_QUERY)
+    .fetch(CAREERS_QUERY)
     .then(withoutNull)
     .then((d) => d ?? undefined)
     .catch(() => undefined);
@@ -49,7 +49,7 @@ export function loadCareers(): Promise<CareersContent | undefined> {
  */
 export function loadJobs(): Promise<Job[]> {
   cachedJobs ??= sanityClient
-    .fetch(STELLEN_QUERY)
+    .fetch(JOBS_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
     .catch(() => []);

@@ -36,10 +36,10 @@ const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
   <div class="s-postliste__raster" data-reveal-stagger="0.06">
     {posts.map((p, i) => (
       <PostKarte
-        beitrag={p}
+        post={p}
         sizes="(max-width: 700px) 100vw, 30vw"
-        mitKnopf
-        ueberschrift="h2"
+        withButton
+        headingLevel="h2"
         data-reveal-child
       />
     ))}

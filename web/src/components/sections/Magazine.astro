@@ -1,6 +1,6 @@
 ---
 import Button from "../ui/Button.astro";
-import PostKarte from "../ui/PostCard.astro";
+import PostCard from "../ui/PostCard.astro";
 import type { Post } from "../../lib/magazine";
 
 /**
@@ -29,7 +29,7 @@ const { topline, title, text, posts } = Astro.props;
            MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
            darunter ein Karussell aus Bild + überlappender weißer Karte
            ================================================================== -->
-      <section class="s-magazine" id="magazine" data-magazine>
+      <section class="s-magazine" id="magazin" data-magazine>
         <div class="container">
           <span class="c-topline" data-reveal="fade">{topline}</span>
 
@@ -51,16 +51,16 @@ const { topline, title, text, posts } = Astro.props;
 
           <div class="s-magazine__track" data-magazine-track>
             {posts.map((p, i) => (
-              <PostKarte beitrag={p} sizes="24vw" parallax="9" mitKnopf data-magazine-item />
+              <PostCard post={p} sizes="24vw" parallax="9" withButton data-magazine-item />
             ))}
           </div>
 
           <div class="s-magazine__nav">
             <div class="s-magazine__arrows">
-              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Post">
+              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
                 <svg aria-hidden="true"><use href="#i-arrow" /></svg>
               </button>
-              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Post">
+              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
                 <svg aria-hidden="true"><use href="#i-arrow" /></svg>
               </button>
             </div>

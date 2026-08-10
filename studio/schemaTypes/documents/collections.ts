@@ -5,7 +5,7 @@ import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
 import { slugAvailable, RESERVED_SLUGS } from "../../lib/paths";
-import { fliesstext } from "../objects/rich-text";
+import { fliesstext, fliesstextBild } from "../objects/rich-text";
 
 /**
  * Die Sammlungen: Typen, von denen es beliebig viele gibt.
@@ -64,6 +64,16 @@ export const beitrag = defineType({
       group: "content",
     }),
     defineField({
+      name: "author",
+      title: "Verfasst von",
+      type: "reference",
+      to: [{ type: "person" }],
+      description:
+        "Wer den Beitrag geschrieben hat. Erscheint mit Rolle unter dem Titel. Ohne Angabe steht dort nichts - kein „Redaktion“ als Notbehelf.",
+      group: "content",
+    }),
+
+    defineField({
       name: "service",
       title: "Gehört zu Leistung",
       type: "reference",
@@ -85,7 +95,7 @@ export const beitrag = defineType({
       name: "text",
       title: "Beitrag",
       type: "array",
-      of: [fliesstext, { type: "picture" }],
+      of: [fliesstext, fliesstextBild],
       group: "content",
     }),
     seoFeld,

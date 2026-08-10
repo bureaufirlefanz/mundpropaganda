@@ -387,6 +387,79 @@ async function pruefeBilder() {
   return fehlend.length;
 }
 
+/**
+ * Jeder Sprung auf `#etwas` muss auf derselben Seite ein `id="etwas"` finden.
+ *
+ * Der Fall, der das nötig gemacht hat: Bei der Umstellung auf englische
+ * Bezeichner wurde aus `id="leistungen"` ein `id="services"` und aus
+ * `id="standorte"` ein `id="locations"`. Die Links dorthin kommen aber aus
+ * dem CMS und tragen den Anker als Text — dort stand weiterhin `leistungen`.
+ * Ergebnis: Man klickt im Menü auf „Leistungen" und es passiert nichts. Kein
+ * Fehler, keine Meldung, keine 404. Die Seite springt nur nicht.
+ *
+ * Anker sind Teil der Adresse und gehören damit zum Publikum, nicht zum Code:
+ * `#standorte`, nicht `#locations`. Dieselbe Regel wie für die Pfade.
+ */
+async function pruefeAnker() {
+  const { readFile, readdir } = await import("node:fs/promises");
+  const { join, relative } = await import("node:path");
+
+  async function alleHtml(ordner) {
+    const raus = [];
+    for (const eintrag of await readdir(ordner, { withFileTypes: true })) {
+      const pfad = join(ordner, eintrag.name);
+      if (eintrag.isDirectory()) raus.push(...(await alleHtml(pfad)));
+      else if (eintrag.name.endsWith(".html")) raus.push(pfad);
+    }
+    return raus;
+  }
+
+  const wurzel = "web/dist";
+  let dateien;
+  try {
+    dateien = await alleHtml(wurzel);
+  } catch {
+    console.log("  (kein web/dist — übersprungen)");
+    return 0;
+  }
+
+  const fehlend = [];
+  let geprueft = 0;
+
+  for (const datei of dateien) {
+    const html = await readFile(datei, "utf8");
+    const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+    const seite = "/" + relative(wurzel, datei).replace(/index\.html$/, "");
+
+    /* Nur echte Links. `<use href="#i-arrow">` verweist auf ein SVG-Symbol
+       im Sprite und hat mit Sprungmarken nichts zu tun. */
+    for (const treffer of html.matchAll(/<a\s[^>]*href="#([^"]+)"/g)) {
+      const anker = decodeURIComponent(treffer[1]);
+      if (anker === "" || anker === "top") continue;
+      geprueft++;
+      if (!ids.has(anker)) fehlend.push({ seite, anker });
+    }
+  }
+
+  if (!fehlend.length) {
+    console.log(`  ✓ ${geprueft} Sprünge finden ihr Ziel`);
+    return 0;
+  }
+
+  /* Nach Anker gebündelt: Ein fehlendes `id` auf 20 Seiten ist EIN Fehler,
+     nicht zwanzig. */
+  const je = new Map();
+  for (const f of fehlend) {
+    if (!je.has(f.anker)) je.set(f.anker, []);
+    je.get(f.anker).push(f.seite);
+  }
+  for (const [anker, seiten] of je) {
+    console.log(`  ✗ #${anker} — kein Element mit dieser id`);
+    console.log(`      verlinkt auf: ${seiten.slice(0, 3).join(", ")}${seiten.length > 3 ? ` und ${seiten.length - 3} weiteren` : ""}`);
+  }
+  return je.size;
+}
+
 const browser = await starteBrowser();
 const SEITEN = await findeSeiten(browser);
 console.log(`Gefundene Seiten: ${SEITEN.join(" · ")}`);
@@ -441,6 +514,9 @@ probleme += await pruefeRoutenDeckung(browser, SEITEN);
 
 console.log(`\n── Bilddateien ──`);
 probleme += await pruefeBilder();
+
+console.log(`\n── Sprungmarken ──`);
+probleme += await pruefeAnker();
 
 await browser.close();
 console.log(probleme ? `\n${probleme} Befund(e).` : "\nAlles sauber.");

@@ -14,7 +14,7 @@ import { defineQuery } from "groq";
  * schnellere Abfrage, und sie kann nicht versehentlich ein zweites Dokument
  * erwischen. Die Studio-Struktur hängt das Einzeldokument an dieselbe ID.
  */
-export const EINSTELLUNGEN_QUERY = defineQuery(`
+export const SETTINGS_QUERY = defineQuery(`
   *[_id == "settings"][0]{
     phone,
     email,
@@ -39,7 +39,7 @@ export const EINSTELLUNGEN_QUERY = defineQuery(`
  * `shortName` fällt auf den Titel zurück, damit die Redaktion es nur pflegen
  * muss, wenn der Listenname vom Seitentitel abweicht.
  */
-export const LEISTUNGSLISTE_QUERY = defineQuery(`
+export const SERVICE_LIST_QUERY = defineQuery(`
   *[_type == "service" && defined(slug.current)] | order(orderRank) {
     "slug": slug.current,
     "name": coalesce(shortName, title),
@@ -72,7 +72,7 @@ const BILD = `{
  * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
  * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
  */
-export const LEISTUNG_QUERY = defineQuery(`*[_type == "service" && slug.current == $slug][0]{
+export const SERVICE_QUERY = defineQuery(`*[_type == "service" && slug.current == $slug][0]{
   title,
   topline,
   seoDescription,
@@ -129,7 +129,7 @@ export const FOOTER_QUERY = defineQuery(`
  * Sprungmarke und Mail-Betreff. Beides gäbe es in einem eingebetteten Array
  * nicht.
  */
-export const KARRIERE_QUERY = defineQuery(`
+export const CAREERS_QUERY = defineQuery(`
   *[_id == "careers"][0]{
     topline, title, lead, image${BILD}, action${LINK},
     introTopline, introHeadline, introColumns,
@@ -149,7 +149,7 @@ export const KARRIERE_QUERY = defineQuery(`
   }
 `);
 
-export const STELLEN_QUERY = defineQuery(`
+export const JOBS_QUERY = defineQuery(`
   *[_type == "job" && active != false] | order(orderRank) {
     title,
     "handle": handle.current,
@@ -174,7 +174,7 @@ export const STELLEN_QUERY = defineQuery(`
  * `$service` filtert auf Beiträge, die auf eine Leistung verweisen — dafür
  * ist die Referenz im Schema da. Ohne Wert (null) kommen alle.
  */
-export const BEITRAEGE_QUERY = defineQuery(`
+export const POSTS_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)
     && ($service == null || service->slug.current == $service)]
     | order(date desc) {
@@ -188,15 +188,28 @@ export const BEITRAEGE_QUERY = defineQuery(`
 `);
 
 /** Ein einzelner Beitrag mit Fließtext. */
-export const BEITRAG_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]{
+/**
+ * Ein einzelner Beitrag mit Fließtext, Autor und den Bildern darin.
+ *
+ * `inlineImage` trägt sein Bild in einem Unterfeld und ist nicht selbst eines:
+ * Sanity lässt auf Subtypen von "image" keine zusätzlichen Felder zu, also ist
+ * es ein Objekt aus Bild, Breite und Bildunterschrift.
+ *
+ * KEIN Kommentar innerhalb des Template-Literals unten. Dort einen zu setzen
+ * hat die Abfrage zerlegt: Backticks um ein Wort beenden die Zeichenkette,
+ * und TypeGen fand danach null Abfragen in der Datei — mit der Folge, dass
+ * jedes Ergebnis `any` wurde und 34 Bausteine ihre Typen verloren.
+ */
+export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]{
   "slug": slug.current,
   title,
   date,
   category,
   lead,
   previewImage${BILD},
-  text[]{ ..., _type == "image" => ${BILD} },
+  text[]{ ..., _type == "inlineImage" => { ..., image${BILD} } },
   "service": service->{ title, "slug": slug.current },
+  "author": author->{ name, role, image${BILD} },
   seo
 }`);
 
@@ -209,14 +222,14 @@ export const BEITRAG_QUERY = defineQuery(`*[_type == "post" && slug.current == $
  * mitzuladen, nur um drei Links zu setzen, wäre der teuerste Posten einer
  * Seite, auf der er gar nicht steht.
  */
-export const RECHTSTEXTE_QUERY = defineQuery(`
+export const LEGAL_PAGES_QUERY = defineQuery(`
   *[_type == "legalPage" && defined(slug.current)] | order(title asc) {
     "slug": slug.current,
     title
   }
 `);
 
-export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "legalPage" && slug.current == $slug][0]{
+export const LEGAL_PAGE_QUERY = defineQuery(`*[_type == "legalPage" && slug.current == $slug][0]{
   title,
   text[]{ ..., _type == "image" => ${BILD} },
   seo
@@ -234,7 +247,7 @@ export const RECHTSTEXT_QUERY = defineQuery(`*[_type == "legalPage" && slug.curr
  * `$slug` schließt den gerade gelesenen Beitrag aus. Ohne das stünde er unter
  * sich selbst.
  */
-export const AEHNLICHE_QUERY = defineQuery(`
+export const RELATED_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)
     && category == $category && slug.current != $slug]
     | order(date desc) [0...3] {
@@ -248,7 +261,7 @@ export const AEHNLICHE_QUERY = defineQuery(`
 `);
 
 /** Der Kopf der Magazin-Übersicht. Die Beiträge kommen aus der Collection. */
-export const MAGAZIN_INDEX_QUERY = defineQuery(`
+export const MAGAZINE_INDEX_QUERY = defineQuery(`
   *[_id == "magazineIndex"][0]{ title, topline, lead, seo }
 `);
 
@@ -270,7 +283,7 @@ export const MAGAZIN_INDEX_QUERY = defineQuery(`
  *                      einzelnen Punkt, nicht am Abschnitt.
  *   `locationsImages`  angeschlossen — der Ring liest jetzt daraus.
  */
-export const STARTSEITE_QUERY = defineQuery(`
+export const HOMEPAGE_QUERY = defineQuery(`
   *[_id == "homepage"][0]{
     heroLines,
     splitTopline, splitTitle, splitParagraphs, splitImage,

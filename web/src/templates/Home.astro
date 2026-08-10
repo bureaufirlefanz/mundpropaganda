@@ -21,6 +21,7 @@ import Experts from "../components/sections/Experts.astro";
 import Stories from "../components/sections/Stories.astro";
 import Magazine from "../components/sections/Magazine.astro";
 import Faq from "../components/sections/Faq.astro";
+import Contact from "../components/sections/Contact.astro";
 import { isCmsImage, imageUrl } from "../lib/images";
 import { resolved } from "../lib/navigation";
 import type { HomepageContent } from "../lib/homepage";
@@ -84,4 +85,10 @@ const teilenBild = isCmsImage(data.seo?.image)
     />
   )}
   <Faq title={data.faqTitle} text={data.faqText} questions={data.faq} />
+
+  {/* Neun Links auf der Startseite zeigen auf `#kontakt` — Menü, Fuß, die
+      Knöpfe im Hero und in den Sections. Das Ziel fehlte. Kein Fehler, keine
+      404: Man klickt auf „Termin buchen" und die Seite steht still. Gefunden
+      hat es die Sprungmarken-Prüfung in `web:check`, nicht das Auge. */}
+  <Contact />
 </Base>
