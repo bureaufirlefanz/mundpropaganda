@@ -42,11 +42,29 @@ const vorschau = (
   feld = "headline",
   extra: { media?: string; icon?: ComponentType } = {}
 ) => ({
-  select: { title: feld, unter: "topline", ...(extra.media ? { image: extra.media } : {}) },
-  prepare: ({ title, unter, image }: { titel?: string; unter?: string; bild?: unknown }) => ({
-    title: titel || art,
-    subtitle: unter ? `${art} · ${unter}` : art,
-    media: bild ?? extra.icon,
+  /* Nur die drei Schlüssel, die Sanity kennt: `title`, `subtitle`, `media`.
+     Eigene Namen sind zwar erlaubt, sobald ein `prepare` sie verarbeitet —
+     hier stand aber `unter` und `image` in `select`, während der Rumpf des
+     `prepare` `titel` und `bild` las. Ergebnis: Der Titel war immer der
+     Typname, das Bild immer das Symbol, und das Studio meldete an jedem
+     Abschnitt „invalid preview config". */
+  select: {
+    title: feld,
+    subtitle: "topline",
+    ...(extra.media ? { media: extra.media } : {}),
+  },
+  prepare: ({
+    title,
+    subtitle,
+    media,
+  }: {
+    title?: string;
+    subtitle?: string;
+    media?: unknown;
+  }) => ({
+    title: title || art,
+    subtitle: subtitle ? `${art} · ${subtitle}` : art,
+    media: media ?? extra.icon,
   }),
 });
 

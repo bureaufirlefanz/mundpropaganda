@@ -49,7 +49,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
             ...(pfad ? [{ title: doc?.titel ?? "Der Rechtstext", href: pfad }] : []),
             /* Und die Zeile im Seitenfuß, die auf ihn verweist — sie steht
                auf jeder Seite. */
-            { title: "Seitenfuß (überall)", href: "/" },
+            { title: "Footer (überall)", href: "/" },
           ],
         };
       },
@@ -115,7 +115,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     footer: defineLocations({
       resolve: () => ({
         locations: UEBERALL,
-        message: "Der Seitenfuß steht auf jeder Seite.",
+        message: "Der Footer steht auf jeder Seite.",
       }),
     }),
   },

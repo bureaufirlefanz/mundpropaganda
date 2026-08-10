@@ -89,7 +89,7 @@ export const einstellungen = defineType({
       title: "Praxen",
       type: "array",
       description:
-        "Erscheinen in der Standorte-Section und im Seitenfuß - eine Quelle für beides.",
+        "Erscheinen in der Standorte-Section und im Footer - eine Quelle für beides.",
       group: "locations",
       /* Klasse 1: Ohne Anschrift ist eine Praxis-Website kaputt, nicht leer.
          Bis Aufgabe 4 fiel eine leere Liste auf zwei Beispieladressen aus dem

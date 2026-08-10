@@ -159,7 +159,7 @@ export const startseite = defineType({
       name: "locationsTitle",
       title: "Überschrift",
       type: "string",
-      description: "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Seitenfuß.",
+      description: "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Footer.",
       group: "locations",
       validation: (r) => r.required(),
     }),

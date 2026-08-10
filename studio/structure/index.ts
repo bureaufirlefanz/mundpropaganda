@@ -126,7 +126,7 @@ export const structure: StructureResolver = (S, context) =>
          man ihn seltener anfasst — aber auffindbar unter dem Namen, unter dem
          man ihn sucht. Bis Aufgabe 8 stand beides fest im Markup. */
       einzeldokument(S, "navigation", "Navigation", MenuIcon),
-      einzeldokument(S, "footer", "Seitenfuß", StackCompactIcon),
+      einzeldokument(S, "footer", "Footer", StackCompactIcon),
       einzeldokument(S, "settings", "Einstellungen", CogIcon),
 
       /* Rechtstexte. Standen bis hierher in OHNE_ROUTE — nicht weil sie

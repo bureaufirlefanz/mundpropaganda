@@ -78,7 +78,7 @@ export const navigation = defineType({
 
 export const footer = defineType({
   name: "footer",
-  title: "Seitenfuß",
+  title: "Footer",
   type: "document",
   icon: StackCompactIcon,
   fields: [
@@ -121,5 +121,5 @@ export const footer = defineType({
     }),
   ],
 
-  preview: { prepare: () => ({ title: "Seitenfuß", subtitle: "Spalten und Rechtliches" }) },
+  preview: { prepare: () => ({ title: "Footer", subtitle: "Spalten und Rechtliches" }) },
 });
