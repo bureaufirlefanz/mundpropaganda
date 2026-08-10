@@ -22,16 +22,14 @@ export interface Etappe {
 }
 
 interface Props {
-  topline: string;
   headline: string;
   stages: Etappe[];
 }
-const { topline, headline, stages } = Astro.props;
+const { headline, stages } = Astro.props;
 ---
 
 <section class="s-timeline container" data-timeline>
   <div class="s-timeline__head">
-    <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-timeline__title" data-split="lines">{headline}</h2>
   </div>
 
@@ -67,10 +65,6 @@ const { topline, headline, stages } = Astro.props;
   .s-timeline__head {
     max-width: 34ch;
     margin-bottom: var(--sp-10);
-  }
-
-  .s-timeline__head .c-topline {
-    margin-bottom: var(--sp-4);
   }
 
   .s-timeline__title {
@@ -142,12 +136,14 @@ const { topline, headline, stages } = Astro.props;
     border-color: var(--c-brand);
   }
 
+  /* Die Zeitmarke in der Grundschrift. Monospace war hier eine Behauptung:
+     „Tag 0" und „Woche 2–3" sind keine Kennungen und kein Code, sondern
+     gewöhnliche Angaben. Die Abstufung leistet jetzt der Grauwert. */
   .s-timeline__marke {
-    font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: var(--fs-label);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 400;
+    font-size: var(--fs-text-small);
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--c-text-muted);
   }
 
@@ -184,8 +180,7 @@ const { topline, headline, stages } = Astro.props;
     border-radius: var(--r-round);
     background: var(--c-dark);
     color: var(--c-grey);
-    font-family: var(--f-mono);
-    font-weight: 300;
+    font-weight: 400;
     font-size: 0.62em;
     line-height: 1;
     letter-spacing: 0;

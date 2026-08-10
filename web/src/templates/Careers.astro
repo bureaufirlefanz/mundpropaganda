@@ -25,7 +25,7 @@
  * Daten: Was das Dokument nicht trägt, erscheint nicht.
  */
 import Base from "../layouts/Base.astro";
-import ServiceHero from "../components/sections/ServiceHero.astro";
+import CareersHero from "../components/sections/CareersHero.astro";
 import Intro from "../components/sections/Intro.astro";
 import Facts from "../components/sections/Facts.astro";
 import Compare from "../components/sections/Compare.astro";
@@ -77,8 +77,8 @@ const voices =
     : undefined;
 
 const ablauf =
-  d?.processTopline && d.processHeadline && d.processStages?.length
-    ? { topline: d.processTopline, headline: d.processHeadline, stages: d.processStages }
+  d?.processHeadline && d.processStages?.length
+    ? { headline: d.processHeadline, stages: d.processStages }
     : undefined;
 
 /* Die Stellen sind der Zweck der Seite. Ohne ausgeschriebene Stelle entfällt
@@ -91,13 +91,14 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
   description={d?.seo?.description || d?.lead || ""}
   noIndex={d?.seo?.noIndex}
 >
-  <ServiceHero
+  <CareersHero
+    title={d?.title ?? "Karriere"}
     topline={d?.topline}
-    title={d?.title ?? ""}
-    text={d?.lead}
+    lead={d?.lead}
     image={d?.image}
+    alt={d?.image?.alt ?? ""}
     action={action?.text}
-    aktionZiel={action?.href}
+    actionHref={action?.href}
   />
 
   {intro && <Intro {...intro} />}

@@ -146,7 +146,6 @@ export const karriere = defineType({
           name: "comparisonColumn",
           fields: [
             defineField({ name: "name", title: "Überschrift", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "meta", title: "Zusatz", type: "string", description: "Die kleine Zeile darunter." }),
             defineField({
               name: "emphasised",
               title: "Hervorgehoben",
@@ -155,7 +154,7 @@ export const karriere = defineType({
               initialValue: false,
             }),
           ],
-          preview: { select: { title: "name", subtitle: "meta" } },
+          preview: { select: { title: "name" } },
         }),
       ],
       validation: (r) => r.required().length(2),
@@ -266,8 +265,18 @@ export const karriere = defineType({
       validation: (r) => r.required().min(1),
     }),
 
-    /* --- Ablauf --------------------------------------------------------- */
-    ...heading("process", "process"),
+    /* --- Ablauf ---------------------------------------------------------
+       Ohne Topline, und deshalb nicht über `heading()`: Der Abschnitt trägt
+       nur eine Überschrift. Ein Feld, das im Formular steht und auf der Seite
+       nichts bewirkt, kostet das Vertrauen in jedes andere — deshalb ist es
+       hier entfernt und nicht bloß ausgeblendet. */
+    defineField({
+      name: "processHeadline",
+      title: "Überschrift",
+      type: "string",
+      group: "process",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "processStages",
       title: "Etappen",

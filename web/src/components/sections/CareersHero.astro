@@ -1,0 +1,175 @@
+---
+/**
+ * Der Kopf der Karriereseite: Wortmarke, darunter das Bild als Bogen.
+ *
+ * Anders als `ServiceHero`, und aus einem Grund: Eine Leistungsseite muss
+ * erklären, was sie anbietet — dort trägt der Kopf Topline, Titel und einen
+ * Absatz nebeneinander. Die Karriereseite muss zuerst wirken. Wer hier
+ * landet, weiß schon, worum es geht; er will sehen, wo er arbeiten würde und
+ * mit wem.
+ *
+ * Deshalb steht hier nur ein Wort, groß und mittig, und darunter das Bild.
+ * Der Einstiegstext rückt nach unten, wo er gelesen wird statt überflogen.
+ *
+ * Das Bild ist oben stärker gerundet als unten. Das ist kein Zierrat: Die
+ * Linien im Hintergrund (`ToothLines`, aus dem Zahnumriss abgeleitet) laufen
+ * als flache Bögen durch die Seite, und ein Bild mit gleicher Rundung an
+ * allen vier Ecken stünde quer dazu. So sitzt es in ihnen drin.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
+import Button from "../ui/Button.astro";
+import ToothLines from "../ui/ToothLines.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Props {
+  title: string;
+  topline?: string;
+  lead?: string;
+  image?: ImageSource;
+  alt?: string;
+  /** Beschriftung des Knopfs. */
+  action?: string;
+  actionHref?: string;
+}
+
+const { title, topline, lead, image, alt = "", action, actionHref } = Astro.props;
+---
+
+<section class="s-chero">
+  {/* Liegt hinter allem und läuft in die folgende Section weiter — dieselbe
+      Behandlung wie im Hero der Startseite. */}
+  <ToothLines />
+
+  <div class="container s-chero__inner">
+    {topline && <span class="c-topline s-chero__topline" data-reveal="fade">{topline}</span>}
+
+    {/* `data-split="lines"` und nicht `chars`: Ein einzelnes Wort in Zeichen
+        zerlegt sieht aus wie eine Ladeanimation. */}
+    <h1 class="s-chero__title" data-split="lines">{title}</h1>
+
+    <div class="s-chero__media" data-reveal="scale">
+      {isCmsImage(image) ? (
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[640, 1024, 1600, 2200]}
+          sizes="(max-width: 900px) 92vw, 72vw"
+          eager
+        />
+      ) : (
+        <Picture name="praxis-03" alt={alt} sizes="(max-width: 900px) 92vw, 72vw" eager />
+      )}
+    </div>
+
+    {(lead || action) && (
+      <div class="s-chero__foot">
+        {lead && <p class="s-chero__lead" data-reveal="up">{lead}</p>}
+        {action && (
+          <div class="s-chero__action" data-reveal="up" data-reveal-delay="0.08">
+            <Button label={action} href={actionHref ?? "#stellen"} />
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* `overflow-x: clip` und nicht `hidden`: Die Linien laufen bewusst über die
+     Unterkante in die nächste Section, nur seitlich sollen sie die Seite
+     nicht breiter machen. `hidden` erzeugte einen Scrollcontainer und nähme
+     dem klebenden Kopf darin seine Wirkung. */
+  .s-chero {
+    position: relative;
+    overflow-x: clip;
+    padding-block: calc(var(--section-space) + 96px) var(--section-space);
+  }
+
+  .s-chero__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .s-chero__topline {
+    margin-bottom: var(--sp-5);
+  }
+
+  /* Ein Wort über die Satzbreite. `--fs-display-2` ist die Stufe der
+     Wortmarke im Fuß; darüber liegt nur noch der Hero der Startseite. */
+  .s-chero__title {
+    max-width: 14ch;
+    font-size: var(--fs-display-2);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Der Bogen. Oben rund wie die Linien dahinter, unten nur leicht gebrochen —
+     das Bild soll aufsteigen und nicht schweben. */
+  .s-chero__media {
+    width: min(100%, 1100px);
+    margin-top: clamp(var(--sp-8), 5vw, var(--sp-12));
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    border-radius: clamp(120px, 16vw, 260px) clamp(120px, 16vw, 260px) var(--r-lg)
+      var(--r-lg);
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt
+     und das Scope-Attribut dieser Datei nicht trägt. */
+  .s-chero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Einstiegstext und Knopf unter dem Bild, linksbündig: Ab hier wird
+     gelesen, und zentrierter Fließtext über mehrere Zeilen zwingt das Auge
+     bei jedem Zeilenanfang zum Suchen. */
+  .s-chero__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-6) clamp(var(--sp-6), 5vw, 96px);
+    width: 100%;
+    margin-top: clamp(var(--sp-8), 5vw, var(--sp-10));
+    text-align: left;
+  }
+
+  .s-chero__lead {
+    flex: 1 1 42ch;
+    max-width: 58ch;
+    font-size: var(--fs-text-large);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  .s-chero__action {
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .s-chero {
+      padding-block: calc(var(--section-space-sm) + 80px) var(--section-space-sm);
+    }
+
+    .s-chero__media {
+      aspect-ratio: 4 / 5;
+      border-radius: clamp(72px, 22vw, 160px) clamp(72px, 22vw, 160px) var(--r-md)
+        var(--r-md);
+    }
+
+    .s-chero__foot {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
