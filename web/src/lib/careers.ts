@@ -12,7 +12,7 @@ import { CAREERS_QUERY, JOBS_QUERY } from "./queries";
  * erreichen — er konnte nicht einmal eine besetzte Stelle abschalten.
  *
  * Ihr eigener Kommentar sagte, die Formen seien „bereits so geschnitten, dass
- * ein Sanity-Dokumenttyp `stelle` sie eins zu eins abpictureet“. Das stimmte:
+ * ein Sanity-Dokumenttyp `stelle` sie eins zu eins abbildet“. Das stimmte:
  * Der Typ existierte, stand im Studio und wurde von niemandem gelesen.
  *
  * Kein Rückfall auf Beispieldaten. Fehlt ein Abschnitt, erscheint er nicht —

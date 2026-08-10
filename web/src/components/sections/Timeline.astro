@@ -16,7 +16,6 @@
  */
 
 export interface Etappe {
-  marker: string;
   title: string;
   text: string;
 }
@@ -36,7 +35,7 @@ const { headline, stages } = Astro.props;
   <ol class="s-timeline__bahn" data-reveal-stagger="0.1">
     {/* Die Bahn selbst: eine blasse Linie über die volle Breite, darüber die
         farbige, die mitwächst. Zwei Elemente statt eines Verlaufs — ein
-        Verlauf ließe sich nicht sauber auf einen Fortschritt abpictureen. */}
+        Verlauf ließe sich nicht sauber auf einen Fortschritt abbilden. */}
     <div class="s-timeline__gleis" aria-hidden="true">
       <span class="s-timeline__fortschritt" data-timeline-fill></span>
     </div>
@@ -44,7 +43,6 @@ const { headline, stages } = Astro.props;
     {stages.map((e, i) => (
       <li class="s-timeline__etappe" data-reveal-child>
         <span class="s-timeline__punkt" aria-hidden="true"></span>
-        <span class="s-timeline__marke">{e.marker}</span>
         <h3 class="s-timeline__etappe-title">
           {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
               Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
@@ -136,22 +134,14 @@ const { headline, stages } = Astro.props;
     border-color: var(--c-brand);
   }
 
-  /* Die Zeitmarke in der Grundschrift. Monospace war hier eine Behauptung:
-     „Tag 0" und „Woche 2–3" sind keine Kennungen und kein Code, sondern
-     gewöhnliche Angaben. Die Abstufung leistet jetzt der Grauwert. */
-  .s-timeline__marke {
-    font-weight: 400;
-    font-size: var(--fs-text-small);
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--c-text-muted);
-  }
-
+  /* Ohne `margin-top`: Über dem Titel stand die Zeitmarke („Tag 0",
+     „Woche 2–3"), von der er hier abgesetzt werden musste. Die Marken sind
+     entfallen — der Titel beginnt jetzt direkt unter dem Punkt, und ein
+     Rest-Abstand ließe die Etappen ohne Grund tiefer sitzen. */
   .s-timeline__etappe-title {
     display: flex;
     align-items: baseline;
     gap: 0.5em;
-    margin-top: var(--sp-2);
     font-size: clamp(1.25rem, 1.7vw, 1.75rem);
     font-weight: 400;
     line-height: 1.15;

@@ -287,11 +287,16 @@ export const karriere = defineType({
           type: "object",
           name: "stage",
           fields: [
-            defineField({ name: "marker", title: "Marke", type: "string", description: "Zum Beispiel „Tag 0“ oder „Woche 2–3“.", validation: (r) => r.required() }),
+            /* Kein `marker` mehr. Das Feld trug Zeitangaben („Tag 0",
+               „Woche 2–3", „im Anschluss") über jeder Etappe. Sie sind von
+               der Seite entfernt worden, also gehört auch das Feld weg:
+               Ein Pflichtfeld, dessen Inhalt nirgends erscheint, kostet das
+               Vertrauen in jedes andere. Vorhandene Werte bleiben im
+               Datensatz liegen und stören nicht. */
             defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
             defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
           ],
-          preview: { select: { title: "title", subtitle: "marker" } },
+          preview: { select: { title: "title", subtitle: "text" } },
         }),
       ],
       validation: (r) => r.required().min(2),

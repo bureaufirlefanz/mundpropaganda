@@ -152,7 +152,7 @@ export const CAREERS_QUERY = defineQuery(`
     jobsTopline, jobsHeadline,
     voicesTopline, voicesHeadline,
     voicesItems[]{ quote, name, role, since, image${BILD}, offset },
-    processHeadline, processStages[]{ marker, title, text },
+    processHeadline, processStages[]{ title, text },
     speculativeTopline, speculativeTitle, speculativeText, speculativeParagraph,
     applicationEmail,
     faqTitle, faq[]{ question, answer },
