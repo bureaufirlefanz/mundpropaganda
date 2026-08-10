@@ -19,6 +19,24 @@
 # stand noch `npm run proto:build` aus der Vite-Zeit, und genau daran ist der
 # erste Deploy-Versuch gescheitert.
 
+# ACHTUNG, zweite Fassung derselben Falle: `web/.netlify/state.json`.
+#
+# Legt das Netlify-CLI diese Datei an (jedes `netlify link`, `netlify deploy`
+# oder `netlify dev` tut das), zieht `@netlify/config` beim nächsten
+# `astro dev` die PROJEKTEINSTELLUNGEN von Netlify — samt „Base directory:
+# web" — und löst sie erneut von `web/` aus auf. Ergebnis wie bei einem `base`
+# in dieser Datei:
+#
+#   Base directory does not exist: …/Mundpropaganda/web/web
+#
+# Der Dev-Server startet dann gar nicht, und der Fehler nennt eine Datei, in
+# der nichts Falsches steht. Die Verknüpfung wird hier nicht gebraucht:
+# `web:deploy` übergibt die Site-ID mit `--site=`, und der normale Weg ist
+# ohnehin ein Push nach main. Wenn `npm run web` plötzlich mit `web/web`
+# abbricht:
+#
+#   rm web/.netlify/state.json
+#
 [build]
   command = "npm run build"
   publish = "dist"
