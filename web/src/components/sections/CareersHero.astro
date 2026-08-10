@@ -54,11 +54,11 @@ const { title, topline, lead, image, alt = "", action, actionHref } = Astro.prop
           source={image}
           alt={alt}
           widths={[640, 1024, 1600, 2200]}
-          sizes="(max-width: 900px) 92vw, 72vw"
+          sizes="(max-width: 900px) 92vw, 94vw"
           eager
         />
       ) : (
-        <Picture name="praxis-03" alt={alt} sizes="(max-width: 900px) 92vw, 72vw" eager />
+        <Picture name="praxis-03" alt={alt} sizes="(max-width: 900px) 92vw, 94vw" eager />
       )}
     </div>
 
@@ -113,9 +113,9 @@ const { title, topline, lead, image, alt = "", action, actionHref } = Astro.prop
   /* Der Bogen. Oben rund wie die Linien dahinter, unten nur leicht gebrochen —
      das Bild soll aufsteigen und nicht schweben. */
   .s-chero__media {
-    width: min(100%, 1100px);
+    width: 100%;
     margin-top: clamp(var(--sp-8), 5vw, var(--sp-12));
-    aspect-ratio: 5 / 4;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: clamp(120px, 16vw, 260px) clamp(120px, 16vw, 260px) var(--r-lg)
       var(--r-lg);
@@ -161,8 +161,10 @@ const { title, topline, lead, image, alt = "", action, actionHref } = Astro.prop
       padding-block: calc(var(--section-space-sm) + 80px) var(--section-space-sm);
     }
 
+    /* Auf schmalen Fenstern wieder hochformatig: 16:9 auf 390px Breite wäre
+       ein 220px hoher Streifen, in dem vom Raum nichts zu erkennen ist. */
     .s-chero__media {
-      aspect-ratio: 4 / 5;
+      aspect-ratio: 3 / 4;
       border-radius: clamp(72px, 22vw, 160px) clamp(72px, 22vw, 160px) var(--r-md)
         var(--r-md);
     }
