@@ -1,0 +1,269 @@
+---
+/**
+ * Das Team: Gruppenfoto über die volle Breite, darunter das Raster.
+ *
+ * Die Reihenfolge ist der Punkt. Erst alle zusammen, dann jede einzeln — wer
+ * mit dem Raster beginnt, zeigt eine Personaldatenbank. Das Foto beantwortet
+ * die Frage, die niemand stellt und jeder hat: Wie ist es da drin.
+ *
+ * Jede Kachel führt auf `/praxis/<slug>`. Kein Aufklappen an Ort und Stelle:
+ * Patienten suchen nach dem Namen ihrer Behandlerin, und eine Adresse, die
+ * man teilen und finden kann, ist mehr wert als eine Animation.
+ *
+ * Ohne Porträt bleibt die Kachel ein Namensfeld mit Markenfläche. Das ist
+ * bewusst so und nicht mit einem Platzhaltergesicht gelöst — ein fremdes
+ * Gesicht auf einer Praxisseite ist die teuerste Art von Füllmaterial.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Member {
+  name: string;
+  slug: string;
+  role: string;
+  text?: string;
+  image?: ImageSource;
+}
+
+interface Props {
+  id?: string;
+  topline: string;
+  headline: string;
+  text?: string;
+  photo?: ImageSource;
+  members: Member[];
+}
+
+const { id, topline, headline, text, photo, members } = Astro.props;
+---
+
+<section class="s-team" id={id}>
+  {isCmsImage(photo) && (
+    <div class="s-team__foto" data-reveal="scale">
+      <CmsImage
+        source={photo}
+        alt=""
+        widths={[640, 1024, 1600, 2200]}
+        sizes="100vw"
+      />
+    </div>
+  )}
+
+  <div class="container">
+    <div class="s-team__head">
+      <span class="c-topline" data-reveal="fade">{topline}</span>
+      <h2 class="s-team__title" data-split="lines">{headline}</h2>
+      {text && <p class="s-team__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+    </div>
+
+    <ul class="s-team__raster" data-reveal-stagger="0.06">
+      {members.map((p) => (
+        <li class="s-team__zelle" data-reveal-child>
+          {/* Der Link umschließt die ganze Kachel — ein Tippziel von 300px
+              Höhe statt eines Namens von 20px. */}
+          <a class="c-member" href={`/praxis/${p.slug}`}>
+            <span class="c-member__media">
+              {isCmsImage(p.image) ? (
+                <CmsImage
+                  source={p.image}
+                  alt=""
+                  widths={[400, 640, 900]}
+                  sizes="(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 24vw"
+                />
+              ) : (
+                <span class="c-member__ohne" aria-hidden="true">
+                  {p.name.replace(/^(Dr\.|Prof\.)\s*/, "").charAt(0)}
+                </span>
+              )}
+            </span>
+
+            <span class="c-member__body">
+              <span class="c-member__name">{p.name}</span>
+              <span class="c-member__role">{p.role}</span>
+              {p.text && <span class="c-member__text">{p.text}</span>}
+              <span class="c-member__mehr" aria-hidden="true">
+                Profil
+                <svg viewBox="0 0 24 24" width="14" height="14">
+                  <path
+                    d="M5 12h13M12 5l7 7-7 7"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                </svg>
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .s-team {
+    padding-block: var(--section-space);
+  }
+
+  /* Über die volle Fensterbreite, oben gebogen wie die Linien im
+     Hintergrund. Unten nur leicht gebrochen — das Foto soll die Section
+     tragen und nicht darin schweben. */
+  .s-team__foto {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    margin-bottom: clamp(56px, 7vw, 120px);
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: clamp(100px, 12vw, 220px) clamp(100px, 12vw, 220px) 0 0;
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
+  .s-team__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .s-team__head {
+    max-width: 46ch;
+    margin-bottom: clamp(48px, 6vw, 96px);
+  }
+
+  .s-team__title {
+    max-width: 18ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-team__text {
+    max-width: 52ch;
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: 1.55;
+    color: var(--c-text-muted);
+  }
+
+  .s-team__raster {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: clamp(32px, 3.5vw, 56px) var(--site-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* --- Die Kachel ------------------------------------------------------- */
+
+  .c-member {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .c-member__media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    /* Oben gebogen, unten gebrochen — dieselbe Form wie die großen Bilder
+       der Seite, nur kleiner. */
+    border-radius: clamp(48px, 6vw, 96px) clamp(48px, 6vw, 96px) var(--r-md)
+      var(--r-md);
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  .c-member__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--d-slow) var(--e-out);
+  }
+
+  .c-member:hover .c-member__media :global(img) {
+    transform: scale(1.04);
+  }
+
+  /* Ohne Porträt: die Initiale auf Markenfläche. Kein Platzhaltergesicht. */
+  .c-member__ohne {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--c-brand);
+    color: var(--c-dark);
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .c-member__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--sp-1);
+    padding-top: var(--sp-4);
+  }
+
+  .c-member__name {
+    font-size: var(--fs-text-large);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .c-member__role {
+    font-size: var(--fs-text-small);
+    line-height: 1.35;
+    color: var(--c-text-muted);
+  }
+
+  .c-member__text {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  /* `margin-top: auto` schiebt die Zeile an den unteren Rand der Kachel —
+     bei ungleich langen Kurzprofilen stehen sie damit trotzdem auf einer
+     Linie. */
+  .c-member__mehr {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: auto;
+    padding-top: var(--sp-4);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .c-member__mehr svg {
+    transition: translate var(--d-base) var(--e-out);
+  }
+
+  .c-member:hover .c-member__mehr svg {
+    translate: 4px 0;
+  }
+
+  .c-member:focus-visible {
+    outline: 2px solid var(--c-dark);
+    outline-offset: 6px;
+    border-radius: var(--r-sm);
+  }
+
+  @media (max-width: 900px) {
+    .s-team {
+      padding-block: var(--section-space-sm);
+    }
+
+    .s-team__foto {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

@@ -1,0 +1,112 @@
+---
+/**
+ * Der Zusammenbau der Praxisseite.
+ *
+ * Die Abfolge beantwortet drei Fragen in der Reihenfolge, in der sie
+ * gestellt werden:
+ *
+ *   Hero       Wo bin ich hier
+ *   Story      Wer seid ihr — mit Zahlen, die man nachprüfen kann
+ *   Values     Wofür steht ihr, und was heißt das konkret
+ *   Team       Wer behandelt mich — Gruppenfoto, dann das Raster
+ *   Locations  Wo finde ich euch
+ *   Contact    Und wie erreiche ich euch
+ *
+ * Zwischen Story und Team liegt das dunkle Haltungs-Band. Das ist kein
+ * Zierrat: Ohne den Farbwechsel liest sich die Seite als eine einzige lange
+ * helle Spalte, und das Team-Raster verlöre seinen Auftritt.
+ *
+ * Jeder Abschnitt hängt an seinen eigenen Daten. Was das Dokument nicht
+ * trägt, erscheint nicht — kein Abschnitt mit Überschrift und leerem Rumpf.
+ * Team und Standorte kommen aus ihren eigenen Quellen und nicht von hier.
+ */
+import Base from "../layouts/Base.astro";
+import PracticeHero from "../components/sections/PracticeHero.astro";
+import Story from "../components/sections/Story.astro";
+import Values from "../components/sections/Values.astro";
+import Team from "../components/sections/Team.astro";
+import Locations from "../components/sections/Locations.astro";
+import Contact from "../components/sections/Contact.astro";
+import type { PracticeContent, Member } from "../lib/practice";
+import type { Standort } from "../lib/settings";
+
+interface Props {
+  data: PracticeContent | undefined;
+  team: Member[];
+  locations: Standort[];
+}
+
+const { data: d, team, locations } = Astro.props;
+
+/* Wahlfrei, aber nicht halb — dieselbe Regel wie auf der Karriereseite: Wer
+   einen Abschnitt anlegt, füllt ihn. Die Abfrage kann das nicht zusagen,
+   also steht die Prüfung hier an einer Stelle. */
+const story =
+  d?.storyTopline && d.storyHeadline && d.storyColumns?.length
+    ? {
+        topline: d.storyTopline,
+        headline: d.storyHeadline,
+        columns: d.storyColumns,
+        image: d.storyImage,
+        figures: d.figures ?? undefined,
+      }
+    : undefined;
+
+const werte =
+  d?.valuesTopline && d.valuesHeadline && d.valuesItems?.length
+    ? {
+        topline: d.valuesTopline,
+        headline: d.valuesHeadline,
+        text: d.valuesText ?? undefined,
+        items: d.valuesItems,
+      }
+    : undefined;
+
+/* Das Team-Raster braucht Überschriften UND Personen. Ohne Personen entfällt
+   der Abschnitt ganz — ein Gruppenfoto über einem leeren Raster wäre die
+   Ankündigung von etwas, das nicht kommt. */
+const teamAbschnitt =
+  d?.teamTopline && d.teamHeadline && team.length
+    ? {
+        topline: d.teamTopline,
+        headline: d.teamHeadline,
+        text: d.teamText ?? undefined,
+        photo: d.teamPhoto,
+        members: team,
+      }
+    : undefined;
+
+const standorte =
+  d?.locationsTopline && d.locationsHeadline && locations.length
+    ? {
+        topline: d.locationsTopline,
+        headline: d.locationsHeadline,
+        text: d.locationsText ?? undefined,
+        locations,
+      }
+    : undefined;
+---
+
+<Base
+  title={d?.seo?.title || d?.title || "Praxis"}
+  description={d?.seo?.description || d?.lead || ""}
+  noIndex={d?.seo?.noIndex}
+>
+  <PracticeHero
+    topline={d?.topline ?? "Praxis"}
+    title={d?.title ?? "Praxis"}
+    lead={d?.lead ?? undefined}
+    image={d?.image}
+    imageSecondary={d?.imageSecondary}
+  />
+
+  {story && <Story {...story} />}
+
+  {werte && <Values {...werte} />}
+
+  {teamAbschnitt && <Team id="team" {...teamAbschnitt} />}
+
+  {standorte && <Locations id="standorte" {...standorte} />}
+
+  <Contact />
+</Base>

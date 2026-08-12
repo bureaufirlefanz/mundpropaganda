@@ -38,6 +38,26 @@ export const resolve: PresentationPluginOptions["resolve"] = {
       resolve: () => ({ locations: [{ title: "Karriere", href: "/karriere" }] }),
     }),
 
+    practice: defineLocations({
+      select: {},
+      resolve: () => ({ locations: [{ title: "Praxis", href: "/praxis" }] }),
+    }),
+
+    person: defineLocations({
+      select: { title: "name", slug: "slug.current" },
+      resolve: (doc) => {
+        const pfad = pathFor("person", doc?.slug ?? undefined);
+        return {
+          locations: [
+            ...(pfad ? [{ title: doc?.title ?? "Die Person", href: pfad }] : []),
+            /* Und das Raster, in dem sie steht. Wer hier den Namen ändert,
+               ändert ihn dort mit — das soll man sehen. */
+            { title: "Praxis (Team-Raster)", href: "/praxis" },
+          ],
+        };
+      },
+    }),
+
     magazineIndex: defineLocations({
       select: {},
       resolve: () => ({ locations: [{ title: "Magazin", href: "/magazin" }] }),

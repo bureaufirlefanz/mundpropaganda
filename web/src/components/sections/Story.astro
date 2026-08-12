@@ -1,0 +1,182 @@
+---
+/**
+ * Die Praxis in eigenen Worten: Text links, Bild rechts, Zahlen darunter.
+ *
+ * Das Bild klebt beim Scrollen (`position: sticky`) und der Text läuft daran
+ * vorbei. Der Grund ist nicht der Effekt, sondern die Lesbarkeit: Zwei
+ * Absätze über 60 Zeichen sind auf einem breiten Fenster hoch, und ein Bild,
+ * das mit ihnen nach oben verschwindet, lässt die rechte Hälfte auf halber
+ * Strecke leer stehen.
+ *
+ * Kein `sticky` auf schmalen Fenstern — dort stapelt alles, und ein
+ * klebendes Bild würde den Text verdecken, den es begleiten soll.
+ *
+ * Die Zahlen sind wahlfrei. Ohne sie endet der Abschnitt mit dem Text; eine
+ * Reihe aus „0 Jahren" und „0 Behandlungen" wäre schlechter als keine.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Figure {
+  value: string;
+  text: string;
+}
+
+interface Props {
+  topline: string;
+  headline: string;
+  columns: string[];
+  image?: ImageSource;
+  figures?: Figure[];
+}
+
+const { topline, headline, columns, image, figures } = Astro.props;
+---
+
+<section class="s-story container">
+  <div class="s-story__text">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-story__title" data-split="lines">{headline}</h2>
+
+    {columns.map((absatz, i) => (
+      <p class="s-story__absatz" data-reveal="up" data-reveal-delay={0.08 * (i + 1)}>
+        {absatz}
+      </p>
+    ))}
+
+    {figures && figures.length > 0 && (
+      <dl class="s-story__zahlen" data-reveal-stagger="0.08">
+        {figures.map((z) => (
+          <div class="s-story__zahl" data-reveal-child>
+            {/* <dd> vor <dt> im Markup wäre falsch herum — die Zahl ist der
+                Wert, die Erläuterung der Begriff. `flex-direction: column-
+                reverse` dreht nur die Darstellung. */}
+            <dt class="s-story__zahl-text">{z.text}</dt>
+            <dd class="s-story__zahl-wert">{z.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+  </div>
+
+  {isCmsImage(image) && (
+    <div class="s-story__media">
+      <div class="s-story__bild" data-reveal="right">
+        <CmsImage
+          source={image}
+          alt=""
+          widths={[640, 1024, 1600]}
+          sizes="(max-width: 900px) 92vw, 42vw"
+        />
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  .s-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: clamp(var(--sp-8), 6vw, 120px);
+    align-items: start;
+    padding-block: var(--section-space);
+  }
+
+  .s-story__title {
+    max-width: 20ch;
+    margin-top: var(--sp-4);
+    margin-bottom: var(--sp-6);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* 60 Zeichen ist die Grenze, ab der das Auge die nächste Zeile nicht mehr
+     sicher findet. Der Absatz bleibt darunter, auch wenn die Spalte breiter
+     werden darf. */
+  .s-story__absatz {
+    max-width: 58ch;
+    font-size: var(--fs-text-main);
+    line-height: 1.6;
+  }
+
+  .s-story__absatz + .s-story__absatz {
+    margin-top: var(--sp-4);
+  }
+
+  /* --- Zahlen ----------------------------------------------------------- */
+
+  .s-story__zahlen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+    gap: var(--sp-6) var(--sp-5);
+    margin: clamp(var(--sp-8), 5vw, var(--sp-10)) 0 0;
+  }
+
+  .s-story__zahl {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--sp-1);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--c-line);
+  }
+
+  .s-story__zahl-wert {
+    margin: 0;
+    font-size: clamp(2rem, 3.4vw, 3.25rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .s-story__zahl-text {
+    font-size: var(--fs-text-small);
+    line-height: 1.35;
+    color: var(--c-text-muted);
+  }
+
+  /* --- Bild ------------------------------------------------------------- */
+
+  /* Der Abstand nach oben ist Absicht: Das Bild setzt eine Stufe unter der
+     Topline an, sonst stünden Überschrift und Bildkante auf einer Linie und
+     die Spalte sähe aus wie eine Tabelle. */
+  .s-story__media {
+    position: sticky;
+    top: clamp(96px, 12vh, 160px);
+    margin-top: clamp(var(--sp-6), 4vw, var(--sp-10));
+  }
+
+  .s-story__bild {
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--r-lg) var(--r-lg) clamp(80px, 10vw, 160px)
+      clamp(80px, 10vw, 160px);
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro kommt. */
+  .s-story__bild :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .s-story {
+      grid-template-columns: 1fr;
+      padding-block: var(--section-space-sm);
+    }
+
+    /* Kein Kleben, wenn gestapelt wird — das Bild würde den Text verdecken,
+       den es begleiten soll. */
+    .s-story__media {
+      position: static;
+      margin-top: var(--sp-8);
+    }
+
+    .s-story__bild {
+      aspect-ratio: 3 / 2;
+    }
+  }
+</style>

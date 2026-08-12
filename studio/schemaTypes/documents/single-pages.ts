@@ -91,7 +91,9 @@ export const leistungenIndex = einzelseite(
   "/leistungen"
 );
 
-export const praxis = einzelseite("practice", "Praxis & Team", UsersIcon, "/praxis");
+/* `practice` steht nicht mehr hier: Die Praxisseite hat eine feste,
+   gestaltete Abfolge und keinen Baukasten. Ihr Typ liegt in
+   `documents/practice.ts` — wie die Karriereseite. */
 export const magazinIndex = einzelseite("magazineIndex", "Magazin (Übersicht)", DocumentsIcon, "/magazin");
 /* `careers` steht nicht mehr hier: Die Seite hat eine feste, gestaltete
    Abfolge und keinen Baukasten. Ihr Typ liegt in `documents/karriere.ts`. */

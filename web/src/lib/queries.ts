@@ -49,7 +49,11 @@ export const SETTINGS_QUERY = defineQuery(`
     shareImage ${BILD},
     googleVerification,
     plausibleDomain,
-    locations[]{ shortCode, name, street, city, description, hours[]{ days, time } }
+    locations[]{
+      shortCode, name, street, city, description,
+      latitude, longitude,
+      hours[]{ days, time }
+    }
   }
 `);
 
@@ -149,7 +153,11 @@ export const CAREERS_QUERY = defineQuery(`
     comparisonColumns[]{ name, emphasised },
     comparisonRows[]{ name, values[]{ kind, text } },
     comparisonNote,
-    jobsTopline, jobsHeadline,
+    videoUrl, videoTitle, videoPoster${BILD},
+    weekTopline, weekHeadline, weekText,
+    benefitsTopline, benefitsHeadline, benefitsItems,
+    reasonsTopline, reasonsHeadline, reasonsItems[]{ title, text },
+    jobsTopline, jobsHeadline, jobsText,
     voicesTopline, voicesHeadline,
     voicesItems[]{ quote, name, role, since, image${BILD}, offset },
     processHeadline, processStages[]{ title, text },
@@ -170,7 +178,9 @@ export const JOBS_QUERY = defineQuery(`
     lead,
     duties,
     profile,
-    highlight
+    highlight,
+    applicationEmail,
+    applicationQuestions[]{ label, kind, choices, required }
   }
 `);
 
@@ -306,6 +316,59 @@ export const HOMEPAGE_QUERY = defineQuery(`
     storiesAction${LINK},
     magazineTopline, magazineTitle, magazineText,
     faqTitle, faqText, faq[]{ question, answer },
+    seo{ title, description, noIndex, image${BILD} }
+  }
+`);
+
+/**
+ * Die Praxisseite. Team und Standorte stehen NICHT darin — sie kommen aus
+ * der Personen-Sammlung und aus den Einstellungen. Hier liegen nur die
+ * Überschriften der Abschnitte und der eigene Text.
+ */
+export const PRACTICE_QUERY = defineQuery(`
+  *[_id == "practice"][0]{
+    topline, title, lead, image${BILD}, imageSecondary${BILD},
+    storyTopline, storyHeadline, storyColumns, storyImage${BILD},
+    figures[]{ value, text },
+    valuesTopline, valuesHeadline, valuesText, valuesItems[]{ title, text },
+    teamTopline, teamHeadline, teamText, teamPhoto${BILD},
+    locationsTopline, locationsHeadline, locationsText,
+    seo{ title, description, noIndex, image${BILD} }
+  }
+`);
+
+/**
+ * Das Team fürs Raster. Sortiert nach `orderRank` — die Reihenfolge schreibt
+ * die Drag-Liste im Studio.
+ *
+ * Nur Personen mit Slug: Ohne ihn gäbe es keine Detailseite, und eine Kachel,
+ * die ins Leere führt, ist schlechter als keine.
+ */
+export const TEAM_QUERY = defineQuery(`
+  *[_type == "person" && defined(slug.current)] | order(orderRank) {
+    name,
+    "slug": slug.current,
+    role,
+    text,
+    image${BILD},
+    "focusAreas": focusAreas[]->{ title, "slug": slug.current }
+  }
+`);
+
+/** Eine Person mit allem, was ihre Seite baut. */
+export const PERSON_QUERY = defineQuery(`
+  *[_type == "person" && slug.current == $slug][0]{
+    name,
+    "slug": slug.current,
+    role,
+    text,
+    quote,
+    image${BILD},
+    bio,
+    milestones[]{ year, text },
+    languages,
+    email,
+    "focusAreas": focusAreas[]->{ title, "slug": slug.current },
     seo{ title, description, noIndex, image${BILD} }
   }
 `);

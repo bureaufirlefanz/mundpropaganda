@@ -1,0 +1,153 @@
+---
+/**
+ * Die Haltung der Praxis: drei bis fünf Punkte, jeder mit einem Wie.
+ *
+ * Als dunkles Band über die volle Fensterbreite. Das ist keine Dekoration,
+ * sondern die Gliederung: Die Praxisseite hat sonst fünf helle Abschnitte
+ * hintereinander, und ohne einen Farbwechsel dazwischen liest sie sich als
+ * eine einzige lange Spalte. Dieselbe Rolle wie das Band auf der
+ * Leistungsseite, nur ohne dessen Bildbühne.
+ *
+ * Große Ziffern statt Symbolen. Eine Haltung mit Piktogrammen bebildert
+ * auszustatten macht sie zur Broschüre — die Ziffer ordnet und behauptet
+ * nichts.
+ *
+ * Jeder Punkt hat Pflicht-Text. Eine Überschrift wie „Ehrlichkeit" allein
+ * ist eine Floskel; erst das Wie darunter macht sie überprüfbar. Deshalb ist
+ * das Feld im Schema Pflicht und nicht wahlfrei.
+ */
+interface Value {
+  title: string;
+  text: string;
+}
+
+interface Props {
+  topline: string;
+  headline: string;
+  text?: string;
+  items: Value[];
+}
+
+const { topline, headline, text, items } = Astro.props;
+---
+
+<section class="s-values">
+  <div class="container s-values__inner">
+    <div class="s-values__head">
+      <span class="c-topline s-values__topline" data-reveal="fade">{topline}</span>
+      <h2 class="s-values__title" data-split="lines">{headline}</h2>
+      {text && <p class="s-values__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+    </div>
+
+    <ol class="s-values__liste" data-reveal-stagger="0.08">
+      {items.map((w, i) => (
+        <li class="s-values__punkt" data-reveal-child>
+          <span class="s-values__nummer" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <h3 class="s-values__punkt-title">{w.title}</h3>
+          <p class="s-values__punkt-text">{w.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* Randlos über die volle Fensterbreite. Die 50vw-Konstruktion bricht aus
+     dem zentrierten Raster aus, ohne die Section aus dem Fluss zu nehmen —
+     dieselbe wie beim Band der Leistungsseite. */
+  .s-values {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    margin-block: var(--section-space);
+    padding-block: clamp(100px, 11vw, 200px);
+    background: var(--c-dark);
+    color: var(--c-bg);
+  }
+
+  .s-values__head {
+    max-width: 46ch;
+    margin-bottom: clamp(56px, 7vw, 120px);
+  }
+
+  /* Die Topline ist auf hellem Grund gedacht; auf dem dunklen Band braucht
+     sie die Markenfarbe, sonst verschwindet sie. */
+  .s-values__topline {
+    color: var(--c-brand);
+  }
+
+  .s-values__title {
+    max-width: 18ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-values__text {
+    max-width: 52ch;
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: 1.55;
+    /* Nicht `--c-text-muted`: Das ist ein Grauwert für hellen Grund und
+       fiele hier unter den Kontrastwert. Die Hintergrundfarbe mit 72 %
+       gegen Dunkel gemischt misst 7.4:1. */
+    color: color-mix(in srgb, var(--c-bg) 72%, var(--c-dark));
+  }
+
+  /* `auto-fit` mit Mindestbreite statt fester Spaltenzahl: Der Abschnitt
+     trägt drei bis fünf Punkte, und bei vier soll er nicht aussehen, als
+     fehle einer. */
+  .s-values__liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .s-values__punkt {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: var(--sp-5);
+    border-top: var(--bw) solid color-mix(in srgb, var(--c-bg) 26%, transparent);
+  }
+
+  /* Zweistellig mit führender Null und in Mono — die einzige Stelle dieser
+     Seite, an der die Monoschrift steht. Sie ist hier eine Kennung und kein
+     Fließtext, genau der Fall, für den sie vorgesehen ist. */
+  .s-values__nummer {
+    margin-bottom: var(--sp-5);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    color: var(--c-brand);
+  }
+
+  .s-values__punkt-title {
+    margin-bottom: var(--sp-3);
+    font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .s-values__punkt-text {
+    max-width: 38ch;
+    font-size: var(--fs-text-main);
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--c-bg) 68%, var(--c-dark));
+  }
+
+  @media (max-width: 900px) {
+    .s-values {
+      margin-block: var(--section-space-sm);
+    }
+  }
+</style>

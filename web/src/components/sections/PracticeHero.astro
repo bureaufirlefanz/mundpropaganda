@@ -1,0 +1,198 @@
+---
+/**
+ * Der Kopf der Praxisseite.
+ *
+ * Anders als `CareersHero`, und aus einem Grund: Die Karriereseite muss
+ * zuerst wirken, deshalb steht dort ein Wort mittig über einem Bogen. Wer
+ * die Praxisseite aufruft, will dagegen sofort lesen — meist steht die
+ * Entscheidung für eine Behandlung schon an, und die Frage ist, bei wem.
+ *
+ * Deshalb hier linksbündig und zweispaltig: Titel links, Einstieg rechts auf
+ * der Grundlinie der letzten Titelzeile. Darunter zwei Bilder, das zweite
+ * versetzt über der rechten Ecke des ersten. Der Versatz ist der ganze
+ * Effekt — ein einzelnes Bild in voller Breite hätte diese Seite mit jeder
+ * anderen gemeinsam.
+ *
+ * Ohne zweites Bild steht das erste allein und über die volle Breite. Das
+ * ist keine Notlösung, sondern der ruhigere von zwei richtigen Zuständen.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import ToothLines from "../ui/ToothLines.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Props {
+  topline: string;
+  title: string;
+  lead?: string;
+  image?: ImageSource;
+  imageSecondary?: ImageSource;
+}
+
+const { topline, title, lead, image, imageSecondary } = Astro.props;
+const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
+---
+
+<section class="s-phero">
+  <ToothLines />
+
+  <div class="container s-phero__inner">
+    <div class="s-phero__head">
+      <span class="c-topline" data-reveal="fade">{topline}</span>
+      <h1 class="s-phero__title" data-split="lines">{title}</h1>
+      {lead && <p class="s-phero__lead" data-reveal="up" data-reveal-delay="0.12">{lead}</p>}
+    </div>
+
+    {isCmsImage(image) && (
+      <div class="s-phero__media" data-zwei={zweiBilder ? "" : undefined}>
+        <div class="s-phero__bild s-phero__bild--gross" data-reveal="scale">
+          <CmsImage
+            source={image}
+            alt=""
+            widths={[640, 1024, 1600, 2200]}
+            sizes="(max-width: 900px) 92vw, 78vw"
+            eager
+          />
+        </div>
+
+        {zweiBilder && (
+          <div class="s-phero__bild s-phero__bild--klein" data-reveal="scale" data-reveal-delay="0.15">
+            <CmsImage
+              source={imageSecondary}
+              alt=""
+              widths={[400, 640, 1024]}
+              sizes="(max-width: 900px) 44vw, 26vw"
+            />
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* `overflow-x: clip` und nicht `hidden`: Die Linien laufen bewusst über die
+     Unterkante in die nächste Section weiter, nur seitlich sollen sie die
+     Seite nicht breiter machen. `hidden` erzeugte einen Scrollcontainer. */
+  .s-phero {
+    position: relative;
+    overflow-x: clip;
+    padding-block: calc(var(--section-space) + 96px) var(--section-space);
+  }
+
+  .s-phero__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Titel links, Einstieg rechts. `align-items: end` setzt den Absatz auf die
+     Grundlinie der letzten Titelzeile statt an den oberen Rand — sonst
+     schwebt er neben einer dreizeiligen Überschrift im Nichts. */
+  .s-phero__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--sp-6) clamp(var(--sp-8), 6vw, 120px);
+    align-items: end;
+  }
+
+  .s-phero__title {
+    grid-column: 1;
+    max-width: 13ch;
+    font-size: var(--fs-display-2);
+    font-weight: 500;
+    line-height: 0.94;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .s-phero__lead {
+    grid-column: 2;
+    max-width: 42ch;
+    padding-bottom: 0.4em;
+    font-size: var(--fs-text-large);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  /* --- Die Bilder ------------------------------------------------------- */
+
+  .s-phero__media {
+    position: relative;
+    margin-top: clamp(var(--sp-8), 6vw, var(--sp-12));
+  }
+
+  /* Oben stärker gerundet als unten — dieselbe Bogenform wie die Linien
+     dahinter, aus dem Zahnumriss abgeleitet. Ein Bild mit gleicher Rundung
+     an allen vier Ecken stünde quer dazu. */
+  .s-phero__bild {
+    overflow: hidden;
+    border-radius: clamp(80px, 10vw, 180px) clamp(80px, 10vw, 180px) var(--r-lg)
+      var(--r-lg);
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  }
+
+  .s-phero__bild--gross {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Nur wenn ein zweites Bild da ist, weicht das große zurück — allein darf
+     es die volle Breite behalten. */
+  .s-phero__media[data-zwei] .s-phero__bild--gross {
+    width: 78%;
+  }
+
+  /* Versetzt über der rechten Ecke. `bottom` und nicht `top`: Das kleine
+     Bild soll unten überstehen und die Section nach unten öffnen, nicht
+     oben in die Überschrift ragen. */
+  .s-phero__bild--klein {
+    position: absolute;
+    right: 0;
+    bottom: clamp(-56px, -4vw, -28px);
+    width: clamp(180px, 26%, 340px);
+    aspect-ratio: 3 / 4;
+    border-radius: clamp(56px, 7vw, 120px) clamp(56px, 7vw, 120px) var(--r-md)
+      var(--r-md);
+  }
+
+  /* :global(img), weil die Bilder aus CmsImage.astro kommen und das
+     Scope-Attribut dieser Datei nicht tragen. */
+  .s-phero__bild :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .s-phero {
+      padding-block: calc(var(--section-space-sm) + 80px) var(--section-space-sm);
+    }
+
+    /* Einspaltig: Zwei Spalten auf 390px wären zwei Schlitze. */
+    .s-phero__head {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .s-phero__title,
+    .s-phero__lead {
+      grid-column: 1;
+      max-width: none;
+    }
+
+    .s-phero__lead {
+      padding-bottom: 0;
+    }
+
+    .s-phero__media[data-zwei] .s-phero__bild--gross {
+      width: 84%;
+    }
+
+    .s-phero__bild--gross {
+      aspect-ratio: 4 / 3;
+    }
+
+    .s-phero__bild--klein {
+      bottom: -24px;
+      width: 38%;
+    }
+  }
+</style>

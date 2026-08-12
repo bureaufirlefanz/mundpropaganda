@@ -34,13 +34,34 @@ export type LinkValue = NonNullable<Navigation["mainMenu"]>[number];
    `startseite` und `karriere`, die Dokumente längst `homepage` und `careers`.
    `documentPath` fand nichts, gab `null` zurück, und `resolved()` verwirft
    jeden Verweis ohne Ziel — das Menü war leer, ohne dass etwas kaputt war. */
+/**
+ * Die zweite Hälfte des Pfadmodells — die erste steht in
+ * `studio/lib/paths.ts`.
+ *
+ * **Sie müssen übereinstimmen, und sie tun es nicht von selbst.** Genau hier
+ * ist es schon einmal auseinandergelaufen: Nach der Sprachmigration standen
+ * in `FIXED_PATHS` noch die deutschen Typnamen als Schlüssel, während die
+ * Dokumente längst englische trugen. Kein einziger Menüpunkt fand danach
+ * seine Adresse, die Navigation war leer — und weil `documentPath` brav
+ * `null` zurückgab statt zu werfen, meldete das keine Prüfung.
+ *
+ * Ein zweites Mal beim Bau der Praxisseite: `practice` fehlte hier, der
+ * Menüpunkt „Praxis" zeigte deshalb ins Leere, obwohl das Studio den Pfad
+ * kannte.
+ *
+ * Wer im Studio einen Typ mit Route ergänzt, ergänzt ihn hier mit.
+ * `scripts/check-web.mjs` liest das Studio-Modell und ruft jeden festen Pfad
+ * auf; ein hier vergessener Eintrag fällt dort als fehlende Seite auf.
+ */
 const DIRECTORIES: Record<string, string> = {
   service: "leistungen",
   post: "magazin",
+  person: "praxis",
 };
 
 const FIXED_PATHS: Record<string, string> = {
   homepage: "/",
+  practice: "/praxis",
   magazineIndex: "/magazin",
   careers: "/karriere",
 };

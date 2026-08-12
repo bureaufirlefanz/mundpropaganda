@@ -5,6 +5,7 @@ import { TagsIcon } from "@sanity/icons/Tags";
 import { HomeIcon } from "@sanity/icons/Home";
 import { CaseIcon } from "@sanity/icons/Case";
 import { UserIcon } from "@sanity/icons/User";
+import { UsersIcon } from "@sanity/icons/Users";
 import { DocumentsIcon } from "@sanity/icons/Documents";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { MenuIcon } from "@sanity/icons/Menu";
@@ -43,7 +44,15 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = ["homepage", "magazineIndex", "careers", "settings", "navigation", "footer"];
+export const EINZELDOKUMENTE = [
+  "homepage",
+  "practice",
+  "magazineIndex",
+  "careers",
+  "settings",
+  "navigation",
+  "footer",
+];
 
 /**
  * Einzeldokumente ohne Seite. Sie stehen weiterhin in den Vorlagen-Sperren
@@ -52,7 +61,6 @@ export const EINZELDOKUMENTE = ["homepage", "magazineIndex", "careers", "setting
  */
 export const OHNE_ROUTE = [
   "servicesIndex",
-  "practice",
   "contactPage",
   "emergency",
   "pillar",
@@ -103,6 +111,19 @@ export const structure: StructureResolver = (S, context) =>
          umgekehrt. Beide waren bis hierher ausgeblendet — der Typ `beitrag`
          hatte keine Route, und die vier Beiträge standen fest im Markup des
          Karussells. Jetzt gibt es /magazin und /magazin/<slug>. */
+      /* Praxis und Team: erst die Seite, darunter die Personen. Beide waren
+         bis hierher ausgeblendet — `practice` hatte keine Route, und das
+         Team stand nur als Kurzprofil auf anderen Seiten. Jetzt gibt es
+         /praxis und /praxis/<slug>. */
+      einzeldokument(S, "practice", "Praxis", UsersIcon),
+      orderableDocumentListDeskItem({
+        type: "person",
+        title: "Team",
+        icon: UserIcon,
+        S,
+        context,
+      }),
+
       einzeldokument(S, "magazineIndex", "Magazin", DocumentsIcon),
       S.documentTypeListItem("post").title("Beiträge").icon(DocumentTextIcon),
 
@@ -111,7 +132,6 @@ export const structure: StructureResolver = (S, context) =>
       S.divider(),
 
       /* --- Bausteine, die auf mehreren Seiten auftauchen ---------------- */
-      S.documentTypeListItem("person").title("Team").icon(UserIcon),
       orderableDocumentListDeskItem({
         type: "job",
         title: "Stellen",

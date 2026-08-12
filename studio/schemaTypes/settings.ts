@@ -166,6 +166,31 @@ export const einstellungen = defineType({
               description: "Zwei bis drei Zeilen. Steht unter der Anschrift.",
             }),
 
+            /* Für die Karte auf der Praxisseite. Als zwei Zahlen und nicht
+               als `geopoint`: Der eingebaute Typ bringt eine Kartenauswahl
+               mit, die eine Google-Maps-Kennung braucht — die haben wir
+               nicht, und für zwei Praxen, die sich nie bewegen, wäre sie
+               auch übertrieben. Die Werte holt man aus der Adresszeile einer
+               beliebigen Karte.
+
+               Beide leer: Der Standort erscheint als Karte ohne Stecknadel,
+               die Anschrift steht trotzdem da. Kein erfundener Punkt - eine
+               falsche Stecknadel schickt jemanden an die falsche Tür. */
+            defineField({
+              name: "latitude",
+              title: "Breitengrad",
+              type: "number",
+              description: "z. B. 52.5386. Die erste der beiden Zahlen.",
+              validation: (rule) => rule.min(-90).max(90),
+            }),
+            defineField({
+              name: "longitude",
+              title: "Längengrad",
+              type: "number",
+              description: "z. B. 13.4241. Die zweite der beiden Zahlen.",
+              validation: (rule) => rule.min(-180).max(180),
+            }),
+
             /* Klasse 2: Wer keine Zeiten pflegt, bekommt keine erfundenen.
                Der Block im Footer entfällt dann an diesem Standort ganz —
                „Öffnungszeiten: keine Angabe" wäre schlechter als nichts.

@@ -1,0 +1,303 @@
+---
+/**
+ * Die Standorte mit Anschrift, Zeiten und Karte.
+ *
+ * ── Warum die Karte erst auf Klick lädt ──────────────────────────────────
+ *
+ * Eine eingebettete Karte lädt Kacheln von einem fremden Server, sobald die
+ * Seite lädt — und überträgt dabei die IP-Adresse jedes Besuchers, ohne dass
+ * er etwas getan hätte. Das bräuchte eine Einwilligung. Die Seite hat kein
+ * Banner, und die Datenschutzerklärung sagt heute ausdrücklich, dass keine
+ * Karten eingebettet sind.
+ *
+ * Deshalb dasselbe Muster wie beim Video: Bis zum Klick steht hier eine
+ * gezeichnete Fläche mit der Anschrift darauf. Erst der Klick holt die
+ * Karte. Wer nur die Adresse braucht, löst nie eine Anfrage aus.
+ *
+ * **OpenStreetMap und nicht Google Maps:** Es setzt keine Cookies und
+ * gehört keinem Werbenetzwerk. Nach dem Klick ist der Unterschied für den
+ * Besucher gering, für die Datenschutzerklärung erheblich.
+ *
+ * Der Weg-Knopf ist etwas anderes als die Einbettung: Er ist ein Link nach
+ * draußen, der erst beim Antippen etwas tut, und führt in die Karten-App,
+ * die der Besucher ohnehin benutzt.
+ *
+ * ── Ohne Koordinaten ─────────────────────────────────────────────────────
+ *
+ * Dann entfällt die Karte an diesem Standort, die Anschrift bleibt. Kein
+ * geratener Punkt: Eine Stecknadel an der falschen Stelle schickt jemanden
+ * an die falsche Tür, und das ist schlimmer als gar keine Karte.
+ */
+import type { Standort } from "../../lib/settings";
+
+interface Props {
+  id?: string;
+  topline: string;
+  headline: string;
+  text?: string;
+  locations: Standort[];
+}
+
+const { id, topline, headline, text, locations } = Astro.props;
+
+/**
+ * Der Kartenausschnitt um einen Punkt. Das Fenster ist bewusst eng
+ * (rund 500 m): Weiter herausgezoomt sieht man Berlin, und das hilft
+ * niemandem, der die Tür sucht.
+ */
+function karte(lat: number, lon: number): string {
+  const d = 0.004;
+  const bbox = [lon - d, lat - d / 2, lon + d, lat + d / 2].join(",");
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+}
+
+/** Route in der Karten-App des Besuchers. Über die Anschrift, nicht über die
+    Koordinaten — die App zeigt dann den Namen der Praxis und nicht zwei
+    Zahlen. */
+const route = (o: Standort) =>
+  `https://www.openstreetmap.org/search?query=${encodeURIComponent(`${o.street}, ${o.city}`)}`;
+---
+
+<section class="s-locations container" id={id}>
+  <div class="s-locations__head">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-locations__title" data-split="lines">{headline}</h2>
+    {text && <p class="s-locations__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+  </div>
+
+  <div class="s-locations__raster" data-reveal-stagger="0.1">
+    {locations.map((o) => (
+      <article class="c-location" data-reveal-child>
+        {o.latitude != null && o.longitude != null ? (
+          <button
+            class="c-location__karte"
+            type="button"
+            data-embed={karte(o.latitude, o.longitude)}
+            aria-label={`Karte laden für ${o.name}`}
+          >
+            <span class="c-location__platzhalter" aria-hidden="true">
+              <span class="c-location__kuerzel">{o.shortCode}</span>
+              <span class="c-location__laden">Karte laden</span>
+            </span>
+          </button>
+        ) : null}
+
+        <div class="c-location__body">
+          <h3 class="c-location__name">{o.name}</h3>
+          {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
+              solche an. Der Browser setzt das Element kursiv, das wird unten
+              zurückgenommen. */}
+          <address class="c-location__adresse">{o.street}<br />{o.city}</address>
+
+          {o.description && <p class="c-location__text">{o.description}</p>}
+
+          {o.hours && o.hours.length > 0 && (
+            <dl class="c-location__zeiten">
+              {o.hours.map((z) => (
+                <>
+                  <dt>{z.days}</dt>
+                  <dd>{z.time}</dd>
+                </>
+              ))}
+            </dl>
+          )}
+
+          <a class="c-location__route" href={route(o)} target="_blank" rel="noopener">
+            Route planen
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </a>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .s-locations {
+    padding-block: var(--section-space);
+  }
+
+  .s-locations__head {
+    max-width: 46ch;
+    margin-bottom: clamp(48px, 6vw, 96px);
+  }
+
+  .s-locations__title {
+    max-width: 18ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-locations__text {
+    max-width: 52ch;
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: 1.55;
+    color: var(--c-text-muted);
+  }
+
+  /* Zwei Praxen nebeneinander, ab 900px. `auto-fit` trägt auch eine dritte,
+     ohne dass hier etwas geändert werden muss. */
+  .s-locations__raster {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: clamp(40px, 4vw, 72px) var(--site-gutter);
+  }
+
+  /* --- Eine Praxis ------------------------------------------------------ */
+
+  .c-location {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ein Knopf, der wie eine Fläche aussieht — der Browser gäbe ihm sonst
+     Rahmen, Grundfarbe und mittigen Text. */
+  .c-location__karte {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    border-radius: clamp(56px, 6vw, 110px) clamp(56px, 6vw, 110px) var(--r-md)
+      var(--r-md);
+    background: var(--c-dark);
+    cursor: pointer;
+  }
+
+  /* Die gezeichnete Fläche vor dem Klick. Das Kürzel ist dieselbe
+     Konturzahl, die auf der Startseite über den Standorten steht — die
+     Seite bleibt dadurch erkennbar dieselbe. */
+  .c-location__platzhalter {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
+    color: var(--c-bg);
+    transition: scale var(--d-base) var(--e-out);
+  }
+
+  .c-location__karte:hover .c-location__platzhalter {
+    scale: 1.03;
+  }
+
+  .c-location__kuerzel {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--c-brand);
+  }
+
+  .c-location__laden {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--sp-2) var(--sp-4);
+    border: var(--bw) solid color-mix(in srgb, var(--c-bg) 40%, transparent);
+    border-radius: var(--r-round);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .c-location__karte:focus-visible {
+    outline: 2px solid var(--c-dark);
+    outline-offset: 4px;
+  }
+
+  /* Das eingesetzte iframe füllt denselben Rahmen. */
+  .c-location__karte :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .c-location__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: flex-start;
+    padding-top: var(--sp-6);
+  }
+
+  .c-location__name {
+    margin-bottom: var(--sp-2);
+    font-size: var(--fs-text-large);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .c-location__adresse {
+    font-style: normal;
+    font-size: var(--fs-text-main);
+    line-height: 1.5;
+  }
+
+  .c-location__text {
+    max-width: 44ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  /* Tage links, Zeit rechts — dieselbe Aufteilung wie im Footer. */
+  .c-location__zeiten {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0 var(--sp-4);
+    width: 100%;
+    max-width: 32ch;
+    margin: var(--sp-5) 0 0;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-text-small);
+    line-height: 1.6;
+    color: var(--c-text-muted);
+  }
+
+  .c-location__zeiten dd {
+    margin: 0;
+  }
+
+  /* `margin-top: auto` hält den Knopf am unteren Rand — bei unterschiedlich
+     vielen Zeitzeilen stehen beide Karten damit trotzdem gleich. */
+  .c-location__route {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: auto;
+    padding-top: var(--sp-6);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .c-location__route svg {
+    transition: translate var(--d-base) var(--e-out);
+  }
+
+  .c-location__route:hover svg {
+    translate: 4px 0;
+  }
+
+  @media (max-width: 900px) {
+    .s-locations {
+      padding-block: var(--section-space-sm);
+    }
+  }
+</style>

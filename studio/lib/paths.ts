@@ -11,6 +11,7 @@
  *   /leistungen              Übersicht aller Leistungen
  *   /leistungen/<slug>       eine Leistung
  *   /praxis                  Praxis & Team
+ *   /praxis/<slug>           eine Person des Teams
  *   /magazin                 Übersicht
  *   /magazin/<slug>          ein Beitrag
  *   /karriere                Karriere
@@ -32,16 +33,26 @@
  * Feste Pfade der obersten Ebene. Kein freier Slug darf so heißen.
  *
  * **Das sind Adressen, keine Typnamen.** Die Website ist deutsch und ihre
- * URLs sind es auch — `/karriere` und nicht `/karriere`. Bei der Umstellung
- * der Bezeichner auf Englisch war das kurzzeitig verwechselt, und die
- * Prüfung schützte `/karriere` statt `/karriere`: Ein Rechtstext mit dem Slug
- * „careers" wäre damit durchgegangen und hätte die Karriereseite verdeckt.
+ * URLs sind es auch: `/karriere`, nicht `/careers`.
+ *
+ * Bei der Umstellung der Bezeichner auf Englisch wurde diese Liste
+ * mitübersetzt — sie schützte danach `/services`, `/magazine` und
+ * `/careers`, also drei Adressen, die es gar nicht gibt. Ein Rechtstext mit
+ * dem Slug „karriere" wäre durchgegangen und hätte die Karriereseite
+ * verdeckt: `/[slug]` und `/karriere` beanspruchen dieselbe Stelle, und wer
+ * gewinnt, entscheidet die Reihenfolge im Build und nicht eine Absicht.
+ *
+ * Der Kommentar, der hier stand, behauptete die Reparatur bereits — und war
+ * selbst ein Opfer derselben Ersetzung („`/karriere` und nicht
+ * `/karriere`"). Ein Beleg dafür, dass eine Prüfung im Code mehr wert ist
+ * als eine Zusage im Kommentar; deshalb steht sie jetzt in
+ * `scripts/check-web.mjs` unter „Reservierte Pfade".
  */
 export const RESERVED_SLUGS = [
-  "services",
+  "leistungen",
   "praxis",
-  "magazine",
-  "careers",
+  "magazin",
+  "karriere",
   "kontakt",
   "notdienst",
   "design",
@@ -59,6 +70,10 @@ const TOP_LEVEL = ["pillar", "legalPage"];
 const DIRECTORIES: Record<string, string> = {
   service: "leistungen",
   post: "magazin",
+  /* Eine Person liegt unter der Praxisseite, nicht auf eigener Ebene: Sie
+     ist kein selbständiges Thema, sondern ein Teil des Teams — und wer die
+     Adresse kürzt, landet dort, wo alle stehen. */
+  person: "praxis",
 };
 
 /** Einzeldokumente und ihr fester Pfad. */
@@ -74,7 +89,7 @@ const FIXED_PATHS: Record<string, string> = {
 
 /**
  * Der Pfad eines Dokuments. Gibt null zurück, wenn der Typ keine eigene Seite
- * hat (Einstellungen, Personen, Stellen) oder der Slug noch fehlt.
+ * hat (Einstellungen, Stellen) oder der Slug noch fehlt.
  */
 export function pathFor(typ?: string, slug?: string): string | null {
   if (!typ) return null;

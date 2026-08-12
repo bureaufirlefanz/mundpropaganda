@@ -49,6 +49,11 @@ export interface Standort {
      Zeiten wären hier so teuer wie eine erfundene Rufnummer — jemand steht
      dann vor einer verschlossenen Tür. */
   hours?: Oeffnungszeit[];
+  /* Für die Karte auf der Praxisseite. Beide fehlen oder beide sind da —
+     `Locations.astro` prüft auf genau das. Ein geratener Punkt schickt
+     jemanden an die falsche Tür, deshalb gibt es keinen Rückfall. */
+  latitude?: number;
+  longitude?: number;
 }
 
 /**

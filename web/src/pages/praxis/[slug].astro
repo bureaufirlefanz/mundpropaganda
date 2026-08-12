@@ -1,0 +1,29 @@
+---
+/**
+ * Eine Person des Teams unter `/praxis/<slug>`.
+ *
+ * `getStaticPaths` baut je Person eine Seite. Die Liste kommt aus derselben
+ * Abfrage wie das Raster auf `/praxis` — damit kann es keine Kachel geben,
+ * die auf eine Seite zeigt, die nicht gebaut wurde.
+ *
+ * Die vollständigen Daten holt die Seite trotzdem einzeln: Das Raster
+ * braucht fünf Felder, die Detailseite zwölf, und die Rasterabfrage soll
+ * nicht die Lebensläufe aller Personen mitschleppen.
+ */
+import PersonContent from "../../templates/Person.astro";
+import { loadTeam, loadPerson } from "../../lib/practice";
+
+export async function getStaticPaths() {
+  const team = await loadTeam();
+  return team.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const person = await loadPerson(slug!);
+
+/* Kann eigentlich nicht eintreten — die Pfade kommen aus derselben Quelle.
+   Falls doch, ist eine 404 die ehrliche Antwort und keine leere Seite. */
+if (!person) return Astro.rewrite("/404");
+---
+
+<PersonContent person={person} />

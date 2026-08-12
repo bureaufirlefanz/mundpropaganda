@@ -1,4 +1,4 @@
-import { defineType, defineField } from "sanity";
+import { defineType, defineField, defineArrayMember } from "sanity";
 import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { BlockContentIcon } from "@sanity/icons/BlockContent";
@@ -205,22 +205,152 @@ export const rechtstext = defineType({
 
 /* --- Team --------------------------------------------------------------- */
 
+/**
+ * Eine Person des Teams.
+ *
+ * Seit der Praxisseite trägt sie eine eigene Seite unter `/praxis/<slug>` und
+ * nicht mehr nur eine Kachel. Der Grund ist nicht Vollständigkeit, sondern
+ * wonach gesucht wird: Patienten suchen nach dem Namen ihrer Behandlerin,
+ * nicht nach „Zahnarzt Prenzlauer Berg Team". Eine Kachel in einem Raster
+ * kann darauf nicht antworten, eine Seite schon.
+ *
+ * Zwei Klassen von Feldern: Was das Raster braucht (Name, Rolle, Porträt,
+ * Kurzprofil), und was nur die Detailseite füllt (Ausbildung, Sprachen,
+ * Zitat, ausführlicher Text). Fehlt das Zweite, bleibt die Seite kurz — sie
+ * verschwindet nicht.
+ */
 export const person = defineType({
   name: "person",
   title: "Person",
   type: "document",
   icon: UserIcon,
+  /* Ziehbar wie Leistungen und Stellen: Die Reihenfolge im Team-Raster ist
+     eine Entscheidung, keine Datenbankausgabe. */
+  orderings: [orderRankOrdering],
+  groups: [
+    { name: "card", title: "Im Team-Raster", default: true },
+    { name: "detail", title: "Auf der eigenen Seite" },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
-    defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-    defineField({ name: "role", title: "Rolle", type: "string" }),
-    defineField({ name: "image", title: "Porträt", type: "picture" }),
-    defineField({ name: "text", title: "Kurzprofil", type: "text", rows: 4 }),
+    orderRankField({ type: "person" }),
+
+    /* --- Was im Raster steht -------------------------------------------- */
+    defineField({
+      name: "name",
+      title: "Name",
+      type: "string",
+      description: "Mit Titel, so wie er auf dem Praxisschild steht.",
+      group: "card",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      description: "Die Adresse der eigenen Seite, z. B. /praxis/kerrin-gratecap.",
+      options: { source: "name", maxLength: 60 },
+      group: "card",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "role",
+      title: "Rolle",
+      type: "string",
+      description: "Kurz. Steht unter dem Namen, z. B. „Zahnärztin, Ästhetik und Prophylaxe“.",
+      group: "card",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "image",
+      title: "Porträt",
+      type: "picture",
+      description: "Hochformat. Ohne Bild bleibt die Kachel ein Namensfeld - das ist besser als ein fremdes Gesicht.",
+      group: "card",
+    }),
+    defineField({
+      name: "text",
+      title: "Kurzprofil",
+      type: "text",
+      rows: 4,
+      description: "Zwei Sätze für die Kachel.",
+      group: "card",
+    }),
     defineField({
       name: "focusAreas",
       title: "Schwerpunkte",
       type: "array",
+      description: "Verweist auf Leistungen. Die Seite verlinkt sie - wer den Namen sucht, findet so die Behandlung.",
       of: [{ type: "reference", to: [{ type: "service" }] }],
+      group: "card",
     }),
+
+    /* --- Was nur die eigene Seite füllt ---------------------------------- */
+    defineField({
+      name: "quote",
+      title: "Zitat",
+      type: "text",
+      rows: 3,
+      description: "Ein Satz in eigenen Worten. Steht groß neben dem Porträt. Leer lassen, wenn es keinen gibt - ein erfundenes Zitat merkt man.",
+      group: "detail",
+    }),
+    defineField({
+      name: "bio",
+      title: "Ausführlich",
+      type: "array",
+      of: [fliesstext],
+      description: "Der Werdegang in Absätzen.",
+      group: "detail",
+    }),
+    defineField({
+      name: "milestones",
+      title: "Stationen",
+      type: "array",
+      description: "Ausbildung und Werdegang, neueste zuerst.",
+      group: "detail",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "milestone",
+          fields: [
+            defineField({
+              name: "year",
+              title: "Jahr oder Zeitraum",
+              type: "string",
+              description: "z. B. „2014“ oder „2016–2019“.",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Was",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+          ],
+          preview: {
+            select: { title: "text", subtitle: "year" },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "languages",
+      title: "Sprachen",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "In denen behandelt wird.",
+      group: "detail",
+    }),
+    defineField({
+      name: "email",
+      title: "E-Mail",
+      type: "string",
+      description: "Nur wenn die Person direkt erreichbar sein soll. Sonst leer lassen - dann steht die allgemeine Adresse da.",
+      group: "detail",
+      validation: (r) => r.email(),
+    }),
+
+    defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" }),
   ],
   preview: { select: { title: "name", subtitle: "role", media: "image" } },
 });
@@ -243,6 +373,7 @@ export const stelle = defineType({
   groups: [
     { name: "posting", title: "Ausschreibung", default: true },
     { name: "facts", title: "Eckdaten" },
+    { name: "application", title: "Bewerbung" },
   ],
   fields: [
     orderRankField({ type: "job" }),
@@ -282,6 +413,96 @@ export const stelle = defineType({
       description: "Abwählen, statt zu löschen - dann verschwindet die Stelle von der Seite, bleibt aber erhalten.",
       initialValue: true,
       group: "facts"
+    }),
+
+    /* --- Bewerbung -------------------------------------------------------
+       Was das Bewerbungsformular für genau diese Stelle tun soll. Beides
+       gehört an die Stelle und nicht an die Karriereseite: Eine
+       Prophylaxeassistenz bewirbt sich woanders und wird anderes gefragt
+       als eine Oralchirurgin. */
+    defineField({
+      name: "applicationEmail",
+      title: "Bewerbungen gehen an",
+      type: "string",
+      description:
+        "Die Adresse, an die eine Bewerbung auf DIESE Stelle geht. Leer lassen: dann nimmt das Formular die allgemeine Adresse von der Karriereseite.",
+      group: "application",
+      validation: (r) => r.email(),
+    }),
+    defineField({
+      name: "applicationQuestions",
+      title: "Zusätzliche Fragen",
+      type: "array",
+      description:
+        "Fragen, die nur bei dieser Stelle gestellt werden. Name, E-Mail, Telefon und Nachricht fragt das Formular ohnehin - hier steht, was darüber hinaus zu dieser Rolle gehört. Leer lassen: dann hat das Formular für diese Stelle einen Schritt weniger.",
+      group: "application",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "applicationQuestion",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Frage",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "kind",
+              title: "Art der Antwort",
+              type: "string",
+              initialValue: "short",
+              options: {
+                list: [
+                  { title: "Kurze Antwort (eine Zeile)", value: "short" },
+                  { title: "Lange Antwort (mehrere Zeilen)", value: "long" },
+                  { title: "Auswahl aus einer Liste", value: "choice" },
+                ],
+                layout: "radio",
+              },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "choices",
+              title: "Auswahlmöglichkeiten",
+              type: "array",
+              of: [{ type: "string" }],
+              description: "Nur bei „Auswahl aus einer Liste“.",
+              hidden: ({ parent }) => parent?.kind !== "choice",
+            }),
+            defineField({
+              name: "required",
+              title: "Pflichtfrage",
+              type: "boolean",
+              initialValue: false,
+            }),
+          ],
+          preview: {
+            select: { title: "label", kind: "kind", required: "required" },
+            prepare: ({
+              title,
+              kind,
+              required,
+            }: {
+              title?: string;
+              kind?: string;
+              required?: boolean;
+            }) => {
+              const arten: Record<string, string> = {
+                short: "kurze Antwort",
+                long: "lange Antwort",
+                choice: "Auswahl",
+              };
+              return {
+                title,
+                subtitle: [(kind && arten[kind]) ?? kind, required ? "Pflicht" : null]
+                  .filter(Boolean)
+                  .join(" · "),
+              };
+            },
+          },
+        }),
+      ],
     }),
   ],
   preview: {

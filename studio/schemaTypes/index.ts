@@ -21,12 +21,14 @@ import {
 import { startseite } from "./documents/homepage";
 import {
   leistungenIndex,
-  praxis,
   magazinIndex,
   kontakt,
   notdienst,
 } from "./documents/single-pages";
 import { karriere } from "./documents/careers";
+/* Praxis hat einen eigenen Typ, seit sie eine Seite hat: feste Abfolge statt
+   Baukasten, wie bei der Karriereseite. */
+import { praxis } from "./documents/practice";
 
 import { beitrag, pillar, rechtstext, person, stelle } from "./documents/collections";
 import { navigation, footer } from "./documents/chrome";
