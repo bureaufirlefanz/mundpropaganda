@@ -30,8 +30,8 @@ const description = kopf?.seo?.description || kopf?.lead || "";
 <Base title={title} description={description} noIndex={kopf?.seo?.noIndex}>
   <section class="container s-magazine-intro">
     {kopf?.topline && <span class="c-topline" data-reveal="fade">{kopf.topline}</span>}
-    <h1 class="s-magazinekopf__titel" data-split="lines">{kopf?.title}</h1>
-    {kopf?.lead && <p class="s-magazinekopf__text" data-reveal="up">{kopf.lead}</p>}
+    <h1 class="s-magazine-intro__title" data-split="lines">{kopf?.title}</h1>
+    {kopf?.lead && <p class="s-magazine-intro__text" data-reveal="up">{kopf.lead}</p>}
   </section>
 
   {posts.length > 0 && <PostListe posts={posts} />}
@@ -52,7 +52,12 @@ const description = kopf?.seo?.description || kopf?.lead || "";
     margin-bottom: var(--sp-4);
   }
 
-  .s-magazinkopf__titel {
+  /* Hieß `s-magazinkopf__titel`, während das Markup `s-magazinekopf__titel`
+     schrieb — ein halb migriertes Paar, keine der beiden Regeln griff je.
+     Die Überschrift stand seit der Umbenennung in Browser-Defaults, und
+     niemandem fiel es auf, weil h1 auch ungestylt nach Überschrift
+     aussieht. Jetzt Elemente der Section, wie die Konvention es will. */
+  .s-magazine-intro__title {
     max-width: 16ch;
     font-size: var(--fs-display-2);
     font-weight: 500;
@@ -60,7 +65,7 @@ const description = kopf?.seo?.description || kopf?.lead || "";
     letter-spacing: -0.03em;
   }
 
-  .s-magazinkopf__text {
+  .s-magazine-intro__text {
     max-width: 52ch;
     margin-top: var(--sp-6);
     font-size: var(--fs-text-large);

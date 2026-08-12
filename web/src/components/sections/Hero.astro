@@ -249,10 +249,18 @@ const { lines } = Astro.props;
     display: block;
   }
 
+  /* `top` bezieht sich auf die Wortmarke, nicht auf die Section — ein
+     Prozentpunkt sind hier rund 3,8px.
+
+     Von 67 % auf 75 % gerückt, also gut 30px tiefer. Bei 67 % verdeckte der
+     Zahn 125 der 191px hohen Zeile „Propaganda", also zwei Drittel: Die
+     Wortmarke war beim Aufschlagen der Seite kaum zu lesen. Jetzt sind es
+     rund 80px. Weiter nach unten geht nicht ohne Anschnitt — die Unterkante
+     liegt damit bei 883 von 900px Hero-Höhe. */
   .s-hero__tooth {
     position: absolute;
     left: 50%;
-    top: 67%;
+    top: 75%;
     translate: -50% 0;
     z-index: 2;
     height: 124%;
@@ -608,7 +616,7 @@ const { lines } = Astro.props;
     display: block;
   }
 
-    /* Nur die Größe: Lage und Staffelung voices schon, sie kommen aus der
+    /* Nur die Größe: Lage und Staffelung stimmen schon, sie kommen aus der
        Regel weiter oben und beziehen sich auf die Wortmarke. Auf 390px ist
        die zwei Zeilen hoch — 124 % davon wären zu wenig, um den Zahn als
        Objekt zu lesen. */

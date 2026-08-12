@@ -105,12 +105,10 @@ const LEISTUNGEN = forTable(await loadServiceList()).map((l) => l.name);
     gap: var(--sp-5) var(--site-gutter);
   }
 
-  .c-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-1);
-  }
-
+  /* Feld, Beschriftung und Fehlerzustand liegen in styles/shared.css — das
+     Bewerbungsformular schreibt dieselben Klassen aus, und scoped erreichte
+     sie dort keine einzige Regel. Hier stehen nur noch die Eigenheiten
+     dieses Formulars. */
   .c-field--full {
     grid-column: 1 / -1;
   }
@@ -119,88 +117,6 @@ const LEISTUNGEN = forTable(await loadServiceList()).map((l) => l.name);
      Im Prototyp stand das als style-Attribut am Element. */
   .c-field--tall {
     grid-row: span 2;
-  }
-
-  .c-field__label {
-    font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: var(--fs-text-small);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--c-neutral-800);
-  }
-
-  /* Der Pflichtstern trägt die Farbe der Beschriftung, nicht die Marke.
-     Pink misst auf hellem Grund 1.54:1 bzw. 2.03:1 — er ist Text und muss
-     deshalb 4.5:1 erreichen (WCAG 1.4.3); bei dieser Größe ist das mit Pink
-     auf Hell nicht zu haben. Der pinke Akzent trägt hier ohnehin schon den
-     Absenden-Knopf.
-
-     Zurück auf Pink: `color: var(--c-brand)` — dann meldet es der Prüflauf
-     wieder. */
-  .c-field__label span {
-    color: inherit;
-  }
-
-  .c-field__control {
-    position: relative;
-  }
-
-  .c-field input,
-  .c-field select,
-  .c-field textarea {
-    width: 100%;
-    padding: var(--sp-3) var(--sp-4);
-    border: var(--bw) solid transparent;
-    border-radius: var(--r-sm);
-    background: var(--c-neutral-200);
-    color: var(--c-neutral-800);
-    font-size: var(--fs-text-main);
-    transition: border-color var(--d-fast) var(--e-swift),
-      background var(--d-fast) var(--e-swift);
-  }
-
-  .c-field textarea {
-    min-height: 140px;
-    resize: vertical;
-  }
-
-  .c-field input::placeholder,
-  .c-field textarea::placeholder {
-    /* Auf --c-neutral-200 ergaben 45 % nur 2.77:1. 62 % erreicht 4.56:1. */
-    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
-  }
-
-  .c-field input:focus,
-  .c-field select:focus,
-  .c-field textarea:focus {
-    outline: none;
-    border-color: var(--c-brand);
-  }
-
-  .c-field[data-invalid="true"] input,
-  .c-field[data-invalid="true"] textarea {
-    border-color: var(--c-brand);
-    background: color-mix(in srgb, var(--c-brand) 12%, var(--c-neutral-200));
-  }
-
-  .c-field__error {
-    position: absolute;
-    top: 50%;
-    right: var(--sp-3);
-    translate: 0 -50%;
-    display: none;
-    width: 20px;
-    height: 20px;
-    place-items: center;
-    border-radius: var(--r-round);
-    background: var(--c-brand);
-    color: var(--c-white);
-    font-size: 0.6875rem;
-  }
-
-  .c-field[data-invalid="true"] .c-field__error {
-    display: grid;
   }
 
   .c-checkbox {

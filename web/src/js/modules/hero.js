@@ -277,7 +277,21 @@ export function initHero() {
       0
     );
 
-  if (tooth) drift(tooth, { yPercent: 26, scale: 1.06 });
+  /* 44 statt 26 Prozent. Der Zahn muss die Zeile „Propaganda" beim Scrollen
+     wirklich freigeben, und dafür reichten 26 % nicht: Das sind rund 122px
+     Weg über die GANZE Hero-Höhe, während allein die Überdeckung damals
+     125px betrug. Die Wortmarke kam nie zurück, egal wie weit man scrollte.
+
+     Gemessen bei 1440×900, nachdem der Zahn im CSS 30px tiefer gerückt ist:
+     Er steht bei 413, die Zeile endet bei 508, macht 95px Überdeckung. Mit
+     44 % (rund 206px Weg) und den 40px, die die Wortmarke gegenläufig nach
+     oben geht, gilt
+
+         413 + 206p ≥ 508 − 40p   →   p ≥ 0,385
+
+     Nachgestellt und bestätigt: 95px Überdeckung bei p=0, 33px bei p=0,25,
+     null ab p=0,385 — also nach gut einem Drittel des Hero-Scrolls. */
+  if (tooth) drift(tooth, { yPercent: 44, scale: 1.06 });
 
   /* Beide Wortzeilen mit demselben Wert und in Pixeln, nicht in yPercent:
      die Wortmarke ist ein Schriftzug und muss als einer stehenbleiben.

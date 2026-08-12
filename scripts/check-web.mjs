@@ -28,13 +28,34 @@ await erwarteServer(BASE, "npm run web");
 /** Alle intern verlinkten Seiten ab „/" sammeln, eine Ebene tief. */
 async function findeSeiten(browser) {
   const page = await browser.newPage();
-  await page.goto(BASE + "/", { waitUntil: "networkidle2", timeout: 60000 });
 
-  const links = await page.evaluate(() =>
-    [...document.querySelectorAll('a[href^="/"]')]
-      .map((a) => new URL(a.getAttribute("href"), location.origin).pathname)
-      .filter((p) => !/\.[a-z0-9]+$/i.test(p))
-  );
+  const linksVon = async (pfad) => {
+    await page.goto(BASE + pfad, { waitUntil: "networkidle2", timeout: 60000 });
+    return page.evaluate(() =>
+      [...document.querySelectorAll('a[href^="/"]')]
+        .map((a) => new URL(a.getAttribute("href"), location.origin).pathname)
+        .filter((p) => !/\.[a-z0-9]+$/i.test(p))
+    );
+  };
+
+  /* Zwei Ebenen, nicht eine.
+     Eine Ebene reichte, solange jede Art von Seite von der Startseite aus
+     verlinkt war — die Leistungstabelle zeigt auf `/leistungen/<slug>`, das
+     Karussell auf `/magazin/<slug>`. Die Personenseiten hängen dagegen unter
+     `/praxis`, und dorthin verweist nur die Praxisseite selbst. Der Kriecher
+     fand sie deshalb nie, und die Routen-Deckung meldete `person` als „ohne
+     Seite", obwohl beide Seiten gebaut wurden und antworteten.
+
+     Zwei Ebenen genügen für dieses Seitenmodell: Tiefer als
+     Startseite → Übersicht → Detail geht es nirgends. */
+  const ersteEbene = await linksVon("/");
+  const links = [...ersteEbene];
+
+  for (const pfad of new Set(ersteEbene)) {
+    if (pfad === "/") continue;
+    links.push(...(await linksVon(pfad)));
+  }
+
   await page.close();
 
   /* Die Design-Seiten sind absichtlich von nirgends verlinkt (interne

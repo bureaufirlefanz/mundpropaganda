@@ -264,42 +264,7 @@ function initDeck() {
   }
 }
 
-/**
- * Endlos-Marquee. Zwei identische Spuren laufen versetzt; sobald die erste
- * durch ist, sitzt die zweite exakt an ihrer Stelle — nahtlose Schleife.
- * Die Richtung dreht sich mit der Scrollrichtung.
- */
-export function initMarquee() {
-  const marquees = document.querySelectorAll("[data-marquee]");
-  if (!marquees.length || prefersReducedMotion) return;
-
-  marquees.forEach((marquee) => {
-    const track = marquee.querySelector("[data-marquee-track]");
-    if (!track) return;
-
-    // Inhalt duplizieren, damit die Schleife lückenlos ist.
-    track.append(...[...track.children].map((c) => c.cloneNode(true)));
-
-    const speed = parseFloat(marquee.dataset.marquee) || 25;
-    const tween = gsap.to(track, {
-      xPercent: -50,
-      duration: speed,
-      ease: "none",
-      repeat: -1,
-    });
-
-    let direction = 1;
-    ScrollTrigger.create({
-      trigger: marquee,
-      start: "top bottom",
-      end: "bottom top",
-      onUpdate: (self) => {
-        const next = self.direction;
-        if (next !== direction) {
-          direction = next;
-          tween.timeScale(next);
-        }
-      },
-    });
-  });
-}
+/* Kein `initMarquee` mehr. Das Endlos-Laufband suchte `[data-marquee]`, und
+   das Attribut existierte in keinem Markup — weder hier noch im Prototyp.
+   Die Funktion lief bei jedem Seitenaufruf an und kehrte sofort um. Kommt
+   ein Laufband zurück, liegt der Stand im git-Verlauf dieses Commits. */

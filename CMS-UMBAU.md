@@ -490,6 +490,36 @@ Seite, deutsch, keine Screenshots von Zuständen, die sich ändern.
 Der Reflex, das wegzulassen, ist teuer: jede Frage, die hier nicht steht,
 kommt als Anruf.
 
+### 17. Formulare verschicken wirklich etwas
+
+**Offen, und der gefährlichste offene Punkt der Liste.**
+
+Das Kontaktformular auf Startseite und Leistungsseiten verschickt nichts. Es
+ruft `preventDefault()`, prüft die Felder und schreibt „Danke - wir melden
+uns" auf den Knopf (`web/src/js/modules/ui.js`). Wer es ausfüllt, glaubt, die
+Praxis erreicht zu haben. Niemand erfährt davon. Solange die Seite ein
+Prototyp ist, ist das eine Attrappe; ab dem Tag, an dem echte Patienten
+darauf stoßen, ist es ein Schaden.
+
+Das Bewerbungsformular auf der Karriereseite geht bewusst den kleinen Weg: Es
+sammelt die Antworten und öffnet damit eine vorbereitete E-Mail an die
+Adresse, die an der Stelle hinterlegt ist. Das verliert nichts, weil es
+nichts selbst zu verschicken vorgibt — aber es kann keine Anhänge, und
+Lebenslauf und Zeugnisse sind bei einer Bewerbung die Hauptsache.
+
+Zu entscheiden ist beides zusammen:
+
+| Weg | Anhänge | Wo die Daten liegen |
+|---|---|---|
+| Netlify Forms | ja | bei Netlify, Auftragsverarbeitung nötig |
+| Eigene Funktion + Versanddienst | ja | nirgends gespeichert, Konto beim Versender nötig |
+| mailto (heute) | nein | nirgends |
+
+Bewerbungsunterlagen sind besondere personenbezogene Daten. Was auch immer
+kommt, es braucht einen Hinweis zur Verarbeitung neben dem Absendeknopf und
+einen Absatz in der Datenschutzerklärung. Beides fehlt heute, weil heute
+nichts verschickt wird.
+
 ---
 
 ## Stufe 5 — Werkzeug für die weitere Arbeit

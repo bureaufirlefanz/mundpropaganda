@@ -6,7 +6,7 @@
  * Hover-Reaktionen gehören zum Element (siehe .c-btn und .c-link im CSS),
  * nicht an den Mauszeiger.
  */
-import { gsap, prefersReducedMotion } from "../lib/gsap.js";
+import { gsap } from "../lib/gsap.js";
 
 /* --- Accordion ---------------------------------------------------------
    Höhe wird animiert statt auf `auto` gesetzt, damit der Übergang weich
@@ -118,8 +118,11 @@ export function initBeforeAfter() {
 }
 
 /* --- Formular ----------------------------------------------------------
-   Reine Client-Validierung für den Prototyp — kein Versand. In Webflow
-   übernimmt das später das native Form-Handling.
+   Reine Client-Validierung — KEIN VERSAND. Das Formular prüft, dankt und
+   verschickt nichts; wer es ausfüllt, erreicht niemanden. Der echte Versand
+   ist Aufgabe 17 in CMS-UMBAU.md und muss vor dem Livegang gelöst sein.
+   (Der Satz, der hier stand — „in Webflow übernimmt das später das native
+   Form-Handling" — stammte aus einer Zukunft, die es nicht mehr gibt.)
    -------------------------------------------------------------------- */
 
 export function initForm() {
@@ -134,6 +137,10 @@ export function initForm() {
 
         const invalid = !input.checkValidity();
         field.dataset.invalid = String(invalid);
+        /* Auch am Feld, nicht nur am Rahmen: `data-invalid` steuert das CSS,
+           `aria-invalid` ist die Auskunft fürs Vorlesegerät. */
+        if (invalid) input.setAttribute("aria-invalid", "true");
+        else input.removeAttribute("aria-invalid");
         if (invalid && !firstInvalid) firstInvalid = field;
       });
 
@@ -153,8 +160,9 @@ export function initForm() {
 
     // Fehlerzustand verschwindet, sobald der Nutzer korrigiert.
     form.querySelectorAll("[data-field]").forEach((field) => {
-      field.addEventListener("input", () => {
+      field.addEventListener("input", (e) => {
         if (field.dataset.invalid === "true") field.dataset.invalid = "false";
+        if (e.target.removeAttribute) e.target.removeAttribute("aria-invalid");
       });
     });
 

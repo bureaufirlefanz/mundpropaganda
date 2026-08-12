@@ -66,7 +66,7 @@ if (Astro.cookies.get(PREVIEW_COOKIE)?.value !== "an") {
 const client = previewClient();
 if (!client) {
   return new Response(
-    "SANITY_API_READ_TOKEN fehlt — ohne Token gibt die API keine Entwürfe heraus.",
+    "SANITY_API_READ_TOKEN fehlt. Ohne Token gibt die API keine Entwürfe heraus.",
     { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } }
   );
 }

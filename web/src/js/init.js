@@ -3,7 +3,7 @@
  * existiert — dadurch teilen sich alle Seiten ein Bundle und wir brauchen
  * keine Per-Page-Einstiegspunkte.
  *
- * Bewusst ohne CSS-Implocations und ohne Selbststart: die Astro-App bringt ihre
+ * Bewusst ohne CSS-Importe und ohne Selbststart: die Astro-App bringt ihre
  * Stile in den Komponenten mit und ruft `init` über den Router auf. Der
  * Prototyp lädt stattdessen main.js daneben, das beides ergänzt.
  */
@@ -13,7 +13,6 @@ import { initScroll, initAnchors } from "./modules/scroll.js";
 import { initReveals, initSplitHeadlines } from "./modules/reveal.js";
 import { initHighlightMarkerTextReveal } from "./modules/marker.js";
 import { initNav } from "./modules/nav.js";
-import { initTransitions } from "./modules/transition.js";
 import { initHero } from "./modules/hero.js";
 import { initServicesPreview } from "./modules/services.js";
 import { initStandards } from "./modules/standards.js";
@@ -21,12 +20,14 @@ import { initGallery, initMediaParallax } from "./modules/gallery.js";
 import { initFacts } from "./modules/facts.js";
 import { initTimeline } from "./modules/timeline.js";
 import { initRing } from "./modules/ring.js";
-import { initStories, initMarquee } from "./modules/stories.js";
+import { initStories } from "./modules/stories.js";
 import { initToothRings } from "./modules/rings.js";
 import { initThread } from "./modules/thread.js";
 import { initAccordion, initBeforeAfter, initForm } from "./modules/ui.js";
 import { initToc } from "./modules/toc.js";
 import { initFilter } from "./modules/filter.js";
+import { initEmbeds } from "./modules/embed.js";
+import { initApplication } from "./modules/application.js";
 
 // Signalisiert dem CSS, dass JS läuft — erst dann werden Reveal-Elemente
 // versteckt. Ohne JS bleibt alles sichtbar.
@@ -65,7 +66,10 @@ export function init() {
   initScroll();
   initAnchors();
 
-  initTransitions();
+  /* Kein `initTransitions()` mehr: Das Modul war der Seitenwechsel aus der
+     Vor-Router-Zeit und suchte `[data-transition-wrap]` — Markup, das es
+     seit Astros ClientRouter nirgends mehr gibt. Den Wechsel trägt
+     Transition.astro mit eigenem Inline-Skript. */
   initNav();
   initHero();
 
@@ -99,7 +103,6 @@ export function init() {
     initGallery(); initRing(); initFacts(); initTimeline();
     initMediaParallax();
     initStories();
-    initMarquee();
     initToothRings();
 
     initAccordion();
@@ -107,6 +110,8 @@ export function init() {
     initForm();
     initToc();
     initFilter();
+    initEmbeds();
+    initApplication();
 
     wennGescrolltWird(() => {
       /* Der durchlaufende Pfad misst seine Länge Stützstelle für Stützstelle

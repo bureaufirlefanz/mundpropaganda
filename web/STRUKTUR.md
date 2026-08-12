@@ -228,10 +228,10 @@ Unchanged: the modules in `../src/js/` are driven through `data-` attributes. A
 component brings its attribute, the module finds it. No framework, no
 hydration, no lifecycles.
 
-`../src/js/init.js` holds the module list; `main.js` next to it adds the global
-stylesheets and the self-start for the prototype. The Astro app includes
-`init.js` and calls it again on every `astro:page-load` — after a page
-transition every module has to start over.
+`../src/js/init.js` holds the module list. The Astro app includes it and calls
+`init()` again on every `astro:page-load` — after a page transition every
+module has to start over. (A `main.js` that added stylesheets and a self-start
+existed only on the prototype's side, in `prototypen/vite/src/js/`.)
 
 Binding, as laid down in the styleguide:
 
