@@ -1,0 +1,385 @@
+---
+/**
+ * Das Bewerbungsformular: mehrere Schritte, je nach Rolle andere Fragen.
+ *
+ * ── Wie es zusammenhängt ─────────────────────────────────────────────────
+ *
+ * Schritt 1  Rolle wählen. Bestimmt alles Weitere: die Fragen in Schritt 3
+ *            und die Adresse, an die es geht.
+ * Schritt 2  Name, E-Mail, Telefon. Bei jeder Rolle gleich.
+ * Schritt 3  Die Fragen, die im Studio an DIESER Stelle hängen. Hat eine
+ *            Stelle keine, entfällt der Schritt für sie — nicht für alle.
+ * Schritt 4  Freier Text, dann abschicken.
+ *
+ * ── Warum die Fragen aller Rollen im Markup stehen ───────────────────────
+ *
+ * Die Seite ist statisch. Es gibt keinen Server, der auf die Wahl in
+ * Schritt 1 hin Schritt 3 nachliefern könnte. Also steht alles da, und das
+ * Skript blendet aus, was nicht zur Wahl gehört. Ausgeblendete Felder
+ * bekommen `disabled` — sonst prüft der Browser Pflichtfelder mit, die
+ * niemand sehen kann, und das Formular ließe sich nicht abschicken, ohne
+ * dass irgendwo etwas rot wird.
+ *
+ * ── Wohin es geht ────────────────────────────────────────────────────────
+ *
+ * Vorerst in eine vorbereitete E-Mail (`mailto:`) an die Adresse, die an der
+ * Stelle hinterlegt ist. Das ist bewusst der kleine Schritt: Es funktioniert
+ * sofort, speichert nichts bei Dritten und wirft keine Datenschutzfragen
+ * auf. Es kann dafür keine Anhänge — Lebenslauf und Zeugnisse hängt die
+ * Bewerberin selbst an die geöffnete Mail.
+ *
+ * Der richtige Versand mit Datei-Upload steht als Aufgabe 15 in
+ * `CMS-UMBAU.md`. Bis dahin gilt: Dieses Formular verliert nichts, weil es
+ * nichts selbst verschickt — anders als das Kontaktformular, das bis heute
+ * `preventDefault()` ruft und dann „Danke" auf den Knopf schreibt.
+ */
+import Panel from "../ui/Panel.astro";
+import Button from "../ui/Button.astro";
+import type { Job } from "../../lib/careers";
+
+interface Props {
+  id?: string;
+  topline: string;
+  headline: string;
+  text?: string;
+  jobs: Job[];
+  /** Adresse für Stellen, an denen keine eigene hinterlegt ist. */
+  fallbackEmail?: string;
+}
+
+const { id, topline, headline, text, jobs, fallbackEmail } = Astro.props;
+
+/* Nur Stellen, die überhaupt eine Adresse haben — eigene oder allgemeine.
+   Eine Rolle zur Wahl zu stellen, deren Bewerbung nirgends ankommt, ist
+   schlimmer, als sie wegzulassen. */
+const waehlbar = jobs.filter((j) => j.applicationEmail || fallbackEmail);
+
+const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
+---
+
+{waehlbar.length > 0 && (
+  <Panel id={id} topline={topline} title={headline} text={text}>
+    <form class="c-apply" data-apply novalidate>
+      {/* Der Fortschritt. `aria-hidden`, weil jede Legende die Schrittzahl
+          als sr-only-Zusatz trägt („Schritt 2 von 4") — dieselbe Auskunft
+          zweimal vorgelesen hilft niemandem. */}
+      <ol class="c-apply__fortschritt" aria-hidden="true">
+        {SCHRITTE.map((name, i) => (
+          <li class="c-apply__marke" data-apply-marke={i}>
+            <span class="c-apply__marke-zahl">{i + 1}</span>
+            <span class="c-apply__marke-name">{name}</span>
+          </li>
+        ))}
+      </ol>
+
+      {/* ── Schritt 1: Rolle ─────────────────────────────────────────── */}
+      <fieldset class="c-apply__schritt" data-apply-schritt="0">
+        <legend class="c-apply__legende">
+          <span class="sr-only">Schritt 1 von 4: </span>Ich bewerbe mich auf die Anstellung als
+        </legend>
+
+        <div class="c-apply__rollen">
+          {waehlbar.map((j, i) => (
+            <label class="c-apply__rolle">
+              <input
+                type="radio"
+                name="rolle"
+                value={j.title}
+                data-apply-rolle={j.handle}
+                data-apply-mail={j.applicationEmail || fallbackEmail}
+                required={i === 0}
+              />
+              <span class="c-apply__rolle-text">
+                <span class="c-apply__rolle-titel">{j.title}</span>
+                {(j.kind || j.location) && (
+                  <span class="c-apply__rolle-info">
+                    {[j.kind, j.location].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {/* ── Schritt 2: Kontakt ───────────────────────────────────────── */}
+      <fieldset class="c-apply__schritt" data-apply-schritt="1" hidden>
+        <legend class="c-apply__legende">
+          <span class="sr-only">Schritt 2 von 4: </span>Wie erreichen wir dich?
+        </legend>
+
+        <div class="c-field" data-field>
+          <label class="c-field__label" for="a-name">Name <span>*</span></label>
+          <div class="c-field__control">
+            <input id="a-name" name="name" type="text" autocomplete="name" required />
+            <span class="c-field__error" aria-hidden="true">!</span>
+          </div>
+        </div>
+
+        <div class="c-field" data-field>
+          <label class="c-field__label" for="a-mail">E-Mail-Adresse <span>*</span></label>
+          <div class="c-field__control">
+            <input id="a-mail" name="email" type="email" autocomplete="email" required />
+            <span class="c-field__error" aria-hidden="true">!</span>
+          </div>
+        </div>
+
+        <div class="c-field" data-field>
+          <label class="c-field__label" for="a-tel">Telefon</label>
+          <div class="c-field__control">
+            <input id="a-tel" name="telefon" type="tel" autocomplete="tel" />
+          </div>
+        </div>
+      </fieldset>
+
+      {/* ── Schritt 3: Fragen je Rolle ───────────────────────────────── */}
+      <fieldset class="c-apply__schritt" data-apply-schritt="2" hidden>
+        <legend class="c-apply__legende">
+          <span class="sr-only">Schritt 3 von 4: </span>Zwei Fragen zur Stelle
+        </legend>
+
+        {waehlbar.map((j) => (
+          <div class="c-apply__fragen" data-apply-fragen={j.handle} hidden>
+            {(j.applicationQuestions ?? []).map((f, i) => {
+              const feldId = `a-${j.handle}-${i}`;
+              return (
+                <div class="c-field" data-field>
+                  <label class="c-field__label" for={feldId}>
+                    {f.label} {f.required && <span>*</span>}
+                  </label>
+                  <div class="c-field__control">
+                    {f.kind === "long" ? (
+                      <textarea id={feldId} name={f.label} rows="4" required={f.required} disabled />
+                    ) : f.kind === "choice" ? (
+                      <select id={feldId} name={f.label} required={f.required} disabled>
+                        <option value="">Bitte wählen</option>
+                        {(f.choices ?? []).map((w) => (
+                          <option value={w}>{w}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input id={feldId} name={f.label} type="text" required={f.required} disabled />
+                    )}
+                    <span class="c-field__error" aria-hidden="true">!</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </fieldset>
+
+      {/* ── Schritt 4: Nachricht ─────────────────────────────────────── */}
+      <fieldset class="c-apply__schritt" data-apply-schritt="3" hidden>
+        <legend class="c-apply__legende">
+          <span class="sr-only">Schritt 4 von 4: </span>Willst du uns noch etwas sagen?
+        </legend>
+
+        <div class="c-field" data-field>
+          <label class="c-field__label" for="a-text">Nachricht</label>
+          <div class="c-field__control">
+            <textarea id="a-text" name="nachricht" rows="5"></textarea>
+          </div>
+        </div>
+
+        {/* Ehrlich sein, statt zu überraschen: Der Knopf öffnet das
+            E-Mail-Programm. Wer das nicht erwartet, hält es für einen
+            Fehler und bewirbt sich nicht. */}
+        <p class="c-apply__hinweis">
+          Der Knopf öffnet dein E-Mail-Programm mit allem, was du hier
+          eingetragen hast. Lebenslauf und Zeugnisse hängst du dort an und
+          schickst die Mail ab.
+        </p>
+      </fieldset>
+
+      {/* ── Steuerung ────────────────────────────────────────────────── */}
+      <div class="c-apply__steuerung">
+        <button class="c-apply__zurueck" type="button" data-apply-zurueck hidden>
+          Zurück
+        </button>
+        {/* Die Hülle trägt das Steuer-Attribut, der Knopf kommt aus der
+            Komponente. Ein von Hand geschriebenes `class="c-btn"` bliebe
+            nackt: Die Optik liegt scoped in Button.astro, und dieses Markup
+            bekäme eine andere Scope-Kennung. Klicks steigen zur Hülle auf,
+            `hidden` an ihr versteckt den Knopf mit. */}
+        <span class="c-apply__weiter" data-apply-weiter>
+          <Button label="Weiter" type="button" />
+        </span>
+        <span class="c-apply__absenden" data-apply-absenden hidden>
+          <Button label="Bewerbung schreiben" href="#" />
+        </span>
+      </div>
+    </form>
+  </Panel>
+)}
+
+<style>
+  .c-apply {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-8);
+    max-width: 58ch;
+  }
+
+  /* --- Fortschritt ------------------------------------------------------ */
+
+  .c-apply__fortschritt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .c-apply__marke {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-label);
+    color: var(--c-text-muted);
+    opacity: 0.5;
+    transition: opacity var(--d-base) var(--e-out);
+  }
+
+  /* Der aktuelle Schritt und alle davor sind voll deckend — man soll sehen,
+     wie weit man ist, nicht nur wo. Das Attribut setzt application.js. */
+  .c-apply__marke[data-erreicht] {
+    opacity: 1;
+  }
+
+  .c-apply__marke-zahl {
+    display: grid;
+    place-items: center;
+    width: 1.8em;
+    height: 1.8em;
+    border-radius: var(--r-round);
+    border: 1px solid var(--c-line);
+    font-size: 0.9em;
+    line-height: 1;
+  }
+
+  .c-apply__marke[data-aktiv] .c-apply__marke-zahl {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+    color: var(--c-dark);
+  }
+
+  /* --- Schritte --------------------------------------------------------- */
+
+  /* `border: 0` und `padding: 0`: Der Browser gibt <fieldset> einen eigenen
+     Rahmen und Innenabstand, die hier nur stören. Das Element bleibt, weil
+     es die Felder für Vorlesegeräte zu einer Gruppe zusammenfasst. */
+  .c-apply__schritt {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .c-apply__legende {
+    padding: 0;
+    margin-bottom: var(--sp-2);
+    font-size: var(--fs-text-large);
+    line-height: 1.3;
+  }
+
+  /* --- Rollenwahl ------------------------------------------------------- */
+
+  .c-apply__rollen {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .c-apply__rolle {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: border-color var(--d-base) var(--e-out),
+      background var(--d-base) var(--e-out);
+  }
+
+  .c-apply__rolle:hover {
+    border-color: var(--c-dark);
+  }
+
+  /* `:has()` statt einer Klasse vom Skript: Der Zustand steht schon im
+     Formular, ein zweiter im DOM liefe auseinander. */
+  .c-apply__rolle:has(input:checked) {
+    border-color: var(--c-dark);
+    background: color-mix(in srgb, var(--c-brand) 14%, transparent);
+  }
+
+  .c-apply__rolle:has(input:focus-visible) {
+    outline: 2px solid var(--c-dark);
+    outline-offset: 2px;
+  }
+
+  .c-apply__rolle input {
+    flex: 0 0 auto;
+    margin-top: 0.2em;
+    accent-color: var(--c-dark);
+  }
+
+  .c-apply__rolle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .c-apply__rolle-titel {
+    font-size: var(--fs-text-main);
+    line-height: 1.3;
+  }
+
+  .c-apply__rolle-info {
+    font-size: var(--fs-text-small);
+    color: var(--c-text-muted);
+  }
+
+  /* --- Hinweis und Steuerung -------------------------------------------- */
+
+  .c-apply__hinweis {
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  .c-apply__steuerung {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .c-apply__zurueck {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--c-text-muted);
+    font-family: inherit;
+    font-size: var(--fs-text-small);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+
+  .c-apply__zurueck:hover {
+    color: var(--c-dark);
+  }
+
+  /* Der Weiter-Knopf steht rechts vom Zurück-Link, aber vor dem Absenden —
+     `margin-inline-start: auto` schiebt beide ans Ende der Reihe. */
+  .c-apply__weiter,
+  .c-apply__absenden {
+    margin-inline-start: auto;
+  }
+</style>

@@ -1,0 +1,193 @@
+---
+/**
+ * Ein YouTube-Video, das erst auf Klick lädt.
+ *
+ * **Warum nicht einfach ein <iframe>:** Ein eingebettetes YouTube-Video
+ * kontaktiert Googles Server, sobald die Seite lädt, und setzt dabei
+ * Kennungen — auch dann, wenn niemand auf Abspielen drückt. Für eine
+ * Zahnarztpraxis in Deutschland heißt das: Es bräuchte ein
+ * Einwilligungsbanner, und die Seite hat keines. Dieselbe Überlegung wie bei
+ * Plausible in den Einstellungen.
+ *
+ * Deshalb liegt hier zunächst nur ein Standbild mit einem Abspielknopf. Erst
+ * der Klick tauscht es gegen das iframe. Bis dahin geht keine einzige
+ * Anfrage nach außen.
+ *
+ * `youtube-nocookie.com` als Domain: Sie setzt keine Werbe-Kennungen. Das
+ * ersetzt die Einwilligung nicht, aber nach dem Klick hat der Besucher
+ * bewusst gehandelt, und die sparsamere Domain ist dann das Mindeste.
+ *
+ * Das Standbild kommt aus dem CMS, wenn eines gepflegt ist. Sonst von
+ * YouTube — das lädt dann doch von einem Google-Server, weshalb das Feld im
+ * Studio ausdrücklich zum eigenen Bild rät.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Props {
+  url: string;
+  title?: string;
+  poster?: ImageSource;
+}
+
+const { url, title, poster } = Astro.props;
+
+/**
+ * Die Kennung aus jeder der drei Adressformen, die YouTube ausgibt:
+ * `watch?v=…`, `youtu.be/…` und `embed/…`. Ohne Kennung rendert der
+ * Baustein nichts — eine Adresse, die wir nicht lesen können, soll keinen
+ * kaputten Rahmen erzeugen.
+ */
+function videoId(adresse: string): string | null {
+  try {
+    const u = new URL(adresse);
+    if (u.hostname.endsWith("youtu.be")) return u.pathname.slice(1) || null;
+    if (u.searchParams.has("v")) return u.searchParams.get("v");
+    const treffer = u.pathname.match(/\/embed\/([^/?]+)/);
+    return treffer ? treffer[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+const id = videoId(url);
+
+/* `rel=0` hält die Vorschläge am Ende bei diesem Kanal, `autoplay=1` startet
+   sofort — der Klick auf den Knopf war schon die Aufforderung, ein zweiter
+   auf den Abspielpfeil im iframe wäre einer zu viel. */
+const einbettung = id
+  ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`
+  : null;
+
+/* Das Vorschaubild von YouTube. `hqdefault` und nicht `maxresdefault`: Das
+   gibt es nicht zu jedem Video, und ein fehlendes Bild wäre eine graue
+   Fläche mit einem Knopf darin. */
+const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+---
+
+{einbettung && (
+  <section class="s-video container">
+    {title && <h2 class="s-video__title" data-split="lines">{title}</h2>}
+
+    {/*
+      Ein <button> und kein <div> mit Klickfänger: Das Ding tut etwas, also
+      muss es mit der Tastatur erreichbar sein und sich als Schaltfläche
+      ansagen. Das Attribut trägt die Adresse — das Skript baut daraus das
+      iframe, damit die Adresse nicht doppelt im Markup steht.
+    */}
+    <button
+      class="s-video__rahmen"
+      type="button"
+      data-embed={einbettung}
+      aria-label={title ? `Video abspielen: ${title}` : "Video abspielen"}
+      data-reveal="scale"
+    >
+      {isCmsImage(poster) ? (
+        <CmsImage
+          source={poster}
+          alt=""
+          widths={[640, 1024, 1600]}
+          sizes="(max-width: 900px) 92vw, 80vw"
+        />
+      ) : (
+        notBild && <img src={notBild} alt="" loading="lazy" width="480" height="360" />
+      )}
+
+      <span class="s-video__knopf" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28">
+          <path d="M8 5v14l11-7z" fill="currentColor" />
+        </svg>
+      </span>
+    </button>
+
+    {/* Wer kein JavaScript hat, bekommt wenigstens den Weg zum Video. */}
+    <noscript>
+      <a class="s-video__aus" href={url} rel="noopener">Video bei YouTube ansehen</a>
+    </noscript>
+  </section>
+)}
+
+<style>
+  .s-video {
+    padding-block: var(--section-space);
+  }
+
+  .s-video__title {
+    max-width: 24ch;
+    margin-bottom: var(--sp-8);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ein Knopf, der wie eine Fläche aussieht: Der Browser gibt <button> einen
+     eigenen Rahmen, eine Grundfarbe und mittigen Text — alles drei muss hier
+     weg, sonst sitzt das Bild in einem grauen Kasten. */
+  .s-video__rahmen {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+    aspect-ratio: 16 / 9;
+    cursor: pointer;
+  }
+
+  /* :global(img), weil das Bild aus CmsImage.astro kommt und das
+     Scope-Attribut dieser Datei nicht trägt. */
+  .s-video__rahmen :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--d-slow) var(--e-out);
+  }
+
+  .s-video__rahmen:hover :global(img) {
+    transform: scale(1.02);
+  }
+
+  /* Der Abspielknopf. Markenfarbe auf Dunkel misst über 8:1 — er muss auf
+     jedem Standbild lesbar bleiben, auch auf einem hellen. */
+  .s-video__knopf {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: clamp(56px, 7vw, 88px);
+    height: clamp(56px, 7vw, 88px);
+    padding-left: 4px;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    transition: scale var(--d-base) var(--e-out);
+  }
+
+  .s-video__rahmen:hover .s-video__knopf {
+    scale: 1.08;
+  }
+
+  .s-video__rahmen:focus-visible {
+    outline: 2px solid var(--c-dark);
+    outline-offset: 4px;
+  }
+
+  /* Das eingesetzte iframe füllt denselben Rahmen. */
+  .s-video__rahmen :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .s-video__aus {
+    display: inline-block;
+    margin-top: var(--sp-4);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

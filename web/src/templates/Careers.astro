@@ -32,6 +32,10 @@ import Compare from "../components/sections/Compare.astro";
 import Jobs from "../components/sections/Jobs.astro";
 import Timeline from "../components/sections/Timeline.astro";
 import Voices from "../components/sections/Voices.astro";
+import VideoBlock from "../components/sections/VideoBlock.astro";
+import Perks from "../components/sections/Perks.astro";
+import Reasons from "../components/sections/Reasons.astro";
+import Application from "../components/sections/Application.astro";
 import Panel from "../components/ui/Panel.astro";
 import Button from "../components/ui/Button.astro";
 import Faq from "../components/sections/Faq.astro";
@@ -81,6 +85,21 @@ const ablauf =
     ? { headline: d.processHeadline, stages: d.processStages }
     : undefined;
 
+const woche =
+  d?.weekTopline && d.weekHeadline && d.weekText
+    ? { topline: d.weekTopline, headline: d.weekHeadline, text: d.weekText }
+    : undefined;
+
+const vorteile =
+  d?.benefitsTopline && d.benefitsHeadline && d.benefitsItems?.length
+    ? { topline: d.benefitsTopline, headline: d.benefitsHeadline, items: d.benefitsItems }
+    : undefined;
+
+const gruende =
+  d?.reasonsTopline && d.reasonsHeadline && d.reasonsItems?.length
+    ? { topline: d.reasonsTopline, headline: d.reasonsHeadline, items: d.reasonsItems }
+    : undefined;
+
 /* Die Stellen sind der Zweck der Seite. Ohne ausgeschriebene Stelle entfällt
    der Abschnitt — dann trägt die Initiativbewerbung darunter die Seite. */
 const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
@@ -100,9 +119,24 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
   {intro && <Intro {...intro} lead={d?.lead} action={action?.text} actionHref={action?.href} />}
 
+  {/* Das Video steht direkt hinter der Haltung: Es zeigt, was der Absatz
+      darüber behauptet. Weiter unten, zwischen Vergleichstabelle und
+      Stellen, wäre es eine Unterbrechung. */}
+  {d?.videoUrl && (
+    <VideoBlock url={d.videoUrl} title={d.videoTitle ?? undefined} poster={d.videoPoster} />
+  )}
+
   {figures && <Facts {...figures} />}
 
+  {/* Die 4-Tage-Woche als eigener Block und nicht als Zeile in der Liste
+      darunter — sie ist das Argument, das die Seite trägt. */}
+  {woche && <Panel id="vier-tage" topline={woche.topline} title={woche.headline} text={woche.text} />}
+
+  {vorteile && <Perks {...vorteile} />}
+
   {vergleich && <Compare {...vergleich} />}
+
+  {gruende && <Reasons {...gruende} />}
 
   {zeigeStellen && d && (
     <Jobs
@@ -111,12 +145,24 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
       headline={d.jobsHeadline!}
       jobs={jobs}
       applicationEmail={d.applicationEmail ?? ""}
+      text={d.jobsText ?? undefined}
     />
   )}
 
   {voices && <Voices {...voices} />}
 
   {ablauf && <Timeline {...ablauf} />}
+
+  {/* Hinter dem Ablauf: Erst weiß man, was einen erwartet, dann bewirbt man
+      sich. Davor wäre das Formular eine Aufforderung ohne Auskunft. */}
+  <Application
+    id="bewerben"
+    topline="Bewerbung"
+    headline="In vier Schritten zu uns"
+    text="Wähle die Stelle, auf die du dich bewirbst - die Fragen richten sich danach."
+    jobs={jobs}
+    fallbackEmail={d?.applicationEmail ?? undefined}
+  />
 
   {d?.speculativeTopline && d.speculativeTitle && (
     <Panel

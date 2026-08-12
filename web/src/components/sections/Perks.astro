@@ -1,0 +1,103 @@
+---
+/**
+ * Was die Praxis bietet, als Liste. Auf der Karriereseite.
+ *
+ * Nicht zu verwechseln mit `Benefits.astro`: Das ist das dunkle Band der
+ * Leistungsseite mit Auswahlliste und Bildbühne. Hier geht es um fünfzehn
+ * kurze Angaben, die man überfliegt — Müslibar, BVG-Ticket, Fortbildung.
+ *
+ * Mehrspaltig über `columns` und nicht über ein Raster: Die Punkte sind
+ * unterschiedlich lang, ein Raster erzwänge gleich hohe Zellen und risse
+ * Lücken. `columns` füllt und bricht von selbst um.
+ *
+ * Kein Symbol je Zeile. Fünfzehn Piktogramme, die zwischen Müslibar und
+ * Fortbildung unterscheiden müssten, werden entweder beliebig oder albern;
+ * ein einheitlicher Haken vor jeder Zeile sagt nichts, was die Liste nicht
+ * schon sagt.
+ */
+interface Props {
+  topline: string;
+  headline: string;
+  items: string[];
+}
+
+const { topline, headline, items } = Astro.props;
+---
+
+<section class="s-perks container">
+  <div class="s-perks__head">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
+    <h2 class="s-perks__title" data-split="lines">{headline}</h2>
+  </div>
+
+  <ul class="s-perks__liste" data-reveal-stagger="0.03">
+    {items.map((punkt) => (
+      <li class="s-perks__punkt" data-reveal-child>{punkt}</li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .s-perks {
+    padding-block: var(--section-space);
+  }
+
+  .s-perks__head {
+    max-width: 34ch;
+    margin-bottom: var(--sp-10);
+  }
+
+  .s-perks__title {
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .s-perks__liste {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    columns: 3;
+    column-gap: var(--site-gutter);
+  }
+
+  /* `break-inside: avoid` hält einen umbrechenden Punkt zusammen — sonst
+     stünde „Team-Events & Wöchentliches" unten in der einen Spalte und
+     „Team-Meeting" oben in der nächsten. */
+  .s-perks__punkt {
+    display: flex;
+    gap: var(--sp-3);
+    break-inside: avoid;
+    padding-block: var(--sp-3);
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-text-main);
+    line-height: 1.4;
+  }
+
+  /* Ein kurzer Strich in Markenfarbe statt eines Aufzählungspunkts. Als
+     eigenes Flex-Element und nicht als `list-style`: So rückt eine
+     zweizeilige Angabe unter dem Text ein und nicht unter dem Strich.
+     `margin-top` hebt ihn auf die Mitte der ersten Zeile. */
+  .s-perks__punkt::before {
+    content: "";
+    flex: 0 0 auto;
+    width: var(--sp-4);
+    height: 1px;
+    margin-top: 0.7em;
+    background: var(--c-brand);
+  }
+
+  @media (max-width: 900px) {
+    .s-perks__liste {
+      columns: 2;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .s-perks__liste {
+      columns: 1;
+    }
+  }
+</style>

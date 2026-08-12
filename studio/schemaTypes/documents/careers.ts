@@ -32,8 +32,12 @@ import { CaseIcon } from "@sanity/icons/Case";
 const gruppen = [
   { name: "header", title: "Kopf", default: true },
   { name: "intro", title: "Haltung" },
+  { name: "video", title: "Video" },
   { name: "figures", title: "Zahlen" },
+  { name: "week", title: "4-Tage-Woche" },
+  { name: "benefits", title: "Das bekommst du" },
   { name: "comparison", title: "Vergleich" },
+  { name: "reasons", title: "Gründe" },
   { name: "jobs", title: "Stellen" },
   { name: "voices", title: "Stimmen" },
   { name: "process", title: "Ablauf" },
@@ -100,6 +104,39 @@ export const karriere = defineType({
       validation: (r) => r.required().max(2),
     }),
 
+    /* --- Video -----------------------------------------------------------
+       Wahlfrei und als Ganzes: Ohne Adresse entfällt der Abschnitt. Ein
+       Standbild ohne Video wäre ein Knopf, der nichts tut. */
+    defineField({
+      name: "videoUrl",
+      title: "Adresse des Videos",
+      type: "url",
+      description:
+        "Ein Link zu YouTube, wie er in der Adresszeile steht. Das Video lädt erst, wenn jemand darauf klickt - vorher geht keine Anfrage an YouTube und es wird kein Cookie gesetzt.",
+      group: "video",
+      validation: (r) =>
+        r.uri({ scheme: ["http", "https"] }).custom((wert) =>
+          !wert || /(?:youtube\.com|youtu\.be)/.test(String(wert))
+            ? true
+            : "Bisher werden nur YouTube-Adressen unterstützt."
+        ),
+    }),
+    defineField({
+      name: "videoTitle",
+      title: "Überschrift",
+      type: "string",
+      description: "Steht über dem Video.",
+      group: "video",
+    }),
+    defineField({
+      name: "videoPoster",
+      title: "Standbild",
+      type: "picture",
+      description:
+        "Was vor dem Klick zu sehen ist. Leer lassen: dann nimmt die Seite das Vorschaubild von YouTube - das lädt allerdings von einem YouTube-Server, ein eigenes Bild ist datensparsamer.",
+      group: "video",
+    }),
+
     /* --- Zahlen --------------------------------------------------------- */
     ...heading("figures", "figures"),
     defineField({
@@ -130,6 +167,35 @@ export const karriere = defineType({
         }),
       ],
       validation: (r) => r.required().min(2),
+    }),
+
+    /* --- 4-Tage-Woche ----------------------------------------------------
+       Ein eigener Abschnitt und keine Zeile in der Vorteilsliste: Das ist
+       die Angabe, wegen der jemand die Seite überhaupt zu Ende liest. Unter
+       fünfzehn Aufzählungspunkten ginge sie unter. */
+    ...heading("week", "week"),
+    defineField({
+      name: "weekText",
+      title: "Text",
+      type: "text",
+      rows: 5,
+      group: "week",
+      validation: (r) => r.required(),
+    }),
+
+    /* --- Das bekommst du -------------------------------------------------
+       Eine schlichte Liste. Kein Feld für ein Symbol je Zeile: Fünfzehn
+       Piktogramme, die zwischen Müslibar und Fortbildung unterscheiden
+       müssten, werden entweder beliebig oder albern. */
+    ...heading("benefits", "benefits"),
+    defineField({
+      name: "benefitsItems",
+      title: "Punkte",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Je Zeile ein Punkt. Kurz halten - eine Liste liest niemand als Fließtext.",
+      group: "benefits",
+      validation: (r) => r.required().min(3),
     }),
 
     /* --- Vergleich ------------------------------------------------------ */
@@ -229,8 +295,56 @@ export const karriere = defineType({
       group: "comparison",
     }),
 
+    /* --- Gründe ----------------------------------------------------------
+       Drei Blöcke, die je eine Frage beantworten, die vor einer Bewerbung
+       wirklich gestellt wird: Wie komme ich hin, mit wem arbeite ich, wo
+       sitze ich. Kein Bild je Block - drei Motive nebeneinander lenken vom
+       Text ab, und es sind Antworten, keine Ansichten. */
+    ...heading("reasons", "reasons"),
+    defineField({
+      name: "reasonsItems",
+      title: "Blöcke",
+      type: "array",
+      group: "reasons",
+      description: "Zwei bis vier. Bei mehr wird die Reihe eng.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "reason",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Überschrift",
+              type: "string",
+              description:
+                "Sagt, worum es im Block geht. Keine Suchbegriffe - „Familien Zahnarzt Berlin“ über einem Text zum Team liest sich wie ein Versehen, und genau so war es auf der alten Seite.",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Text",
+              type: "text",
+              rows: 4,
+              validation: (r) => r.required(),
+            }),
+          ],
+          preview: { select: { title: "title", subtitle: "text" } },
+        }),
+      ],
+      validation: (r) => r.required().min(2).max(4),
+    }),
+
     /* --- Stellen -------------------------------------------------------- */
     ...heading("jobs", "jobs"),
+    defineField({
+      name: "jobsText",
+      title: "Einleitung über der Liste",
+      type: "text",
+      rows: 5,
+      description:
+        "Der Anspruch, aus dem sich die Anforderungen ergeben. Steht über den Ausschreibungen, damit die Aufzählungen darunter nicht wie eine Wunschliste ohne Begründung wirken.",
+      group: "jobs",
+    }),
 
     /* --- Stimmen -------------------------------------------------------- */
     ...heading("voices", "voices"),
