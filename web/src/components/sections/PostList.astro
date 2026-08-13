@@ -25,15 +25,15 @@ const { posts } = Astro.props;
    in der sie zuerst auftauchen, also nach Datum. Eine feste Reihenfolge aus
    dem Schema abzuschreiben wäre die zweite Stelle, an der dieselbe Liste
    steht. */
-const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as string[];
+const categories = [...new Set(posts.map((b) => b.category).filter(Boolean))] as string[];
 ---
 
-<section class="container s-postliste">
-  <div class="s-postliste__leiste">
-    <Filter kategorien={kategorien} gesamt={posts.length} />
+<section class="container s-postlist">
+  <div class="s-postlist__bar">
+    <Filter categories={categories} total={posts.length} />
   </div>
 
-  <div class="s-postliste__raster" data-reveal-stagger="0.06">
+  <div class="s-postlist__grid" data-reveal-stagger="0.06">
     {posts.map((p, i) => (
       <PostKarte
         post={p}
@@ -47,14 +47,14 @@ const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
 </section>
 
 <style>
-  .s-postliste {
+  .s-postlist {
     padding-block: var(--section-space-sm) var(--section-space);
   }
 
   /* Die Leiste steht über dem Raster und behält ihre Höhe, auch wenn kein
      Filter gerendert wird (eine einzige Kategorie) — sonst rückte das Raster
      auf manchen Seiten hoch und auf anderen nicht. */
-  .s-postliste__leiste {
+  .s-postlist__bar {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -70,7 +70,7 @@ const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
 
      `align-items: start`, sonst dehnen die Zellen ihren Inhalt auf die
      Zeilenhöhe und die weiße Fläche hinge unter dem Knopf. */
-  .s-postliste__raster {
+  .s-postlist__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
@@ -78,13 +78,13 @@ const kategorien = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
   }
 
   @media (max-width: 1000px) {
-    .s-postliste__raster {
+    .s-postlist__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 640px) {
-    .s-postliste__raster {
+    .s-postlist__grid {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-10) 0;
     }

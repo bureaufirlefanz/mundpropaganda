@@ -43,19 +43,19 @@ let schema;
 try {
   const stand = statSync(ZIEL);
   if (stand.mtimeMs < BEGONNEN - 1000) {
-    throw new Error("schema.json ist älter als dieser Lauf — es wurde nicht neu geschrieben.");
+    throw new Error("schema.json ist älter als dieser Lauf — es wurde nicht next geschrieben.");
   }
   schema = JSON.parse(readFileSync(ZIEL, "utf8"));
   if (!Array.isArray(schema) || schema.length === 0) {
     throw new Error("schema.json ist leer oder hat nicht die erwartete Form.");
   }
-  const namen = new Set(schema.map((t) => t?.name));
-  const fehlend = PFLICHT.filter((n) => !namen.has(n));
-  if (fehlend.length) {
-    throw new Error(`Im Schema fehlen: ${fehlend.join(", ")}`);
+  const names = new Set(schema.map((t) => t?.name));
+  const missing = PFLICHT.filter((n) => !names.has(n));
+  if (missing.length) {
+    throw new Error(`Im Schema fehlen: ${missing.join(", ")}`);
   }
-} catch (fehler) {
-  console.error(`\n✗ Schema-Export fehlgeschlagen: ${fehler.message}`);
+} catch (error) {
+  console.error(`\n✗ Schema-Export fehlgeschlagen: ${error.message}`);
   process.exit(1);
 }
 

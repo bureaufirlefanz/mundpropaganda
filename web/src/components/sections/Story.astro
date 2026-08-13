@@ -38,21 +38,21 @@ const { topline, headline, columns, image, figures } = Astro.props;
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-story__title" data-split="lines">{headline}</h2>
 
-    {columns.map((absatz, i) => (
-      <p class="s-story__absatz" data-reveal="up" data-reveal-delay={0.08 * (i + 1)}>
-        {absatz}
+    {columns.map((paragraph, i) => (
+      <p class="s-story__paragraph" data-reveal="up" data-reveal-delay={0.08 * (i + 1)}>
+        {paragraph}
       </p>
     ))}
 
     {figures && figures.length > 0 && (
-      <dl class="s-story__zahlen" data-reveal-stagger="0.08">
+      <dl class="s-story__figures" data-reveal-stagger="0.08">
         {figures.map((z) => (
-          <div class="s-story__zahl" data-reveal-child>
+          <div class="s-story__figure" data-reveal-child>
             {/* <dd> vor <dt> im Markup wäre falsch herum — die Zahl ist der
                 Wert, die Erläuterung der Begriff. `flex-direction: column-
                 reverse` dreht nur die Darstellung. */}
-            <dt class="s-story__zahl-text">{z.text}</dt>
-            <dd class="s-story__zahl-wert">{z.value}</dd>
+            <dt class="s-story__figure-label">{z.text}</dt>
+            <dd class="s-story__figure-value">{z.value}</dd>
           </div>
         ))}
       </dl>
@@ -61,7 +61,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
 
   {isCmsImage(image) && (
     <div class="s-story__media">
-      <div class="s-story__bild" data-reveal="right">
+      <div class="s-story__image" data-reveal="right">
         <CmsImage
           source={image}
           alt=""
@@ -95,26 +95,26 @@ const { topline, headline, columns, image, figures } = Astro.props;
   /* 60 Zeichen ist die Grenze, ab der das Auge die nächste Zeile nicht mehr
      sicher findet. Der Absatz bleibt darunter, auch wenn die Spalte breiter
      werden darf. */
-  .s-story__absatz {
+  .s-story__paragraph {
     max-width: 58ch;
     font-size: var(--fs-text-main);
     line-height: 1.6;
   }
 
-  .s-story__absatz + .s-story__absatz {
+  .s-story__paragraph + .s-story__paragraph {
     margin-top: var(--sp-4);
   }
 
   /* --- Zahlen ----------------------------------------------------------- */
 
-  .s-story__zahlen {
+  .s-story__figures {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
     gap: var(--sp-6) var(--sp-5);
     margin: clamp(var(--sp-8), 5vw, var(--sp-10)) 0 0;
   }
 
-  .s-story__zahl {
+  .s-story__figure {
     display: flex;
     flex-direction: column-reverse;
     gap: var(--sp-1);
@@ -122,7 +122,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
     border-top: 1px solid var(--c-line);
   }
 
-  .s-story__zahl-wert {
+  .s-story__figure-value {
     margin: 0;
     font-size: clamp(2rem, 3.4vw, 3.25rem);
     font-weight: 500;
@@ -130,7 +130,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
     letter-spacing: -0.03em;
   }
 
-  .s-story__zahl-text {
+  .s-story__figure-label {
     font-size: var(--fs-text-small);
     line-height: 1.35;
     color: var(--c-text-muted);
@@ -147,7 +147,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
     margin-top: clamp(var(--sp-6), 4vw, var(--sp-10));
   }
 
-  .s-story__bild {
+  .s-story__image {
     overflow: hidden;
     aspect-ratio: 4 / 5;
     border-radius: var(--r-lg) var(--r-lg) clamp(80px, 10vw, 160px)
@@ -156,7 +156,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
   }
 
   /* :global(img), weil das Bild aus CmsImage.astro kommt. */
-  .s-story__bild :global(img) {
+  .s-story__image :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -175,7 +175,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
       margin-top: var(--sp-8);
     }
 
-    .s-story__bild {
+    .s-story__image {
       aspect-ratio: 3 / 2;
     }
   }

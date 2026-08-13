@@ -21,7 +21,7 @@ import { starteBrowser } from "./lib/chrome.mjs";
 
 const BASE = process.env.MP_BASE ?? "http://localhost:4322";
 const OUT = process.env.MP_OUT ?? ".shots/intro";
-const [pfad = "/"] = process.argv.slice(2);
+const [path = "/"] = process.argv.slice(2);
 
 // Dicht gelegt, wo die Choreografie einsetzt, weiter auseinander gegen Ende.
 const MS = [150, 300, 450, 600, 800, 1000, 1200, 1500, 1800, 2200, 2600, 3200, 4000];
@@ -36,7 +36,7 @@ await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 const RELOAD = process.env.MP_RELOAD === "1";
 await page.setCacheEnabled(RELOAD);
 
-const url = `${BASE}${pfad}${pfad.includes("?") ? "&" : "?"}nosmooth`;
+const url = `${BASE}${path}${path.includes("?") ? "&" : "?"}nosmooth`;
 
 if (RELOAD) {
   // Erst einmal vollständig laden, damit Schriften und Bilder im Cache

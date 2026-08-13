@@ -41,15 +41,15 @@ export async function schreibeBreiten() {
     je.get(name).add(Number(width));
   }
 
-  const fehlend = [];
+  const missing = [];
   for (const [name, widths] of je) {
     for (const b of widths) {
-      if (!files.includes(`${name}-${b}.webp`)) fehlend.push(`${name}-${b}.webp`);
+      if (!files.includes(`${name}-${b}.webp`)) missing.push(`${name}-${b}.webp`);
     }
   }
-  if (fehlend.length) {
+  if (missing.length) {
     throw new Error(
-      `Zu diesen AVIF-Dateien fehlt die WebP-Fassung: ${fehlend.join(", ")}.\n` +
+      `Zu diesen AVIF-Dateien fehlt die WebP-Fassung: ${missing.join(", ")}.\n` +
         `Der <source>-Rückfall liefe damit ins Leere. Bitte 'npm run images' laufen lassen.`
     );
   }

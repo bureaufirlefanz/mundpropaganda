@@ -78,9 +78,9 @@ export function pruefeSeite() {
     }
     if (!gestapelt.length) return { farbe: { r: 255, g: 255, b: 255, a: 1 } };
     // Von hinten nach vorn zusammenrechnen.
-    let ergebnis = { r: 255, g: 255, b: 255, a: 1 };
-    for (const f of gestapelt.reverse()) ergebnis = ueber(f, ergebnis);
-    return { farbe: ergebnis };
+    let result = { r: 255, g: 255, b: 255, a: 1 };
+    for (const f of gestapelt.reverse()) result = ueber(f, result);
+    return { farbe: result };
   }
 
   const bezeichne = (el) => {
@@ -200,30 +200,30 @@ export function pruefeSeite() {
 
 /** Aus dem Messergebnis lesbare Befunde bauen. */
 export function wcagBefunde(r) {
-  const liste = [];
+  const list = [];
 
   if (r.kontrast.length) {
     const schlimmster = r.kontrast.sort((a, b) => a.ist - b.ist)[0];
-    liste.push(
+    list.push(
       `${r.kontrast.length}× Kontrast unter AA — schlechtester ${schlimmster.ist}:1 statt ${schlimmster.soll}:1 ` +
         `(${schlimmster.el}, ${schlimmster.groesse}px, „${schlimmster.text}")`
     );
   }
   if (r.ohneNamen.length) {
-    liste.push(`${r.ohneNamen.length} Bedienelement(e) ohne zugänglichen Namen: ${r.ohneNamen[0]}`);
+    list.push(`${r.ohneNamen.length} Bedienelement(e) ohne zugänglichen Namen: ${r.ohneNamen[0]}`);
   }
   if (r.bilderOhneAlt.length) {
-    liste.push(`${r.bilderOhneAlt.length} Bild(er) ohne alt-Attribut: ${r.bilderOhneAlt[0]}`);
+    list.push(`${r.bilderOhneAlt.length} Bild(er) ohne alt-Attribut: ${r.bilderOhneAlt[0]}`);
   }
   if (r.felderOhneLabel.length) {
-    liste.push(`${r.felderOhneLabel.length} Formularfeld(er) ohne Beschriftung: ${r.felderOhneLabel[0]}`);
+    list.push(`${r.felderOhneLabel.length} Formularfeld(er) ohne Beschriftung: ${r.felderOhneLabel[0]}`);
   }
   if (r.spruenge.length) {
-    liste.push(`Überschriftenebene übersprungen: ${r.spruenge[0]}`);
+    list.push(`Überschriftenebene übersprungen: ${r.spruenge[0]}`);
   }
   if (r.h1 !== 1) {
-    liste.push(`${r.h1} h1 auf der Seite — genau eine ist gemeint`);
+    list.push(`${r.h1} h1 auf der Seite — genau eine ist gemeint`);
   }
 
-  return liste;
+  return list;
 }

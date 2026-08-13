@@ -38,7 +38,7 @@ const heading = (group: string, prefix: string) => [
   }),
 ];
 
-export const praxis = defineType({
+export const practice = defineType({
   name: "practice",
   title: "Praxis",
   type: "document",

@@ -9,7 +9,7 @@
  * Mechanik ein zweites Mal — und die zweite Fassung ist die, die man beim
  * nächsten Fehler vergisst.
  *
- * Das Erscheinungspicture folgt der Leistungstabelle: Zeilen mit Trennlinie,
+ * Das Erscheinungsbild folgt der Leistungstabelle: Zeilen mit Trennlinie,
  * Titel links, Angaben rechts, beim Überfahren färbt sich die Linie.
  */
 import Button from "../ui/Button.astro";
@@ -42,20 +42,20 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
         {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
             geben dann beim Ansteuern der Zeile den Stellentitel aus und
             nicht nur „Schaltfläche". */}
-        <h3 class="s-jobs__zeile-title">
-          <button class="s-jobs__zeile" data-accordion-trigger type="button">
+        <h3 class="s-jobs__row-title">
+          <button class="s-jobs__row" data-accordion-trigger type="button">
             {/* Reine Ordnungszahl. `aria-hidden`, weil sie sonst der
                 Überschrift vorangestellt vorgelesen würde — „null eins
                 Zahnmedizinische Fachangestellte". Die Reihenfolge ergibt
                 sich für Vorlesegeräte ohnehin aus der Liste. */}
-            <span class="s-jobs__nummer" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <span class="s-jobs__number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
 
             <span class="s-jobs__name">{s.title}</span>
 
             <span class="s-jobs__meta">
-              <span class="s-jobs__marke">{s.kind}</span>
-              <span class="s-jobs__ort">{s.location}</span>
-              <span class="s-jobs__zeit">{s.hours}</span>
+              <span class="s-jobs__badge">{s.kind}</span>
+              <span class="s-jobs__location">{s.location}</span>
+              <span class="s-jobs__hours">{s.hours}</span>
             </span>
 
             <span class="s-jobs__icon" aria-hidden="true">
@@ -65,27 +65,27 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
         </h3>
 
         <div class="s-jobs__panel" data-accordion-panel>
-          <div class="s-jobs__inhalt">
-            <p class="s-jobs__einleitung">{s.lead}</p>
+          <div class="s-jobs__content">
+            <p class="s-jobs__lead">{s.lead}</p>
 
-            <div class="s-jobs__spalten">
+            <div class="s-jobs__columns">
               <div>
-                <h4 class="s-jobs__untertitel">Deine Aufgaben</h4>
-                <ul class="s-jobs__punkte">
+                <h4 class="s-jobs__subtitle">Deine Aufgaben</h4>
+                <ul class="s-jobs__bullets">
                   {(s.duties ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
               <div>
-                <h4 class="s-jobs__untertitel">Das bringst du mit</h4>
-                <ul class="s-jobs__punkte">
+                <h4 class="s-jobs__subtitle">Das bringst du mit</h4>
+                <ul class="s-jobs__bullets">
                   {(s.profile ?? []).map((a) => <li>{a}</li>)}
                 </ul>
               </div>
             </div>
 
-            {s.highlight && <p class="s-jobs__hinweis">{s.highlight}</p>}
+            {s.highlight && <p class="s-jobs__note">{s.highlight}</p>}
 
-            <div class="s-jobs__aktion">
+            <div class="s-jobs__action">
               {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
                   einem Postfach unter „Bewerbung". */}
               <Button label="Auf diese Stelle bewerben" href={applicationLink(applicationEmail, s)} />
@@ -131,7 +131,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
 
   /* Die Überschrift trägt keine eigene Gestalt — sie ist nur die Ebene, die
      Vorlesegeräten die Gliederung gibt. Ausgesehen wird der Knopf darin. */
-  .s-jobs__zeile-title {
+  .s-jobs__row-title {
     margin: 0;
     font: inherit;
     letter-spacing: inherit;
@@ -147,7 +147,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
 
   /* Vier Spalten: Nummer, Titel, Angaben, Zeichen. Die Angaben rücken auf
      schmalen Fenstern unter den Titel. */
-  .s-jobs__zeile {
+  .s-jobs__row {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
@@ -159,7 +159,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     transition: color var(--d-fast) var(--e-swift);
   }
 
-  .s-jobs__nummer {
+  .s-jobs__number {
     font-size: var(--fs-label);
     letter-spacing: 0.06em;
     color: var(--c-text-muted);
@@ -187,7 +187,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   /* Die Art der Stelle ist die wichtigste der drei Angaben — sie bekommt
      als einzige eine Fläche. Braun auf Taupe: 5.31:1, WCAG verlangt 4.5:1
      für Text dieser Größe. */
-  .s-jobs__marke {
+  .s-jobs__badge {
     padding: 0.25em 0.7em;
     border-radius: var(--r-round);
     background: color-mix(in srgb, var(--c-dark) 10%, transparent);
@@ -221,7 +221,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   @media (hover: hover) {
-    .s-jobs__zeile:hover .s-jobs__icon {
+    .s-jobs__row:hover .s-jobs__icon {
       background: var(--c-brand);
       border-color: var(--c-brand);
       color: var(--c-dark);
@@ -234,7 +234,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     overflow: hidden;
   }
 
-  .s-jobs__inhalt {
+  .s-jobs__content {
     display: flex;
     flex-direction: column;
     gap: var(--sp-5);
@@ -243,20 +243,20 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     padding: 0 0 var(--sp-8) calc(2ch + var(--sp-4));
   }
 
-  .s-jobs__einleitung {
+  .s-jobs__lead {
     max-width: 62ch;
     font-size: var(--fs-text-large);
     line-height: 1.45;
   }
 
-  .s-jobs__spalten {
+  .s-jobs__columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-6) var(--site-gutter);
     max-width: 68ch;
   }
 
-  .s-jobs__untertitel {
+  .s-jobs__subtitle {
     margin-bottom: var(--sp-3);
     font-weight: 300;
     font-size: var(--fs-text-small);
@@ -265,7 +265,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     color: var(--c-text-muted);
   }
 
-  .s-jobs__punkte {
+  .s-jobs__bullets {
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
@@ -278,14 +278,14 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
 
   /* Eigener Punkt statt des Listenzeichens: dasselbe Zeichen wie in der
      Topline, dadurch bleibt die Seite bei einer Formensprache. */
-  .s-jobs__punkte li {
+  .s-jobs__bullets li {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0.7em;
     align-items: baseline;
   }
 
-  .s-jobs__punkte li::before {
+  .s-jobs__bullets li::before {
     content: "";
     width: 0.4em;
     height: 0.4em;
@@ -296,7 +296,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     translate: 0 -0.25em;
   }
 
-  .s-jobs__hinweis {
+  .s-jobs__note {
     max-width: 62ch;
     padding: var(--sp-3) var(--sp-4);
     border-left: 2px solid var(--c-brand);
@@ -306,7 +306,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   @media (max-width: 1000px) {
-    .s-jobs__zeile {
+    .s-jobs__row {
       grid-template-columns: auto minmax(0, 1fr) auto;
       row-gap: var(--sp-3);
     }
@@ -323,11 +323,11 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   @media (max-width: 700px) {
-    .s-jobs__spalten {
+    .s-jobs__columns {
       grid-template-columns: 1fr;
     }
 
-    .s-jobs__inhalt {
+    .s-jobs__content {
       padding-left: 0;
     }
   }

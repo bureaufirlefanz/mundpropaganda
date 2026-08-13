@@ -21,7 +21,7 @@ import { TagIcon } from "@sanity/icons/Tag";
  *     zählen dieselben Leistungen auf. Sie standen dreimal von Hand im Markup;
  *     jetzt kommen sie aus diesem Dokument. Dafür die Gruppe „Listeneintrag".
  */
-export const leistung = defineType({
+export const service = defineType({
   name: "service",
   title: "Leistung",
   type: "document",

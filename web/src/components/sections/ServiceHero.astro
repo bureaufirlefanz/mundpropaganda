@@ -23,7 +23,7 @@ interface Props {
   alt?: string;
   /** Beschriftung des Knopfs. */
   action?: string;
-  aktionZiel?: string;
+  actionHref?: string;
 }
 
 const {
@@ -33,7 +33,7 @@ const {
   image,
   alt = "",
   action = "Termin buchen",
-  aktionZiel = "#kontakt",
+  actionHref = "#kontakt",
 } = Astro.props;
 
 /* Das längste Wort — und zwar so, wie die Hero-Choreografie es abgrenzt:
@@ -42,7 +42,7 @@ const {
    KEINE Trennstelle mehr. „Parodontitis-Behandlung" zählt deshalb als 23
    Zeichen, nicht als 12 — genau daran lief die Überschrift zuletzt noch ins
    Bild, als ich den Bindestrich mitgezählt hatte. */
-const laengsteEinheit =
+const longestUnit =
   title
     .split(/\s+/)
     .filter(Boolean)
@@ -57,14 +57,14 @@ const laengsteEinheit =
    Daraus der Höchstgrad in Prozent der Spaltenbreite: Bei welchem Grad füllt
    das längste Wort die Spalte gerade aus? Darüber liefe es hinaus — und zwar
    ins Bild rechts daneben, weil nowrap es nicht umbrechen ließ. */
-const gradDeckel = (100 / (0.67 * laengsteEinheit)).toFixed(2);
+const sizeCap = (100 / (0.67 * longestUnit)).toFixed(2);
 
 /* Klasse 3: das gestaltete Motiv, solange im Studio keines hochgeladen ist.
    Es steht hier und nicht mehr in der Datenschicht — der Baustein kennt sein
    Motiv, `services.ts` ginge das nichts an. Ohne diesen Rückfall bliebe die
    halbe Seite weiß, und ein leeres Bildfeld heißt „noch nicht hochgeladen",
    nicht „bewusst gelöscht". */
-const MOTIV = "/img/portrait-hero-1600.webp";
+const MOTIF = "/img/portrait-hero-1600.webp";
 ---
 
 <section class="s-shero container" data-hero>
@@ -75,11 +75,11 @@ const MOTIV = "/img/portrait-hero-1600.webp";
         `data-hero-word` — damit greift die Hero-Choreografie: der
         Leistungsname steigt zeichenweise hinter seiner Maske auf. */}
     {topline && <p class="s-shero__topline" data-hero-meta>{topline}</p>}
-    <h1 class="s-shero__title" style={`--shero-deckel: ${gradDeckel}cqw`} data-hero-word>{title}</h1>
+    <h1 class="s-shero__title" style={`--shero-cap: ${sizeCap}cqw`} data-hero-word>{title}</h1>
     {text && <p data-hero-meta>{text}</p>}
 
     <div class="s-shero__actions" data-hero-foot>
-      <Button label={action} href={aktionZiel} />
+      <Button label={action} href={actionHref} />
     </div>
 
     <div class="s-shero__reviews" data-hero-foot>
@@ -91,7 +91,7 @@ const MOTIV = "/img/portrait-hero-1600.webp";
     {/* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
         unter 900px die ganze. */}
     <CmsImage
-      source={isCmsImage(image) ? image : MOTIV}
+      source={isCmsImage(image) ? image : MOTIF}
       alt={alt}
       widths={[640, 1024, 1600, 2200]}
       sizes="(max-width: 900px) 100vw, 50vw"
@@ -151,7 +151,7 @@ const MOTIV = "/img/portrait-hero-1600.webp";
     margin-top: var(--sp-8);
   }
 
-  /* Mehrzeilig, wenn nötig — before stand hier `white-space: nowrap`. Das
+  /* Mehrzeilig, wenn nötig — vorher stand hier `white-space: nowrap`. Das
      hielt den Namen zwar auf einer Zeile, ließ ihn aber aus seiner Spalte
      laufen: gemessen bis zu 901px weit ins Bild daneben, bei zehn von
      vierzehn Leistungen. Eine Box wird von nowrap nicht breiter, der Text
@@ -163,7 +163,7 @@ const MOTIV = "/img/portrait-hero-1600.webp";
      Mehrwortige Namen brechen um und behalten ihren Grad, einwortige werden
      kleiner — umbrechen können sie ja nicht. */
   .s-shero__title {
-    font-size: min(var(--fs-display-2), 13vw, var(--shero-deckel, 100cqw));
+    font-size: min(var(--fs-display-2), 13vw, var(--shero-cap, 100cqw));
     font-weight: 500;
     line-height: 0.92;
     letter-spacing: -0.03em;

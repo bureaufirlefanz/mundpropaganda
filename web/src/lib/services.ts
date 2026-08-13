@@ -12,7 +12,7 @@ import { loadServiceList } from "./service-list";
  * jede Leistung der Liste. Käme die Seite nicht dazu, zeigte jeder zweite
  * Menüpunkt ins Leere. Wer in der Liste steht, bekommt eine Seite.
  */
-export async function ladeSlugs(): Promise<{ params: { slug: string } }[]> {
+export async function loadSlugs(): Promise<{ params: { slug: string } }[]> {
   const liste = await loadServiceList();
   return liste.map((l) => ({ params: { slug: l.slug } }));
 }
@@ -30,7 +30,7 @@ export async function ladeSlugs(): Promise<{ params: { slug: string } }[]> {
  * Das ist kein CMS-Problem mehr, sondern eine falsche Aussage über eine
  * Behandlung samt Preis. Der Rückfall ist deshalb ersatzlos weg: Ein
  * Abschnitt, den das Dokument nicht trägt, erscheint nicht. Zehn Seiten sind
- * seitdem dünn — sie waren es before auch, man sah es nur nicht.
+ * seitdem dünn — sie waren es vorher auch, man sah es nur nicht.
  *
  * Die Bilder bleiben die bekannte Ausnahme: Ein leeres Bildfeld fällt weiter
  * auf das gestaltete Motiv zurück. Das entscheidet der Baustein, nicht diese

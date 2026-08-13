@@ -44,9 +44,12 @@ A `CLAUDE.md` sits in `web/` and `studio/` with what applies there.
 
 ## Language
 
-**Code is English, the product is German.** Identifiers, comments and developer
-documentation in English. German stays wherever a human reads it inside the
-product:
+**Code is English, the product is German.** Identifiers, CSS class names
+(including every BEM element and modifier — `__list`, not `__liste`), data
+attributes, comments and developer documentation in English. Decided
+2026-08-12, after the mixed state was called out: half-German class names were
+never a convention, only leftovers. German stays wherever a human reads it
+inside the product:
 
 - page copy
 - field labels and descriptions in the Studio (`title`, `description`)

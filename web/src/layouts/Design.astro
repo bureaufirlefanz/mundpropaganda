@@ -26,9 +26,9 @@ interface Props {
 }
 const { title, active } = Astro.props;
 
-const SEITEN = [
-  { pfad: "/design/styleguide", name: "Styleguide", note: "Farben, Typografie, Abstände, Bausteine" },
-  { pfad: "/design/komponenten", name: "Komponenten", note: "Jeder Baustein mit Beschreibung" },
+const PAGES = [
+  { path: "/design/styleguide", name: "Styleguide", note: "Farben, Typografie, Abstände, Bausteine" },
+  { path: "/design/komponenten", name: "Komponenten", note: "Jeder Baustein mit Beschreibung" },
 ] as const;
 ---
 
@@ -50,18 +50,18 @@ const SEITEN = [
   <body class="d-body">
     <Icons />
 
-    <header class="d-kopf">
-      <a class="d-kopf__marke" href="/">Mundpropaganda</a>
-      <nav class="d-kopf__nav" aria-label="Design">
-        {SEITEN.map((s) => (
-          <a href={s.pfad} aria-current={s.name.toLowerCase().startsWith(active.slice(0, 4)) ? "page" : undefined}>
+    <header class="d-header">
+      <a class="d-header__brand" href="/">Mundpropaganda</a>
+      <nav class="d-header__nav" aria-label="Design">
+        {PAGES.map((s) => (
+          <a href={s.path} aria-current={s.name.toLowerCase().startsWith(active.slice(0, 4)) ? "page" : undefined}>
             {s.name}
           </a>
         ))}
       </nav>
     </header>
 
-    <main class="d-haupt"><slot /></main>
+    <main class="d-main"><slot /></main>
 
     <script>
       import { init } from "../js/init.js";
@@ -81,7 +81,7 @@ const SEITEN = [
         color: var(--c-text);
       }
 
-      .d-kopf {
+      .d-header {
         position: sticky;
         top: 0;
         z-index: var(--z-nav);
@@ -98,11 +98,11 @@ const SEITEN = [
         text-transform: uppercase;
       }
 
-      .d-kopf__marke {
+      .d-header__brand {
         font-weight: 500;
       }
 
-      .d-kopf__nav {
+      .d-header__nav {
         display: flex;
         gap: var(--sp-5);
       }
@@ -110,12 +110,12 @@ const SEITEN = [
       /* Der aktuelle Eintrag ist unterstrichen, nicht nur farbig — Farbe
          allein wäre kein Unterschied für alle, die sie nicht sehen (WCAG
          1.4.1). */
-      .d-kopf__nav a[aria-current="page"] {
+      .d-header__nav a[aria-current="page"] {
         text-decoration: underline;
         text-underline-offset: 4px;
       }
 
-      .d-haupt {
+      .d-main {
         padding-bottom: var(--sp-16);
       }
 
@@ -124,22 +124,22 @@ const SEITEN = [
       /* Enger als auf der Seite selbst. --section-space ist für eine Seite
          gedacht, die man durchscrollt; hier stünde pro Bildschirm eine
          Überschrift und sonst nichts. */
-      .d-teil {
+      .d-section {
         padding-block: var(--sp-10);
         border-top: var(--bw) solid var(--c-line);
       }
 
-      .d-teil:first-child {
+      .d-section:first-child {
         border-top: 0;
       }
 
-      .d-teil__kopf {
+      .d-section__header {
         max-width: 62ch;
         margin-bottom: var(--sp-6);
         padding-inline: var(--site-margin);
       }
 
-      .d-teil__nummer {
+      .d-section__number {
         display: block;
         margin-bottom: var(--sp-2);
         font-family: var(--f-mono);
@@ -148,13 +148,13 @@ const SEITEN = [
         color: var(--c-text-muted);
       }
 
-      .d-teil__titel {
+      .d-section__title {
         font-size: var(--fs-h2);
         font-weight: 400;
         line-height: 1.15;
       }
 
-      .d-teil__text {
+      .d-section__text {
         margin-top: var(--sp-3);
         font-size: var(--fs-text-main);
         line-height: 1.5;
@@ -162,12 +162,12 @@ const SEITEN = [
       }
 
       /* Eine einzelne Probe: Beschriftung darüber, Beispiel darunter. */
-      .d-probe {
+      .d-sample {
         padding-inline: var(--site-margin);
         margin-bottom: var(--sp-8);
       }
 
-      .d-probe__kopf {
+      .d-sample__header {
         display: flex;
         flex-wrap: wrap;
         align-items: baseline;
@@ -177,7 +177,7 @@ const SEITEN = [
         border-bottom: var(--bw) solid var(--c-line);
       }
 
-      .d-probe__name {
+      .d-sample__name {
         font-family: var(--f-mono);
         font-size: var(--fs-text-small);
         letter-spacing: 0.06em;
@@ -186,14 +186,14 @@ const SEITEN = [
 
       /* Der Quellpfad. Damit findet man die Datei, ohne suchen zu müssen —
          der häufigste Grund, eine solche Seite überhaupt aufzuschlagen. */
-      .d-probe__pfad {
+      .d-sample__path {
         font-family: var(--f-mono);
         font-size: var(--fs-label);
         letter-spacing: 0.04em;
         color: var(--c-text-muted);
       }
 
-      .d-probe__text {
+      .d-sample__text {
         max-width: 68ch;
         margin-bottom: var(--sp-4);
         font-size: var(--fs-text-main);
@@ -203,24 +203,24 @@ const SEITEN = [
 
       /* Die Bühne, auf der ein Beispiel steht. Heller Grund, damit man die
          Kante des Bausteins sieht — auf dem Seitengrau verschwämme sie. */
-      .d-buehne {
+      .d-stage {
         padding: var(--sp-5);
         border: var(--bw) solid var(--c-line);
         border-radius: var(--r-md);
         background: var(--c-surface);
       }
 
-      .d-buehne--dunkel {
+      .d-stage--dark {
         background: var(--c-dark);
         color: var(--c-bg);
       }
 
-      .d-buehne--randlos {
+      .d-stage--borderless {
         padding: 0;
         overflow: hidden;
       }
 
-      .d-buehne--reihe {
+      .d-stage--row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -228,13 +228,13 @@ const SEITEN = [
       }
 
       /* Raster für Farb- und Wertkacheln. */
-      .d-raster {
+      .d-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: var(--sp-4);
       }
 
-      .d-notiz {
+      .d-note {
         padding: var(--sp-4);
         border: var(--bw) dashed var(--c-line);
         border-radius: var(--r-md);
@@ -253,17 +253,17 @@ const SEITEN = [
          außerhalb davon nicht. Deshalb über die Textklassen — und niemals
          über einen allgemeinen a-Selektor, der auch in die eingebetteten
          Beispiele hineinschlüge. */
-      .d-teil__text a,
-      .d-probe__text a,
-      .d-notiz a {
+      .d-section__text a,
+      .d-sample__text a,
+      .d-note a {
         text-decoration: underline;
         text-underline-offset: 3px;
         text-decoration-thickness: 1px;
       }
 
-      .d-teil__text a:hover,
-      .d-probe__text a:hover,
-      .d-notiz a:hover {
+      .d-section__text a:hover,
+      .d-sample__text a:hover,
+      .d-note a:hover {
         color: var(--c-text);
         text-decoration-color: var(--c-brand);
         text-decoration-thickness: 2px;

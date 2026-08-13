@@ -64,7 +64,7 @@ const heading = (group: string, prefix: string) => [
   }),
 ];
 
-export const karriere = defineType({
+export const careers = defineType({
   name: "careers",
   title: "Karriere",
   type: "document",

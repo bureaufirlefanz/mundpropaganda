@@ -1,7 +1,7 @@
 /**
  * Zahlen, die beim Hereinscrollen hochzählen.
  *
- * Der Zielwert steht im Markup (`data-zaehler`) und ist auch der Text, der
+ * Der Zielwert steht im Markup (`data-counter`) und ist auch der Text, der
  * ohne JavaScript dasteht. Das Modul setzt ihn kurz auf null und zählt
  * hinauf — geht dabei etwas schief, steht am Ende trotzdem die richtige Zahl
  * da, weil sie aus demselben Attribut kommt.
@@ -14,27 +14,27 @@ import { gsap, prefersReducedMotion } from "../lib/gsap.js";
 export function initFacts() {
   if (prefersReducedMotion) return;
 
-  gsap.utils.toArray("[data-zaehler]").forEach((el) => {
-    const target = Number(el.dataset.zaehler);
+  gsap.utils.toArray("[data-counter]").forEach((el) => {
+    const target = Number(el.dataset.counter);
     if (!Number.isFinite(target)) return;
 
     /* Ein Zwischenwert im Objekt, nicht am Element: GSAP kann keinen
        Textknoten interpolieren. Gerundet wird erst beim Schreiben. */
-    const stand = { value: 0 };
+    const counter = { value: 0 };
 
     /* Nur auf null setzen, was noch unterhalb des Sichtfelds steht. Eine
        Zahl, die beim Laden schon im Bild ist, würde sonst erst auf null
        springen und dann hochlaufen — der Sprung wäre auffälliger als das
        Zählen. Sie bleibt einfach stehen. */
-    const nochNichtImBild = el.getBoundingClientRect().top > window.innerHeight;
-    if (nochNichtImBild) el.textContent = "0";
+    const notYetInView = el.getBoundingClientRect().top > window.innerHeight;
+    if (notYetInView) el.textContent = "0";
 
-    gsap.to(stand, {
+    gsap.to(counter, {
       value: target,
       duration: 1.4,
       ease: "power2.out",
       onUpdate: () => {
-        el.textContent = String(Math.round(stand.value));
+        el.textContent = String(Math.round(counter.value));
       },
       /* Auf den Endwert festnageln: bei einer abgebrochenen Animation bliebe
          sonst die zuletzt gerundete Zahl stehen, und die kann daneben liegen. */

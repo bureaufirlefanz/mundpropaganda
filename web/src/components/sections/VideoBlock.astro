@@ -38,13 +38,13 @@ const { url, title, poster } = Astro.props;
  * Baustein nichts — eine Adresse, die wir nicht lesen können, soll keinen
  * kaputten Rahmen erzeugen.
  */
-function videoId(adresse: string): string | null {
+function videoId(url: string): string | null {
   try {
-    const u = new URL(adresse);
+    const u = new URL(url);
     if (u.hostname.endsWith("youtu.be")) return u.pathname.slice(1) || null;
     if (u.searchParams.has("v")) return u.searchParams.get("v");
-    const treffer = u.pathname.match(/\/embed\/([^/?]+)/);
-    return treffer ? treffer[1] : null;
+    const match = u.pathname.match(/\/embed\/([^/?]+)/);
+    return match ? match[1] : null;
   } catch {
     return null;
   }
@@ -55,17 +55,17 @@ const id = videoId(url);
 /* `rel=0` hält die Vorschläge am Ende bei diesem Kanal, `autoplay=1` startet
    sofort — der Klick auf den Knopf war schon die Aufforderung, ein zweiter
    auf den Abspielpfeil im iframe wäre einer zu viel. */
-const einbettung = id
+const embedUrl = id
   ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`
   : null;
 
 /* Das Vorschaubild von YouTube. `hqdefault` und nicht `maxresdefault`: Das
    gibt es nicht zu jedem Video, und ein fehlendes Bild wäre eine graue
    Fläche mit einem Knopf darin. */
-const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+const fallbackPoster = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
 ---
 
-{einbettung && (
+{embedUrl && (
   <section class="s-video container">
     {title && <h2 class="s-video__title" data-split="lines">{title}</h2>}
 
@@ -76,9 +76,9 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
       iframe, damit die Adresse nicht doppelt im Markup steht.
     */}
     <button
-      class="s-video__rahmen"
+      class="s-video__frame"
       type="button"
-      data-embed={einbettung}
+      data-embed={embedUrl}
       aria-label={title ? `Video abspielen: ${title}` : "Video abspielen"}
       data-reveal="scale"
     >
@@ -90,10 +90,10 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
           sizes="(max-width: 900px) 92vw, 80vw"
         />
       ) : (
-        notBild && <img src={notBild} alt="" loading="lazy" width="480" height="360" />
+        fallbackPoster && <img src={fallbackPoster} alt="" loading="lazy" width="480" height="360" />
       )}
 
-      <span class="s-video__knopf" aria-hidden="true">
+      <span class="s-video__play" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="28" height="28">
           <path d="M8 5v14l11-7z" fill="currentColor" />
         </svg>
@@ -102,7 +102,7 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
 
     {/* Wer kein JavaScript hat, bekommt wenigstens den Weg zum Video. */}
     <noscript>
-      <a class="s-video__aus" href={url} rel="noopener">Video bei YouTube ansehen</a>
+      <a class="s-video__external" href={url} rel="noopener">Video bei YouTube ansehen</a>
     </noscript>
   </section>
 )}
@@ -124,7 +124,7 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
   /* Ein Knopf, der wie eine Fläche aussieht: Der Browser gibt <button> einen
      eigenen Rahmen, eine Grundfarbe und mittigen Text — alles drei muss hier
      weg, sonst sitzt das Bild in einem grauen Kasten. */
-  .s-video__rahmen {
+  .s-video__frame {
     position: relative;
     display: block;
     width: 100%;
@@ -139,20 +139,20 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
 
   /* :global(img), weil das Bild aus CmsImage.astro kommt und das
      Scope-Attribut dieser Datei nicht trägt. */
-  .s-video__rahmen :global(img) {
+  .s-video__frame :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform var(--d-slow) var(--e-out);
   }
 
-  .s-video__rahmen:hover :global(img) {
+  .s-video__frame:hover :global(img) {
     transform: scale(1.02);
   }
 
   /* Der Abspielknopf. Markenfarbe auf Dunkel misst über 8:1 — er muss auf
      jedem Standbild lesbar bleiben, auch auf einem hellen. */
-  .s-video__knopf {
+  .s-video__play {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -168,23 +168,23 @@ const notBild = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
     transition: scale var(--d-base) var(--e-out);
   }
 
-  .s-video__rahmen:hover .s-video__knopf {
+  .s-video__frame:hover .s-video__play {
     scale: 1.08;
   }
 
-  .s-video__rahmen:focus-visible {
+  .s-video__frame:focus-visible {
     outline: 2px solid var(--c-dark);
     outline-offset: 4px;
   }
 
   /* Das eingesetzte iframe füllt denselben Rahmen. */
-  .s-video__rahmen :global(iframe) {
+  .s-video__frame :global(iframe) {
     width: 100%;
     height: 100%;
     border: 0;
   }
 
-  .s-video__aus {
+  .s-video__external {
     display: inline-block;
     margin-top: var(--sp-4);
     text-decoration: underline;

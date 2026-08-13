@@ -16,12 +16,12 @@ export function initFilter() {
   const box = document.querySelector("[data-filter]");
   if (!box) return;
 
-  const knopf = box.querySelector("[data-filter-knopf]");
+  const button = box.querySelector("[data-filter-button]");
   const panel = box.querySelector("#filter-optionen");
-  const punkt = box.querySelector("[data-filter-punkt]");
-  const optionen = [...box.querySelectorAll("[data-filter-value]")];
-  const karten = [...document.querySelectorAll("[data-category]")];
-  if (!knopf || !panel || !karten.length) return;
+  const dot = box.querySelector("[data-filter-dot]");
+  const options = [...box.querySelectorAll("[data-filter-value]")];
+  const cards = [...document.querySelectorAll("[data-category]")];
+  if (!button || !panel || !cards.length) return;
 
   /* --- Auf- und Zuklappen ------------------------------------------------ */
 
@@ -38,10 +38,10 @@ export function initFilter() {
    * also vom Knopf weg. Rückwärts gestaffelt, damit das erste, das
    * auftaucht, das dem Knopf nächste ist.
    */
-  function klappe(auf) {
-    knopf.setAttribute("aria-expanded", String(auf));
+  function toggle(open) {
+    button.setAttribute("aria-expanded", String(open));
 
-    if (auf) {
+    if (open) {
       panel.hidden = false;
       if (!prefersReducedMotion) {
         gsap.fromTo(
@@ -79,70 +79,70 @@ export function initFilter() {
     });
   }
 
-  knopf.addEventListener("click", () => {
-    klappe(knopf.getAttribute("aria-expanded") !== "true");
+  button.addEventListener("click", () => {
+    toggle(button.getAttribute("aria-expanded") !== "true");
   });
 
   /* Klick daneben und Escape schließen. Ohne beides bleibt das Panel offen
      stehen, während man schon wieder liest. */
   document.addEventListener("click", (e) => {
-    if (!box.contains(e.target)) klappe(false);
+    if (!box.contains(e.target)) toggle(false);
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape" || knopf.getAttribute("aria-expanded") !== "true") return;
-    klappe(false);
-    knopf.focus();
+    if (e.key !== "Escape" || button.getAttribute("aria-expanded") !== "true") return;
+    toggle(false);
+    button.focus();
   });
 
   /* --- Filtern ----------------------------------------------------------- */
 
-  function wende(value, { animieren = true } = {}) {
-    for (const karte of karten) {
-      const passt = !value || karte.dataset.category === value;
+  function apply(value, { animate = true } = {}) {
+    for (const card of cards) {
+      const matches = !value || card.dataset.category === value;
 
       /* `hidden` und nicht nur Deckkraft: Eine ausgeblendete Karte darf weder
          im Tabulatorlauf noch in der Vorleseordnung stehen bleiben. */
-      if (!animieren || prefersReducedMotion) {
-        karte.hidden = !passt;
-        gsap.set(karte, { opacity: passt ? 1 : 0, y: 0 });
+      if (!animate || prefersReducedMotion) {
+        card.hidden = !matches;
+        gsap.set(card, { opacity: matches ? 1 : 0, y: 0 });
         continue;
       }
 
-      if (passt) {
-        karte.hidden = false;
+      if (matches) {
+        card.hidden = false;
         gsap.fromTo(
-          karte,
+          card,
           { opacity: 0, y: 12 },
           { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", overwrite: true }
         );
       } else {
-        gsap.to(karte, {
+        gsap.to(card, {
           opacity: 0,
           y: 8,
           duration: 0.25,
           ease: "power2.in",
           overwrite: true,
           onComplete: () => {
-            karte.hidden = true;
+            card.hidden = true;
           },
         });
       }
     }
 
-    for (const o of optionen) {
+    for (const o of options) {
       o.setAttribute("aria-pressed", String((o.dataset.filterValue || "") === (value || "")));
     }
 
-    if (punkt) punkt.hidden = !value;
+    if (dot) dot.hidden = !value;
   }
 
-  for (const o of optionen) {
+  for (const o of options) {
     o.addEventListener("click", () => {
       const value = o.dataset.filterValue || "";
-      wende(value);
-      klappe(false);
-      knopf.focus();
+      apply(value);
+      toggle(false);
+      button.focus();
 
       /* `replaceState`, nicht `pushState`: Sonst sammelt der Zurück-Knopf
          jede einzelne Filterauswahl, und wer dreimal geklickt hat, muss
@@ -158,7 +158,7 @@ export function initFilter() {
      Ohne Animation — beim ersten Bild soll nichts eingeblendet werden, was
      ohnehin schon dasteht. */
   const start = new URL(location.href).searchParams.get("category");
-  if (start && optionen.some((o) => o.dataset.filterValue === start)) {
-    wende(start, { animieren: false });
+  if (start && options.some((o) => o.dataset.filterValue === start)) {
+    apply(start, { animate: false });
   }
 }

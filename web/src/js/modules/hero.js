@@ -14,7 +14,7 @@
  * erst dadurch werden die Ebenen als Ebenen lesbar.
  */
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion } from "../lib/gsap.js";
-import { warteAufSchrift, SCHRIFT } from "../lib/fonts.js";
+import { waitForFonts, FONTS } from "../lib/fonts.js";
 
 export function initHero() {
   const hero = document.querySelector("[data-hero]");
@@ -25,8 +25,8 @@ export function initHero() {
      der Fall abgedeckt sein, dass es auf einer Seite gar keinen Hero gibt:
      sonst bliebe die Leiste dort dauerhaft unsichtbar. */
   if (!hero) {
-    const navOhneHero = document.querySelector("[data-nav] .c-nav__inner");
-    if (navOhneHero) gsap.set(navOhneHero, { visibility: "visible" });
+    const navWithoutHero = document.querySelector("[data-nav] .c-nav__inner");
+    if (navWithoutHero) gsap.set(navWithoutHero, { visibility: "visible" });
     return;
   }
 
@@ -75,14 +75,14 @@ export function initHero() {
 
      Gebraucht wird die Schrift überhaupt, weil SplitText die Zeichen ausmisst;
      mit der Ersatzschrift fielen Breiten und Umbruch anders aus. */
-  warteAufSchrift(SCHRIFT.display).then(() => {
+  waitForFonts(FONTS.display).then(() => {
     /* „words,chars" statt nur „chars": Zerlegt man ausschließlich in
        Zeichen, wird jedes Zeichen ein eigener Inline-Block — und dann darf
        der Browser zwischen JE ZWEI ZEICHEN umbrechen. Auf den
        Leistungsseiten stand deshalb „CMD MIT BOTO / XBEHANDLUNG“, mitten im
        Wort und ohne Trennstrich.
 
-       Mit der Wlocationsbene liegen die Zeichen in Wort-Containern. Die allein
+       Mit der Wortebene liegen die Zeichen in Wort-Containern. Die allein
        genügen allerdings nicht: SplitText setzt sie auf inline-block, und ein
        inline-block bricht seinen Inhalt sehr wohl um, wenn der breiter ist
        als die Zeile — nur eben nicht sich selbst. Deshalb die Klasse, an der
@@ -116,7 +116,7 @@ export function initHero() {
       /* Die Wortmarke erst hier freigeben: die Zeichen stecken jetzt in ihren
          Masken, und der `from`-Tween unten legt seine Startwerte schon beim
          Anlegen an (yPercent 100). Zu sehen ist dadurch noch nichts — anders
-         als before, wo die Zeilen bis zu diesem Moment fertig dastanden. */
+         als vorher, wo die Zeilen bis zu diesem Moment fertig dastanden. */
       .set(words, { visibility: "visible" }, 0)
       // Zeichen steigen hinter der Maske hoch und kippen dabei aus der
       // Tiefe in die Fläche.
@@ -138,7 +138,7 @@ export function initHero() {
       // Maßstabswechsel genügt für die Tiefe. Die Deckkraft läuft als
       // eigener, kurzer Tween — als Teil der langen Bewegung wäre das
       // Einblenden zäh.
-      // Erst hier aus der Verborgenheit holen — before zeigte das CSS die
+      // Erst hier aus der Verborgenheit holen — vorher zeigte das CSS die
       // Glasebene bereits in voller Stärke, während der Zahn noch fehlte.
       .set(tooth ?? {}, { visibility: "visible" }, 0.85)
       .from(

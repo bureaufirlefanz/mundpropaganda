@@ -6,7 +6,7 @@
  * aus Aufgabe 6 exakt dasselbe rendert.
  */
 import Service from "../../templates/Service.astro";
-import { loadService, ladeSlugs } from "../../lib/services";
+import { loadService, loadSlugs } from "../../lib/services";
 import { loadServiceList } from "../../lib/service-list";
 import { loadHomepage } from "../../lib/homepage";
 import { loadPosts } from "../../lib/magazine";
@@ -14,7 +14,7 @@ import { loadPosts } from "../../lib/magazine";
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
-  return await ladeSlugs();
+  return await loadSlugs();
 }
 
 const { slug } = Astro.params;
@@ -23,8 +23,8 @@ const data = await loadService(slug!);
 /* Der Name aus der Liste trägt die Überschrift, falls das Dokument fehlt —
    sonst stünde über der Seite nichts. Alles Weitere kommt aus dem Dokument
    oder erscheint nicht: Seit Aufgabe 4 füllt kein Beispielinhalt mehr auf. */
-const eintrag = (await loadServiceList()).find((l) => l.slug === slug);
-const title = data?.title || eintrag?.name || "";
+const entry = (await loadServiceList()).find((l) => l.slug === slug);
+const title = data?.title || entry?.name || "";
 
 /* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
    deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4

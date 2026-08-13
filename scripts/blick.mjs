@@ -22,7 +22,7 @@ import { starteBrowser, erwarteServer } from "./lib/chrome.mjs";
 import { mkdir } from "node:fs/promises";
 
 const BASIS = process.env.MP_BASIS || "http://localhost:4321";
-const [pfad = "/", wahl = "body", breite = "1728", ...rest] = process.argv.slice(2);
+const [path = "/", wahl = "body", breite = "1728", ...rest] = process.argv.slice(2);
 const VOLL = rest.includes("--voll");
 const ORDNER = "/tmp/blick";
 
@@ -43,7 +43,7 @@ await seite.setViewport({
   hasTouch: Number(breite) <= 700,
   isMobile: Number(breite) <= 700,
 });
-await seite.goto(BASIS + pfad, { waitUntil: "networkidle0", timeout: 60000 });
+await seite.goto(BASIS + path, { waitUntil: "networkidle0", timeout: 60000 });
 await seite.evaluate(() => document.fonts.ready);
 
 /* Einmal durch die Seite, damit jede Einblendung ausgelöst hat — sonst steht
@@ -68,29 +68,29 @@ await seite.evaluate(() => {
   document.head.appendChild(stil);
 });
 
-const ziel = await seite.$(wahl);
-if (!ziel) {
-  console.error(`Kein Element für "${wahl}" auf ${pfad}.`);
+const target = await seite.$(wahl);
+if (!target) {
+  console.error(`Kein Element für "${wahl}" auf ${path}.`);
   process.exit(1);
 }
 
 /* Den Abschnitt in die Bildmitte holen und dort in Ruhe kommen lassen. Bei
    `--voll` wird ohnehin das ganze Element aufgenommen. */
-await ziel.scrollIntoView();
+await target.scrollIntoView();
 await new Promise((r) => setTimeout(r, 600));
 
-const kasten = await ziel.boundingBox();
-const datei = `${ORDNER}/${pfad.replace(/\W+/g, "_")}-${wahl.replace(/\W+/g, "_")}-${breite}.png`;
+const kasten = await target.boundingBox();
+const file = `${ORDNER}/${path.replace(/\W+/g, "_")}-${wahl.replace(/\W+/g, "_")}-${breite}.png`;
 
 if (VOLL) {
-  await ziel.screenshot({ path: datei, captureBeyondViewport: true });
+  await target.screenshot({ path: file, captureBeyondViewport: true });
 } else {
   await seite.screenshot({
-    path: datei,
+    path: file,
     clip: { x: kasten.x, y: kasten.y, width: kasten.width, height: Math.min(kasten.height, 2400) },
   });
 }
 
-console.log(`${datei}  (${Math.round(kasten.width)}×${Math.round(kasten.height)} CSS-px)`);
+console.log(`${file}  (${Math.round(kasten.width)}×${Math.round(kasten.height)} CSS-px)`);
 await browser.close();
 process.exit(0);

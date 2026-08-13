@@ -14,15 +14,15 @@ interface Props {
 /* Keine Vorgabe: Pflichtfeld im Schema, die Seite reicht es durch. */
 const { title } = Astro.props;
 import Button from "../ui/Button.astro";
-import { loadServiceList, forTable, forList, pfad } from "../../lib/service-list";
+import { loadServiceList, forTable, forList, servicePath } from "../../lib/service-list";
 import { isCmsImage, imageUrl, motifPath } from "../../lib/images";
 
-const liste = await loadServiceList();
-const lines = forTable(liste);
-const weitere = forList(liste);
+const list = await loadServiceList();
+const lines = forTable(list);
+const more = forList(list);
 
 /* Klasse 3: die gestalteten Motive für die Zeilen, an denen im CMS kein
-   Vorschaupicture hängt.
+   Vorschaubild hängt.
 
    Ohne sie stand `data-preview` leer da, und `services.js` ließ folgerichtig
    immer dasselbe Bild stehen: Beim Überfahren der Tabelle wechselte die
@@ -38,9 +38,9 @@ const MOTIFS = [
   "treatment-02",
 ] as const;
 
-/* Das Vorschaupicture hängt als Pfad im data-Attribut, weil services.js es an den
+/* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
    Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
-const vorschauPfad = (l: (typeof lines)[number], i: number) => {
+const previewPath = (l: (typeof lines)[number], i: number) => {
   const v = l.preview;
   if (isCmsImage(v)) return imageUrl(v, 640);
   if (typeof v === "string" && v) return v;
@@ -69,23 +69,23 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
 
           <div class="s-services__head" data-reveal="fade">
             <span>Leistung</span>
-            <span class="s-services__head-praxis">Praxis</span>
+            <span class="s-services__head-practice">Praxis</span>
             {/* Leere Zelle für die Pfeilspalte — sie trägt dieselbe Klasse wie
                 der Pfeil in den Zeilen und erscheint und verschwindet
                 deshalb mit ihm. Ohne diese Kopplung stünde der Kopf dort, wo
                 auf Touch der Pfeil sitzt, und läge eine Pfeilbreite neben
                 seiner eigenen Spalte. */}
-            <span class="s-services__pfeil" aria-hidden="true"></span>
+            <span class="s-services__arrow" aria-hidden="true"></span>
           </div>
 
           <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
             {lines.map((l, i) => (
               <a
                 class="s-services__row"
-                href={pfad(l)}
+                href={servicePath(l)}
                 data-service-row
                 data-reveal-child
-                data-preview={vorschauPfad(l, i)}
+                data-preview={previewPath(l, i)}
                 data-preview-label="Mehr Info"
               >
                 <span class="s-services__name">{l.name}</span>
@@ -93,7 +93,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
                 {/* Zeigt, dass die Zeile irgendwohin führt. Auf Zeigergeräten
                     verrät das der Hover, auf dem Telefon gäbe es sonst kein
                     Anzeichen — der Pfeil steht dort dauerhaft. */}
-                <span class="s-services__pfeil" aria-hidden="true">
+                <span class="s-services__arrow" aria-hidden="true">
                   <svg><use href="#i-arrow" /></svg>
                 </span>
               </a>
@@ -101,8 +101,8 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
           </div>
 
           <div class="s-services__more" data-reveal-stagger="0.06">
-            {weitere.map((l) => (
-              <a href={pfad(l)} data-reveal-child>
+            {more.map((l) => (
+              <a href={servicePath(l)} data-reveal-child>
                 <span>{l.name}</span>
                 {/* Der Pfeil steckt in einem überlaufversteckten Fenster —
                     das ist die Maske, aus der er beim Überfahren
@@ -304,7 +304,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
      Form und Maß stehen hier, nicht in den beiden Media-Blöcken weiter unten:
      Dort wird nur noch `display` umgelegt. Sonst stünde dieselbe Kontur
      zweimal da und liefe beim nächsten Eingriff auseinander. */
-  .s-services__pfeil {
+  .s-services__arrow {
     display: none;
     place-items: center;
     width: 32px;
@@ -314,12 +314,12 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
   /* Die Kontur bekommen nur die Zeilen. Die gleichnamige Zelle in der
      Kopfzeile hält bloß die Spur frei — mit Rand wäre sie ein leerer Kreis
      neben „LEISTUNG", der nach einem vergessenen Symbol aussieht. */
-  .s-services__row .s-services__pfeil {
+  .s-services__row .s-services__arrow {
     border: var(--bw) solid var(--c-line);
     border-radius: var(--r-round);
   }
 
-  .s-services__pfeil svg {
+  .s-services__arrow svg {
     width: 15px;
     height: 15px;
   }
@@ -336,7 +336,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
      selteneren. 24px setzen sie unter die 40px der Haupttabelle, ohne sie
      dorthin zu stellen — ein Schritt, keine zwei. */
   .s-services__more a {
-    --pfeil: 18px;
+    --arrow: 18px;
 
     position: relative;
     display: flex;
@@ -345,7 +345,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
     padding-block: var(--sp-3);
     /* Platz für den Pfeil, der aus dem Fluss genommen ist. Ohne das liefe ein
        langer Name unter ihm hindurch. */
-    padding-right: calc(var(--pfeil) + var(--sp-3));
+    padding-right: calc(var(--arrow) + var(--sp-3));
     border-bottom: var(--bw) solid var(--c-line);
     font-size: var(--fs-h5);
     line-height: 1.2;
@@ -371,8 +371,8 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
     right: 0;
     top: 50%;
     bottom: 0;
-    margin-top: calc(var(--pfeil) / -2);
-    width: var(--pfeil);
+    margin-top: calc(var(--arrow) / -2);
+    width: var(--arrow);
     overflow: hidden;
   }
 
@@ -387,8 +387,8 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
   }
 
   .s-services__more-icon svg {
-    width: var(--pfeil);
-    height: var(--pfeil);
+    width: var(--arrow);
+    height: var(--arrow);
   }
 
   /* Rückt beim Hover ein Stück nach rechts — dieselbe Geste wie in der
@@ -410,7 +410,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
     /* Kreis mit Pfeil, dauerhaft sichtbar. Auf Zeigergeräten verrät der Hover,
        dass die Zeile irgendwohin führt — hier gibt es davon nichts, und die
        Zeile sähe aus wie Text. */
-    .s-services__pfeil {
+    .s-services__arrow {
       display: grid;
     }
 
@@ -457,7 +457,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
     }
 
     .s-services__tag,
-    .s-services__head-praxis {
+    .s-services__head-practice {
       display: none;
     }
 
@@ -465,7 +465,7 @@ const vorschauPfad = (l: (typeof lines)[number], i: number) => {
        Darstellung eine Telefon-Darstellung, unabhängig davon, womit gezeigt
        wird. Sonst hinge das Anzeichen am Zufall, ob ein Trackpad
        angeschlossen ist. */
-    .s-services__pfeil {
+    .s-services__arrow {
       display: grid;
     }
 

@@ -12,20 +12,20 @@
 import Picture from "../ui/Picture.astro";
 import BildRing from "../ui/ImageRing.astro";
 import { loadSettings } from "../../lib/settings";
-import type { RingBild } from "../ui/ImageRing.astro";
+import type { RingImage } from "../ui/ImageRing.astro";
 import type { ImageSource } from "../../lib/images";
 
 interface Props {
-  variante?: "reihe" | "ring";
+  variant?: "reihe" | "ring";
   title: string;
   /** Die Motive auf dem Ring, aus dem CMS. */
-  bilder?: { image: ImageSource; caption?: string }[];
+  images?: { image: ImageSource; caption?: string }[];
 }
 
 /* Keine Vorgabe für den Titel: Pflichtfeld im Schema, die Seite reicht ihn
-   durch. `variante` ist dagegen eine Gestaltungsentscheidung der Seite und
+   durch. `variant` ist dagegen eine Gestaltungsentscheidung der Seite und
    kein Inhalt — sie behält ihre Vorgabe. */
-const { variante = "reihe", title, bilder } = Astro.props;
+const { variant = "reihe", title, images } = Astro.props;
 
 /* Die Standorte stehen in den Einstellungen — dieselbe Quelle wie im Fuß. */
 const { locations } = await loadSettings();
@@ -37,7 +37,7 @@ const { locations } = await loadSettings();
    `locationsImages` gab es im Schema schon einmal und es erreichte nie ein
    Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
    Standortfotos hochlädt, sieht sie hier. */
-const MOTIFS: RingBild[] = [
+const MOTIFS: RingImage[] = [
   { name: "praxis-03", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
   { name: "praxis-01", alt: "Empfangsbereich Prenzlauer Allee" },
   { name: "praxis-02", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
@@ -48,8 +48,8 @@ const MOTIFS: RingBild[] = [
 /* Gepflegte Bilder gewinnen als GANZE Liste, nicht Karte für Karte: Der Ring
    ist eine Komposition, und drei eigene Fotos zwischen zwei geliehenen
    Abstraktionen sähen aus wie ein Fehler. */
-const ringBilder: RingBild[] = bilder?.length
-  ? bilder.map((b) => ({ image: b.image, alt: b.caption ?? "", caption: b.caption }))
+const ringImages: RingImage[] = images?.length
+  ? images.map((b) => ({ image: b.image, alt: b.caption ?? "", caption: b.caption }))
   : MOTIFS;
 ---
 
@@ -59,8 +59,8 @@ const ringBilder: RingBild[] = bilder?.length
       <section class="s-gallery" id="standorte" data-gallery>
         <h2 class="s-gallery__title" data-split="lines">{title}</h2>
 
-        {variante === "ring" ? (
-          <BildRing bilder={ringBilder} label="Unsere Standorte" />
+        {variant === "ring" ? (
+          <BildRing images={ringImages} label="Unsere Standorte" />
         ) : (
           <Fragment>
           <div class="s-gallery__track" data-gallery-track>
@@ -107,7 +107,7 @@ const ringBilder: RingBild[] = bilder?.length
               <h3 data-reveal="up" data-reveal-delay={0.06 + i * 0.08} data-reveal-trigger=".s-experts">{o.name}</h3>
               {/* <address> statt <p>: das ist die Anschrift der Praxis, und
                   Vorlesegeräte kündigen sie als solche an. */}
-              <address class="s-cols__adresse" data-reveal="up" data-reveal-delay={0.1 + i * 0.08} data-reveal-trigger=".s-experts">
+              <address class="s-cols__address" data-reveal="up" data-reveal-delay={0.1 + i * 0.08} data-reveal-trigger=".s-experts">
                 {o.street}<br />{o.city}
               </address>
               <p data-reveal="up" data-reveal-delay={0.14 + i * 0.08} data-reveal-trigger=".s-experts">{o.description}</p>
@@ -223,7 +223,7 @@ const ringBilder: RingBild[] = bilder?.length
      aber in der Auszeichnungsschrift und etwas kräftiger, damit sie sich
      vom Fließtext löst, ohne eine eigene Überschrift zu sein.
      `font-style: normal`, weil <address> vom Browser kursiv gesetzt wird. */
-  .s-cols__adresse {
+  .s-cols__address {
     margin-bottom: var(--sp-3);
     font-family: var(--f-mono);
     font-style: normal;

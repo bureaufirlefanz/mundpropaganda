@@ -1,6 +1,6 @@
 ---
 import Button from "./Button.astro";
-import { loadServiceList, forTable, pfad } from "../../lib/service-list";
+import { loadServiceList, forTable, servicePath } from "../../lib/service-list";
 import { loadSettings, telLink } from "../../lib/settings";
 import { loadFooter, resolved } from "../../lib/navigation";
 
@@ -17,39 +17,39 @@ const e = await loadSettings();
 // standen auf jeder Seite vier Symbole, die den Browser nach oben springen
 // ließen. Ein Platzhalter, der die Prüfung besteht, ist schlimmer als ein
 // leeres Feld.
-const PROFILE = [
+const PROFILES = [
   { key: "facebook", title: "Facebook", symbol: "#i-facebook" },
   { key: "instagram", title: "Instagram", symbol: "#i-instagram" },
   { key: "linkedin", title: "LinkedIn", symbol: "#i-linkedin" },
   { key: "youtube", title: "YouTube", symbol: "#i-youtube" },
 ] as const;
-const profile = PROFILE.map((p) => ({ ...p, url: e.social[p.key] })).filter(
+const profiles = PROFILES.map((p) => ({ ...p, url: e.social[p.key] })).filter(
   (p) => p.url && p.url !== "#"
 );
 
 // Jahreszahl zur Bauzeit — die Seite ist statisch, ein Skript dafür wäre
 // unnötiges Gewicht. Sie steht bewusst NICHT im CMS: Eine getippte
 // Jahreszahl ist am 1. Januar falsch, und niemand denkt daran.
-const jahr = new Date().getFullYear();
+const year = new Date().getFullYear();
 
 /* Spalten, Knopf und Rechtliches seit Aufgabe 8 aus dem CMS. Die vier
-   Rechtstext-Links standen before auf `href="#"` — sie sahen aus wie ein
+   Rechtstext-Links standen vorher auf `href="#"` — sie sahen aus wie ein
    Angebot und führten nirgendwohin. Jetzt zeigen sie auf Rechtstext-
    Dokumente, und solange es die nicht gibt, steht die Zeile leer. */
 const f = await loadFooter();
-const hier = Astro.url.pathname;
+const here = Astro.url.pathname;
 
-const action = (await resolved([f?.action ?? null], hier))[0];
-const legalLinks = await resolved(f?.legalLinks, hier);
+const action = (await resolved([f?.action ?? null], here))[0];
+const legalLinks = await resolved(f?.legalLinks, here);
 
 const columns = (
   await Promise.all(
-    (f?.columns ?? []).map(async (sp) => ({
-      title: sp?.title ?? "",
-      links: await resolved(sp?.links, hier),
+    (f?.columns ?? []).map(async (col) => ({
+      title: col?.title ?? "",
+      links: await resolved(col?.links, here),
     }))
   )
-).filter((sp) => sp.title && sp.links.length > 0);
+).filter((col) => col.title && col.links.length > 0);
 ---
 
 <footer class="c-footer">
@@ -60,7 +60,7 @@ const columns = (
   <div class="c-footer__top">
     <div class="c-footer__contact">
       <div class="c-footer__social">
-        {profile.map((p) => (
+        {profiles.map((p) => (
           <a href={p.url} aria-label={p.title}><svg><use href={p.symbol} /></svg></a>
         ))}
       </div>
@@ -86,7 +86,7 @@ const columns = (
                 ohnehin die Straße, und „Praxis Prenzlauer Allee /
                 Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
                 Halbgeviertstrich wie sonst auch auf der Seite. */}
-            <p class="c-footer__standort-name">Praxis – {o.shortCode}</p>
+            <p class="c-footer__location-name">Praxis – {o.shortCode}</p>
             {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
                 solche an. Der Browser setzt das Element kursiv, das wird
                 unten zurückgenommen. */}
@@ -116,17 +116,17 @@ const columns = (
     <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
       <p class="c-footer__nav-title">{f?.servicesHeading}</p>
       {services.map((l) => (
-        <a class="c-link" href={pfad(l)}>{l.name}</a>
+        <a class="c-link" href={servicePath(l)}>{l.name}</a>
       ))}
     </nav>
 
     {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
         Zeile höher als die anderen — drei Spalten, von denen eine ohne
         Anlass aus der Reihe fällt. */}
-    {columns.map((spalte) => (
-      <nav class="c-footer__nav" aria-label={spalte.title}>
-        <p class="c-footer__nav-title">{spalte.title}</p>
-        {spalte.links.map((l) => (
+    {columns.map((column) => (
+      <nav class="c-footer__nav" aria-label={column.title}>
+        <p class="c-footer__nav-title">{column.title}</p>
+        {column.links.map((l) => (
           <a class="c-link" href={l.href}>{l.text}</a>
         ))}
       </nav>
@@ -134,7 +134,7 @@ const columns = (
   </div>
 
   <div class="c-footer__bottom">
-    <p>© {jahr}{f?.copyright ? ` ${f.copyright}` : ""}</p>
+    <p>© {year}{f?.copyright ? ` ${f.copyright}` : ""}</p>
     {legalLinks.length > 0 && (
       <div class="c-footer__legal">
         {legalLinks.map((l) => (
@@ -286,7 +286,7 @@ const columns = (
     }
   }
 
-  .c-footer__standort-name {
+  .c-footer__location-name {
     margin-bottom: var(--sp-1);
     font-family: var(--f-mono);
     font-weight: 300;

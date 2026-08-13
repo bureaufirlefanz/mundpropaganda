@@ -12,11 +12,11 @@
  * die Voraussetzung.
  */
 /**
- * Eine Zahl in der Leiste. Steht hier und nicht in lib/karriere.ts: Die Form
+ * Eine Zahl in der Leiste. Steht hier und nicht in lib/careers.ts: Die Form
  * gehört zum Baustein, nicht zu einer Seite — dieselbe Leiste könnte auch
  * woanders stehen.
  */
-interface Zahl {
+interface Figure {
   value: number;
   /** Was hinter der Zahl steht: „+", „%", „ min". Leer lassen für nichts. */
   unit?: string;
@@ -26,7 +26,7 @@ interface Zahl {
 interface Props {
   topline: string;
   headline: string;
-  figures: Zahl[];
+  figures: Figure[];
 }
 const { topline, headline, figures } = Astro.props;
 ---
@@ -42,10 +42,10 @@ const { topline, headline, figures } = Astro.props;
       <div class="s-facts__item" data-reveal-child>
         {/* <dt>/<dd> statt zweier <p>: Zahl und Erklärung gehören zusammen,
             und Vorlesegeräte geben das Paar auch als Paar aus. */}
-        <dt class="s-facts__wert">
+        <dt class="s-facts__value">
           {/* Der Zielwert steht als Text da — facts.js zählt ihn nur hoch.
               aria-hidden am Zähler wäre falsch: die Zahl IST die Angabe. */}
-          <span data-zaehler={z.value}>{z.value}</span>{z.unit}
+          <span data-counter={z.value}>{z.value}</span>{z.unit}
         </dt>
         <dd class="s-facts__text">{z.text}</dd>
       </div>
@@ -93,7 +93,7 @@ const { topline, headline, figures } = Astro.props;
      „24" las sich als „2 4". Gebraucht werden sie hier ohnehin nicht: Die
      Zahlen stehen linksbündig in je eigener Rasterzelle, beim Zählen wandert
      also nur die rechte Kante, und die grenzt an nichts. */
-  .s-facts__wert {
+  .s-facts__value {
     font-size: clamp(3rem, 6vw, 6.5rem);
     font-weight: 500;
     line-height: 1;

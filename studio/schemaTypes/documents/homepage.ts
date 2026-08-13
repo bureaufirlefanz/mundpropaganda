@@ -68,7 +68,7 @@ const heading = (group: string, withTopline = true) =>
     }),
   ].filter(Boolean) as ReturnType<typeof defineField>[];
 
-export const startseite = defineType({
+export const homepage = defineType({
   name: "homepage",
   title: "Startseite",
   type: "document",

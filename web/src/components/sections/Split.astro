@@ -17,11 +17,11 @@ import { isCmsImage, type ImageSource } from "../../lib/images";
 interface Props {
   topline: string;
   title: string;
-  absaetze: string[];
+  paragraphs: string[];
   image?: ImageSource;
 }
 
-const { topline, title, absaetze, image } = Astro.props;
+const { topline, title, paragraphs, image } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -44,7 +44,7 @@ const { topline, title, absaetze, image } = Astro.props;
         </div>
 
         <div class="s-split__panel" data-reveal="left" data-reveal-trigger=".s-split">
-          {absaetze.map((t, i) => (
+          {paragraphs.map((t, i) => (
             <p data-reveal="up" data-reveal-delay={0.3 + i * 0.12} data-reveal-trigger=".s-split">{t}</p>
           ))}
         </div>

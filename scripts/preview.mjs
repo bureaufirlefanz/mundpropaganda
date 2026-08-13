@@ -19,10 +19,10 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { join, extname, normalize } from "node:path";
 
-const WURZEL = "web/dist";
+const ROOT = "web/dist";
 const PORT = Number(process.argv[2] ?? process.env.PORT ?? 4322);
 
-const TYPEN = {
+const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -47,9 +47,9 @@ const TYPEN = {
  * `.html`, und das `index.html` im Verzeichnis. Ohne den mittleren Schritt
  * fände `/karriere.html` nichts, ohne den letzten `/karriere`.
  */
-async function finde(pfad) {
-  const kandidaten = [pfad, `${pfad}.html`, join(pfad, "index.html")];
-  for (const k of kandidaten) {
+async function resolveFile(path) {
+  const candidates = [path, `${path}.html`, join(path, "index.html")];
+  for (const k of candidates) {
     try {
       const s = await stat(k);
       if (s.isFile()) return k;
@@ -60,24 +60,24 @@ async function finde(pfad) {
   return null;
 }
 
-createServer(async (anfrage, antwort) => {
-  const url = new URL(anfrage.url ?? "/", "http://localhost");
+createServer(async (request, response) => {
+  const url = new URL(request.url ?? "/", "http://localhost");
   /* `normalize` gegen `..` im Pfad. Ein Prüfserver ist zwar nur lokal
      erreichbar, aber ein Verzeichniswechsel nach oben ist nie beabsichtigt. */
   const rel = normalize(decodeURIComponent(url.pathname)).replace(/^(\.\.[/\\])+/, "");
-  const datei = await finde(join(WURZEL, rel));
+  const file = await resolveFile(join(ROOT, rel));
 
-  if (!datei) {
-    antwort.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-    antwort.end("404");
+  if (!file) {
+    response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+    response.end("404");
     return;
   }
 
-  antwort.writeHead(200, {
-    "content-type": TYPEN[extname(datei)] ?? "application/octet-stream",
+  response.writeHead(200, {
+    "content-type": MIME_TYPES[extname(file)] ?? "application/octet-stream",
     "cache-control": "no-store",
   });
-  antwort.end(await readFile(datei));
+  response.end(await readFile(file));
 }).listen(PORT, () => {
-  console.log(`Build aus ${WURZEL} auf http://localhost:${PORT}`);
+  console.log(`Build aus ${ROOT} auf http://localhost:${PORT}`);
 });

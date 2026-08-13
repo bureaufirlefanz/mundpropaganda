@@ -66,7 +66,7 @@ for (const file of files) {
 }
 
 /* Festhalten, welche Stufen tatsächlich entstanden sind. `Picture.astro`
-   liest das; ohne diesen Schritt bliebe die alte Liste stehen und das Markup
+   liest das; ohne diesen Schritt bliebe die stale Liste stehen und das Markup
    forderte Breiten an, die es nicht mehr (oder noch nicht) gibt. */
 const karte = await schreibeBreiten();
 console.log(`\nBreiten-Verzeichnis geschrieben: ${Object.keys(karte).length} Motive.`);

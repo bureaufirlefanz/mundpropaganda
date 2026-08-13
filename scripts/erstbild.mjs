@@ -19,7 +19,7 @@ import { starteBrowser } from "./lib/chrome.mjs";
 
 const BASE = process.env.MP_BASE ?? "http://localhost:4322";
 const OUT = process.env.MP_OUT ?? ".shots/erstbild";
-const [pfad = "/"] = process.argv.slice(2);
+const [path = "/"] = process.argv.slice(2);
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
@@ -40,7 +40,7 @@ page.on("request", (r) => {
   r.continue().catch(() => {});
 });
 
-const url = `${BASE}${pfad}`;
+const url = `${BASE}${path}`;
 await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 }).catch(() => {});
 await page.evaluate(() => document.fonts.ready);
 await new Promise((r) => setTimeout(r, 400));

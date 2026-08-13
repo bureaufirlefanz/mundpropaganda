@@ -9,32 +9,32 @@
  * dahin trägt der Kopf die Seite, und das steht auch so im Studio.
  */
 import Base from "../layouts/Base.astro";
-import PostListe from "../components/sections/PostList.astro";
+import PostList from "../components/sections/PostList.astro";
 import Contact from "../components/sections/Contact.astro";
 import type { Post, MagazineIntro } from "../lib/magazine";
 
 interface Props {
-  kopf: MagazineIntro | undefined;
+  intro: MagazineIntro | undefined;
   posts: Post[];
 }
 
-const { kopf, posts } = Astro.props;
+const { intro, posts } = Astro.props;
 
 /* Wie auf der Startseite: Suchmaschinenangaben sind kein sichtbarer
    Seiteninhalt, deshalb darf der Seitentitel auf die Überschrift der Seite
    zurückfallen. Das sagt das Schema dem Kunden auch zu. */
-const title = kopf?.seo?.title || `${kopf?.title || "Magazin"} - Mundpropaganda`;
-const description = kopf?.seo?.description || kopf?.lead || "";
+const title = intro?.seo?.title || `${intro?.title || "Magazin"} - Mundpropaganda`;
+const description = intro?.seo?.description || intro?.lead || "";
 ---
 
-<Base title={title} description={description} noIndex={kopf?.seo?.noIndex}>
+<Base title={title} description={description} noIndex={intro?.seo?.noIndex}>
   <section class="container s-magazine-intro">
-    {kopf?.topline && <span class="c-topline" data-reveal="fade">{kopf.topline}</span>}
-    <h1 class="s-magazine-intro__title" data-split="lines">{kopf?.title}</h1>
-    {kopf?.lead && <p class="s-magazine-intro__text" data-reveal="up">{kopf.lead}</p>}
+    {intro?.topline && <span class="c-topline" data-reveal="fade">{intro.topline}</span>}
+    <h1 class="s-magazine-intro__title" data-split="lines">{intro?.title}</h1>
+    {intro?.lead && <p class="s-magazine-intro__text" data-reveal="up">{intro.lead}</p>}
   </section>
 
-  {posts.length > 0 && <PostListe posts={posts} />}
+  {posts.length > 0 && <PostList posts={posts} />}
 
   <Contact />
 </Base>

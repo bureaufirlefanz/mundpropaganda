@@ -23,8 +23,8 @@ const { topline, before, after } = Astro.props;
 /* Klasse 3: die Motive aus der lokalen Bildpipeline. Sie zeigen Veneers —
    deshalb steht im Studio an diesem Abschnitt ausdrücklich, dass eigene
    Aufnahmen hochgeladen gehören. Ohne den Rückfall bliebe der Vergleich leer. */
-const MOTIV_VORHER = "teeth-macro";
-const MOTIV_NACHHER = "teeth-macro-after";
+const MOTIF_BEFORE = "teeth-macro";
+const MOTIF_AFTER = "teeth-macro-after";
 ---
 
 <section class="s-ba">
@@ -35,13 +35,13 @@ const MOTIV_NACHHER = "teeth-macro-after";
       {isCmsImage(before) ? (
         <CmsImage source={before} alt="Zähne vor der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
       ) : (
-        <Picture name={MOTIV_VORHER} alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+        <Picture name={MOTIF_BEFORE} alt="Zähne vor der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
       )}
       <div class="s-ba__after">
         {isCmsImage(after) ? (
           <CmsImage source={after} alt="Zähne nach der Behandlung" widths={[640, 1024, 1600, 2048]} sizes="(max-width: 1100px) 100vw, 1100px" />
         ) : (
-          <Picture name={MOTIV_NACHHER} alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
+          <Picture name={MOTIF_AFTER} alt="Zähne nach der Behandlung" sizes="(max-width: 1100px) 100vw, 1100px" />
         )}
       </div>
       {/* Der Griff ist das Bedienelement, nicht nur Zierrat: role="slider"

@@ -5,7 +5,7 @@
  *
  * Die Geometrie rechnet modules/ring.js zur Laufzeit aus der gemessenen
  * Kartenbreite. Hier steht nur, wie eine Karte aussieht und wie viel Luft
- * zwischen zweien liegt (--ring-luft) — der Radius folgt daraus.
+ * zwischen zweien liegt (--ring-gap) — der Radius folgt daraus.
  *
  * Ein Ring braucht genug Karten, sonst wird aus dem Zylinder ein Dreieck.
  * Reichen die Motive nicht, werden sie wiederholt, bis MINDESTENS voll ist.
@@ -23,7 +23,7 @@ import { isCmsImage, type ImageSource } from "../../lib/images";
  * ankommen können, weil der Ring seinen Rückfall braucht, solange im Studio
  * nichts hochgeladen ist.
  */
-export interface RingBild {
+export interface RingImage {
   image?: ImageSource;
   /** Nur für den Rückfall: Name aus public/img, ohne Größe und Endung. */
   name?: string;
@@ -32,9 +32,9 @@ export interface RingBild {
 }
 
 interface Props {
-  bilder: RingBild[];
+  images: RingImage[];
   label: string;
-  mindestens?: number;
+  minimum?: number;
 }
 
 /* Die Anzahl steuert, wie stark sich der Ring krümmt. Der Radius wächst mit
@@ -45,21 +45,21 @@ interface Props {
      20 Karten → 18° Schritt → fast flach, mit einer Andeutung von Kurve
 
    Gewollt ist das Zweite. */
-const { bilder, label, mindestens = 20 } = Astro.props;
+const { images, label, minimum = 20 } = Astro.props;
 
 /* Auffüllen bis der Zylinder rund wird — aber auf ein VIELFACHES der
    Motivzahl. Sonst stößt am Ring-Schluss die letzte Wiederholung auf ihr
    eigenes Original und zwei gleiche Bilder stehen nebeneinander. Bei 5
-   Motiven und mindestens 16 werden daraus 20.
+   Motiven und minimum 16 werden daraus 20.
 
    Der Index sagt später, ob es sich um ein Original oder eine
    Wiederholung handelt. */
-const anzahl =
-  Math.ceil(Math.max(mindestens, bilder.length) / bilder.length) * bilder.length;
+const count =
+  Math.ceil(Math.max(minimum, images.length) / images.length) * images.length;
 
-const karten = Array.from({ length: anzahl }, (_, i) => ({
-  image: bilder[i % bilder.length],
-  wiederholung: i >= bilder.length,
+const cards = Array.from({ length: count }, (_, i) => ({
+  image: images[i % images.length],
+  repeated: i >= images.length,
 }));
 ---
 
@@ -76,23 +76,23 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
     tabindex="0"
   >
     <div class="c-ring__rotor" data-ring-rotor>
-      {karten.map(({ image, wiederholung }) => (
-        <figure class="c-ring__card" data-ring-card aria-hidden={wiederholung ? "true" : undefined}>
+      {cards.map(({ image, repeated }) => (
+        <figure class="c-ring__card" data-ring-card aria-hidden={repeated ? "true" : undefined}>
           {isCmsImage(image.image) ? (
             <CmsImage
               source={image.image}
-              alt={wiederholung ? "" : (image.alt ?? "")}
+              alt={repeated ? "" : (image.alt ?? "")}
               widths={[640, 1024]}
               sizes="(max-width: 700px) 80vw, 38vw"
             />
           ) : (
             <Picture
               name={image.name ?? "praxis-01"}
-              alt={wiederholung ? "" : (image.alt ?? "")}
+              alt={repeated ? "" : (image.alt ?? "")}
               sizes="(max-width: 700px) 80vw, 38vw"
             />
           )}
-          {image.caption && !wiederholung && (
+          {image.caption && !repeated && (
             <figcaption class="c-ring__caption">{image.caption}</figcaption>
           )}
         </figure>
@@ -117,7 +117,7 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
      ring.js ihn für den Radius braucht — eine zweite, fest verdrahtete Zahl
      im Skript würde beim nächsten Feinschliff auseinanderlaufen. */
   .c-ring {
-    --ring-luft: 20px;
+    --ring-gap: 20px;
 
     /* Kartenmaß an einer Stelle, damit die Bühne daraus rechnen kann. */
     --karte-width: clamp(260px, 34vw, 500px);
@@ -168,7 +168,7 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
     user-select: none;
   }
 
-  .c-ring[data-ring-zieht] .c-ring__stage {
+  .c-ring[data-ring-dragging] .c-ring__stage {
     cursor: grabbing;
   }
 
@@ -294,7 +294,7 @@ const karten = Array.from({ length: anzahl }, (_, i) => ({
      -------------------------------------------------------------------- */
   @media (max-width: 700px) {
     .c-ring {
-      --ring-luft: 10px;
+      --ring-gap: 10px;
       --karte-width: 92vw;
       --karte-height: 115vw;
       --buehne-luft: 12px;

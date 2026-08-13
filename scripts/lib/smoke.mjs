@@ -27,15 +27,15 @@ const istRauschen = (text) => RAUSCHEN.some((r) => r.test(text));
  * Fehler des ersten Ladevorgangs.
  */
 export function beobachte(page) {
-  const fehler = [];
+  const error = [];
   const requests = [];
 
   page.on("console", (m) => {
     if (m.type() !== "error") return;
     const text = m.text();
-    if (!istRauschen(text)) fehler.push(text);
+    if (!istRauschen(text)) error.push(text);
   });
-  page.on("pageerror", (e) => fehler.push(e.message));
+  page.on("pageerror", (e) => error.push(e.message));
   page.on("requestfailed", (r) => {
     // Abgebrochene Requests sind kein Fund: der Router bricht Prefetches ab,
     // wenn er die Seite doch schon hat.
@@ -48,7 +48,7 @@ export function beobachte(page) {
     }
   });
 
-  return { fehler, requests };
+  return { error, requests };
 }
 
 /** Einmal durch die Seite scrollen, damit jeder ScrollTrigger auslöst. */
@@ -112,20 +112,20 @@ export function messe(page) {
 }
 
 /** Aus Beobachtung und Messung eine Liste lesbarer Befunde bauen. */
-export function befunde({ fehler, requests }, report) {
-  const liste = [];
-  if (fehler.length) liste.push(`${fehler.length} Konsolenfehler: ${fehler[0]}`);
-  if (requests.length) liste.push(`${requests.length} fehlgeschlagene Requests: ${requests[0]}`);
+export function befunde({ error, requests }, report) {
+  const list = [];
+  if (error.length) list.push(`${error.length} Konsolenfehler: ${error[0]}`);
+  if (requests.length) list.push(`${requests.length} fehlgeschlagene Requests: ${requests[0]}`);
   if (report.toteReveals.length)
-    liste.push(`${report.toteReveals.length} unsichtbare Reveals: ${report.toteReveals[0]}`);
+    list.push(`${report.toteReveals.length} unsichtbare Reveals: ${report.toteReveals[0]}`);
   if (report.ueberlaufX > 1) {
     const wer = report.ueberlaeufer.map((u) => `${u.el} bis ${u.rechts}px`).join(", ");
-    liste.push(`horizontaler Überlauf: ${report.ueberlaufX}px${wer ? ` — ${wer}` : ""}`);
+    list.push(`horizontaler Überlauf: ${report.ueberlaufX}px${wer ? ` — ${wer}` : ""}`);
   }
   if (report.kaputteBilder.length)
-    liste.push(`${report.kaputteBilder.length} kaputte Bilder: ${report.kaputteBilder[0]}`);
-  if (report.leereBilder) liste.push(`${report.leereBilder} Bilder ohne src`);
-  return liste;
+    list.push(`${report.kaputteBilder.length} kaputte Bilder: ${report.kaputteBilder[0]}`);
+  if (report.leereBilder) list.push(`${report.leereBilder} Bilder ohne src`);
+  return list;
 }
 
 /** Eine Seite in einem Viewport vollständig prüfen. */
@@ -138,18 +138,18 @@ export async function pruefeSeite(browser, url, vp) {
   await page.evaluate(() => document.fonts.ready);
   await scrolleDurch(page);
 
-  const liste = befunde(beobachtet, await messe(page));
+  const list = befunde(beobachtet, await messe(page));
   await page.close();
-  return liste;
+  return list;
 }
 
 /** Ausgabe und Rückgabe der Gesamtzahl — für beide Prüfskripte gleich. */
-export function melde(pfad, liste) {
-  if (liste.length) {
-    console.log(`  ✗ ${pfad}`);
-    liste.forEach((i) => console.log(`      ${i}`));
+export function melde(path, list) {
+  if (list.length) {
+    console.log(`  ✗ ${path}`);
+    list.forEach((i) => console.log(`      ${i}`));
   } else {
-    console.log(`  ✓ ${pfad}`);
+    console.log(`  ✓ ${path}`);
   }
-  return liste.length;
+  return list.length;
 }

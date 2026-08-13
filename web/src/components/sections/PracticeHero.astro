@@ -29,7 +29,7 @@ interface Props {
 }
 
 const { topline, title, lead, image, imageSecondary } = Astro.props;
-const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
+const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
 ---
 
 <section class="s-phero">
@@ -43,8 +43,8 @@ const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
     </div>
 
     {isCmsImage(image) && (
-      <div class="s-phero__media" data-zwei={zweiBilder ? "" : undefined}>
-        <div class="s-phero__bild s-phero__bild--gross" data-reveal="scale">
+      <div class="s-phero__media" data-two-images={hasSecondImage ? "" : undefined}>
+        <div class="s-phero__image s-phero__image--large" data-reveal="scale">
           <CmsImage
             source={image}
             alt=""
@@ -54,8 +54,8 @@ const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
           />
         </div>
 
-        {zweiBilder && (
-          <div class="s-phero__bild s-phero__bild--klein" data-reveal="scale" data-reveal-delay="0.15">
+        {hasSecondImage && (
+          <div class="s-phero__image s-phero__image--small" data-reveal="scale" data-reveal-delay="0.15">
             <CmsImage
               source={imageSecondary}
               alt=""
@@ -123,27 +123,27 @@ const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
   /* Oben stärker gerundet als unten — dieselbe Bogenform wie die Linien
      dahinter, aus dem Zahnumriss abgeleitet. Ein Bild mit gleicher Rundung
      an allen vier Ecken stünde quer dazu. */
-  .s-phero__bild {
+  .s-phero__image {
     overflow: hidden;
     border-radius: clamp(80px, 10vw, 180px) clamp(80px, 10vw, 180px) var(--r-lg)
       var(--r-lg);
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 
-  .s-phero__bild--gross {
+  .s-phero__image--large {
     aspect-ratio: 16 / 9;
   }
 
   /* Nur wenn ein zweites Bild da ist, weicht das große zurück — allein darf
      es die volle Breite behalten. */
-  .s-phero__media[data-zwei] .s-phero__bild--gross {
+  .s-phero__media[data-two-images] .s-phero__image--large {
     width: 78%;
   }
 
   /* Versetzt über der rechten Ecke. `bottom` und nicht `top`: Das kleine
      Bild soll unten überstehen und die Section nach unten öffnen, nicht
      oben in die Überschrift ragen. */
-  .s-phero__bild--klein {
+  .s-phero__image--small {
     position: absolute;
     right: 0;
     bottom: clamp(-56px, -4vw, -28px);
@@ -155,7 +155,7 @@ const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
 
   /* :global(img), weil die Bilder aus CmsImage.astro kommen und das
      Scope-Attribut dieser Datei nicht tragen. */
-  .s-phero__bild :global(img) {
+  .s-phero__image :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -182,15 +182,15 @@ const zweiBilder = isCmsImage(image) && isCmsImage(imageSecondary);
       padding-bottom: 0;
     }
 
-    .s-phero__media[data-zwei] .s-phero__bild--gross {
+    .s-phero__media[data-two-images] .s-phero__image--large {
       width: 84%;
     }
 
-    .s-phero__bild--gross {
+    .s-phero__image--large {
       aspect-ratio: 4 / 3;
     }
 
-    .s-phero__bild--klein {
+    .s-phero__image--small {
       bottom: -24px;
       width: 38%;
     }

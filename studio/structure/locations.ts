@@ -18,7 +18,7 @@ import { pathFor } from "../lib/paths";
  */
 
 /** Die Seiten, auf denen der Rahmen überall sichtbar ist. */
-const UEBERALL = [
+const SITEWIDE = [
   { title: "Startseite", href: "/" },
   { title: "Magazin", href: "/magazin" },
   { title: "Karriere", href: "/karriere" },
@@ -46,10 +46,10 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     person: defineLocations({
       select: { title: "name", slug: "slug.current" },
       resolve: (doc) => {
-        const pfad = pathFor("person", doc?.slug ?? undefined);
+        const path = pathFor("person", doc?.slug ?? undefined);
         return {
           locations: [
-            ...(pfad ? [{ title: doc?.title ?? "Die Person", href: pfad }] : []),
+            ...(path ? [{ title: doc?.title ?? "Die Person", href: path }] : []),
             /* Und das Raster, in dem sie steht. Wer hier den Namen ändert,
                ändert ihn dort mit — das soll man sehen. */
             { title: "Praxis (Team-Raster)", href: "/praxis" },
@@ -66,10 +66,10 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     legalPage: defineLocations({
       select: { title: "title", slug: "slug.current" },
       resolve: (doc) => {
-        const pfad = pathFor("legalPage", doc?.slug ?? undefined);
+        const path = pathFor("legalPage", doc?.slug ?? undefined);
         return {
           locations: [
-            ...(pfad ? [{ title: doc?.title ?? "Der Rechtstext", href: pfad }] : []),
+            ...(path ? [{ title: doc?.title ?? "Der Rechtstext", href: path }] : []),
             /* Und die Zeile im Seitenfuß, die auf ihn verweist — sie steht
                auf jeder Seite. */
             { title: "Footer (überall)", href: "/" },
@@ -81,12 +81,12 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     service: defineLocations({
       select: { title: "title", shortName: "shortName", slug: "slug.current" },
       resolve: (doc) => {
-        const pfad = pathFor("service", doc?.slug ?? undefined);
+        const path = pathFor("service", doc?.slug ?? undefined);
         return {
           locations: [
             /* Die eigene Seite zuerst — sie ist gemeint, wenn jemand die
                Leistung bearbeitet. */
-            ...(pfad ? [{ title: doc?.title ?? "Die Leistung", href: pfad }] : []),
+            ...(path ? [{ title: doc?.title ?? "Die Leistung", href: path }] : []),
             /* Und die drei Aufzählungen, die denselben Namen tragen. Wer hier
                umbenennt, ändert sie alle mit — das soll man sehen, bevor man
                publiziert. */
@@ -99,16 +99,16 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     post: defineLocations({
       select: { title: "title", slug: "slug.current", service: "service->slug.current" },
       resolve: (doc) => {
-        const pfad = pathFor("post", doc?.slug ?? undefined);
-        const zurLeistung = pathFor("service", doc?.service ?? undefined);
+        const path = pathFor("post", doc?.slug ?? undefined);
+        const serviceHref = pathFor("service", doc?.service ?? undefined);
         return {
           locations: [
-            ...(pfad ? [{ title: doc?.title ?? "Der Beitrag", href: pfad }] : []),
+            ...(path ? [{ title: doc?.title ?? "Der Beitrag", href: path }] : []),
             { title: "Magazin (Übersicht)", href: "/magazin" },
             { title: "Startseite (Karussell)", href: "/" },
             /* Nur wenn der Beitrag auf eine Leistung verweist: dort steht er
                dann unter „Passend zum Thema". */
-            ...(zurLeistung ? [{ title: "Die verknüpfte Leistung", href: zurLeistung }] : []),
+            ...(serviceHref ? [{ title: "Die verknüpfte Leistung", href: serviceHref }] : []),
           ],
         };
       },
@@ -124,7 +124,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     settings: defineLocations({
       select: {},
       resolve: () => ({
-        locations: UEBERALL,
+        locations: SITEWIDE,
         message: "Kontakt, Bewertungen, Standorte und die Profile stehen auf jeder Seite.",
       }),
     }),
@@ -132,7 +132,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     navigation: defineLocations({
       select: {},
       resolve: () => ({
-        locations: UEBERALL,
+        locations: SITEWIDE,
         message: "Die Leiste und das große Menü stehen auf jeder Seite.",
       }),
     }),
@@ -140,7 +140,7 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     footer: defineLocations({
       select: {},
       resolve: () => ({
-        locations: UEBERALL,
+        locations: SITEWIDE,
         message: "Der Footer steht auf jeder Seite.",
       }),
     }),

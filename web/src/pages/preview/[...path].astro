@@ -9,7 +9,7 @@
  * Eigenschaft, dass die Site auch ohne laufenden Server steht. Für eine
  * Praxis-Website ist das ein schlechter Tausch.
  *
- * Gerendert wird über dieselben Zusammenbauten aus `seiten/` wie die echten
+ * Gerendert wird über dieselben Zusammenbauten aus `templates/` wie die echten
  * Routen. Das ist der Grund, warum Aufgabe 5 vor dieser hier stand: Zwei
  * Zusammenbauten, die dasselbe zeigen sollen, laufen garantiert auseinander —
  * und zwar unbemerkt, weil man immer nur eine von beiden ansieht.
@@ -23,9 +23,9 @@
  */
 export const prerender = false;
 
-import Startseite from "../../templates/Home.astro";
+import Home from "../../templates/Home.astro";
 import Service from "../../templates/Service.astro";
-import Magazin from "../../templates/Magazine.astro";
+import Magazine from "../../templates/Magazine.astro";
 import Post from "../../templates/Post.astro";
 import CareersContent from "../../templates/Careers.astro";
 import LegalPage from "../../templates/LegalPage.astro";
@@ -46,11 +46,11 @@ import {
 } from "../../lib/queries";
 import { withoutNull } from "../../lib/without-null";
 import type { HomepageContent } from "../../lib/homepage";
-import type { Service as LeistungDaten } from "../../lib/services";
-import type { Post as BeitragKarte, FullPost, MagazineIntro } from "../../lib/magazine";
-import type { CareersContent as KarriereDaten, Job } from "../../lib/careers";
+import type { Service as ServiceData } from "../../lib/services";
+import type { Post as PostData, FullPost, MagazineIntro } from "../../lib/magazine";
+import type { CareersContent as CareersData, Job } from "../../lib/careers";
 import type { ServiceEntry } from "../../lib/service-list";
-import type { LegalPage as RechtstextDaten } from "../../lib/legal-pages";
+import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
@@ -71,106 +71,106 @@ if (!client) {
   );
 }
 
-const target = targetFor(Astro.params.pfad ?? "");
+const target = targetFor(Astro.params.path ?? "");
 if (!target) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
 
 /* Kein Zwischenspeichern wie in den Ladefunktionen unter `lib/`: Die Vorschau
    läuft je Aufruf frisch, das ist ihr Zweck. */
-async function hole<T>(abfrage: string, params: Record<string, unknown> = {}) {
-  return withoutNull(await client!.fetch<T>(abfrage, params));
+async function load<T>(query: string, params: Record<string, unknown> = {}) {
+  return withoutNull(await client!.fetch<T>(query, params));
 }
 
 /* Je Seitenart genau die Abfragen, die ihr Zusammenbau braucht — und jede nur
    einmal. */
-let inhalt: {
-  startseite?: HomepageContent;
-  service?: LeistungDaten;
-  magazinKopf?: MagazineIntro;
-  beitrag?: FullPost;
-  karriere?: KarriereDaten;
-  rechtstext?: RechtstextDaten;
-  posts: BeitragKarte[];
+let content: {
+  homepage?: HomepageContent;
+  service?: ServiceData;
+  magazineIntro?: MagazineIntro;
+  post?: FullPost;
+  careers?: CareersData;
+  legalPage?: LegalPageData;
+  posts: PostData[];
   jobs: Job[];
   title: string;
 } = { posts: [], jobs: [], title: "" };
 
 if (target.kind === "homepage") {
   const [data, posts] = await Promise.all([
-    hole<HomepageContent>(HOMEPAGE_QUERY),
-    hole<BeitragKarte[]>(POSTS_QUERY, { service: null }),
+    load<HomepageContent>(HOMEPAGE_QUERY),
+    load<PostData[]>(POSTS_QUERY, { service: null }),
   ]);
-  inhalt = { ...inhalt, startseite: data, posts: posts ?? [] };
+  content = { ...content, homepage: data, posts: posts ?? [] };
 } else if (target.kind === "service") {
-  const [data, liste, start, posts] = await Promise.all([
-    hole<LeistungDaten>(SERVICE_QUERY, { slug: target.slug }),
-    hole<ServiceEntry[]>(SERVICE_LIST_QUERY),
-    hole<HomepageContent>(HOMEPAGE_QUERY),
-    hole<BeitragKarte[]>(POSTS_QUERY, { service: target.slug }),
+  const [data, list, home, posts] = await Promise.all([
+    load<ServiceData>(SERVICE_QUERY, { slug: target.slug }),
+    load<ServiceEntry[]>(SERVICE_LIST_QUERY),
+    load<HomepageContent>(HOMEPAGE_QUERY),
+    load<PostData[]>(POSTS_QUERY, { service: target.slug }),
   ]);
-  inhalt = {
-    ...inhalt,
+  content = {
+    ...content,
     service: data,
     posts: posts ?? [],
-    title: data?.title || (liste ?? []).find((l) => l.slug === target.slug)?.name || "",
-    startseite: start,
+    title: data?.title || (list ?? []).find((l) => l.slug === target.slug)?.name || "",
+    homepage: home,
   };
 } else if (target.kind === "magazineIndex") {
-  const [kopf, posts] = await Promise.all([
-    hole<MagazineIntro>(MAGAZINE_INDEX_QUERY),
-    hole<BeitragKarte[]>(POSTS_QUERY, { service: null }),
+  const [intro, posts] = await Promise.all([
+    load<MagazineIntro>(MAGAZINE_INDEX_QUERY),
+    load<PostData[]>(POSTS_QUERY, { service: null }),
   ]);
-  inhalt = { ...inhalt, magazinKopf: kopf, posts: posts ?? [] };
+  content = { ...content, magazineIntro: intro, posts: posts ?? [] };
 } else if (target.kind === "post") {
-  const data = await hole<FullPost>(POST_QUERY, { slug: target.slug });
+  const data = await load<FullPost>(POST_QUERY, { slug: target.slug });
   /* Erst nach dem Beitrag, nicht parallel: Die Kategorie steht in ihm, und
      ohne sie gibt es nichts Ähnliches zu holen. */
   const related = data?.category
-    ? ((await hole<BeitragKarte[]>(RELATED_QUERY, {
+    ? ((await load<PostData[]>(RELATED_QUERY, {
         category: data.category,
         slug: target.slug,
       })) ?? [])
     : [];
-  inhalt = { ...inhalt, beitrag: data, title: data?.title ?? "", posts: related };
+  content = { ...content, post: data, title: data?.title ?? "", posts: related };
 } else if (target.kind === "legalPage") {
-  const data = await hole<RechtstextDaten>(LEGAL_PAGE_QUERY, { slug: target.slug });
-  /* `zielVon` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
+  const data = await load<LegalPageData>(LEGAL_PAGE_QUERY, { slug: target.slug });
+  /* `targetFor` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
      wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
   if (!data) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
-  inhalt = { ...inhalt, rechtstext: data, title: data.title ?? "" };
+  content = { ...content, legalPage: data, title: data.title ?? "" };
 } else {
   const [data, jobs] = await Promise.all([
-    hole<KarriereDaten>(CAREERS_QUERY),
-    hole<Job[]>(JOBS_QUERY),
+    load<CareersData>(CAREERS_QUERY),
+    load<Job[]>(JOBS_QUERY),
   ]);
-  inhalt = { ...inhalt, karriere: data, jobs: jobs ?? [] };
+  content = { ...content, careers: data, jobs: jobs ?? [] };
 }
 ---
 
-{target.kind === "homepage" && inhalt.startseite && (
-  <Startseite data={inhalt.startseite} posts={inhalt.posts} />
+{target.kind === "homepage" && content.homepage && (
+  <Home data={content.homepage} posts={content.posts} />
 )}
 
 {target.kind === "service" && (
   <Service
-    data={inhalt.service}
-    title={inhalt.title}
-    stories={inhalt.startseite?.storiesItems ?? []}
-    posts={inhalt.posts}
+    data={content.service}
+    title={content.title}
+    stories={content.homepage?.storiesItems ?? []}
+    posts={content.posts}
   />
 )}
 
 {target.kind === "magazineIndex" && (
-  <Magazin kopf={inhalt.magazinKopf} posts={inhalt.posts} />
+  <Magazine intro={content.magazineIntro} posts={content.posts} />
 )}
 
 {target.kind === "post" && (
-  <Post data={inhalt.beitrag} title={inhalt.title} related={inhalt.posts} />
+  <Post data={content.post} title={content.title} related={content.posts} />
 )}
 
-{target.kind === "careers" && <CareersContent data={inhalt.karriere} jobs={inhalt.jobs} />}
+{target.kind === "careers" && <CareersContent data={content.careers} jobs={content.jobs} />}
 
 {target.kind === "legalPage" && (
-  <LegalPage data={inhalt.rechtstext} title={inhalt.title} />
+  <LegalPage data={content.legalPage} title={content.title} />
 )}
 
 <VisualEditing />

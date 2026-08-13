@@ -62,23 +62,23 @@ export function initAccordion() {
 
 export function initBeforeAfter() {
   document.querySelectorAll("[data-ba]").forEach((frame) => {
-    const griff = frame.querySelector("[data-ba-handle]");
+    const handle = frame.querySelector("[data-ba-handle]");
     let dragging = false;
-    let stand = 50; // Prozent, von links
+    let position = 50; // Prozent, von links
 
-    const anwenden = () => {
-      frame.style.setProperty("--ba-pos", `${stand}%`);
-      if (!griff) return;
+    const apply = () => {
+      frame.style.setProperty("--ba-pos", `${position}%`);
+      if (!handle) return;
       /* Der Wert muss auch angesagt werden, nicht nur gezeichnet: ohne
          aria-valuenow liest ein Vorlesegerät den Regler als leer vor. */
-      griff.setAttribute("aria-valuenow", String(Math.round(stand)));
-      griff.setAttribute("aria-valuetext", `${Math.round(stand)} % after`);
+      handle.setAttribute("aria-valuenow", String(Math.round(position)));
+      handle.setAttribute("aria-valuetext", `${Math.round(position)} % after`);
     };
 
     const setPos = (clientX) => {
       const rect = frame.getBoundingClientRect();
-      stand = gsap.utils.clamp(0, 100, ((clientX - rect.left) / rect.width) * 100);
-      anwenden();
+      position = gsap.utils.clamp(0, 100, ((clientX - rect.left) / rect.width) * 100);
+      apply();
     };
 
     frame.addEventListener("pointerdown", (e) => {
@@ -102,18 +102,18 @@ export function initBeforeAfter() {
        alle, die keine Maus benutzen, gab es den Vergleich schlicht nicht
        (WCAG 2.1.1). Die Schrittweiten folgen der Gepflogenheit für Regler:
        Pfeiltasten fein, Bild auf/ab grob, Pos1/Ende an den Anschlag. */
-    griff?.addEventListener("keydown", (e) => {
-      const schritt = { ArrowLeft: -2, ArrowRight: 2, PageDown: -10, PageUp: 10 }[e.key];
-      if (schritt !== undefined) stand = gsap.utils.clamp(0, 100, stand + schritt);
-      else if (e.key === "Home") stand = 0;
-      else if (e.key === "End") stand = 100;
+    handle?.addEventListener("keydown", (e) => {
+      const step = { ArrowLeft: -2, ArrowRight: 2, PageDown: -10, PageUp: 10 }[e.key];
+      if (step !== undefined) position = gsap.utils.clamp(0, 100, position + step);
+      else if (e.key === "Home") position = 0;
+      else if (e.key === "End") position = 100;
       else return;
 
       e.preventDefault();
-      anwenden();
+      apply();
     });
 
-    anwenden();
+    apply();
   });
 }
 

@@ -12,7 +12,7 @@
  * Die Bewegung soll auffallen, während sie läuft, und nicht danach.
  */
 import { gsap, ScrollTrigger, SplitText, prefersReducedMotion } from "../lib/gsap.js";
-import { warteAufSchrift, SCHRIFT } from "../lib/fonts.js";
+import { waitForFonts, FONTS } from "../lib/fonts.js";
 
 /* Gemeinsame Kurve für alle Reveals: sehr langes Auslaufen, kein Bounce.
    Das ist der Unterschied zwischen "animiert" und "elegant". */
@@ -99,7 +99,7 @@ export function initSplitHeadlines() {
   /* Erst nach dem Laden der Schrift splitten, sonst brechen die Zeilen falsch
      um. Gewartet wird auf die Schnitte der Display-Typo, nicht auf
      `document.fonts.ready` — die Begründung steht in lib/fonts.js. */
-  warteAufSchrift(SCHRIFT.sans).then(() => {
+  waitForFonts(FONTS.sans).then(() => {
     targets.forEach((el) => {
       const type = el.dataset.split || "lines";
       const isChars = type === "chars";

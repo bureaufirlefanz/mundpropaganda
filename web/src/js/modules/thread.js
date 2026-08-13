@@ -51,16 +51,16 @@ function measure(path, samples = 240) {
   const geometric = path.getTotalLength();
   const table = [];
   let acc = 0;
-  let vorX = 0;
-  let vorY = 0;
+  let prevX = 0;
+  let prevY = 0;
 
   for (let i = 0; i <= samples; i++) {
-    const roh = path.getPointAtLength((geometric * i) / samples);
-    const x = roh.x;
-    const y = roh.y;
-    if (i) acc += Math.hypot((x - vorX) * sx, (y - vorY) * sy);
-    vorX = x;
-    vorY = y;
+    const raw = path.getPointAtLength((geometric * i) / samples);
+    const x = raw.x;
+    const y = raw.y;
+    if (i) acc += Math.hypot((x - prevX) * sx, (y - prevY) * sy);
+    prevX = x;
+    prevY = y;
     table.push({ y, len: acc });
   }
 

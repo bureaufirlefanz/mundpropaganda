@@ -15,14 +15,14 @@
  * vollständig da: Der gefüllte Teil ist die Voreinstellung, nicht der leere.
  */
 
-export interface Etappe {
+export interface Stage {
   title: string;
   text: string;
 }
 
 interface Props {
   headline: string;
-  stages: Etappe[];
+  stages: Stage[];
 }
 const { headline, stages } = Astro.props;
 ---
@@ -32,21 +32,21 @@ const { headline, stages } = Astro.props;
     <h2 class="s-timeline__title" data-split="lines">{headline}</h2>
   </div>
 
-  <ol class="s-timeline__bahn" data-reveal-stagger="0.1">
+  <ol class="s-timeline__track" data-reveal-stagger="0.1">
     {/* Die Bahn selbst: eine blasse Linie über die volle Breite, darüber die
         farbige, die mitwächst. Zwei Elemente statt eines Verlaufs — ein
         Verlauf ließe sich nicht sauber auf einen Fortschritt abbilden. */}
-    <div class="s-timeline__gleis" aria-hidden="true">
-      <span class="s-timeline__fortschritt" data-timeline-fill></span>
+    <div class="s-timeline__rail" aria-hidden="true">
+      <span class="s-timeline__progress" data-timeline-fill></span>
     </div>
 
     {stages.map((e, i) => (
-      <li class="s-timeline__etappe" data-reveal-child>
-        <span class="s-timeline__punkt" aria-hidden="true"></span>
-        <h3 class="s-timeline__etappe-title">
+      <li class="s-timeline__stage" data-reveal-child>
+        <span class="s-timeline__dot" aria-hidden="true"></span>
+        <h3 class="s-timeline__stage-title">
           {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
               Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
-          <span class="s-timeline__nummer" aria-hidden="true">{i + 1}</span>
+          <span class="s-timeline__number" aria-hidden="true">{i + 1}</span>
           {e.title}
         </h3>
         <p class="s-timeline__text">{e.text}</p>
@@ -72,7 +72,7 @@ const { headline, stages } = Astro.props;
     letter-spacing: -0.01em;
   }
 
-  .s-timeline__bahn {
+  .s-timeline__track {
     position: relative;
     display: grid;
     grid-auto-flow: column;
@@ -86,7 +86,7 @@ const { headline, stages } = Astro.props;
   /* Das Gleis liegt auf Höhe der Punkte, nicht am oberen Rand: Die Punkte
      sitzen mittig auf ihm, deshalb dieselbe Rechnung an beiden Stellen
      (halbe Punktgröße). */
-  .s-timeline__gleis {
+  .s-timeline__rail {
     position: absolute;
     top: 7px;
     right: 0;
@@ -95,7 +95,7 @@ const { headline, stages } = Astro.props;
     background: var(--c-line);
   }
 
-  .s-timeline__fortschritt {
+  .s-timeline__progress {
     display: block;
     width: 100%;
     height: 100%;
@@ -107,7 +107,7 @@ const { headline, stages } = Astro.props;
     transform: scaleX(1);
   }
 
-  .s-timeline__etappe {
+  .s-timeline__stage {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -115,7 +115,7 @@ const { headline, stages } = Astro.props;
     padding-top: var(--sp-6);
   }
 
-  .s-timeline__punkt {
+  .s-timeline__dot {
     position: absolute;
     top: 0;
     left: 0;
@@ -129,7 +129,7 @@ const { headline, stages } = Astro.props;
   }
 
   /* Erreichte Marke: gefüllt. Das Attribut setzt timeline.js. */
-  .s-timeline__etappe[data-erreicht] .s-timeline__punkt {
+  .s-timeline__stage[data-reached] .s-timeline__dot {
     background: var(--c-brand);
     border-color: var(--c-brand);
   }
@@ -138,7 +138,7 @@ const { headline, stages } = Astro.props;
      „Woche 2–3"), von der er hier abgesetzt werden musste. Die Marken sind
      entfallen — der Titel beginnt jetzt direkt unter dem Punkt, und ein
      Rest-Abstand ließe die Etappen ohne Grund tiefer sitzen. */
-  .s-timeline__etappe-title {
+  .s-timeline__stage-title {
     display: flex;
     align-items: baseline;
     gap: 0.5em;
@@ -160,7 +160,7 @@ const { headline, stages } = Astro.props;
      `align-self: center` statt der Grundlinie des Titels: Ein Kreis hat
      keine Grundlinie, an der man ihn ausrichten könnte — er säße sonst
      sichtbar zu tief. */
-  .s-timeline__nummer {
+  .s-timeline__number {
     flex: 0 0 auto;
     align-self: center;
     display: grid;
@@ -186,13 +186,13 @@ const { headline, stages } = Astro.props;
 
   /* Senkrecht ab hier: Das Gleis wandert nach links, die Etappen stapeln. */
   @media (max-width: 900px) {
-    .s-timeline__bahn {
+    .s-timeline__track {
       grid-auto-flow: row;
       gap: var(--sp-8);
       padding-left: var(--sp-6);
     }
 
-    .s-timeline__gleis {
+    .s-timeline__rail {
       top: 7px;
       bottom: 7px;
       right: auto;
@@ -201,16 +201,16 @@ const { headline, stages } = Astro.props;
       height: auto;
     }
 
-    .s-timeline__fortschritt {
+    .s-timeline__progress {
       transform-origin: 50% 0;
     }
 
-    .s-timeline__etappe {
+    .s-timeline__stage {
       padding-top: 0;
       padding-left: var(--sp-6);
     }
 
-    .s-timeline__punkt {
+    .s-timeline__dot {
       left: calc(-1 * var(--sp-6));
     }
 

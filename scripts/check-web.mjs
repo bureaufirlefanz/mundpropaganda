@@ -26,11 +26,11 @@ const VOLL = 2;
 await erwarteServer(BASE, "npm run web");
 
 /** Alle intern verlinkten Seiten ab „/" sammeln, eine Ebene tief. */
-async function findeSeiten(browser) {
+async function findPages(browser) {
   const page = await browser.newPage();
 
-  const linksVon = async (pfad) => {
-    await page.goto(BASE + pfad, { waitUntil: "networkidle2", timeout: 60000 });
+  const linksVon = async (path) => {
+    await page.goto(BASE + path, { waitUntil: "networkidle2", timeout: 60000 });
     return page.evaluate(() =>
       [...document.querySelectorAll('a[href^="/"]')]
         .map((a) => new URL(a.getAttribute("href"), location.origin).pathname)
@@ -51,9 +51,9 @@ async function findeSeiten(browser) {
   const ersteEbene = await linksVon("/");
   const links = [...ersteEbene];
 
-  for (const pfad of new Set(ersteEbene)) {
-    if (pfad === "/") continue;
-    links.push(...(await linksVon(pfad)));
+  for (const path of new Set(ersteEbene)) {
+    if (path === "/") continue;
+    links.push(...(await linksVon(path)));
   }
 
   await page.close();
@@ -75,7 +75,7 @@ async function findeSeiten(browser) {
  * sein kann: Reveals, die nicht wieder anlaufen, und ScrollTrigger, die vom
  * alten Dokument übrig bleiben.
  */
-async function pruefeWechsel(browser, ziel, vp) {
+async function checkTransition(browser, target, vp) {
   const page = await browser.newPage();
   await page.setViewport({ width: vp.width, height: vp.height });
   const beobachtet = beobachte(page);
@@ -113,9 +113,9 @@ async function pruefeWechsel(browser, ziel, vp) {
     );
   });
 
-  const gewechselt = await page.evaluate(async (ziel) => {
+  const gewechselt = await page.evaluate(async (target) => {
     const link = [...document.querySelectorAll("a[href]")].find(
-      (a) => new URL(a.href).pathname === ziel
+      (a) => new URL(a.href).pathname === target
     );
     if (!link) return false;
     link.click();
@@ -125,39 +125,39 @@ async function pruefeWechsel(browser, ziel, vp) {
       document.addEventListener("astro:page-load", r, { once: true });
       setTimeout(r, 8000);
     });
-    return location.pathname === ziel;
-  }, ziel);
+    return location.pathname === target;
+  }, target);
 
-  const liste = [];
+  const list = [];
   if (!gewechselt) {
-    liste.push(`Router-Wechsel nach ${ziel} hat nicht stattgefunden`);
+    list.push(`Router-Wechsel nach ${target} hat nicht stattgefunden`);
   } else {
     const nachTausch = await page.evaluate(() => window.__nachTausch ?? null);
     if (nachTausch && !nachTausch.htmlKlassen.split(/\s+/).includes("js")) {
-      liste.push(`die Klasse „js" fehlt nach dem Austausch — keine Startregel greift`);
+      list.push(`die Klasse „js" fehlt nach dem Austausch — keine Startregel greift`);
     }
     if (nachTausch?.reveals) {
-      liste.push(`${nachTausch.reveals} Reveals stehen direkt nach dem Austausch schon sichtbar da`);
+      list.push(`${nachTausch.reveals} Reveals stehen direkt nach dem Austausch schon sichtbar da`);
     }
     if (nachTausch?.splits) {
-      liste.push(`${nachTausch.splits} Headlines stehen direkt nach dem Austausch schon sichtbar da`);
+      list.push(`${nachTausch.splits} Headlines stehen direkt nach dem Austausch schon sichtbar da`);
     }
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await scrolleDurch(page);
-    liste.push(...befunde(beobachtet, await messe(page)));
+    list.push(...befunde(beobachtet, await messe(page)));
 
     const nachher = await page.evaluate(() => window.__st?.getAll?.().length ?? null);
     // Die Trigger der alten Seite müssen weg sein. Grob doppelt so viele wie
     // vorher heißt: sie wurden nicht aufgeräumt und messen gegen Elemente,
     // die es nicht mehr gibt.
     if (vorher && nachher && nachher > vorher * 1.8) {
-      liste.push(`ScrollTrigger stapeln sich: ${vorher} vor dem Wechsel, ${nachher} danach`);
+      list.push(`ScrollTrigger stapeln sich: ${vorher} vor dem Wechsel, ${nachher} danach`);
     }
   }
 
   await page.close();
-  return liste;
+  return list;
 }
 
 /**
@@ -166,13 +166,13 @@ async function pruefeWechsel(browser, ziel, vp) {
  * jeden mit „Bewegung reduzieren" die halbe Seite leer — ein Fehler, den man
  * selbst nie sieht, solange die Einstellung aus ist.
  */
-async function pruefeOhneBewegung(browser, pfad, vp) {
+async function pruefeOhneBewegung(browser, path, vp) {
   const page = await browser.newPage();
   await page.setViewport({ width: vp.width, height: vp.height });
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   const beobachtet = beobachte(page);
 
-  await page.goto(BASE + pfad, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(BASE + path, { waitUntil: "networkidle2", timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 1200));
   await scrolleDurch(page);
@@ -197,12 +197,12 @@ async function pruefeOhneBewegung(browser, pfad, vp) {
       .map(bezeichne);
   });
 
-  const liste = befunde(beobachtet, await messe(page));
+  const list = befunde(beobachtet, await messe(page));
   if (versteckt.length) {
-    liste.push(`${versteckt.length} Element(e) bleiben ohne Bewegung verborgen: ${versteckt[0]}`);
+    list.push(`${versteckt.length} Element(e) bleiben ohne Bewegung verborgen: ${versteckt[0]}`);
   }
   await page.close();
-  return liste;
+  return list;
 }
 
 /**
@@ -212,18 +212,18 @@ async function pruefeOhneBewegung(browser, pfad, vp) {
  * Mit abgeschalteter Bewegung, sonst stehen die Reveals noch auf Deckkraft 0
  * und jeder Text darin fiele als unsichtbar durch.
  */
-async function pruefeBarrierefreiheit(browser, pfad, vp) {
+async function pruefeBarrierefreiheit(browser, path, vp) {
   const page = await browser.newPage();
   await page.setViewport({ width: vp.width, height: vp.height });
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-  await page.goto(BASE + pfad, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(BASE + path, { waitUntil: "networkidle2", timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 1200));
   await scrolleDurch(page);
 
-  const ergebnis = await page.evaluate(wcagMessen);
+  const result = await page.evaluate(wcagMessen);
   await page.close();
-  return { liste: wcagBefunde(ergebnis), ergebnis };
+  return { list: wcagBefunde(result), result };
 }
 
 /**
@@ -237,9 +237,9 @@ async function pruefeBarrierefreiheit(browser, pfad, vp) {
  * Gelesen wird aus `studio/lib/paths.ts`, der einzigen Stelle, an der URLs
  * entstehen. Eine zweite Liste hier würde genau den Zweck verfehlen.
  */
-async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
-  const { FIXED_PATHS, DIRECTORIES, TOP_LEVEL } = await ladePfadmodell();
-  const ausgeblendet = await ladeAusgeblendete();
+async function checkRouteCoverage(browser, gefundeneSeiten) {
+  const { FIXED_PATHS, DIRECTORIES, TOP_LEVEL } = await loadPathModel();
+  const ausgeblendet = await loadHiddenTypes();
 
   /* Ein Typ, den das Studio gar nicht anbietet, kann auch niemanden
      enttäuschen. Geprüft wird, was der Kunde sieht — nicht, was das
@@ -247,15 +247,15 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
   const zeigtStudio = (typ) => !ausgeblendet.includes(typ);
 
   const seite = await browser.newPage();
-  const fehlend = [];
-  let geprueft = 0;
+  const missing = [];
+  let checked = 0;
 
   /* Einzeldokumente: ihr fester Pfad muss antworten. */
-  for (const [typ, pfad] of Object.entries(FIXED_PATHS)) {
+  for (const [typ, path] of Object.entries(FIXED_PATHS)) {
     if (!zeigtStudio(typ)) continue;
-    geprueft++;
-    const antwort = await seite.goto(BASE + pfad, { waitUntil: "domcontentloaded", timeout: 30000 });
-    if (!antwort || antwort.status() >= 400) fehlend.push({ typ, pfad, status: antwort?.status() ?? 0 });
+    checked++;
+    const response = await seite.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 30000 });
+    if (!response || response.status() >= 400) missing.push({ typ, path, status: response?.status() ?? 0 });
   }
   await seite.close();
 
@@ -264,12 +264,12 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
      keine Übersicht hat. Die Übersicht ist ein eigener Typ
      (`leistungenIndex`) und wird oben geprüft. Deshalb hier gegen die
      gecrawlte Liste statt gegen das nackte Verzeichnis: sonst meldete die
-     Prüfung `leistung` als fehlend, obwohl es elf Seiten hat. */
-  for (const [typ, ordner] of Object.entries(DIRECTORIES)) {
+     Prüfung `leistung` als missing, obwohl es elf Seiten hat. */
+  for (const [typ, dir] of Object.entries(DIRECTORIES)) {
     if (!zeigtStudio(typ)) continue;
-    geprueft++;
-    if (!gefundeneSeiten.some((p) => p.startsWith(`/${ordner}/`))) {
-      fehlend.push({ typ, pfad: `/${ordner}/<slug>`, status: 0 });
+    checked++;
+    if (!gefundeneSeiten.some((p) => p.startsWith(`/${dir}/`))) {
+      missing.push({ typ, path: `/${dir}/<slug>`, status: 0 });
     }
   }
 
@@ -279,47 +279,47 @@ async function pruefeRoutenDeckung(browser, gefundeneSeiten) {
   const { existsSync } = await import("node:fs");
   for (const typ of TOP_LEVEL) {
     if (!zeigtStudio(typ)) continue;
-    geprueft++;
+    checked++;
     if (!existsSync("web/src/pages/[slug].astro")) {
-      fehlend.push({ typ, pfad: "/<slug>", status: 0 });
+      missing.push({ typ, path: "/<slug>", status: 0 });
     }
   }
 
-  if (!fehlend.length) {
-    console.log(`  ✓ ${geprueft} Dokumenttypen haben eine Seite`);
+  if (!missing.length) {
+    console.log(`  ✓ ${checked} Dokumenttypen haben eine Seite`);
     return 0;
   }
 
-  console.log(`  ✗ ${fehlend.length} Dokumenttyp(en) ohne Seite`);
-  for (const { typ, pfad, status } of fehlend) {
-    console.log(`      ${typ.padEnd(16)} ${pfad.padEnd(14)} ${status || "keine Route"}`);
+  console.log(`  ✗ ${missing.length} Dokumenttyp(en) ohne Seite`);
+  for (const { typ, path, status } of missing) {
+    console.log(`      ${typ.padEnd(16)} ${path.padEnd(14)} ${status || "keine Route"}`);
   }
   console.log(`      Entweder die Seite bauen oder den Typ aus studio/structure/index.ts nehmen.`);
-  return fehlend.length;
+  return missing.length;
 }
 
 /**
- * `pfade.ts` ist TypeScript und exportiert die drei Tabellen nicht. Statt
+ * `paths.ts` ist TypeScript und exportiert die drei Tabellen nicht. Statt
  * eine zweite Wahrheit anzulegen, werden sie hier aus der Quelle gelesen.
  * Bricht das Einlesen, ist das ein Befund und keine stille Null.
  */
 /** Die Typen, die das Studio bewusst nicht anbietet (structure/index.ts). */
-async function ladeAusgeblendete() {
+async function loadHiddenTypes() {
   const { readFile } = await import("node:fs/promises");
-  const quelle = await readFile("studio/structure/index.ts", "utf8");
-  const treffer = quelle.match(/OHNE_ROUTE\s*=\s*\[([\s\S]*?)\]/);
-  if (!treffer) throw new Error("In studio/structure/index.ts fehlt OHNE_ROUTE.");
-  return [...treffer[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  const source = await readFile("studio/structure/index.ts", "utf8");
+  const match = source.match(/UNROUTED\s*=\s*\[([\s\S]*?)\]/);
+  if (!match) throw new Error("In studio/structure/index.ts fehlt UNROUTED.");
+  return [...match[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
 }
 
-async function ladePfadmodell() {
+async function loadPathModel() {
   const { readFile } = await import("node:fs/promises");
-  const quelle = await readFile("studio/lib/paths.ts", "utf8");
+  const source = await readFile("studio/lib/paths.ts", "utf8");
 
   const block = (name) => {
-    const treffer = quelle.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
-    if (!treffer) throw new Error(`In studio/lib/paths.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
-    return treffer[1];
+    const match = source.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
+    if (!match) throw new Error(`In studio/lib/paths.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
+    return match[1];
   };
 
   const paare = (roh) =>
@@ -348,16 +348,16 @@ async function ladePfadmodell() {
  * Kandidatinnen, von denen der Browser genau eine holt — über HTTP fiele
  * immer nur die auf, die dieses Fenster gerade wählt.
  */
-async function pruefeBilder() {
+async function checkImages() {
   const { readFile, readdir, access } = await import("node:fs/promises");
   const { join, relative } = await import("node:path");
 
-  async function alleHtml(ordner) {
+  async function allHtml(dir) {
     const raus = [];
-    for (const eintrag of await readdir(ordner, { withFileTypes: true })) {
-      const pfad = join(ordner, eintrag.name);
-      if (eintrag.isDirectory()) raus.push(...(await alleHtml(pfad)));
-      else if (eintrag.name.endsWith(".html")) raus.push(pfad);
+    for (const eintrag of await readdir(dir, { withFileTypes: true })) {
+      const path = join(dir, eintrag.name);
+      if (eintrag.isDirectory()) raus.push(...(await allHtml(path)));
+      else if (eintrag.name.endsWith(".html")) raus.push(path);
     }
     return raus;
   }
@@ -365,7 +365,7 @@ async function pruefeBilder() {
   const wurzel = "web/dist";
   let dateien;
   try {
-    dateien = await alleHtml(wurzel);
+    dateien = await allHtml(wurzel);
   } catch {
     console.log("  (kein web/dist — übersprungen)");
     return 0;
@@ -374,38 +374,38 @@ async function pruefeBilder() {
   /* Adresse -> Seiten, auf denen sie steht. So nennt die Meldung nicht nur
      die fehlende Datei, sondern auch, wo man sie sieht. */
   const referenzen = new Map();
-  for (const datei of dateien) {
-    const html = await readFile(datei, "utf8");
-    for (const treffer of html.matchAll(/(?:src|srcset)="([^"]+)"/g)) {
-      for (const teil of treffer[1].split(",")) {
+  for (const file of dateien) {
+    const html = await readFile(file, "utf8");
+    for (const match of html.matchAll(/(?:src|srcset)="([^"]+)"/g)) {
+      for (const teil of match[1].split(",")) {
         const url = teil.trim().split(/\s+/)[0];
         if (!url.startsWith("/") || url.startsWith("//")) continue;
         if (!/\.(avif|webp|png|jpe?g|gif|svg)$/i.test(url)) continue;
         if (!referenzen.has(url)) referenzen.set(url, new Set());
-        referenzen.get(url).add("/" + relative(wurzel, datei).replace(/index\.html$/, ""));
+        referenzen.get(url).add("/" + relative(wurzel, file).replace(/index\.html$/, ""));
       }
     }
   }
 
-  const fehlend = [];
+  const missing = [];
   for (const url of referenzen.keys()) {
     try {
       await access(join(wurzel, decodeURIComponent(url)));
     } catch {
-      fehlend.push(url);
+      missing.push(url);
     }
   }
 
-  if (!fehlend.length) {
+  if (!missing.length) {
     console.log(`  ✓ ${referenzen.size} Bildadressen zeigen auf vorhandene Dateien`);
     return 0;
   }
-  for (const url of fehlend.sort()) {
+  for (const url of missing.sort()) {
     const wo = [...referenzen.get(url)].sort();
     console.log(`  ✗ ${url}`);
     console.log(`      steht auf: ${wo.slice(0, 3).join(", ")}${wo.length > 3 ? ` und ${wo.length - 3} weiteren` : ""}`);
   }
-  return fehlend.length;
+  return missing.length;
 }
 
 /**
@@ -421,16 +421,16 @@ async function pruefeBilder() {
  * Anker sind Teil der Adresse und gehören damit zum Publikum, nicht zum Code:
  * `#standorte`, nicht `#locations`. Dieselbe Regel wie für die Pfade.
  */
-async function pruefeAnker() {
+async function checkAnchors() {
   const { readFile, readdir } = await import("node:fs/promises");
   const { join, relative } = await import("node:path");
 
-  async function alleHtml(ordner) {
+  async function allHtml(dir) {
     const raus = [];
-    for (const eintrag of await readdir(ordner, { withFileTypes: true })) {
-      const pfad = join(ordner, eintrag.name);
-      if (eintrag.isDirectory()) raus.push(...(await alleHtml(pfad)));
-      else if (eintrag.name.endsWith(".html")) raus.push(pfad);
+    for (const eintrag of await readdir(dir, { withFileTypes: true })) {
+      const path = join(dir, eintrag.name);
+      if (eintrag.isDirectory()) raus.push(...(await allHtml(path)));
+      else if (eintrag.name.endsWith(".html")) raus.push(path);
     }
     return raus;
   }
@@ -438,67 +438,67 @@ async function pruefeAnker() {
   const wurzel = "web/dist";
   let dateien;
   try {
-    dateien = await alleHtml(wurzel);
+    dateien = await allHtml(wurzel);
   } catch {
     console.log("  (kein web/dist — übersprungen)");
     return 0;
   }
 
-  const fehlend = [];
-  let geprueft = 0;
+  const missing = [];
+  let checked = 0;
 
-  for (const datei of dateien) {
-    const html = await readFile(datei, "utf8");
+  for (const file of dateien) {
+    const html = await readFile(file, "utf8");
     const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
-    const seite = "/" + relative(wurzel, datei).replace(/index\.html$/, "");
+    const seite = "/" + relative(wurzel, file).replace(/index\.html$/, "");
 
     /* Nur echte Links. `<use href="#i-arrow">` verweist auf ein SVG-Symbol
        im Sprite und hat mit Sprungmarken nichts zu tun. */
-    for (const treffer of html.matchAll(/<a\s[^>]*href="#([^"]+)"/g)) {
-      const anker = decodeURIComponent(treffer[1]);
+    for (const match of html.matchAll(/<a\s[^>]*href="#([^"]+)"/g)) {
+      const anker = decodeURIComponent(match[1]);
       if (anker === "" || anker === "top") continue;
-      geprueft++;
-      if (!ids.has(anker)) fehlend.push({ seite, anker });
+      checked++;
+      if (!ids.has(anker)) missing.push({ seite, anker });
     }
   }
 
-  if (!fehlend.length) {
-    console.log(`  ✓ ${geprueft} Sprünge finden ihr Ziel`);
+  if (!missing.length) {
+    console.log(`  ✓ ${checked} Sprünge finden ihr Ziel`);
     return 0;
   }
 
   /* Nach Anker gebündelt: Ein fehlendes `id` auf 20 Seiten ist EIN Fehler,
      nicht zwanzig. */
   const je = new Map();
-  for (const f of fehlend) {
+  for (const f of missing) {
     if (!je.has(f.anker)) je.set(f.anker, []);
     je.get(f.anker).push(f.seite);
   }
-  for (const [anker, seiten] of je) {
+  for (const [anker, pages] of je) {
     console.log(`  ✗ #${anker} — kein Element mit dieser id`);
-    console.log(`      verlinkt auf: ${seiten.slice(0, 3).join(", ")}${seiten.length > 3 ? ` und ${seiten.length - 3} weiteren` : ""}`);
+    console.log(`      verlinkt auf: ${pages.slice(0, 3).join(", ")}${pages.length > 3 ? ` und ${pages.length - 3} weiteren` : ""}`);
   }
   return je.size;
 }
 
 const browser = await starteBrowser();
-const SEITEN = await findeSeiten(browser);
-console.log(`Gefundene Seiten: ${SEITEN.join(" · ")}`);
+const PAGES = await findPages(browser);
+console.log(`Gefundene Seiten: ${PAGES.join(" · ")}`);
 
-let probleme = 0;
+let problems = 0;
 
 for (const [i, vp] of VIEWPORTS.entries()) {
-  const seiten = i === 0 ? SEITEN : SEITEN.slice(0, VOLL);
+  const pages = i === 0 ? PAGES : PAGES.slice(0, VOLL);
   console.log(`\n── ${vp.name} (${vp.width}×${vp.height}) ──`);
   if (i === 1) console.log(`  (nur die ersten ${VOLL} Seiten — die übrigen teilen sich deren Route)`);
-  for (const pfad of seiten) {
-    probleme += melde(pfad, await pruefeSeite(browser, BASE + pfad, vp));
+  for (const path of pages) {
+    problems += melde(path, await pruefeSeite(browser, BASE + path, vp));
   }
 }
 
 console.log(`\n── Ohne Bewegung (prefers-reduced-motion) ──`);
-for (const pfad of SEITEN) {
-  probleme += melde(pfad, await pruefeOhneBewegung(browser, pfad, VIEWPORTS[0]));
+for (const path of PAGES) {
+  problems += melde(path, await pruefeOhneBewegung(browser, path, VIEWPORTS[0]));
 }
 
 /* Startseite, eine Leistungsseite, die Karriereseite — und die beiden
@@ -510,13 +510,13 @@ for (const pfad of SEITEN) {
 console.log(`\n── Barrierefreiheit (WCAG 2.1 AA) ──`);
 let unpruefbar = 0;
 const BARRIERE = [
-  ...SEITEN.slice(0, VOLL),
-  ...SEITEN.filter((p) => p === "/karriere" || p.startsWith("/design/")),
+  ...PAGES.slice(0, VOLL),
+  ...PAGES.filter((p) => p === "/karriere" || p.startsWith("/design/")),
 ];
-for (const pfad of BARRIERE) {
-  const { liste, ergebnis } = await pruefeBarrierefreiheit(browser, pfad, VIEWPORTS[0]);
-  unpruefbar += ergebnis.unpruefbar.length;
-  probleme += melde(pfad, liste);
+for (const path of BARRIERE) {
+  const { list, result } = await pruefeBarrierefreiheit(browser, path, VIEWPORTS[0]);
+  unpruefbar += result.unpruefbar.length;
+  problems += melde(path, list);
 }
 if (unpruefbar) {
   console.log(`  (${unpruefbar} Textstellen liegen auf Bildern oder Verläufen — Kontrast dort nicht rechenbar)`);
@@ -524,21 +524,21 @@ if (unpruefbar) {
 
 // Der Wechsel einmal auf Desktop — er hängt nicht am Breakpoint, und drei
 // Durchläufe kosten nur Zeit.
-const ziel = SEITEN.find((p) => p !== "/");
-if (ziel) {
+const target = PAGES.find((p) => p !== "/");
+if (target) {
   console.log(`\n── Seitenwechsel (Router) ──`);
-  probleme += melde(`/ → ${ziel}`, await pruefeWechsel(browser, ziel, VIEWPORTS[0]));
+  problems += melde(`/ → ${target}`, await checkTransition(browser, target, VIEWPORTS[0]));
 }
 
 console.log(`\n── Routen-Deckung ──`);
-probleme += await pruefeRoutenDeckung(browser, SEITEN);
+problems += await checkRouteCoverage(browser, PAGES);
 
 console.log(`\n── Bilddateien ──`);
-probleme += await pruefeBilder();
+problems += await checkImages();
 
 console.log(`\n── Sprungmarken ──`);
-probleme += await pruefeAnker();
+problems += await checkAnchors();
 
 await browser.close();
-console.log(probleme ? `\n${probleme} Befund(e).` : "\nAlles sauber.");
-process.exit(probleme ? 1 : 0);
+console.log(problems ? `\n${problems} Befund(e).` : "\nAlles sauber.");
+process.exit(problems ? 1 : 0);

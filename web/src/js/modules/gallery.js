@@ -29,7 +29,7 @@ export function initGallery() {
     dots: "[data-magazine-dots]",
     prev: "[data-magazine-prev]",
     next: "[data-magazine-next]",
-    seitenweise: true,
+    paged: true,
     label: "Beitrag",
     startInMiddle: false,
   });
@@ -59,12 +59,12 @@ function initCarousel(cfg) {
    * Fenstergröße daneben. Der Abstand steckt in der Differenz zweier
    * Startkanten, deshalb reicht ein Blick auf die ersten beiden.
    */
-  function proSeite() {
-    if (!cfg.seitenweise) return 1;
-    const sicht = track.parentElement.clientWidth;
-    const schritt =
+  function perPage() {
+    if (!cfg.paged) return 1;
+    const visibleWidth = track.parentElement.clientWidth;
+    const step =
       items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : items[0].offsetWidth;
-    return Math.max(1, Math.floor(sicht / schritt));
+    return Math.max(1, Math.floor(visibleWidth / step));
   }
 
   /* Punkte: bei seitenweisem Blättern einer je SEITE, sonst einer je Element.
@@ -72,24 +72,24 @@ function initCarousel(cfg) {
      von denen drei nichts bewirken. */
   let dots = [];
 
-  function baueDots() {
+  function buildDots() {
     dotsBox?.replaceChildren();
-    const anzahl = cfg.seitenweise
-      ? Math.ceil(items.length / proSeite())
+    const count = cfg.paged
+      ? Math.ceil(items.length / perPage())
       : items.length;
-    dots = Array.from({ length: anzahl }, (_, i) => {
+    dots = Array.from({ length: count }, (_, i) => {
       const dot = document.createElement("button");
       dot.type = "button";
       dot.className = "s-gallery__dot";
       dot.setAttribute("role", "tab");
       dot.setAttribute("aria-label", `${cfg.label} ${i + 1}`);
-      dot.addEventListener("click", () => go(cfg.seitenweise ? i * proSeite() : i));
+      dot.addEventListener("click", () => go(cfg.paged ? i * perPage() : i));
       dotsBox?.append(dot);
       return dot;
     });
   }
 
-  baueDots();
+  buildDots();
 
   /** Verschiebt die Spur auf das gewählte Element. */
   function go(next) {
@@ -109,17 +109,17 @@ function initCarousel(cfg) {
       overwrite: "auto",
     });
 
-    const active = cfg.seitenweise ? Math.floor(index / proSeite()) : index;
+    const active = cfg.paged ? Math.floor(index / perPage()) : index;
     dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === active)));
   }
 
   /* Ein Klick blättert eine SEITE weiter, nicht einen Beitrag. Bei vier
      nebeneinander sichtbaren Karten sprang der Pfeil sonst um eine Karte —
      das las sich wie ein Ruckeln und nicht wie Blättern. */
-  const schrittweite = () => (cfg.seitenweise ? proSeite() : 1);
+  const stepSize = () => (cfg.paged ? perPage() : 1);
 
-  section.querySelector(cfg.next)?.addEventListener("click", () => go(index + schrittweite()));
-  section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - schrittweite()));
+  section.querySelector(cfg.next)?.addEventListener("click", () => go(index + stepSize()));
+  section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - stepSize()));
 
   go(cfg.startInMiddle ? Math.floor(items.length / 2) : 0);
 
@@ -127,7 +127,7 @@ function initCarousel(cfg) {
      Blättern auch die Anzahl der Punkte nicht, weil dann andere viele Karten
      nebeneinander passen. */
   ScrollTrigger.addEventListener("refreshInit", () => {
-    if (cfg.seitenweise) baueDots();
+    if (cfg.paged) buildDots();
     go(index);
   });
 }

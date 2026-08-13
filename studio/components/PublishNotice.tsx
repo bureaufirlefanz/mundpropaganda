@@ -17,7 +17,7 @@ import { Box, Card, Text } from "@sanity/ui";
  * Kür in `CMS-UMBAU.md`, Aufgabe 14. Dieser Satz kostet nichts und trägt
  * das Meiste davon.
  */
-export function PublishHinweis(props: LayoutProps) {
+export function PublishNotice(props: LayoutProps) {
   return (
     <>
       <Card padding={2} tone="primary" borderBottom>

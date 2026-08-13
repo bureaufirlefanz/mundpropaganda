@@ -17,36 +17,36 @@ import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
 
 export function initTimeline() {
   document.querySelectorAll("[data-timeline]").forEach((root) => {
-    const fuellung = root.querySelector("[data-timeline-fill]");
-    const stages = [...root.querySelectorAll(".s-timeline__etappe")];
-    if (!fuellung || !stages.length) return;
+    const fill = root.querySelector("[data-timeline-fill]");
+    const stages = [...root.querySelectorAll(".s-timeline__stage")];
+    if (!fill || !stages.length) return;
 
     if (prefersReducedMotion) {
-      stages.forEach((e) => (e.dataset.erreicht = ""));
+      stages.forEach((e) => (e.dataset.reached = ""));
       return;
     }
 
-    const bahn = root.querySelector(".s-timeline__bahn");
+    const track = root.querySelector(".s-timeline__track");
 
     /* Beim Aufziehen wandert die Kante über die Marken. Erreicht ist eine
        Marke, sobald die Kante ihre Mitte passiert hat — gemessen an der
        Bahn, nicht an festen Anteilen: bei vier gleich breiten Spalten wäre
        das dasselbe, bei ungleichen nicht. */
-    const anteile = () => {
-      const b = bahn.getBoundingClientRect();
-      const senkrecht = b.height > b.width;
+    const fractions = () => {
+      const b = track.getBoundingClientRect();
+      const vertical = b.height > b.width;
       return stages.map((e) => {
-        const p = e.querySelector(".s-timeline__punkt").getBoundingClientRect();
-        return senkrecht
+        const p = e.querySelector(".s-timeline__dot").getBoundingClientRect();
+        return vertical
           ? (p.top + p.height / 2 - b.top) / b.height
           : (p.left + p.width / 2 - b.left) / b.width;
       });
     };
 
-    let headings = anteile();
+    let headings = fractions();
 
     gsap.fromTo(
-      fuellung,
+      fill,
       { scaleX: 0, scaleY: 0 },
       {
         /* Beide Achsen setzen: Welche wirkt, entscheidet die Bahn über ihre
@@ -61,19 +61,19 @@ export function initTimeline() {
           end: "bottom 75%",
           scrub: 0.6,
           onRefresh: () => {
-            headings = anteile();
+            headings = fractions();
           },
-          onUpdate: (selbst) => {
+          onUpdate: (self) => {
             stages.forEach((e, i) => {
-              if (selbst.progress >= headings[i]) e.dataset.erreicht = "";
-              else delete e.dataset.erreicht;
+              if (self.progress >= headings[i]) e.dataset.reached = "";
+              else delete e.dataset.reached;
             });
           },
         },
       }
     );
 
-    /* Nach dem Umbruch voices die Anteile nicht mehr — waagerecht und
+    /* Nach dem Umbruch stimmen die Anteile nicht mehr — waagerecht und
        senkrecht liegen die Punkte woanders. ScrollTrigger misst bei
        `refresh` neu, das oben angehängte `onRefresh` zieht die Marken mit. */
     ScrollTrigger.refresh();

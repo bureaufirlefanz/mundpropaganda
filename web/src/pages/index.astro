@@ -6,7 +6,7 @@
  * Vorschau-Route aus Aufgabe 6 exakt dasselbe rendern kann. Zwei
  * Zusammenbauten, die dasselbe zeigen sollen, laufen unbemerkt auseinander.
  */
-import Startseite from "../templates/Home.astro";
+import Home from "../templates/Home.astro";
 import { loadHomepage } from "../lib/homepage";
 import { loadPosts } from "../lib/magazine";
 
@@ -14,4 +14,4 @@ const data = await loadHomepage();
 const posts = await loadPosts();
 ---
 
-<Startseite data={data} posts={posts} />
+<Home data={data} posts={posts} />

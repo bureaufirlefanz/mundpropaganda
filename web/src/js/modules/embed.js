@@ -15,20 +15,20 @@
  * ohne Einwilligung keine Daten überträgt, braucht auch keine.
  */
 export function initEmbeds() {
-  document.querySelectorAll("[data-embed]").forEach((knopf) => {
-    knopf.addEventListener(
+  document.querySelectorAll("[data-embed]").forEach((button) => {
+    button.addEventListener(
       "click",
       () => {
-        const adresse = knopf.dataset.embed;
-        if (!adresse) return;
+        const url = button.dataset.embed;
+        if (!url) return;
 
-        const rahmen = document.createElement("iframe");
-        rahmen.src = adresse;
-        rahmen.title = knopf.getAttribute("aria-label") || "Eingebetteter Inhalt";
-        rahmen.loading = "lazy";
-        rahmen.allow =
+        const frame = document.createElement("iframe");
+        frame.src = url;
+        frame.title = button.getAttribute("aria-label") || "Eingebetteter Inhalt";
+        frame.loading = "lazy";
+        frame.allow =
           "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        rahmen.allowFullscreen = true;
+        frame.allowFullscreen = true;
 
         /* Der Knopf wird zur Hülle des iframes: Er trägt bereits Rundung,
            Seitenverhältnis und Überlauf. Ein neues Element daneben müsste
@@ -38,10 +38,10 @@ export function initEmbeds() {
            Dokumentfluss, die Höhe springt also nicht. Ohne die Abschaltung
            bliebe eine Schaltfläche mit einem Video darin — mit der Tastatur
            erreichbar, aber ohne Wirkung. */
-        knopf.replaceChildren(rahmen);
-        knopf.disabled = true;
-        knopf.style.cursor = "default";
-        knopf.removeAttribute("data-embed");
+        button.replaceChildren(frame);
+        button.disabled = true;
+        button.style.cursor = "default";
+        button.removeAttribute("data-embed");
       },
       { once: true }
     );

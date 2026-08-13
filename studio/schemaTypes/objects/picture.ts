@@ -12,7 +12,7 @@ import { defineType, defineField } from "sanity";
  * vor. Der Haken darunter macht diese Entscheidung sichtbar, statt sie dem
  * Zufall zu überlassen.
  */
-export const bild = defineType({
+export const picture = defineType({
   name: "picture",
   title: "Bild",
   type: "image",

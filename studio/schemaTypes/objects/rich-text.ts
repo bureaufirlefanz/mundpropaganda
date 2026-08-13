@@ -34,7 +34,7 @@ import { defineArrayMember, defineField } from "sanity";
  * 350px frei, und `breite` entscheidet, ob ein Bild in der Spalte bleibt oder
  * dorthin ausbricht.
  */
-export const fliesstextBild = defineArrayMember({
+export const inlineImageMember = defineArrayMember({
   /* Ein eigener Objekttyp statt eines erweiterten `picture`. Sanity lässt auf
      Subtypen von `image` keine zusätzlichen `fields` zu — der Schema-Export
      bricht mit „Cannot override fields of subtypes of image" ab. Also ein
@@ -86,7 +86,7 @@ export const fliesstextBild = defineArrayMember({
   },
 });
 
-export const fliesstext = defineArrayMember({
+export const blockContentMember = defineArrayMember({
   type: "block",
 
   styles: [

@@ -28,12 +28,12 @@ import Team from "../components/sections/Team.astro";
 import Locations from "../components/sections/Locations.astro";
 import Contact from "../components/sections/Contact.astro";
 import type { PracticeContent, Member } from "../lib/practice";
-import type { Standort } from "../lib/settings";
+import type { Location } from "../lib/settings";
 
 interface Props {
   data: PracticeContent | undefined;
   team: Member[];
-  locations: Standort[];
+  locations: Location[];
 }
 
 const { data: d, team, locations } = Astro.props;
@@ -52,7 +52,7 @@ const story =
       }
     : undefined;
 
-const werte =
+const values =
   d?.valuesTopline && d.valuesHeadline && d.valuesItems?.length
     ? {
         topline: d.valuesTopline,
@@ -65,7 +65,7 @@ const werte =
 /* Das Team-Raster braucht Überschriften UND Personen. Ohne Personen entfällt
    der Abschnitt ganz — ein Gruppenfoto über einem leeren Raster wäre die
    Ankündigung von etwas, das nicht kommt. */
-const teamAbschnitt =
+const teamSection =
   d?.teamTopline && d.teamHeadline && team.length
     ? {
         topline: d.teamTopline,
@@ -76,7 +76,7 @@ const teamAbschnitt =
       }
     : undefined;
 
-const standorte =
+const locationsSection =
   d?.locationsTopline && d.locationsHeadline && locations.length
     ? {
         topline: d.locationsTopline,
@@ -102,11 +102,11 @@ const standorte =
 
   {story && <Story {...story} />}
 
-  {werte && <Values {...werte} />}
+  {values && <Values {...values} />}
 
-  {teamAbschnitt && <Team id="team" {...teamAbschnitt} />}
+  {teamSection && <Team id="team" {...teamSection} />}
 
-  {standorte && <Locations id="standorte" {...standorte} />}
+  {locationsSection && <Locations id="standorte" {...locationsSection} />}
 
   <Contact />
 </Base>

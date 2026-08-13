@@ -25,9 +25,9 @@ const { headings, title = "Inhalt" } = Astro.props;
 <nav class="c-toc" aria-labelledby="toc-title" data-toc>
   <p class="c-toc__heading" id="toc-title">{title}</p>
 
-  <ol class="c-toc__liste">
+  <ol class="c-toc__list">
     {headings.map((m) => (
-      <li class:list={["c-toc__item", m.level === 3 && "c-toc__punkt--tief"]}>
+      <li class:list={["c-toc__item", m.level === 3 && "c-toc__item--deep"]}>
         <a class="c-toc__link" href={`#${m.id}`} data-toc-link={m.id}>
           <span class="c-toc__rule" aria-hidden="true"></span>
           <span class="c-toc__label">{m.text}</span>
@@ -64,14 +64,14 @@ const { headings, title = "Inhalt" } = Astro.props;
     color: var(--c-text-muted);
   }
 
-  .c-toc__liste {
+  .c-toc__list {
     display: flex;
     flex-direction: column;
     gap: var(--sp-1);
     list-style: none;
   }
 
-  .c-toc__punkt--tief {
+  .c-toc__item--deep {
     padding-left: var(--sp-4);
   }
 
@@ -129,7 +129,7 @@ const { headings, title = "Inhalt" } = Astro.props;
       border-bottom: var(--bw) solid var(--c-line);
     }
 
-    .c-toc__liste {
+    .c-toc__list {
       gap: 0;
     }
   }

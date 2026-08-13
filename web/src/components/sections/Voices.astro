@@ -15,7 +15,7 @@ import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
 
-export interface Stimme {
+export interface Voice {
   quote: string;
   name: string;
   role: string;
@@ -30,12 +30,12 @@ export interface Stimme {
 interface Props {
   topline: string;
   headline: string;
-  voices: Stimme[];
+  voices: Voice[];
 }
 const { topline, headline, voices } = Astro.props;
 
 /* Klasse 3: die gestalteten Porträts, positionsgenau, solange an einer
-   Stimme kein Bild hängt. */
+   Voice kein Bild hängt. */
 const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
 ---
 
@@ -45,10 +45,10 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
     <h2 class="s-voices__title" data-split="lines">{headline}</h2>
   </div>
 
-  <div class="s-voices__feld">
+  <div class="s-voices__field">
     {voices.map((s, i) => (
       <figure
-        class="s-voices__karte"
+        class="s-voices__card"
         style={`--offset: ${s.offset ?? 0}`}
         data-reveal="up"
         data-reveal-delay={i * 0.1}
@@ -56,7 +56,7 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
         {/* <blockquote> im <figure>, Name in der <figcaption>: So gehört das
             Zitat der Person, und Vorlesegeräte geben beides zusammen aus.
             Ein <p> mit Anführungszeichen täte das nicht. */}
-        <blockquote class="s-voices__zitat">
+        <blockquote class="s-voices__quote">
           <p>{s.quote}</p>
         </blockquote>
 
@@ -68,10 +68,10 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
               <Picture name={MOTIFS[i % MOTIFS.length]} alt="" sizes="72px" />
             )}
           </span>
-          <span class="s-voices__daten">
+          <span class="s-voices__data">
             <span class="s-voices__name">{s.name}</span>
-            <span class="s-voices__rolle">{s.role}</span>
-            <span class="s-voices__seit">{s.since}</span>
+            <span class="s-voices__role">{s.role}</span>
+            <span class="s-voices__since">{s.since}</span>
           </span>
         </figcaption>
       </figure>
@@ -103,7 +103,7 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
   /* `align-items: start`, damit die Karten NICHT gleich hoch werden — sie
      sollen unterschiedlich lang sein dürfen. Genau das nimmt der Reihe das
      Formularhafte. */
-  .s-voices__feld {
+  .s-voices__field {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--site-gutter);
@@ -113,7 +113,7 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
   /* Der Versatz kommt aus den Daten und wird hier in einen Abstand
      übersetzt. Der Höchstwert hängt am Fenster, damit die Staffelung auf
      kleinen Schirmen nicht zur Treppe wird. */
-  .s-voices__karte {
+  .s-voices__card {
     margin: 0;
     margin-top: calc(var(--offset, 0) * clamp(24px, 6vw, 96px));
     display: flex;
@@ -125,7 +125,7 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
     color: var(--c-neutral-800);
   }
 
-  .s-voices__zitat {
+  .s-voices__quote {
     margin: 0;
     font-size: var(--fs-text-large);
     line-height: 1.4;
@@ -139,17 +139,17 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
 
      Gesetzt statt getippt, damit im CMS reiner Text stehen kann. Nur die
      Zeichen sind farbig, nicht das Zitat. */
-  .s-voices__zitat p {
+  .s-voices__quote p {
     margin: 0;
     text-wrap: pretty;
   }
 
-  .s-voices__zitat p::before {
+  .s-voices__quote p::before {
     content: "„";
     color: var(--c-brand);
   }
 
-  .s-voices__zitat p::after {
+  .s-voices__quote p::after {
     content: "“";
     color: var(--c-brand);
   }
@@ -182,7 +182,7 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
     object-fit: cover;
   }
 
-  .s-voices__daten {
+  .s-voices__data {
     display: flex;
     flex-direction: column;
     gap: 0.15em;
@@ -193,8 +193,8 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
     line-height: 1.2;
   }
 
-  .s-voices__rolle,
-  .s-voices__seit {
+  .s-voices__role,
+  .s-voices__since {
     font-weight: 300;
     font-size: var(--fs-label);
     line-height: 1.3;
@@ -204,14 +204,14 @@ const MOTIFS = ["praxis-01", "praxis-02", "praxis-03"];
   }
 
   @media (max-width: 900px) {
-    .s-voices__feld {
+    .s-voices__field {
       grid-template-columns: 1fr;
       gap: var(--sp-5);
     }
 
     /* Gestapelt ergibt der Versatz keinen Sinn mehr — er würde nur Lücken
        zwischen die Karten reißen. */
-    .s-voices__karte {
+    .s-voices__card {
       margin-top: 0;
     }
   }

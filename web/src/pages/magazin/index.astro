@@ -6,11 +6,11 @@
  * auf Eis, weil die Route fehlte, und die vier Beiträge standen fest im
  * Markup des Karussells. Beides ist damit aufgelöst.
  */
-import Magazin from "../../templates/Magazine.astro";
+import Magazine from "../../templates/Magazine.astro";
 import { loadPosts, loadMagazineIntro } from "../../lib/magazine";
 
-const kopf = await loadMagazineIntro();
+const intro = await loadMagazineIntro();
 const posts = await loadPosts();
 ---
 
-<Magazin kopf={kopf} posts={posts} />
+<Magazine intro={intro} posts={posts} />

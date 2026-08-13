@@ -5,7 +5,7 @@ import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
 import { slugAvailable, RESERVED_SLUGS } from "../../lib/paths";
-import { fliesstext, fliesstextBild } from "../objects/rich-text";
+import { blockContentMember, inlineImageMember } from "../objects/rich-text";
 
 /**
  * Die Sammlungen: Typen, von denen es beliebig viele gibt.
@@ -24,7 +24,7 @@ const seoFeld = defineField({ name: "seo", title: "Suchmaschine", type: "seo", g
 
 /* --- Magazinbeitrag ----------------------------------------------------- */
 
-export const beitrag = defineType({
+export const post = defineType({
   name: "post",
   title: "Magazinbeitrag",
   type: "document",
@@ -95,7 +95,7 @@ export const beitrag = defineType({
       name: "text",
       title: "Beitrag",
       type: "array",
-      of: [fliesstext, fliesstextBild],
+      of: [blockContentMember, inlineImageMember],
       group: "content",
     }),
     seoFeld,
@@ -164,7 +164,7 @@ export const pillar = defineType({
 
 /* --- Rechtstexte -------------------------------------------------------- */
 
-export const rechtstext = defineType({
+export const legalPage = defineType({
   name: "legalPage",
   title: "Rechtstext",
   type: "document",
@@ -188,7 +188,7 @@ export const rechtstext = defineType({
       name: "text",
       title: "Text",
       type: "array",
-      of: [fliesstext],
+      of: [blockContentMember],
       group: "content",
     }),
     /* Rechtstexte gehören nicht in den Suchindex — sie ziehen Suchanfragen
@@ -298,7 +298,7 @@ export const person = defineType({
       name: "bio",
       title: "Ausführlich",
       type: "array",
-      of: [fliesstext],
+      of: [blockContentMember],
       description: "Der Werdegang in Absätzen.",
       group: "detail",
     }),
@@ -357,7 +357,7 @@ export const person = defineType({
 
 /* --- Stellenanzeigen ---------------------------------------------------- */
 
-export const stelle = defineType({
+export const job = defineType({
   name: "job",
   title: "Stelle",
   type: "document",

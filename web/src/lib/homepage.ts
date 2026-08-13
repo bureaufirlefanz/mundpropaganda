@@ -52,7 +52,7 @@ export interface HomepageContent {
   expertsImage?: ImageSource;
 
   storiesItems: { name: string; image?: ImageSource; quote?: string }[];
-  /* Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner — before stand
+  /* Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner — vorher stand
      dort einer mit `href="#"`. Die Form kommt aus lib/navigation.ts. */
   storiesAction?: LinkValue;
 

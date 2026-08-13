@@ -27,26 +27,26 @@ const {
   label,
   href,
   variant,
-  static: statisch = false,
+  static: isStatic = false,
   type,
   labelAttrs = {},
 } = Astro.props;
 
-const klasse = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" ");
+const classes = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" ");
 ---
 
-{statisch ? (
-  <span class={klasse} aria-hidden="true">
+{isStatic ? (
+  <span class={classes} aria-hidden="true">
     <span class="c-btn__label" {...labelAttrs}>{label}</span>
     <span class="c-btn__icon"><svg><use href="#i-arrow" /></svg></span>
   </span>
 ) : type ? (
-  <button class={klasse} type={type}>
+  <button class={classes} type={type}>
     <span class="c-btn__label" {...labelAttrs}>{label}</span>
     <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
   </button>
 ) : (
-  <a class={klasse} href={href ?? "#"}>
+  <a class={classes} href={href ?? "#"}>
     <span class="c-btn__label" {...labelAttrs}>{label}</span>
     <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
   </a>

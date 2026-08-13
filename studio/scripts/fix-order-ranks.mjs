@@ -29,7 +29,7 @@
  * Es liest jede ziehbare Liste in der Reihenfolge, die das Studio gerade
  * zeigt, und schreibt allen Einträgen frische, gleichmäßig verteilte
  * Lexoranks. Die sichtbare Reihenfolge bleibt dabei erhalten — mit einer
- * Ausnahme: Was in `NACH_OBEN` steht, wandert an den Anfang seiner Liste.
+ * Ausnahme: Was in `MOVE_TO_TOP` steht, wandert an den Anfang seiner Liste.
  *
  * Danach funktioniert das Ziehen im Studio wieder für alle Einträge.
  *
@@ -53,65 +53,65 @@ const DRY = process.env.DRY === "1";
 const client = getCliClient({ apiVersion: "2026-07-28" });
 
 /** Die Typen, die im Studio als ziehbare Liste stehen. */
-const LISTEN = ["service", "job"];
+const ORDERABLE_TYPES = ["service", "job"];
 
 /** Was an den Anfang seiner Liste soll. Leeren, wenn nichts umsortiert wird. */
-const NACH_OBEN = ["service-veneers"];
+const MOVE_TO_TOP = ["service-veneers"];
 
 /** Erzeugt n gleichmäßig verteilte, gültige Lexoranks in aufsteigender Folge. */
-function raenge(n) {
+function ranks(n) {
   let r = LexoRank.min();
   return Array.from({ length: n }, () => (r = r.genNext()).toString());
 }
 
 async function los() {
-  const stapel = client.transaction();
-  let geaendert = 0;
+  const batch = client.transaction();
+  let changed = 0;
 
-  for (const typ of LISTEN) {
+  for (const typ of ORDERABLE_TYPES) {
     /* In genau der Reihenfolge lesen, die das Studio anzeigt. `order()` auf
        einer Mischung aus kaputten und gültigen Werten ist zwar willkürlich,
        aber es ist die Willkür, die der Kunde vor sich sieht — und die soll
-       erhalten bleiben, bis auf das, was NACH_OBEN sagt. */
+       erhalten bleiben, bis auf das, was MOVE_TO_TOP sagt. */
     const docs = await client.fetch(
       `*[_type == $typ] | order(orderRank) { _id, title, orderRank }`,
       { typ }
     );
     if (!docs.length) continue;
 
-    const vorne = docs.filter((d) => NACH_OBEN.includes(d._id));
-    const rest = docs.filter((d) => !NACH_OBEN.includes(d._id));
-    const sortiert = [...vorne, ...rest];
+    const first = docs.filter((d) => MOVE_TO_TOP.includes(d._id));
+    const rest = docs.filter((d) => !MOVE_TO_TOP.includes(d._id));
+    const sorted = [...first, ...rest];
 
-    const neu = raenge(sortiert.length);
+    const next = ranks(sorted.length);
 
-    console.log(`\n${typ} (${sortiert.length}):`);
-    sortiert.forEach((d, i) => {
+    console.log(`\n${typ} (${sorted.length}):`);
+    sorted.forEach((d, i) => {
       const alt = d.orderRank ?? "—";
-      const marke = alt === neu[i] ? " " : "→";
-      console.log(`  ${marke} ${String(i + 1).padStart(2)}. ${neu[i]}  ${d.title ?? d._id}`);
-      if (alt !== neu[i]) {
-        stapel.patch(d._id, (p) => p.set({ orderRank: neu[i] }));
-        geaendert++;
+      const marke = alt === next[i] ? " " : "→";
+      console.log(`  ${marke} ${String(i + 1).padStart(2)}. ${next[i]}  ${d.title ?? d._id}`);
+      if (alt !== next[i]) {
+        batch.patch(d._id, (p) => p.set({ orderRank: next[i] }));
+        changed++;
       }
     });
   }
 
-  if (!geaendert) {
+  if (!changed) {
     console.log("\nNichts zu tun — alle Sortierwerte sind bereits gültig.");
     return;
   }
 
   if (DRY) {
-    console.log(`\nProbelauf: ${geaendert} Werte WÜRDEN geändert. Nichts geschrieben.`);
+    console.log(`\nProbelauf: ${changed} Werte WÜRDEN geändert. Nichts geschrieben.`);
     return;
   }
 
-  await stapel.commit();
-  console.log(`\n✓ ${geaendert} Sortierwerte repariert. Ziehen funktioniert wieder.`);
+  await batch.commit();
+  console.log(`\n✓ ${changed} Sortierwerte repariert. Ziehen funktioniert wieder.`);
 }
 
-los().catch((fehler) => {
-  console.error("Fehlgeschlagen:", fehler.message);
+los().catch((error) => {
+  console.error("Fehlgeschlagen:", error.message);
   process.exit(1);
 });

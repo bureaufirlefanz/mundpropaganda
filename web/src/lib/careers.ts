@@ -23,9 +23,9 @@ export type CareersContent = NonNullable<WithoutNull<CAREERS_QUERY_RESULT>>;
 export type Job = NonNullable<WithoutNull<JOBS_QUERY_RESULT>>[number];
 
 /** Adresse für Bewerbungen mit vorbereitetem Betreff. */
-export const applicationLink = (mail: string, stelle?: { title?: string }) =>
+export const applicationLink = (mail: string, job?: { title?: string }) =>
   `mailto:${mail}?subject=${encodeURIComponent(
-    stelle?.title ? `Bewerbung: ${stelle.title}` : "Initiativbewerbung"
+    job?.title ? `Bewerbung: ${job.title}` : "Initiativbewerbung"
   )}`;
 
 let cached: Promise<CareersContent | undefined> | null = null;

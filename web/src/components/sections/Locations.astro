@@ -28,14 +28,14 @@
  * geratener Punkt: Eine Stecknadel an der falschen Stelle schickt jemanden
  * an die falsche Tür, und das ist schlimmer als gar keine Karte.
  */
-import type { Standort } from "../../lib/settings";
+import type { Location } from "../../lib/settings";
 
 interface Props {
   id?: string;
   topline: string;
   headline: string;
   text?: string;
-  locations: Standort[];
+  locations: Location[];
 }
 
 const { id, topline, headline, text, locations } = Astro.props;
@@ -45,7 +45,7 @@ const { id, topline, headline, text, locations } = Astro.props;
  * (rund 500 m): Weiter herausgezoomt sieht man Berlin, und das hilft
  * niemandem, der die Tür sucht.
  */
-function karte(lat: number, lon: number): string {
+function mapUrl(lat: number, lon: number): string {
   const d = 0.004;
   const bbox = [lon - d, lat - d / 2, lon + d, lat + d / 2].join(",");
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
@@ -54,7 +54,7 @@ function karte(lat: number, lon: number): string {
 /** Route in der Karten-App des Besuchers. Über die Anschrift, nicht über die
     Koordinaten — die App zeigt dann den Namen der Praxis und nicht zwei
     Zahlen. */
-const route = (o: Standort) =>
+const route = (o: Location) =>
   `https://www.openstreetmap.org/search?query=${encodeURIComponent(`${o.street}, ${o.city}`)}`;
 ---
 
@@ -65,19 +65,19 @@ const route = (o: Standort) =>
     {text && <p class="s-locations__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
   </div>
 
-  <div class="s-locations__raster" data-reveal-stagger="0.1">
+  <div class="s-locations__grid" data-reveal-stagger="0.1">
     {locations.map((o) => (
       <article class="c-location" data-reveal-child>
         {o.latitude != null && o.longitude != null ? (
           <button
-            class="c-location__karte"
+            class="c-location__map"
             type="button"
-            data-embed={karte(o.latitude, o.longitude)}
+            data-embed={mapUrl(o.latitude, o.longitude)}
             aria-label={`Karte laden für ${o.name}`}
           >
-            <span class="c-location__platzhalter" aria-hidden="true">
-              <span class="c-location__kuerzel">{o.shortCode}</span>
-              <span class="c-location__laden">Karte laden</span>
+            <span class="c-location__placeholder" aria-hidden="true">
+              <span class="c-location__code">{o.shortCode}</span>
+              <span class="c-location__load">Karte laden</span>
             </span>
           </button>
         ) : null}
@@ -87,12 +87,12 @@ const route = (o: Standort) =>
           {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
               solche an. Der Browser setzt das Element kursiv, das wird unten
               zurückgenommen. */}
-          <address class="c-location__adresse">{o.street}<br />{o.city}</address>
+          <address class="c-location__address">{o.street}<br />{o.city}</address>
 
           {o.description && <p class="c-location__text">{o.description}</p>}
 
           {o.hours && o.hours.length > 0 && (
-            <dl class="c-location__zeiten">
+            <dl class="c-location__hours">
               {o.hours.map((z) => (
                 <>
                   <dt>{z.days}</dt>
@@ -143,7 +143,7 @@ const route = (o: Standort) =>
 
   /* Zwei Praxen nebeneinander, ab 900px. `auto-fit` trägt auch eine dritte,
      ohne dass hier etwas geändert werden muss. */
-  .s-locations__raster {
+  .s-locations__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: clamp(40px, 4vw, 72px) var(--site-gutter);
@@ -158,7 +158,7 @@ const route = (o: Standort) =>
 
   /* Ein Knopf, der wie eine Fläche aussieht — der Browser gäbe ihm sonst
      Rahmen, Grundfarbe und mittigen Text. */
-  .c-location__karte {
+  .c-location__map {
     position: relative;
     display: block;
     width: 100%;
@@ -175,7 +175,7 @@ const route = (o: Standort) =>
   /* Die gezeichnete Fläche vor dem Klick. Das Kürzel ist dieselbe
      Konturzahl, die auf der Startseite über den Standorten steht — die
      Seite bleibt dadurch erkennbar dieselbe. */
-  .c-location__platzhalter {
+  .c-location__placeholder {
     position: absolute;
     inset: 0;
     display: flex;
@@ -187,11 +187,11 @@ const route = (o: Standort) =>
     transition: scale var(--d-base) var(--e-out);
   }
 
-  .c-location__karte:hover .c-location__platzhalter {
+  .c-location__map:hover .c-location__placeholder {
     scale: 1.03;
   }
 
-  .c-location__kuerzel {
+  .c-location__code {
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 500;
     line-height: 1;
@@ -199,7 +199,7 @@ const route = (o: Standort) =>
     color: var(--c-brand);
   }
 
-  .c-location__laden {
+  .c-location__load {
     display: inline-flex;
     align-items: center;
     padding: var(--sp-2) var(--sp-4);
@@ -212,13 +212,13 @@ const route = (o: Standort) =>
     text-transform: uppercase;
   }
 
-  .c-location__karte:focus-visible {
+  .c-location__map:focus-visible {
     outline: 2px solid var(--c-dark);
     outline-offset: 4px;
   }
 
   /* Das eingesetzte iframe füllt denselben Rahmen. */
-  .c-location__karte :global(iframe) {
+  .c-location__map :global(iframe) {
     width: 100%;
     height: 100%;
     border: 0;
@@ -240,7 +240,7 @@ const route = (o: Standort) =>
     letter-spacing: -0.01em;
   }
 
-  .c-location__adresse {
+  .c-location__address {
     font-style: normal;
     font-size: var(--fs-text-main);
     line-height: 1.5;
@@ -255,7 +255,7 @@ const route = (o: Standort) =>
   }
 
   /* Tage links, Zeit rechts — dieselbe Aufteilung wie im Footer. */
-  .c-location__zeiten {
+  .c-location__hours {
     display: grid;
     grid-template-columns: max-content 1fr;
     gap: 0 var(--sp-4);
@@ -269,7 +269,7 @@ const route = (o: Standort) =>
     color: var(--c-text-muted);
   }
 
-  .c-location__zeiten dd {
+  .c-location__hours dd {
     margin: 0;
   }
 

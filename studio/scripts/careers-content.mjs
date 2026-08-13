@@ -33,16 +33,16 @@ const client = getCliClient({ apiVersion: "2026-07-28" });
  * das war bei den Leistungen und den alten Stellen der Fall; siehe
  * `fix-order-ranks.mjs`.
  */
-function raenge(n) {
+function ranks(n) {
   let r = LexoRank.min();
   return Array.from({ length: n }, () => (r = r.genNext()).toString());
 }
 
-const RAENGE = raenge(5);
+const RAENGE = ranks(5);
 
 /* --- Die Seite ---------------------------------------------------------- */
 
-const VORTEILE = [
+const BENEFITS = [
   "Unbefristete Festanstellung in Voll- oder Teilzeit",
   "Überdurchschnittliches Gehalt",
   "BVG-Monatsticket",
@@ -66,7 +66,7 @@ const VORTEILE = [
    und „Zahnimplantate Berlin" — Suchbegriffe über Texten, die vom Team und
    von den Praxisräumen handeln. Wer das liest, hält es für ein Versehen,
    und Google bewertet es seit Jahren nicht mehr positiv. */
-const GRUENDE = [
+const REASONS = [
   {
     _key: "anreise",
     title: "Gut zu erreichen, auch von weiter weg",
@@ -87,7 +87,7 @@ const GRUENDE = [
   },
 ];
 
-const SEITE = {
+const PAGE = {
   videoUrl: "https://www.youtube.com/watch?v=cq7TTk5idx0",
   videoTitle: "Ein Blick in die Praxis",
 
@@ -98,11 +98,11 @@ const SEITE = {
 
   benefitsTopline: "Leistungen",
   benefitsHeadline: "Du bekommst einiges",
-  benefitsItems: VORTEILE,
+  benefitsItems: BENEFITS,
 
   reasonsTopline: "Gründe",
   reasonsHeadline: "Was für uns spricht",
-  reasonsItems: GRUENDE,
+  reasonsItems: REASONS,
 
   jobsText:
     "Bei Mundpropaganda arbeiten wir auf dem aktuellsten wissenschaftlichen und technischen Stand, und unsere Fachkräfte führen modernste Behandlungsmethoden präzise durch. Dieses Niveau wollen wir halten und weiter ausbauen. Deshalb setzen wir auf qualifizierte Kolleginnen und Kollegen mit freundlichem Umgang und verlässlicher Arbeitsmoral.",
@@ -113,7 +113,7 @@ const SEITE = {
 /* Fragen, die nur bei dieser Rolle gestellt werden. Bewusst wenige: Jede
    zusätzliche Frage kostet Bewerbungen, und was im Lebenslauf steht, muss
    hier niemand abtippen. */
-const FRAGEN_APPROBIERT = [
+const QUESTIONS_LICENSED = [
   {
     _key: "approbation",
     label: "Seit wann bist du approbiert?",
@@ -128,7 +128,7 @@ const FRAGEN_APPROBIERT = [
   },
 ];
 
-const FRAGEN_ASSISTENZ = [
+const QUESTIONS_ASSISTANT = [
   {
     _key: "abschluss",
     label: "Welchen Abschluss hast du, und wann hast du ihn gemacht?",
@@ -143,7 +143,7 @@ const FRAGEN_ASSISTENZ = [
   },
 ];
 
-const UMFANG = {
+const WORKLOAD = {
   _key: "umfang",
   label: "In welchem Umfang möchtest du arbeiten?",
   kind: "choice",
@@ -151,84 +151,84 @@ const UMFANG = {
   required: true,
 };
 
-const STELLEN = [
+const JOBS = [
   {
     _id: "job-kinderzahnheilkunde",
     title: "Kinderzahnärztin oder Kinderzahnarzt (m/w/d)",
     handle: "kinderzahnheilkunde",
     kind: "Voll- oder Teilzeit, unbefristet",
-    fragen: FRAGEN_APPROBIERT,
+    fragen: QUESTIONS_LICENSED,
   },
   {
     _id: "job-endodontologie",
     title: "Zahnärztin oder Zahnarzt (m/w/d) mit Spezialisierung Endodontologie",
     handle: "endodontologie",
     kind: "Voll- oder Teilzeit, unbefristet",
-    fragen: FRAGEN_APPROBIERT,
+    fragen: QUESTIONS_LICENSED,
   },
   {
     _id: "job-zfa",
     title: "Zahnmedizinische Fachkraft ZFA (m/w/d)",
     handle: "zfa",
     kind: "Voll- oder Teilzeit, unbefristet",
-    fragen: FRAGEN_ASSISTENZ,
+    fragen: QUESTIONS_ASSISTANT,
   },
   {
     _id: "job-zmp",
     title: "Zahnmedizinische Prophylaxeassistenz ZMP (m/w/d)",
     handle: "zmp",
     kind: "Voll- oder Teilzeit, unbefristet",
-    fragen: FRAGEN_ASSISTENZ,
+    fragen: QUESTIONS_ASSISTANT,
   },
   {
     _id: "job-dentalhygiene",
     title: "Dentalhygienikerin oder Dentalhygieniker (m/w/d)",
     handle: "dentalhygiene",
     kind: "Voll- oder Teilzeit, unbefristet",
-    fragen: FRAGEN_ASSISTENZ,
+    fragen: QUESTIONS_ASSISTANT,
   },
 ];
 
 /* --- Ausführung --------------------------------------------------------- */
 
 async function los() {
-  const stapel = client.transaction();
+  const batch = client.transaction();
 
   /* Die Seite. `set` und nicht `setIfMissing`: Das sind die Texte, die der
      Kunde geliefert hat, und sie sollen genau so dastehen. Alle übrigen
      Felder des Dokuments bleiben unberührt. */
-  stapel.patch("careers", (p) => p.set(SEITE));
+  batch.patch("careers", (p) => p.set(PAGE));
 
   /* Die alten Prototyp-Stellen abschalten, nicht löschen. */
-  const alte = await client.fetch(
-    `*[_type == "job" && !(_id in $neu)]._id`,
-    { neu: STELLEN.map((s) => s._id) }
+  const stale = await client.fetch(
+    `*[_type == "job" && !(_id in $next)]._id`,
+    { next: JOBS.map((s) => s._id) }
   );
-  for (const id of alte) {
-    stapel.patch(id, (p) => p.set({ active: false }));
+  for (const id of stale) {
+    batch.patch(id, (p) => p.set({ active: false }));
   }
 
   /* Die neuen Stellen. `createIfNotExists` legt an, der Patch danach setzt
      die Felder — zusammen ist der Aufruf wiederholbar, ohne Dubletten. */
-  STELLEN.forEach((s, i) => {
-    stapel.createIfNotExists({ _id: s._id, _type: "job" });
-    stapel.patch(s._id, (p) =>
+  JOBS.forEach((s, i) => {
+    batch.createIfNotExists({ _id: s._id, _type: "job" });
+    batch.patch(s._id, (p) =>
       p.set({
         title: s.title,
         handle: { _type: "slug", current: s.handle },
         kind: s.kind,
         active: true,
-        applicationQuestions: [UMFANG, ...s.fragen],
+        applicationQuestions: [WORKLOAD, ...s.fragen],
         orderRank: RAENGE[i],
       })
     );
   });
 
-  await stapel.commit();
+  await batch.commit();
 
-  console.log(`✓ Karriereseite: ${Object.keys(SEITE).length} Felder gesetzt`);
-  console.log(`✓ ${STELLEN.length} Stellen angelegt oder aktualisiert`);
-  console.log(`✓ ${alte.length} alte Stellen auf „nicht ausgeschrieben" gesetzt`);
+  console.log(`✓ Karriereseite: ${Object.keys(PAGE).length} Felder gesetzt`);
+  console.log(`✓ ${JOBS.length} Stellen angelegt oder aktualisiert`);
+  console.log(`✓ ${stale.length} stale Stellen auf „nicht ausgeschrieben" gesetzt`);
   console.log("");
   console.log("Offen und bewusst nicht gesetzt:");
   console.log("  · Bewerbungsadresse je Stelle (Studio → Stellen → Bewerbung)");
@@ -236,7 +236,7 @@ async function los() {
   console.log("  · Standbild für das Video (sonst lädt es von YouTube)");
 }
 
-los().catch((fehler) => {
-  console.error("Fehlgeschlagen:", fehler.message);
+los().catch((error) => {
+  console.error("Fehlgeschlagen:", error.message);
   process.exit(1);
 });

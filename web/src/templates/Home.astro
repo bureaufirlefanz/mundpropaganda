@@ -48,7 +48,7 @@ const description =
    und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
 const storiesAction = (await resolved([data.storiesAction ?? null], Astro.url.pathname))[0];
 
-const teilenBild = isCmsImage(data.seo?.image)
+const shareImage = isCmsImage(data.seo?.image)
   ? imageUrl(data.seo.image, 1200, 1.91)
   : undefined;
 ---
@@ -57,22 +57,22 @@ const teilenBild = isCmsImage(data.seo?.image)
   title={title}
   description={description}
   noIndex={data.seo?.noIndex}
-  image={teilenBild}
+  image={shareImage}
 >
   <Hero lines={data.heroLines} />
   <Split
     topline={data.splitTopline}
     title={data.splitTitle}
-    absaetze={data.splitParagraphs}
+    paragraphs={data.splitParagraphs}
     image={data.splitImage}
   />
   <Services title={data.servicesTitle} />
   <Standards title={data.standardsTitle} items={data.standardsItems} />
-  <Gallery variante="ring" title={data.locationsTitle} bilder={data.locationsImages} />
+  <Gallery variant="ring" title={data.locationsTitle} images={data.locationsImages} />
   <Experts
     title={data.expertsTitle}
-    namen={data.expertsNames}
-    absaetze={data.expertsParagraphs}
+    names={data.expertsNames}
+    paragraphs={data.expertsParagraphs}
     image={data.expertsImage}
   />
   <Stories items={data.storiesItems} action={storiesAction} />

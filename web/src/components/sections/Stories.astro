@@ -10,7 +10,7 @@
  *
  * Nur die Motive bleiben als Rückfall, positionsgenau: Solange im Studio kein
  * Foto hochgeladen ist, tritt das gestaltete Motiv an derselben Stelle ein.
- * Über den Index und nicht über ein einzelnes Ersatzpicture — sonst trügen alle
+ * Über den Index und nicht über ein einzelnes Ersatzbild — sonst trügen alle
  * fünf Karten dasselbe Gesicht.
  */
 import Button from "../ui/Button.astro";
@@ -145,7 +145,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
   /* Auf schmalen Fenstern soll vom Textkreis nur der obere Bogen zu sehen
      sein — der untere verschwindet hinter der Taupe-Fläche.
 
-     Dafür fällt der z-index der Section weg: Mit ihm pictureet sie einen
+     Dafür fällt der z-index der Section weg: Mit ihm bildet sie einen
      Stapelkontext, und darin lässt sich nichts unter die Taupe schieben, so
      klein man den Wert am Ring auch macht. Ohne ihn liegen Ring (0) und
      Taupe (0) im selben Kontext, die Taupe kommt später im Dokument und

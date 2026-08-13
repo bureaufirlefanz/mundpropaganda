@@ -31,7 +31,7 @@ const client = getCliClient({ apiVersion: "2026-07-28" });
 const DRY = process.env.DRY === "1";
 
 /** Aus „Dr. Kerrin Gratecap" wird „kerrin-gratecap". */
-function slugAus(name) {
+function slugFrom(name) {
   return name
     .replace(/^(Dr\.|Prof\.|med\.|dent\.)\s*/gi, "")
     .toLowerCase()
@@ -46,7 +46,7 @@ function slugAus(name) {
 
 /* --- Die Seite ---------------------------------------------------------- */
 
-const SEITE = {
+const PAGE = {
   topline: "Praxis",
   title: "Zwei Praxen, ein Anspruch",
 
@@ -104,36 +104,36 @@ const SEITE = {
 /* --- Ausführung --------------------------------------------------------- */
 
 async function los() {
-  const stapel = client.transaction();
-  const bericht = [];
+  const batch = client.transaction();
+  const report = [];
 
   /* 1. Die Seite. `createIfNotExists` plus Patch, damit der Aufruf
      wiederholbar ist: Das Dokument gab es bisher nicht, weil der Typ keine
      Route hatte. */
-  stapel.createIfNotExists({ _id: "practice", _type: "practice" });
-  stapel.patch("practice", (p) => p.set(SEITE));
-  bericht.push(`practice: ${Object.keys(SEITE).length} Felder`);
+  batch.createIfNotExists({ _id: "practice", _type: "practice" });
+  batch.patch("practice", (p) => p.set(PAGE));
+  report.push(`practice: ${Object.keys(PAGE).length} Felder`);
 
   /* 2. Die Slugs. Nur wo keiner steht — ein vorhandener Slug ist eine
      Adresse, die vielleicht schon jemand geteilt hat. */
-  const personen = await client.fetch(
+  const people = await client.fetch(
     `*[_type == "person"] | order(coalesce(orderRank, "zzz")) { _id, name, "slug": slug.current, orderRank }`
   );
 
   let r = LexoRank.min();
-  const raenge = personen.map(() => (r = r.genNext()).toString());
+  const ranks = people.map(() => (r = r.genNext()).toString());
 
-  personen.forEach((person, i) => {
-    const aenderung = {};
-    if (!person.slug) aenderung.slug = { _type: "slug", current: slugAus(person.name) };
+  people.forEach((person, i) => {
+    const changes = {};
+    if (!person.slug) changes.slug = { _type: "slug", current: slugFrom(person.name) };
     /* Auch der Sortierwert fehlt bei den Personen — sie waren nie ziehbar. */
-    if (!person.orderRank) aenderung.orderRank = raenge[i];
+    if (!person.orderRank) changes.orderRank = ranks[i];
 
-    if (Object.keys(aenderung).length) {
-      stapel.patch(person._id, (p) => p.set(aenderung));
-      bericht.push(
-        `${person.name}: ${aenderung.slug ? `/praxis/${aenderung.slug.current}` : ""}` +
-          `${aenderung.orderRank ? "  (+ Sortierwert)" : ""}`
+    if (Object.keys(changes).length) {
+      batch.patch(person._id, (p) => p.set(changes));
+      report.push(
+        `${person.name}: ${changes.slug ? `/praxis/${changes.slug.current}` : ""}` +
+          `${changes.orderRank ? "  (+ Sortierwert)" : ""}`
       );
     }
   });
@@ -148,11 +148,11 @@ async function los() {
   const index = punkte.findIndex((p) => p?.text === "Praxis");
 
   if (index === -1) {
-    bericht.push('Navigation: kein Punkt „Praxis“ gefunden — bitte im Studio prüfen');
+    report.push('Navigation: kein Punkt „Praxis“ gefunden — bitte im Studio prüfen');
   } else if (punkte[index].target?._ref === "practice") {
-    bericht.push("Navigation: zeigt bereits auf die Praxisseite");
+    report.push("Navigation: zeigt bereits auf die Praxisseite");
   } else {
-    stapel.patch("navigation", (p) =>
+    batch.patch("navigation", (p) =>
       p
         .set({
           [`mainMenu[${index}].target`]: {
@@ -166,7 +166,7 @@ async function los() {
            habe der Klick nicht funktioniert. */
         .unset([`mainMenu[${index}].anchor`])
     );
-    bericht.push('Navigation: „Praxis“ zeigt jetzt auf /praxis (Sprungmarke entfernt)');
+    report.push('Navigation: „Praxis“ zeigt jetzt auf /praxis (Sprungmarke entfernt)');
   }
 
   /* 4. Die Koordinaten der beiden Praxen. Ohne sie entfällt die Karte auf
@@ -179,7 +179,7 @@ async function los() {
      Zugeordnet über die Straße und nicht über die Position im Array: Wer im
      Studio die Reihenfolge der Standorte ändert, bekäme sonst die
      Koordinaten der jeweils anderen Praxis. */
-  const KOORDINATEN = {
+  const COORDINATES = {
     "Prenzlauer Allee 25": { latitude: 52.5324712, longitude: 13.4206726 },
     "Christburger Straße 37": { latitude: 52.5359564, longitude: 13.4268302 },
   };
@@ -189,32 +189,32 @@ async function los() {
   );
 
   (einstellungen?.locations ?? []).forEach((o, i) => {
-    const treffer = KOORDINATEN[o?.street];
+    const treffer = COORDINATES[o?.street];
     if (!treffer) {
-      bericht.push(`Standort „${o?.street}“: keine Koordinaten hinterlegt`);
+      report.push(`Standort „${o?.street}“: keine Koordinaten hinterlegt`);
       return;
     }
     if (o.latitude != null) {
-      bericht.push(`Standort „${o.street}“: hat bereits Koordinaten`);
+      report.push(`Standort „${o.street}“: hat bereits Koordinaten`);
       return;
     }
-    stapel.patch("settings", (p) =>
+    batch.patch("settings", (p) =>
       p.set({
         [`locations[${i}].latitude`]: treffer.latitude,
         [`locations[${i}].longitude`]: treffer.longitude,
       })
     );
-    bericht.push(`Standort „${o.street}“: ${treffer.latitude}, ${treffer.longitude}`);
+    report.push(`Standort „${o.street}“: ${treffer.latitude}, ${treffer.longitude}`);
   });
 
-  console.log(bericht.map((z) => "  " + z).join("\n"));
+  console.log(report.map((z) => "  " + z).join("\n"));
 
   if (DRY) {
     console.log("\nProbelauf. Nichts geschrieben.");
     return;
   }
 
-  await stapel.commit();
+  await batch.commit();
   console.log("\n✓ Geschrieben.");
   console.log("\nNoch offen, weil niemand hier die Antwort kennt:");
   console.log("  · Kopfbild, zweites Bild, Bild der Praxis, Teamfoto");
@@ -223,7 +223,7 @@ async function los() {
   console.log("  · Alle mit ENTWURF markierten Texte in diesem Skript");
 }
 
-los().catch((fehler) => {
-  console.error("Fehlgeschlagen:", fehler.message);
+los().catch((error) => {
+  console.error("Fehlgeschlagen:", error.message);
   process.exit(1);
 });

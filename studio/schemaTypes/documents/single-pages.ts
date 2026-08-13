@@ -84,7 +84,7 @@ function einzelseite(name: string, title: string, icon: any, untertitel: string)
 
 /* --- Übersichten und Unterseiten --------------------------------------- */
 
-export const leistungenIndex = einzelseite(
+export const servicesIndex = einzelseite(
   "servicesIndex",
   "Leistungen (Übersicht)",
   TagsIcon,
@@ -94,8 +94,8 @@ export const leistungenIndex = einzelseite(
 /* `practice` steht nicht mehr hier: Die Praxisseite hat eine feste,
    gestaltete Abfolge und keinen Baukasten. Ihr Typ liegt in
    `documents/practice.ts` — wie die Karriereseite. */
-export const magazinIndex = einzelseite("magazineIndex", "Magazin (Übersicht)", DocumentsIcon, "/magazin");
+export const magazineIndex = einzelseite("magazineIndex", "Magazin (Übersicht)", DocumentsIcon, "/magazin");
 /* `careers` steht nicht mehr hier: Die Seite hat eine feste, gestaltete
    Abfolge und keinen Baukasten. Ihr Typ liegt in `documents/karriere.ts`. */
-export const kontakt = einzelseite("contactPage", "Kontakt", EnvelopeIcon, "/kontakt");
-export const notdienst = einzelseite("emergency", "Notdienst", WarningOutlineIcon, "/notdienst");
+export const contactPage = einzelseite("contactPage", "Kontakt", EnvelopeIcon, "/kontakt");
+export const emergency = einzelseite("emergency", "Notdienst", WarningOutlineIcon, "/notdienst");

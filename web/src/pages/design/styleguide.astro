@@ -30,80 +30,80 @@ const HEX = {
   black: "#000000",
 } as const;
 
-const kanal = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const channels = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 
-function leuchtdichte(hex: string) {
-  const k = kanal(hex).map((v) => {
+function luminance(hex: string) {
+  const k = channels(hex).map((v) => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
 }
 
-function kontrast(a: string, b: string) {
-  const [x, y] = [leuchtdichte(a), leuchtdichte(b)];
+function contrast(a: string, b: string) {
+  const [x, y] = [luminance(a), luminance(b)];
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
 /* Jede Farbe gegen den Grund, auf dem sie tatsächlich vorkommt. */
-const FARBEN = [
-  { name: "--c-brand", hex: HEX.brand, role: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-dark", hex: HEX.dark, role: "Schrift, dunkle Bänder, Knopffüllung", gegen: HEX.grey, gegenName: "--c-grey" },
-  { name: "--c-taupe", hex: HEX.taupe, role: "Grund der Leistungs- und Geschichten-Section", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-grey", hex: HEX.grey, role: "Seitengrund", gegen: HEX.dark, gegenName: "--c-dark" },
-  { name: "--c-neutral-800", hex: HEX["neutral-800"], role: "Schrift auf hellen Flächen (Formular, Magazin)", gegen: HEX["neutral-200"], gegenName: "--c-neutral-200" },
-  { name: "--c-neutral-200", hex: HEX["neutral-200"], role: "Flächen: Karten, Eingabefelder", gegen: HEX["neutral-800"], gegenName: "--c-neutral-800" },
+const COLORS = [
+  { name: "--c-brand", hex: HEX.brand, role: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", against: HEX.dark, againstName: "--c-dark" },
+  { name: "--c-dark", hex: HEX.dark, role: "Schrift, dunkle Bänder, Knopffüllung", against: HEX.grey, againstName: "--c-grey" },
+  { name: "--c-taupe", hex: HEX.taupe, role: "Grund der Leistungs- und Geschichten-Section", against: HEX.dark, againstName: "--c-dark" },
+  { name: "--c-grey", hex: HEX.grey, role: "Seitengrund", against: HEX.dark, againstName: "--c-dark" },
+  { name: "--c-neutral-800", hex: HEX["neutral-800"], role: "Schrift auf hellen Flächen (Formular, Magazin)", against: HEX["neutral-200"], againstName: "--c-neutral-200" },
+  { name: "--c-neutral-200", hex: HEX["neutral-200"], role: "Flächen: Karten, Eingabefelder", against: HEX["neutral-800"], againstName: "--c-neutral-800" },
 ];
 
 /* Abgeleitete Töne. Die Deckungswerte sind gerechnet — siehe tokens.css. */
-const ABGELEITET = [
-  { name: "--c-text-muted", regel: "--c-dark auf 75 %", zweck: "Nebentext auf Grau", value: 4.53 },
-  { name: "--c-text-muted (Taupe)", regel: "--c-dark auf 82 %", zweck: "Nebentext auf Taupe", value: 4.55 },
-  { name: "--c-text-muted (dunkel)", regel: "--c-grey auf 65 %", zweck: "Nebentext auf Braun", value: 4.62 },
-  { name: "--c-line", regel: "--c-dark auf 28 %", zweck: "Trennlinien - Schmuck, kein Bedienelement", value: null },
+const DERIVED = [
+  { name: "--c-text-muted", rule: "--c-dark auf 75 %", purpose: "Nebentext auf Grau", value: 4.53 },
+  { name: "--c-text-muted (Taupe)", rule: "--c-dark auf 82 %", purpose: "Nebentext auf Taupe", value: 4.55 },
+  { name: "--c-text-muted (dunkel)", rule: "--c-grey auf 65 %", purpose: "Nebentext auf Braun", value: 4.62 },
+  { name: "--c-line", rule: "--c-dark auf 28 %", purpose: "Trennlinien - Schmuck, kein Bedienelement", value: null },
 ];
 
-const GRADE = [
-  { token: "--fs-display", figma: "250 px", zweck: "Wortmarke im Hero", text: "Mund" },
-  { token: "--fs-display-2", figma: "125 px", zweck: "Konturzahlen der Standorte", text: "P25" },
-  { token: "--fs-h1", figma: "70 px", zweck: "Seitentitel der Leistungsseiten", text: "Veneers" },
-  { token: "--fs-h2", figma: "40 px", zweck: "Überschrift einer Section", text: "Unsere Standorte" },
-  { token: "--fs-h5", figma: "24 px", zweck: "Meta-Zeilen im Hero", text: "Zahnarzt Prenzlauer Berg" },
-  { token: "--fs-text-large", figma: "20 px", zweck: "Einleitungstexte", text: "Wir nehmen uns eine volle Stunde." },
-  { token: "--fs-text-main", figma: "18 px", zweck: "Fließtext", text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus." },
-  { token: "--fs-text-small", figma: "16 px", zweck: "Toplines, Beschriftungen", text: "Prenzlauer Berg" },
-  { token: "--fs-label", figma: "12 px", zweck: "Kleinstbeschriftungen", text: "Ab 690 € je Zahn" },
+const SIZES = [
+  { token: "--fs-display", figma: "250 px", purpose: "Wortmarke im Hero", text: "Mund" },
+  { token: "--fs-display-2", figma: "125 px", purpose: "Konturzahlen der Standorte", text: "P25" },
+  { token: "--fs-h1", figma: "70 px", purpose: "Seitentitel der Leistungsseiten", text: "Veneers" },
+  { token: "--fs-h2", figma: "40 px", purpose: "Überschrift einer Section", text: "Unsere Standorte" },
+  { token: "--fs-h5", figma: "24 px", purpose: "Meta-Zeilen im Hero", text: "Zahnarzt Prenzlauer Berg" },
+  { token: "--fs-text-large", figma: "20 px", purpose: "Einleitungstexte", text: "Wir nehmen uns eine volle Stunde." },
+  { token: "--fs-text-main", figma: "18 px", purpose: "Fließtext", text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus." },
+  { token: "--fs-text-small", figma: "16 px", purpose: "Toplines, Beschriftungen", text: "Prenzlauer Berg" },
+  { token: "--fs-label", figma: "12 px", purpose: "Kleinstbeschriftungen", text: "Ab 690 € je Zahn" },
 ];
 
-const ABSTAENDE = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-8", "--sp-10", "--sp-12", "--sp-16"];
-const RADIEN = ["--r-sm", "--r-md", "--r-lg", "--r-round"];
-const KURVEN = [
-  { token: "--e-out", zweck: "Standard. Schnell los, lange auslaufend." },
-  { token: "--e-in-out", zweck: "Wenn Anfang und Ende gleich wiegen - Aufklappen." },
-  { token: "--e-swift", zweck: "Kurze Zustandswechsel: Farbe, Deckkraft." },
+const SPACING = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-8", "--sp-10", "--sp-12", "--sp-16"];
+const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-round"];
+const CURVES = [
+  { token: "--e-out", purpose: "Standard. Schnell los, lange auslaufend." },
+  { token: "--e-in-out", purpose: "Wenn Anfang und Ende gleich wiegen - Aufklappen." },
+  { token: "--e-swift", purpose: "Kurze Zustandswechsel: Farbe, Deckkraft." },
 ];
-const DAUERN = [
-  { token: "--d-fast", value: "0.25 s", zweck: "Farbwechsel beim Überfahren" },
-  { token: "--d-base", value: "0.45 s", zweck: "Standard für Bewegung" },
-  { token: "--d-slow", value: "0.8 s", zweck: "Aufklappen, Umblenden" },
+const DURATIONS = [
+  { token: "--d-fast", value: "0.25 s", purpose: "Farbwechsel beim Überfahren" },
+  { token: "--d-base", value: "0.45 s", purpose: "Standard für Bewegung" },
+  { token: "--d-slow", value: "0.8 s", purpose: "Aufklappen, Umblenden" },
 ];
 
-const SYMBOLE = ["i-arrow", "i-chevron", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
+const SYMBOLS = ["i-arrow", "i-chevron", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
 
-const BEISPIEL_FRAGEN = [
+const SAMPLE_QUESTIONS = [
   { question: "Wie bekomme ich einen Termin?", answer: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
   { question: "Behandeln Sie gesetzlich Versicherte?", answer: "Ja. Die Regelleistungen rechnen wir über die Kasse ab." },
 ];
 
-const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 ---
 
 <Design title="Styleguide" active="styleguide">
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">00</span>
-      <h1 class="d-teil__titel">Styleguide</h1>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">00</span>
+      <h1 class="d-section__title">Styleguide</h1>
+      <p class="d-section__text">
         Die Grundlagen der Seite: Farben, Typografie, Abstände, Radien und
         Bewegung - dazu die kleinen Bausteine, aus denen alles Übrige
         zusammengesetzt ist. Jeder Wert kommt aus <code>src/styles/tokens.css</code>
@@ -114,11 +114,11 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">01</span>
-      <h2 class="d-teil__titel">Farben</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">01</span>
+      <h2 class="d-section__title">Farben</h2>
+      <p class="d-section__text">
         Sechs Farben, mehr nicht. Daneben steht das gemessene Kontrastverhältnis
         gegen den Grund, auf dem die Farbe tatsächlich vorkommt - WCAG&nbsp;AA
         verlangt 4,5:1 für Fließtext, 3:1 für große Schrift und für
@@ -126,20 +126,20 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-raster">
-        {FARBEN.map((f) => {
-          const v = kontrast(f.hex, f.gegen);
+    <div class="d-sample">
+      <div class="d-grid">
+        {COLORS.map((f) => {
+          const v = contrast(f.hex, f.against);
           return (
-            <div class="d-farbe">
-              <div class="d-farbe__feld" style={`background: ${f.hex}`}></div>
-              <p class="d-farbe__name">{f.name}</p>
-              <p class="d-farbe__hex">{f.hex}</p>
-              <p class="d-farbe__rolle">{f.role}</p>
-              <p class="d-farbe__wert">
-                {zahl(v)}:1 auf <code>{f.gegenName}</code>
+            <div class="d-color">
+              <div class="d-color__swatch" style={`background: ${f.hex}`}></div>
+              <p class="d-color__name">{f.name}</p>
+              <p class="d-color__hex">{f.hex}</p>
+              <p class="d-color__role">{f.role}</p>
+              <p class="d-color__value">
+                {formatNumber(v)}:1 auf <code>{f.againstName}</code>
                 {" "}
-                <span class={v >= 4.5 ? "d-marker d-marker--gut" : v >= 3 ? "d-marker d-marker--teils" : "d-marker d-marker--schwach"}>
+                <span class={v >= 4.5 ? "d-marker d-marker--good" : v >= 3 ? "d-marker d-marker--partial" : "d-marker d-marker--weak"}>
                   {v >= 4.5 ? "Fließtext" : v >= 3 ? "nur groß" : "nur Fläche"}
                 </span>
               </p>
@@ -149,27 +149,27 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       </div>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf">
-        <span class="d-probe__name">Abgeleitete Töne</span>
-        <span class="d-probe__pfad">src/styles/tokens.css</span>
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Abgeleitete Töne</span>
+        <span class="d-sample__path">src/styles/tokens.css</span>
       </div>
-      <p class="d-probe__text">
+      <p class="d-sample__text">
         Nebentext entsteht nicht aus einer eigenen Farbe, sondern aus der
         Schriftfarbe mit verringerter Deckung. Die Deckungswerte sind gerechnet:
         Taupe ist dunkler als Grau und braucht deshalb mehr.
       </p>
-      <table class="d-tabelle">
+      <table class="d-table">
         <thead>
           <tr><th>Token</th><th>Regel</th><th>Zweck</th><th>Kontrast</th></tr>
         </thead>
         <tbody>
-          {ABGELEITET.map((a) => (
+          {DERIVED.map((a) => (
             <tr>
               <td><code>{a.name}</code></td>
-              <td>{a.regel}</td>
-              <td>{a.zweck}</td>
-              <td>{a.value ? `${zahl(a.value)}:1` : "-"}</td>
+              <td>{a.rule}</td>
+              <td>{a.purpose}</td>
+              <td>{a.value ? `${formatNumber(a.value)}:1` : "-"}</td>
             </tr>
           ))}
         </tbody>
@@ -178,11 +178,11 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">02</span>
-      <h2 class="d-teil__titel">Typografie</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">02</span>
+      <h2 class="d-section__title">Typografie</h2>
+      <p class="d-section__text">
         Zwei Schriften. PP Neue Montreal trägt alles Gesetzte, GT Pressura Mono
         alles Beschriftende - Toplines, Preise, Kleinstangaben. Die Skala ist
         fluid: die Figma-Werte gelten bei 1728&nbsp;px Fensterbreite, darunter
@@ -190,58 +190,58 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Schriften</span></div>
-      <div class="d-raster">
-        <div class="d-buehne">
-          <p class="d-schrift-name">--f-sans · PP Neue Montreal</p>
-          <p class="d-schrift-probe" style="font-family: var(--f-sans)">AaBbCc 0123</p>
-          <p class="d-schrift-probe" style="font-family: var(--f-sans); font-weight: 500">Medium 500</p>
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Schriften</span></div>
+      <div class="d-grid">
+        <div class="d-stage">
+          <p class="d-font-name">--f-sans · PP Neue Montreal</p>
+          <p class="d-font-sample" style="font-family: var(--f-sans)">AaBbCc 0123</p>
+          <p class="d-font-sample" style="font-family: var(--f-sans); font-weight: 500">Medium 500</p>
         </div>
-        <div class="d-buehne">
-          <p class="d-schrift-name">--f-mono · GT Pressura Mono</p>
-          <p class="d-schrift-probe" style="font-family: var(--f-mono); font-weight: 300">AaBbCc 0123</p>
-          <p class="d-schrift-probe" style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em">Light 300 gesperrt</p>
+        <div class="d-stage">
+          <p class="d-font-name">--f-mono · GT Pressura Mono</p>
+          <p class="d-font-sample" style="font-family: var(--f-mono); font-weight: 300">AaBbCc 0123</p>
+          <p class="d-font-sample" style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em">Light 300 gesperrt</p>
         </div>
       </div>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Skala</span></div>
-      {GRADE.map((g) => (
-        <div class="d-grad">
-          <div class="d-grad__meta">
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Skala</span></div>
+      {SIZES.map((g) => (
+        <div class="d-size">
+          <div class="d-size__meta">
             <code>{g.token}</code>
             <span>{g.figma}</span>
-            <span class="d-grad__zweck">{g.zweck}</span>
+            <span class="d-size__purpose">{g.purpose}</span>
           </div>
-          <p class="d-grad__probe" style={`font-size: var(${g.token})`}>{g.text}</p>
+          <p class="d-size__sample" style={`font-size: var(${g.token})`}>{g.text}</p>
         </div>
       ))}
     </div>
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">03</span>
-      <h2 class="d-teil__titel">Abstände, Radien, Rahmen</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">03</span>
+      <h2 class="d-section__title">Abstände, Radien, Rahmen</h2>
+      <p class="d-section__text">
         Die Abstandsskala wächst nicht linear - unten in Achterschritten, oben
         in Sprüngen. Abstände zwischen Sections haben eigene Token, weil sie
         mit der Fensterbreite mitwachsen müssen.
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Abstände</span></div>
-      {ABSTAENDE.map((t) => (
-        <div class="d-mass">
-          <code class="d-mass__name">{t}</code>
-          <div class="d-mass__balken" style={`width: var(${t})`}></div>
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Abstände</span></div>
+      {SPACING.map((t) => (
+        <div class="d-space">
+          <code class="d-space__name">{t}</code>
+          <div class="d-space__bar" style={`width: var(${t})`}></div>
         </div>
       ))}
-      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
         Dazu drei fluide Werte für den Abstand zwischen Sections:
         <code>--section-space</code> als Regelfall,
         <code>--section-space-sm</code> wenn direkt darunter eine Farbfläche
@@ -249,17 +249,17 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Radien</span></div>
-      <div class="d-buehne d-buehne--reihe">
-        {RADIEN.map((r) => (
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Radien</span></div>
+      <div class="d-stage d-stage--row">
+        {RADII.map((r) => (
           <div class="d-radius">
-            <div class="d-radius__feld" style={`border-radius: var(${r})`}></div>
+            <div class="d-radius__field" style={`border-radius: var(${r})`}></div>
             <code>{r}</code>
           </div>
         ))}
       </div>
-      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
         Rahmenstärke ist überall <code>--bw</code> (1&nbsp;px). Es gibt keine
         zweite - eine Seite mit drei Linienstärken wirkt unentschieden.
       </p>
@@ -267,38 +267,38 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">04</span>
-      <h2 class="d-teil__titel">Bewegung</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">04</span>
+      <h2 class="d-section__title">Bewegung</h2>
+      <p class="d-section__text">
         Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus
         und federn nie zurück. Zum Ausprobieren die Felder überfahren.
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Kurven</span></div>
-      {KURVEN.map((k) => (
-        <div class="d-kurve">
-          <div class="d-kurve__meta">
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Kurven</span></div>
+      {CURVES.map((k) => (
+        <div class="d-curve">
+          <div class="d-curve__meta">
             <code>{k.token}</code>
-            <span class="d-grad__zweck">{k.zweck}</span>
+            <span class="d-size__purpose">{k.purpose}</span>
           </div>
-          <div class="d-kurve__bahn">
-            <span class="d-kurve__ball" style={`transition-timing-function: var(${k.token})`}></span>
+          <div class="d-curve__track">
+            <span class="d-curve__ball" style={`transition-timing-function: var(${k.token})`}></span>
           </div>
         </div>
       ))}
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Dauern</span></div>
-      <table class="d-tabelle">
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Dauern</span></div>
+      <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {DAUERN.map((d) => (
-            <tr><td><code>{d.token}</code></td><td>{d.value}</td><td>{d.zweck}</td></tr>
+          {DURATIONS.map((d) => (
+            <tr><td><code>{d.token}</code></td><td>{d.value}</td><td>{d.purpose}</td></tr>
           ))}
         </tbody>
       </table>
@@ -306,11 +306,11 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">05</span>
-      <h2 class="d-teil__titel">Knöpfe und Links</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">05</span>
+      <h2 class="d-section__title">Knöpfe und Links</h2>
+      <p class="d-section__text">
         Der Knopf ist zweiteilig: Pille mit Beschriftung, abgesetzt daneben der
         runde Pfeil. Beim Überfahren wandert der Pfeil nach rechts und beide
         Teile kehren ihre Farben um - der Knopf öffnet sich in Leserichtung.
@@ -318,31 +318,31 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf">
-        <span class="d-probe__name">Varianten</span>
-        <span class="d-probe__pfad">components/ui/Button.astro</span>
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Varianten</span>
+        <span class="d-sample__path">components/ui/Button.astro</span>
       </div>
-      <div class="d-buehne d-buehne--reihe">
+      <div class="d-stage d-stage--row">
         <Button label="Termin buchen" href="#" />
         <Button label="Dunkel" href="#" variant="dark" />
         <Button label="Absenden" type="submit" />
       </div>
-      <div class="d-buehne d-buehne--dunkel" style="margin-top: var(--sp-4)">
-        <div class="d-buehne--reihe" style="display:flex; flex-wrap:wrap; gap: var(--sp-4)">
+      <div class="d-stage d-stage--dark" style="margin-top: var(--sp-4)">
+        <div class="d-stage--row" style="display:flex; flex-wrap:wrap; gap: var(--sp-4)">
           <Button label="Auf dunklem Grund" href="#" />
           <Button label="Block" href="#" variant="block" />
         </div>
       </div>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Textlink und Topline</span></div>
-      <div class="d-buehne">
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Textlink und Topline</span></div>
+      <div class="d-stage">
         <p style="margin-bottom: var(--sp-4)"><a class="c-link" href="#">Ein Textlink</a> im Fließtext.</p>
         <span class="c-topline">Vorher &amp; Nachher</span>
       </div>
-      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
         Die Topline erbt ihre Farbe von der Section, sie setzt keine eigene -
         sonst stünde sie auf dem braunen Band dunkel auf dunkel.
       </p>
@@ -350,28 +350,28 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">06</span>
-      <h2 class="d-teil__titel">Flächen und Formularelemente</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">06</span>
+      <h2 class="d-section__title">Flächen und Formularelemente</h2>
+      <p class="d-section__text">
         Alles, was Inhalt trägt oder Eingaben entgegennimmt.
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf">
-        <span class="d-probe__name">Akkordeon</span>
-        <span class="d-probe__pfad">components/ui/Accordion.astro</span>
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Akkordeon</span>
+        <span class="d-sample__path">components/ui/Accordion.astro</span>
       </div>
-      <div class="d-buehne">
-        <Accordion questions={BEISPIEL_FRAGEN} />
+      <div class="d-stage">
+        <Accordion questions={SAMPLE_QUESTIONS} />
       </div>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf"><span class="d-probe__name">Eingabefelder</span></div>
-      <div class="d-buehne d-formular">
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Eingabefelder</span></div>
+      <div class="d-stage d-form">
         <div class="c-field">
           <label class="c-field__label" for="sg-name">Name <span>*</span></label>
           <div class="c-field__control">
@@ -391,7 +391,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
           </div>
         </div>
       </div>
-      <p class="d-probe__text" style="margin-top: var(--sp-4)">
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
         Die Beschriftung steht über dem Feld und ist über <code>for</code> mit
         ihm verbunden - ein Platzhalter allein ist keine Beschriftung, er
         verschwindet beim Tippen.
@@ -400,24 +400,24 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
   </section>
 
   {/* ---------------------------------------------------------------- */}
-  <section class="d-teil">
-    <div class="d-teil__kopf">
-      <span class="d-teil__nummer">07</span>
-      <h2 class="d-teil__titel">Symbole</h2>
-      <p class="d-teil__text">
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">07</span>
+      <h2 class="d-section__title">Symbole</h2>
+      <p class="d-section__text">
         Ein einziges SVG-Sprite, einmal im Dokument, überall per
         <code>&lt;use href="#i-…"&gt;</code> aufgerufen. Die Symbole erben
         <code>currentColor</code>, sie tragen keine eigene Farbe.
       </p>
     </div>
 
-    <div class="d-probe">
-      <div class="d-probe__kopf">
-        <span class="d-probe__name">Sprite</span>
-        <span class="d-probe__pfad">components/ui/Icons.astro</span>
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Sprite</span>
+        <span class="d-sample__path">components/ui/Icons.astro</span>
       </div>
-      <div class="d-raster">
-        {SYMBOLE.map((s) => (
+      <div class="d-grid">
+        {SYMBOLS.map((s) => (
           <div class="d-symbol">
             <svg aria-hidden="true"><use href={`#${s}`} /></svg>
             <code>{s}</code>
@@ -429,27 +429,27 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
 
   <style is:global>
     /* --- Farbkacheln --- */
-    .d-farbe__feld {
+    .d-color__swatch {
       height: 96px;
       margin-bottom: var(--sp-3);
       border: var(--bw) solid var(--c-line);
       border-radius: var(--r-sm);
     }
 
-    .d-farbe__name {
+    .d-color__name {
       font-family: var(--f-mono);
       font-size: var(--fs-text-small);
     }
 
-    .d-farbe__hex,
-    .d-farbe__rolle,
-    .d-farbe__wert {
+    .d-color__hex,
+    .d-color__role,
+    .d-color__value {
       font-size: var(--fs-text-small);
       line-height: 1.45;
       color: var(--c-text-muted);
     }
 
-    .d-farbe__rolle {
+    .d-color__role {
       margin-block: var(--sp-1);
     }
 
@@ -465,38 +465,38 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       text-transform: uppercase;
     }
 
-    .d-marker--gut { background: var(--c-dark); color: var(--c-grey); }
-    .d-marker--teils { background: var(--c-brand); color: var(--c-dark); }
-    .d-marker--schwach { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
+    .d-marker--good { background: var(--c-dark); color: var(--c-grey); }
+    .d-marker--partial { background: var(--c-brand); color: var(--c-dark); }
+    .d-marker--weak { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
 
     /* --- Tabellen --- */
-    .d-tabelle {
+    .d-table {
       width: 100%;
       border-collapse: collapse;
       font-size: var(--fs-text-small);
       text-align: left;
     }
 
-    .d-tabelle th,
-    .d-tabelle td {
+    .d-table th,
+    .d-table td {
       padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
       border-bottom: var(--bw) solid var(--c-line);
       vertical-align: top;
     }
 
-    .d-tabelle th {
+    .d-table th {
       font-family: var(--f-mono);
       font-weight: 300;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
-    .d-tabelle td:not(:first-child) {
+    .d-table td:not(:first-child) {
       color: var(--c-text-muted);
     }
 
     /* --- Schrift- und Gradproben --- */
-    .d-schrift-name {
+    .d-font-name {
       margin-bottom: var(--sp-3);
       font-family: var(--f-mono);
       font-size: var(--fs-label);
@@ -505,17 +505,17 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       color: var(--c-text-muted);
     }
 
-    .d-schrift-probe {
+    .d-font-sample {
       font-size: var(--fs-h2);
       line-height: 1.2;
     }
 
-    .d-grad {
+    .d-size {
       padding-block: var(--sp-4);
       border-top: var(--bw) solid var(--c-line);
     }
 
-    .d-grad__meta {
+    .d-size__meta {
       display: flex;
       flex-wrap: wrap;
       gap: var(--sp-2) var(--sp-4);
@@ -526,14 +526,14 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       color: var(--c-text-muted);
     }
 
-    .d-grad__zweck {
+    .d-size__purpose {
       text-transform: none;
     }
 
     /* Überlauf erlaubt: die großen Grade sind breiter als das Fenster, und
        genau das sollen sie zeigen. Abgeschnitten wären sie eine Lüge über
        ihre Größe — deshalb scrollt die Zeile für sich. */
-    .d-grad__probe {
+    .d-size__sample {
       overflow-x: auto;
       font-weight: 500;
       line-height: 1.05;
@@ -541,20 +541,20 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
     }
 
     /* --- Abstände und Radien --- */
-    .d-mass {
+    .d-space {
       display: flex;
       align-items: center;
       gap: var(--sp-4);
       padding-block: var(--sp-1);
     }
 
-    .d-mass__name {
+    .d-space__name {
       flex: 0 0 7ch;
       font-size: var(--fs-label);
       color: var(--c-text-muted);
     }
 
-    .d-mass__balken {
+    .d-space__bar {
       height: 14px;
       border-radius: var(--r-sm);
       background: var(--c-dark);
@@ -565,7 +565,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       font-size: var(--fs-label);
     }
 
-    .d-radius__feld {
+    .d-radius__field {
       width: 88px;
       height: 88px;
       margin-bottom: var(--sp-2);
@@ -574,12 +574,12 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
     }
 
     /* --- Bewegungskurven --- */
-    .d-kurve {
+    .d-curve {
       padding-block: var(--sp-4);
       border-top: var(--bw) solid var(--c-line);
     }
 
-    .d-kurve__meta {
+    .d-curve__meta {
       display: flex;
       flex-wrap: wrap;
       gap: var(--sp-2) var(--sp-4);
@@ -589,14 +589,14 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       color: var(--c-text-muted);
     }
 
-    .d-kurve__bahn {
+    .d-curve__track {
       position: relative;
       height: 32px;
       border-radius: var(--r-round);
       background: color-mix(in srgb, var(--c-dark) 8%, transparent);
     }
 
-    .d-kurve__ball {
+    .d-curve__ball {
       position: absolute;
       top: 4px;
       left: 4px;
@@ -608,30 +608,30 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       transition-duration: var(--d-slow);
     }
 
-    .d-kurve:hover .d-kurve__ball,
-    .d-kurve:focus-within .d-kurve__ball {
+    .d-curve:hover .d-curve__ball,
+    .d-curve:focus-within .d-curve__ball {
       translate: calc(100cqw - 32px) 0;
     }
 
-    .d-kurve__bahn {
+    .d-curve__track {
       container-type: inline-size;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .d-kurve__ball {
+      .d-curve__ball {
         transition-duration: 0s;
       }
     }
 
     /* --- Formular --- */
-    .d-formular {
+    .d-form {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--sp-4);
     }
 
     @media (max-width: 700px) {
-      .d-formular {
+      .d-form {
         grid-template-columns: 1fr;
       }
     }
@@ -639,7 +639,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
     /* Die Feldregeln liegen in Contact.astro und sind dort abgegrenzt — auf
        dieser Seite gibt es sie nicht. Hier stehen deshalb nur die nötigsten,
        bewusst als Nachbau gekennzeichnet. */
-    .d-formular .c-field__label {
+    .d-form .c-field__label {
       display: block;
       margin-bottom: var(--sp-1);
       font-family: var(--f-mono);
@@ -653,12 +653,12 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
     /* Wie in Contact.astro: der Pflichtstern trägt die Farbe der
        Beschriftung. Pink erreicht bei dieser Größe auf hellem Grund keine
        4.5:1 und wäre als Text unzulässig. */
-    .d-formular .c-field__label span {
+    .d-form .c-field__label span {
       color: inherit;
     }
 
-    .d-formular input,
-    .d-formular textarea {
+    .d-form input,
+    .d-form textarea {
       width: 100%;
       padding: var(--sp-3) var(--sp-4);
       border: var(--bw) solid var(--c-line);
@@ -669,7 +669,7 @@ const zahl = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2
       color: var(--c-neutral-800);
     }
 
-    .d-formular .c-field--tall {
+    .d-form .c-field--tall {
       grid-column: 1 / -1;
     }
 

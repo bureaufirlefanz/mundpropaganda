@@ -336,7 +336,7 @@ nicht.
 - `astro.config.mjs`: `adapter: netlify()` dazu. `output: "static"` **bleibt** —
   in Astro 5 heißt das: alles prerendert, außer wo `export const prerender = false`
   steht. Dazu `stega: { studioUrl: … }` in der Sanity-Integration.
-- `src/pages/preview/[...pfad].astro` mit `export const prerender = false`:
+- `src/pages/preview/[...path].astro` mit `export const prerender = false`:
   löst den Pfad über die Umkehrung von `pfadVon()` auf, lädt mit
   `perspective: "drafts"` und Token, rendert die Renderer aus Aufgabe 5,
   hängt `<SanityVisualEditing />` an.
@@ -489,6 +489,32 @@ Seite, deutsch, keine Screenshots von Zuständen, die sich ändern.
 
 Der Reflex, das wegzulassen, ist teuer: jede Frage, die hier nicht steht,
 kommt als Anruf.
+
+### 17a. Mehrsprachigkeit: Deutsch und Englisch
+
+**Entschieden 2026-08-12, noch nicht gebaut.** Die Seite soll auch auf
+Englisch funktionieren. Die Architektur steht fest, damit niemand sie beim
+Bauen neu erfindet:
+
+- **Dokument-Ebene, nicht Feld-Ebene**, über `@sanity/document-internationalization`
+  für Seiten und Beiträge (`language`-Feld, je Sprache ein Dokument). Die
+  Einzeldokumente (homepage, careers, practice …) bekommen je Sprache eine
+  feste ID nach dem Muster `homepage-en`; das deutsche Original behält seine
+  heutige ID und gilt als `de`. Feld-Ebene (`internationalized-array`) nur
+  dort, wo Inhalte zwischen den Sprachen geteilt sind — voraussichtlich die
+  Einstellungen (Telefonnummer und Adresse sind sprachfrei, nur die Texte
+  darin nicht).
+- **URLs:** Deutsch bleibt an der Wurzel (`/karriere`), Englisch liegt unter
+  `/en/` mit eigenen englischen Slugs (`/en/careers`). Beide Fassungen
+  verweisen per `hreflang` aufeinander. Kein `/de/`-Präfix — die deutschen
+  Adressen sind etabliert.
+- **Übersetzung:** Zunächst per Skript (wie `studio/scripts/careers-content.mjs`)
+  aus dem deutschen Bestand — maschinell vorübersetzt, im Studio frei
+  anpassbar, jedes Feld bleibt editierbar. Sanity AI Assist (Übersetzen-Knopf
+  im Studio, bezahltes Feature) wird danach als Komfort-Option geprüft, ist
+  aber keine Voraussetzung.
+- **Reihenfolge:** Erst nach der Englisch-Umstellung des Codes bauen — sonst
+  wird zweimal umbenannt.
 
 ### 17. Formulare verschicken wirklich etwas
 

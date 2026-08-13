@@ -410,11 +410,11 @@ const minutes = readingTime(d?.text);
      die h2 und ignoriert die h3 — sonst zählte er Unterpunkte mit und die
      Nummerierung entspräche nicht dem Verzeichnis daneben. */
   .s-post__text {
-    counter-reset: abschnitt;
+    counter-reset: section;
   }
 
   .s-post__text :global(h2) {
-    counter-increment: abschnitt;
+    counter-increment: section;
     position: relative;
     margin-top: var(--sp-12);
     margin-bottom: var(--sp-4);
@@ -426,7 +426,7 @@ const minutes = readingTime(d?.text);
   }
 
   .s-post__text :global(h2)::before {
-    content: counter(abschnitt, decimal-leading-zero);
+    content: counter(section, decimal-leading-zero);
     position: absolute;
     top: 0.15em;
     left: calc(-1 * var(--sp-8));

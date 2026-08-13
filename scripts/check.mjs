@@ -16,15 +16,15 @@ const PAGES = ["/", "/leistungen/veneers.html", "/styleguide.html"];
 await erwarteServer(BASE, "npm run dev");
 
 const browser = await starteBrowser();
-let probleme = 0;
+let problems = 0;
 
 for (const vp of VIEWPORTS) {
   console.log(`\n── ${vp.name} (${vp.width}×${vp.height}) ──`);
-  for (const pfad of PAGES) {
-    probleme += melde(pfad, await pruefeSeite(browser, BASE + pfad, vp));
+  for (const path of PAGES) {
+    problems += melde(path, await pruefeSeite(browser, BASE + path, vp));
   }
 }
 
 await browser.close();
-console.log(probleme ? `\n${probleme} Befund(e).` : "\nAlles sauber.");
-process.exit(probleme ? 1 : 0);
+console.log(problems ? `\n${problems} Befund(e).` : "\nAlles sauber.");
+process.exit(problems ? 1 : 0);

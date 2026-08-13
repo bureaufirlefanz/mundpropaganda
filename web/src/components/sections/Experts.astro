@@ -7,7 +7,7 @@ import { isCmsImage, type ImageSource } from "../../lib/images";
 /**
  * Teamfoto links, Text rechts.
  *
- * `absaetze` war bis Aufgabe 4 eine Prop mit zwei fest eingebauten Absätzen,
+ * `paragraphs` war bis Aufgabe 4 eine Prop mit zwei fest eingebauten Absätzen,
  * die niemand je übergab — im Studio stand daneben ein Feld `expertenText`,
  * das die Seite nie durchreichte. Der Kunde konnte es füllen, ohne dass sich
  * etwas änderte. Beides ist zusammengeführt: Das Feld heißt jetzt
@@ -15,12 +15,12 @@ import { isCmsImage, type ImageSource } from "../../lib/images";
  */
 interface Props {
   title: string;
-  namen: string;
-  absaetze: string[];
+  names: string;
+  paragraphs: string[];
   image?: ImageSource;
 }
 
-const { title, namen, absaetze, image } = Astro.props;
+const { title, names, paragraphs, image } = Astro.props;
 ---
 
 <!-- ==================================================================
@@ -31,7 +31,7 @@ const { title, namen, absaetze, image } = Astro.props;
              steht rechts auf einer schmalen Spalte — so im Entwurf. -->
         <div class="s-experts__media" data-reveal="fade">
           {isCmsImage(image) ? (
-            <CmsImage source={image} alt={namen.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
+            <CmsImage source={image} alt={names.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
           ) : (
             <Picture name="experten" alt="Dr. Hannes Schulte-Ostermann und Dr. Kerrin Gratecap" sizes="(max-width: 900px) 100vw, 62vw" parallax="9" />
           )}
@@ -43,8 +43,8 @@ const { title, namen, absaetze, image } = Astro.props;
             {/* Zeilenumbrüche aus dem CMS übernehmen: Die Namenszeile ist
                 gesetzt, nicht umgebrochen — sie soll da brechen, wo die
                 Redaktion es schreibt. */}
-            <p class="s-experts__names" data-reveal="up" data-reveal-trigger=".s-experts" set:html={namen.split("\n").join("<br />")} />
-            {absaetze.map((x, i) => (
+            <p class="s-experts__names" data-reveal="up" data-reveal-trigger=".s-experts" set:html={names.split("\n").join("<br />")} />
+            {paragraphs.map((x, i) => (
               <p data-reveal="up" data-reveal-delay={0.06 + i * 0.06} data-reveal-trigger=".s-experts">{x}</p>
             ))}
           </div>

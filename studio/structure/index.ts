@@ -44,7 +44,7 @@ import type { ComponentType } from "react";
  * sonst stünden sie zweimal da, einmal als Seite und einmal als Sammlung, in
  * der man ein zweites anlegen könnte.
  */
-export const EINZELDOKUMENTE = [
+export const SINGLETONS = [
   "homepage",
   "practice",
   "magazineIndex",
@@ -59,7 +59,7 @@ export const EINZELDOKUMENTE = [
  * und in dieser Liste, damit niemand sie versehentlich über die generische
  * Auflistung wieder hereinholt — sichtbar sind sie nicht.
  */
-export const OHNE_ROUTE = [
+export const UNROUTED = [
   "servicesIndex",
   "contactPage",
   "emergency",
@@ -67,9 +67,9 @@ export const OHNE_ROUTE = [
 ];
 
 /** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
-const AUSGESCHRIEBEN = [
-  ...EINZELDOKUMENTE,
-  ...OHNE_ROUTE,
+const EXPLICIT = [
+  ...SINGLETONS,
+  ...UNROUTED,
   "service",
   "post",
   "person",
@@ -77,16 +77,16 @@ const AUSGESCHRIEBEN = [
   "legalPage",
 ];
 
-function einzeldokument(
+function singleton(
   S: StructureBuilder,
-  typ: string,
-  titel: string,
+  type: string,
+  title: string,
   icon: ComponentType
 ) {
   return S.listItem()
-    .title(titel)
+    .title(title)
     .icon(icon)
-    .child(S.document().schemaType(typ).documentId(typ).title(titel));
+    .child(S.document().schemaType(type).documentId(type).title(title));
 }
 
 export const structure: StructureResolver = (S, context) =>
@@ -94,7 +94,7 @@ export const structure: StructureResolver = (S, context) =>
     .title("Mundpropaganda")
     .items([
       /* --- Die Seiten, in der Reihenfolge der Navigation --------------- */
-      einzeldokument(S, "homepage", "Startseite", HomeIcon),
+      singleton(S, "homepage", "Startseite", HomeIcon),
 
       /* Nur die Leistungen selbst, ohne Übersichtsseite: `/leistungen` gibt
          es nicht, `/leistungen/<slug>` schon. */
@@ -115,7 +115,7 @@ export const structure: StructureResolver = (S, context) =>
          bis hierher ausgeblendet — `practice` hatte keine Route, und das
          Team stand nur als Kurzprofil auf anderen Seiten. Jetzt gibt es
          /praxis und /praxis/<slug>. */
-      einzeldokument(S, "practice", "Praxis", UsersIcon),
+      singleton(S, "practice", "Praxis", UsersIcon),
       orderableDocumentListDeskItem({
         type: "person",
         title: "Team",
@@ -124,10 +124,10 @@ export const structure: StructureResolver = (S, context) =>
         context,
       }),
 
-      einzeldokument(S, "magazineIndex", "Magazin", DocumentsIcon),
+      singleton(S, "magazineIndex", "Magazin", DocumentsIcon),
       S.documentTypeListItem("post").title("Beiträge").icon(DocumentTextIcon),
 
-      einzeldokument(S, "careers", "Karriere", CaseIcon),
+      singleton(S, "careers", "Karriere", CaseIcon),
 
       S.divider(),
 
@@ -145,11 +145,11 @@ export const structure: StructureResolver = (S, context) =>
       /* Der Rahmen: was auf jeder Seite gleich ist. Unter den Seiten, weil
          man ihn seltener anfasst — aber auffindbar unter dem Namen, unter dem
          man ihn sucht. Bis Aufgabe 8 stand beides fest im Markup. */
-      einzeldokument(S, "navigation", "Navigation", MenuIcon),
-      einzeldokument(S, "footer", "Footer", StackCompactIcon),
-      einzeldokument(S, "settings", "Einstellungen", CogIcon),
+      singleton(S, "navigation", "Navigation", MenuIcon),
+      singleton(S, "footer", "Footer", StackCompactIcon),
+      singleton(S, "settings", "Einstellungen", CogIcon),
 
-      /* Rechtstexte. Standen bis hierher in OHNE_ROUTE — nicht weil sie
+      /* Rechtstexte. Standen bis hierher in UNROUTED — nicht weil sie
          niemand braucht, sondern weil es `/impressum` nicht gab und die Zeile
          im Seitenfuß deshalb leer blieb. Mit der Route `/[slug]` ist beides
          aufgelöst. Ganz unten, weil man sie einmal schreibt und dann jahrelang
@@ -160,6 +160,6 @@ export const structure: StructureResolver = (S, context) =>
          diese Datei anfassen muss. Erst wenn ein Typ eine eigene Ordnung
          braucht, bekommt er oben einen ausgeschriebenen Eintrag. */
       ...S.documentTypeListItems().filter(
-        (eintrag) => !AUSGESCHRIEBEN.includes(eintrag.getId() as string)
+        (entry) => !EXPLICIT.includes(entry.getId() as string)
       ),
     ]);

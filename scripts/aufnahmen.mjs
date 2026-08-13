@@ -57,21 +57,21 @@ const gefunden = await sucher.evaluate(() =>
 await sucher.close();
 
 const ALLE = [...new Set(["/", ...gefunden, "/design/styleguide", "/design/komponenten"])];
-const SEITEN = process.env.MP_NUR ? ALLE.filter((p) => p === process.env.MP_NUR) : ALLE;
+const PAGES = process.env.MP_NUR ? ALLE.filter((p) => p === process.env.MP_NUR) : ALLE;
 
-const name = (pfad) =>
-  (pfad === "/" ? "startseite" : pfad.replace(/^\//, "").replace(/\//g, "-")) +
+const name = (path) =>
+  (path === "/" ? "startseite" : path.replace(/^\//, "").replace(/\//g, "-")) +
   `-${BREITE}${SKALA > 1 ? `@${SKALA}x` : ""}.png`;
 
-console.log(`${SEITEN.length} Seiten, ${BREITE}px breit, ${SKALA}× Auflösung → ${ORDNER}/\n`);
+console.log(`${PAGES.length} Seiten, ${BREITE}px breit, ${SKALA}× Auflösung → ${ORDNER}/\n`);
 
-for (const pfad of SEITEN) {
+for (const path of PAGES) {
   await rm(TEMP, { recursive: true, force: true });
   await mkdir(TEMP, { recursive: true });
 
   const seite = await browser.newPage();
   await seite.setViewport({ width: BREITE, height: FENSTER, deviceScaleFactor: SKALA });
-  await seite.goto(BASIS + pfad, { waitUntil: "networkidle0", timeout: 60000 });
+  await seite.goto(BASIS + path, { waitUntil: "networkidle0", timeout: 60000 });
   await seite.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 1600));
 
@@ -115,8 +115,8 @@ for (const pfad of SEITEN) {
     const y = i * FENSTER;
 
     await seite.evaluate(
-      (ziel, ersteKachel) => {
-        window.__lenis ? window.__lenis.scrollTo(ziel, { immediate: true }) : scrollTo(0, ziel);
+      (target, ersteKachel) => {
+        window.__lenis ? window.__lenis.scrollTo(target, { immediate: true }) : scrollTo(0, target);
 
         /* Ab der zweiten Kachel alles ausblenden, was am Fenster festsitzt —
            sonst stünde die Navigationsleiste in jeder Kachel und damit ein
@@ -151,17 +151,17 @@ for (const pfad of SEITEN) {
        Die letzte Kachel ist meist niedriger; aufgenommen wird nur, was noch
        zur Seite gehört. */
     const rest = Math.min(FENSTER, hoehe - y);
-    const datei = `${TEMP}/${String(i).padStart(3, "0")}.png`;
+    const file = `${TEMP}/${String(i).padStart(3, "0")}.png`;
     await seite.screenshot({
-      path: datei,
+      path: file,
       clip: { x: 0, y, width: BREITE, height: rest },
     });
-    teile.push({ datei, top: y * SKALA, hoehe: rest * SKALA });
+    teile.push({ file, top: y * SKALA, hoehe: rest * SKALA });
   }
 
   await seite.close();
 
-  const ziel = `${ORDNER}/${name(pfad)}`;
+  const target = `${ORDNER}/${name(path)}`;
   await sharp({
     create: {
       width: BREITE * SKALA,
@@ -170,11 +170,11 @@ for (const pfad of SEITEN) {
       background: "#d6d6d6",
     },
   })
-    .composite(teile.map((t) => ({ input: t.datei, top: t.top, left: 0 })))
+    .composite(teile.map((t) => ({ input: t.file, top: t.top, left: 0 })))
     .png()
-    .toFile(ziel);
+    .toFile(target);
 
-  console.log(`  ${pfad.padEnd(34)} ${String(hoehe).padStart(6)}px · ${String(kacheln).padStart(2)} Kacheln  →  ${ziel}`);
+  console.log(`  ${path.padEnd(34)} ${String(hoehe).padStart(6)}px · ${String(kacheln).padStart(2)} Kacheln  →  ${target}`);
 }
 
 await rm(TEMP, { recursive: true, force: true });

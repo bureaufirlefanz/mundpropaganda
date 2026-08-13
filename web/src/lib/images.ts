@@ -76,10 +76,10 @@ export function stableMotif(motive: readonly string[], key?: string): string {
  * dort einen 404 — genau der Fehler, der auf der Veneers-Seite das Bild der
  * ersten Zeile verschluckt hat.
  */
-export function motifPath(name: string, mindestens = 640): string | undefined {
+export function motifPath(name: string, minimum = 640): string | undefined {
   const widths = (BREITEN as Record<string, number[]>)[name];
   if (!widths?.length) return undefined;
-  const passend = widths.find((b) => b >= mindestens) ?? widths.at(-1);
+  const passend = widths.find((b) => b >= minimum) ?? widths.at(-1);
   return `/img/${name}-${passend}.webp`;
 }
 

@@ -42,20 +42,20 @@ const { website } = await loadSettings();
 /* Der Titel bekommt den Websitenamen angehängt — außer er steht schon darin.
    Ohne diese Prüfung stünde „Karriere - Mundpropaganda - Mundpropaganda" im
    Tab, sobald jemand im SEO-Feld den vollständigen Titel gepflegt hat. */
-const vollerTitel = title.includes(website.siteName)
+const fullTitle = title.includes(website.siteName)
   ? title
   : `${title} - ${website.siteName}`;
 
 /* Reihenfolge der Rückfälle: was die Seite mitbringt, sonst was global
    gepflegt ist, sonst nichts. Kein eingebauter Text — fehlt beides, entfällt
    die Zeile. */
-const beschreibung = description || website.defaultDescription || "";
-const teilenBild = image || website.shareImageUrl;
+const metaDescription = description || website.defaultDescription || "";
+const shareImage = image || website.shareImageUrl;
 
 /* Zwei Wege in denselben Zustand: Der Schalter im Studio sperrt die ganze
    Website, das SEO-Feld sperrt eine einzelne Seite. Beides zusammen mit ODER,
    weil „nicht indexieren" die stärkere Aussage ist. */
-const nichtIndexieren = noIndex || !website.searchEngines;
+const blockIndexing = noIndex || !website.searchEngines;
 ---
 
 <!doctype html>
@@ -87,9 +87,9 @@ const nichtIndexieren = noIndex || !website.searchEngines;
       document.documentElement.classList.add("js");
     </script>
 
-    <title>{vollerTitel}</title>
-    {beschreibung && <meta name="description" content={beschreibung} />}
-    {nichtIndexieren && <meta name="robots" content="noindex, nofollow" />}
+    <title>{fullTitle}</title>
+    {metaDescription && <meta name="description" content={metaDescription} />}
+    {blockIndexing && <meta name="robots" content="noindex, nofollow" />}
     {website.googleVerification && (
       <meta name="google-site-verification" content={website.googleVerification} />
     )}
@@ -111,14 +111,14 @@ const nichtIndexieren = noIndex || !website.searchEngines;
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={website.siteName} />
     <meta property="og:locale" content="de_DE" />
-    <meta property="og:title" content={vollerTitel} />
-    {beschreibung && <meta property="og:description" content={beschreibung} />}
-    {teilenBild && <meta property="og:image" content={teilenBild} />}
+    <meta property="og:title" content={fullTitle} />
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
+    {shareImage && <meta property="og:image" content={shareImage} />}
 
-    <meta name="twitter:card" content={teilenBild ? "summary_large_image" : "summary"} />
-    <meta name="twitter:title" content={vollerTitel} />
-    {beschreibung && <meta name="twitter:description" content={beschreibung} />}
-    {teilenBild && <meta name="twitter:image" content={teilenBild} />}
+    <meta name="twitter:card" content={shareImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={fullTitle} />
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
+    {shareImage && <meta name="twitter:image" content={shareImage} />}
 
     <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
          blitzt die Fallback-Schrift im Hero auf. -->

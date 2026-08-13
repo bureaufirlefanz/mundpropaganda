@@ -32,7 +32,7 @@ import { VIEWPORTS } from "./lib/smoke.mjs";
 
 const BASE = "http://localhost:4322";
 const ORDNER = ".shots/styles";
-const SEITEN = ["/", "/leistungen/veneers"];
+const PAGES = ["/", "/leistungen/veneers"];
 
 const befehl = process.argv[2] ?? "vergleichen";
 if (!["sichern", "vergleichen"].includes(befehl)) {
@@ -62,18 +62,18 @@ const EIGENSCHAFTEN = [
   "writing-mode", "list-style-type",
 ];
 
-async function nimmAuf(browser, pfad, vp) {
+async function nimmAuf(browser, path, vp) {
   const page = await browser.newPage();
   await page.setJavaScriptEnabled(false);
   await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 1 });
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
 
-  await page.goto(`${BASE}${pfad}?nosmooth`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${BASE}${path}?nosmooth`, { waitUntil: "networkidle2", timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   // Bilder verschieben nach dem Laden noch Höhen.
   await new Promise((r) => setTimeout(r, 1500));
 
-  const daten = await page.evaluate((eigenschaften) => {
+  const data = await page.evaluate((eigenschaften) => {
     /* Astro hängt an Elemente mit eigenem <style>-Block ein
        data-astro-cid-Attribut und teils eine astro-* Klasse. Beides gehört
        nicht in den Schlüssel — sonst gilt allein das Aufteilen des CSS schon
@@ -103,23 +103,23 @@ async function nimmAuf(browser, pfad, vp) {
   }, EIGENSCHAFTEN);
 
   await page.close();
-  return daten;
+  return data;
 }
 
-function vergleiche(alt, neu, wo) {
-  const funde = [];
+function vergleiche(alt, next, wo) {
+  const findings = [];
 
-  if (alt.length !== neu.length) {
-    funde.push(`${wo}: ${alt.length} Elemente vorher, ${neu.length} jetzt — das Markup hat sich verschoben`);
+  if (alt.length !== next.length) {
+    findings.push(`${wo}: ${alt.length} Elemente vorher, ${next.length} jetzt — das Markup hat sich verschoben`);
   }
 
-  const n = Math.min(alt.length, neu.length);
+  const n = Math.min(alt.length, next.length);
   for (let i = 0; i < n; i++) {
     const a = alt[i];
-    const b = neu[i];
+    const b = next[i];
 
     if (a.k !== b.k) {
-      funde.push(`${wo}: an Position ${i} stand „${a.k}", jetzt „${b.k}" — ab hier ist der Vergleich wertlos`);
+      findings.push(`${wo}: an Position ${i} stand „${a.k}", jetzt „${b.k}" — ab hier ist der Vergleich wertlos`);
       break;
     }
 
@@ -134,44 +134,44 @@ function vergleiche(alt, neu, wo) {
       if (b.werte[p] !== v) abweichungen.push(`${p}: ${v} → ${b.werte[p]}`);
     }
 
-    if (abweichungen.length) funde.push(`${wo} · ${a.k} (#${i})\n      ${abweichungen.join("\n      ")}`);
+    if (abweichungen.length) findings.push(`${wo} · ${a.k} (#${i})\n      ${abweichungen.join("\n      ")}`);
   }
 
-  return funde;
+  return findings;
 }
 
 await erwarteServer(BASE, "npm run web:build && npm run web:preview");
 await mkdir(ORDNER, { recursive: true });
 
 const browser = await starteBrowser();
-let funde = 0;
+let findings = 0;
 
 for (const vp of VIEWPORTS) {
-  for (const pfad of SEITEN) {
-    const name = `${pfad.replace(/[^a-z0-9]+/gi, "_") || "start"}-${vp.name}.json`;
-    const datei = `${ORDNER}/${name}`;
-    const jetzt = await nimmAuf(browser, pfad, vp);
+  for (const path of PAGES) {
+    const name = `${path.replace(/[^a-z0-9]+/gi, "_") || "start"}-${vp.name}.json`;
+    const file = `${ORDNER}/${name}`;
+    const jetzt = await nimmAuf(browser, path, vp);
 
     if (befehl === "sichern") {
-      await writeFile(datei, JSON.stringify(jetzt));
-      console.log(`  ↓ ${pfad} · ${vp.name} — ${jetzt.length} Elemente`);
+      await writeFile(file, JSON.stringify(jetzt));
+      console.log(`  ↓ ${path} · ${vp.name} — ${jetzt.length} Elemente`);
       continue;
     }
 
     let vorher;
     try {
-      vorher = JSON.parse(await readFile(datei, "utf8"));
+      vorher = JSON.parse(await readFile(file, "utf8"));
     } catch {
-      console.log(`  – ${pfad} · ${vp.name} — kein gesicherter Stand, übersprungen`);
+      console.log(`  – ${path} · ${vp.name} — kein gesicherter Stand, übersprungen`);
       continue;
     }
 
-    const liste = vergleiche(vorher, jetzt, `${pfad} · ${vp.name}`);
-    if (liste.length) {
-      funde += liste.length;
-      liste.forEach((f) => console.log(`  ✗ ${f}`));
+    const list = vergleiche(vorher, jetzt, `${path} · ${vp.name}`);
+    if (list.length) {
+      findings += list.length;
+      list.forEach((f) => console.log(`  ✗ ${f}`));
     } else {
-      console.log(`  ✓ ${pfad} · ${vp.name} — ${jetzt.length} Elemente unverändert`);
+      console.log(`  ✓ ${path} · ${vp.name} — ${jetzt.length} Elemente unverändert`);
     }
   }
 }
@@ -181,6 +181,6 @@ await browser.close();
 if (befehl === "sichern") {
   console.log(`\nStand liegt in ${ORDNER}/.`);
 } else {
-  console.log(funde ? `\n${funde} Abweichung(en).` : "\nKeine Abweichung.");
-  process.exit(funde ? 1 : 0);
+  console.log(findings ? `\n${findings} Abweichung(en).` : "\nKeine Abweichung.");
+  process.exit(findings ? 1 : 0);
 }

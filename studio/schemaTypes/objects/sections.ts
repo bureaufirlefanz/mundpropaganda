@@ -38,9 +38,9 @@ import { EnvelopeIcon } from "@sanity/icons/Envelope";
  * keines gibt, steht das Symbol des Typs. Ein Abschnitt ohne beides bekäme
  * ein graues Quadrat, und zwölf graue Quadrate helfen niemandem.
  */
-const vorschau = (
-  art: string,
-  feld = "headline",
+const sectionPreview = (
+  kind: string,
+  field = "headline",
   extra: { media?: string; icon?: ComponentType } = {}
 ) => ({
   /* Nur die drei Schlüssel, die Sanity kennt: `title`, `subtitle`, `media`.
@@ -50,7 +50,7 @@ const vorschau = (
      Typname, das Bild immer das Symbol, und das Studio meldete an jedem
      Abschnitt „invalid preview config". */
   select: {
-    title: feld,
+    title: field,
     subtitle: "topline",
     ...(extra.media ? { media: extra.media } : {}),
   },
@@ -63,8 +63,8 @@ const vorschau = (
     subtitle?: string;
     media?: PreviewValue["media"];
   }) => ({
-    title: title || art,
-    subtitle: subtitle ? `${art} · ${subtitle}` : art,
+    title: title || kind,
+    subtitle: subtitle ? `${kind} · ${subtitle}` : kind,
     media: media ?? extra.icon,
   }),
 });
@@ -74,7 +74,7 @@ const headline = defineField({ name: "headline", title: "Überschrift", type: "s
 
 /* --- Einleitung -------------------------------------------------------- */
 
-export const abschnittIntro = defineType({
+export const sectionIntro = defineType({
   name: "sectionIntro",
   title: "Einleitung",
   type: "object",
@@ -91,12 +91,12 @@ export const abschnittIntro = defineType({
     }),
   ],
   icon: BlockContentIcon,
-  preview: vorschau("Einleitung", "headline", { icon: BlockContentIcon }),
+  preview: sectionPreview("Einleitung", "headline", { icon: BlockContentIcon }),
 });
 
 /* --- Zahlen ------------------------------------------------------------ */
 
-export const abschnittFacts = defineType({
+export const sectionFacts = defineType({
   name: "sectionFacts",
   title: "Zahlen",
   type: "object",
@@ -132,12 +132,12 @@ export const abschnittFacts = defineType({
     }),
   ],
   icon: BarChartIcon,
-  preview: vorschau("Zahlen", "headline", { icon: BarChartIcon }),
+  preview: sectionPreview("Zahlen", "headline", { icon: BarChartIcon }),
 });
 
 /* --- Vergleich --------------------------------------------------------- */
 
-export const abschnittCompare = defineType({
+export const sectionCompare = defineType({
   name: "sectionCompare",
   title: "Vergleichstabelle",
   type: "object",
@@ -236,12 +236,12 @@ export const abschnittCompare = defineType({
     }),
   ],
   icon: SplitVerticalIcon,
-  preview: vorschau("Vergleichstabelle", "headline", { icon: SplitVerticalIcon }),
+  preview: sectionPreview("Vergleichstabelle", "headline", { icon: SplitVerticalIcon }),
 });
 
 /* --- Ablauf als Zeitstrahl --------------------------------------------- */
 
-export const abschnittTimeline = defineType({
+export const sectionTimeline = defineType({
   name: "sectionTimeline",
   title: "Zeitstrahl",
   type: "object",
@@ -268,12 +268,12 @@ export const abschnittTimeline = defineType({
     }),
   ],
   icon: ClockIcon,
-  preview: vorschau("Zeitstrahl", "headline", { icon: ClockIcon }),
+  preview: sectionPreview("Zeitstrahl", "headline", { icon: ClockIcon }),
 });
 
 /* --- Stimmen ----------------------------------------------------------- */
 
-export const abschnittVoices = defineType({
+export const sectionVoices = defineType({
   name: "sectionVoices",
   title: "Stimmen",
   type: "object",
@@ -309,12 +309,12 @@ export const abschnittVoices = defineType({
     }),
   ],
   icon: UsersIcon,
-  preview: vorschau("Stimmen", "headline", { media: "stimmen.0.picture", icon: UsersIcon }),
+  preview: sectionPreview("Stimmen", "headline", { media: "stimmen.0.picture", icon: UsersIcon }),
 });
 
 /* --- Aussage ----------------------------------------------------------- */
 
-export const abschnittStatement = defineType({
+export const sectionStatement = defineType({
   name: "sectionStatement",
   title: "Aussage",
   type: "object",
@@ -323,12 +323,12 @@ export const abschnittStatement = defineType({
     defineField({ name: "text", title: "Satz", type: "text", rows: 3, validation: (r) => r.required() }),
   ],
   icon: BlockquoteIcon,
-  preview: vorschau("Aussage", "text", { icon: BlockquoteIcon }),
+  preview: sectionPreview("Aussage", "text", { icon: BlockquoteIcon }),
 });
 
 /* --- Schritte ---------------------------------------------------------- */
 
-export const abschnittSchritte = defineType({
+export const sectionSteps = defineType({
   name: "sectionSteps",
   title: "Schritte",
   type: "object",
@@ -352,12 +352,12 @@ export const abschnittSchritte = defineType({
     }),
   ],
   icon: OlistIcon,
-  preview: vorschau("Schritte", "title", { icon: OlistIcon }),
+  preview: sectionPreview("Schritte", "title", { icon: OlistIcon }),
 });
 
 /* --- Preise ------------------------------------------------------------ */
 
-export const abschnittPreise = defineType({
+export const sectionPricing = defineType({
   name: "sectionPricing",
   title: "Preise",
   type: "object",
@@ -381,12 +381,12 @@ export const abschnittPreise = defineType({
     }),
   ],
   icon: TagIcon,
-  preview: vorschau("Preise", "title", { icon: TagIcon }),
+  preview: sectionPreview("Preise", "title", { icon: TagIcon }),
 });
 
 /* --- Häufige Fragen ---------------------------------------------------- */
 
-export const abschnittFaq = defineType({
+export const sectionFaq = defineType({
   name: "sectionFaq",
   title: "Häufige Fragen",
   type: "object",
@@ -411,12 +411,12 @@ export const abschnittFaq = defineType({
     }),
   ],
   icon: HelpCircleIcon,
-  preview: vorschau("Häufige Fragen", "title", { icon: HelpCircleIcon }),
+  preview: sectionPreview("Häufige Fragen", "title", { icon: HelpCircleIcon }),
 });
 
 /* --- Kontaktformular --------------------------------------------------- */
 
-export const abschnittKontakt = defineType({
+export const sectionContact = defineType({
   name: "sectionContact",
   title: "Kontaktformular",
   type: "object",
@@ -431,14 +431,14 @@ export const abschnittKontakt = defineType({
     }),
   ],
   icon: EnvelopeIcon,
-  preview: vorschau("Kontaktformular", "title", { icon: EnvelopeIcon }),
+  preview: sectionPreview("Kontaktformular", "title", { icon: EnvelopeIcon }),
 });
 
 /**
  * Die Liste selbst. Steht als eigener Typ da, damit mehrere Dokumenttypen
  * denselben Baukasten benutzen, ohne die Aufzählung zu wiederholen.
  */
-export const abschnitte = defineType({
+export const sectionsArray = defineType({
   name: "sections",
   title: "Abschnitte",
   type: "array",

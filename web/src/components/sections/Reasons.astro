@@ -29,10 +29,10 @@ const { topline, headline, items } = Astro.props;
     <h2 class="s-reasons__title" data-split="lines">{headline}</h2>
   </div>
 
-  <ol class="s-reasons__liste" data-reveal-stagger="0.08">
+  <ol class="s-reasons__list" data-reveal-stagger="0.08">
     {items.map((g, i) => (
       <li class="s-reasons__block" data-reveal-child>
-        <span class="s-reasons__nummer" aria-hidden="true">{i + 1}</span>
+        <span class="s-reasons__number" aria-hidden="true">{i + 1}</span>
         <h3 class="s-reasons__block-title">{g.title}</h3>
         <p class="s-reasons__text">{g.text}</p>
       </li>
@@ -61,7 +61,7 @@ const { topline, headline, items } = Astro.props;
   /* `auto-fit` mit einer Mindestbreite statt einer festen Spaltenzahl: Der
      Abschnitt trägt zwei bis vier Blöcke, und bei drei soll er nicht so
      aussehen, als fehle einer. */
-  .s-reasons__liste {
+  .s-reasons__list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap: var(--sp-10) var(--site-gutter);
@@ -80,7 +80,7 @@ const { topline, headline, items } = Astro.props;
 
   /* Brauner Kreis mit heller Ziffer — dieselbe Form wie im Ablauf und im
      Benefits-Band. Grau auf Braun misst 8.65:1. */
-  .s-reasons__nummer {
+  .s-reasons__number {
     display: grid;
     place-items: center;
     width: 2.1em;

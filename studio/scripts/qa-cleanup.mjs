@@ -25,8 +25,8 @@ const client = getCliClient({ apiVersion: "2026-07-28" });
 const DRY = process.env.DRY === "1";
 
 async function los() {
-  const stapel = client.transaction();
-  const bericht = [];
+  const batch = client.transaction();
+  const report = [];
 
   /* 1. Die verwaisten Marker. `unset` je Index — die Etappen selbst bleiben
      unangetastet. */
@@ -36,38 +36,38 @@ async function los() {
     .filter((e) => e.marker != null);
 
   if (mitMarker.length) {
-    stapel.patch("careers", (p) =>
+    batch.patch("careers", (p) =>
       p.unset(mitMarker.map((e) => `processStages[${e.i}].marker`))
     );
-    bericht.push(
+    report.push(
       `careers: ${mitMarker.length} verwaiste marker entfernt (${mitMarker.map((e) => `„${e.marker}“`).join(", ")})`
     );
   } else {
-    bericht.push("careers: keine verwaisten marker");
+    report.push("careers: keine verwaisten marker");
   }
 
   /* 2. Der Websitename. Nur setzen, wenn er fehlt — ein gepflegter Wert
      gehört dem Kunden. */
   const name = await client.fetch(`*[_id == "settings"][0].siteName`);
   if (!name) {
-    stapel.patch("settings", (p) => p.set({ siteName: "Mundpropaganda" }));
-    bericht.push('settings: siteName auf „Mundpropaganda“ gesetzt');
+    batch.patch("settings", (p) => p.set({ siteName: "Mundpropaganda" }));
+    report.push('settings: siteName auf „Mundpropaganda“ gesetzt');
   } else {
-    bericht.push(`settings: siteName ist bereits „${name}“`);
+    report.push(`settings: siteName ist bereits „${name}“`);
   }
 
-  console.log(bericht.map((z) => "  " + z).join("\n"));
+  console.log(report.map((z) => "  " + z).join("\n"));
 
   if (DRY) {
     console.log("\nProbelauf. Nichts geschrieben.");
     return;
   }
 
-  await stapel.commit();
+  await batch.commit();
   console.log("\n✓ Geschrieben.");
 }
 
-los().catch((fehler) => {
-  console.error("Fehlgeschlagen:", fehler.message);
+los().catch((error) => {
+  console.error("Fehlgeschlagen:", error.message);
   process.exit(1);
 });

@@ -10,29 +10,29 @@
  * Markup.
  */
 import Button from "./Button.astro";
-import { loadServiceList, fuerGruppe, pfad, GRUPPEN } from "../../lib/service-list";
+import { loadServiceList, forGroup, servicePath, GROUPS } from "../../lib/service-list";
 import { loadNavigation, resolved } from "../../lib/navigation";
 
-const liste = await loadServiceList();
-const leistungsSpalten = GRUPPEN.map((g) => ({ title: g.title, items: fuerGruppe(liste, g.value) }));
+const list = await loadServiceList();
+const serviceColumns = GROUPS.map((g) => ({ title: g.title, items: forGroup(list, g.value) }));
 
 const nav = await loadNavigation();
-const hier = Astro.url.pathname;
+const here = Astro.url.pathname;
 
-const mainMenu = await resolved(nav?.mainMenu, hier);
-const action = (await resolved([nav?.action ?? null], hier))[0];
+const mainMenu = await resolved(nav?.mainMenu, here);
+const action = (await resolved([nav?.action ?? null], here))[0];
 
 /* Die Zusatzspalten, jede für sich aufgelöst. Ein Verweis ohne Ziel fällt
    dabei heraus, eine Spalte ohne Verweise ebenfalls — statt eine leere
    Überschrift stehen zu lassen. */
-const zusatzSpalten = (
+const extraColumns = (
   await Promise.all(
-    (nav?.menuColumns ?? []).map(async (sp) => ({
-      title: sp?.title ?? "",
-      links: await resolved(sp?.links, hier),
+    (nav?.menuColumns ?? []).map(async (col) => ({
+      title: col?.title ?? "",
+      links: await resolved(col?.links, here),
     }))
   )
-).filter((sp) => sp.title && sp.links.length > 0);
+).filter((col) => col.title && col.links.length > 0);
 
 ---
 
@@ -53,9 +53,9 @@ const zusatzSpalten = (
         nach `[data-megamenu="true"]` — findet nichts, schadet nichts,
         behauptet aber einen Namen, den es nicht gibt. */}
     <nav class="c-nav__menu" aria-label="Hauptnavigation">
-      {mainMenu.map((eintrag, i) => (
+      {mainMenu.map((entry, i) => (
         <div class="c-nav__item" data-nav-item={i === 0 ? "services" : ""} data-open={i === 0 ? "false" : undefined}>
-          <a class="c-nav__link" href={eintrag.href}>{eintrag.text}</a>
+          <a class="c-nav__link" href={entry.href}>{entry.text}</a>
         </div>
       ))}
     </nav>
@@ -77,19 +77,19 @@ const zusatzSpalten = (
 
   <div class="c-megamenu" data-megamenu="services">
     <div class="c-megamenu__inner">
-      {leistungsSpalten.map((spalte) => (
+      {serviceColumns.map((column) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.title}</p>
-          {spalte.items.map((l) => (
-            <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
+          <p class="c-megamenu__col-title">{column.title}</p>
+          {column.items.map((l) => (
+            <a class="c-megamenu__link" href={servicePath(l)}>{l.name}</a>
           ))}
         </div>
       ))}
 
-      {zusatzSpalten.map((spalte) => (
+      {extraColumns.map((column) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.title}</p>
-          {spalte.links.map((l) => (
+          <p class="c-megamenu__col-title">{column.title}</p>
+          {column.links.map((l) => (
             <a class="c-megamenu__link" href={l.href}>{l.text}</a>
           ))}
         </div>
@@ -103,18 +103,18 @@ const zusatzSpalten = (
           das Menü zeigte damit vier von elf Leistungen, und welche vier war
           reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt
           dieselbe Auswahl wie am Schreibtisch. */}
-      {leistungsSpalten.map((spalte) => (
+      {serviceColumns.map((column) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.title}</p>
-          {spalte.items.map((l) => (
-            <a class="c-megamenu__link" href={pfad(l)}>{l.name}</a>
+          <p class="c-megamenu__col-title">{column.title}</p>
+          {column.items.map((l) => (
+            <a class="c-megamenu__link" href={servicePath(l)}>{l.name}</a>
           ))}
         </div>
       ))}
-      {zusatzSpalten.map((spalte) => (
+      {extraColumns.map((column) => (
         <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{spalte.title}</p>
-          {spalte.links.map((l) => (
+          <p class="c-megamenu__col-title">{column.title}</p>
+          {column.links.map((l) => (
             <a class="c-megamenu__link" href={l.href}>{l.text}</a>
           ))}
         </div>
@@ -139,22 +139,22 @@ const zusatzSpalten = (
        Der Überstand ist ein Wert und keine zwei: Er wird vom Außenabstand
        abgezogen UND zur Innenbreite addiert, sonst verschöbe sich nur eine
        der beiden Kanten. */
-    --nav-ueberstand: clamp(8px, 1vw, 20px);
+    --nav-overhang: clamp(8px, 1vw, 20px);
 
     /* Kante und Breite stehen als eigene Werte da, weil zwei Dinge sie
        brauchen: die Leiste und das Aufklappmenü darunter. Vorher rechnete
        jedes für sich (`left: var(--site-margin)` gegen `padding: …`), und als
        die Leiste nach außen rückte, blieb das Menü stehen — beide sollen aber
        als eine Fläche gelesen werden. */
-    --nav-rand: max(8px, calc(var(--site-margin) - var(--nav-ueberstand)));
+    --nav-edge: max(8px, calc(var(--site-margin) - var(--nav-overhang)));
     --nav-width: calc(
-      var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-ueberstand)
+      var(--site-max) - 2 * var(--site-margin) + 2 * var(--nav-overhang)
     );
 
     position: fixed;
     inset: 0 0 auto 0;
     z-index: var(--z-nav);
-    padding: var(--sp-4) var(--nav-rand);
+    padding: var(--sp-4) var(--nav-edge);
     color: var(--c-dark);
     pointer-events: none;
   }
@@ -284,8 +284,8 @@ const zusatzSpalten = (
   .c-megamenu {
     position: absolute;
     top: calc(100% - var(--sp-2));
-    left: var(--nav-rand);
-    right: var(--nav-rand);
+    left: var(--nav-edge);
+    right: var(--nav-edge);
     max-width: var(--nav-width);
     margin-inline: auto;
     /* Dasselbe Milchglas wie die Leiste darüber — beide sollen als eine

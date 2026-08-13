@@ -26,7 +26,7 @@
  * Ersatzschrift zu sehen, was deutlich besser ist als ein leerer Block.
  */
 
-const FRIST = 1200;
+const TIMEOUT = 1200;
 
 /**
  * Die Schnitte, die im Entwurf vorkommen — bewusst so klein geschnitten, wie
@@ -37,7 +37,7 @@ const FRIST = 1200;
  * Bildern einreiht. Allein dadurch startete sie 780 ms später (891 ms statt
  * 110 ms), obwohl sie den Schnitt überhaupt nicht setzt.
  */
-export const SCHRIFT = {
+export const FONTS = {
   /** Wortmarke und Display-Typo — Medium, above the fold, vorgeladen. */
   display: ['500 1em "PP Neue Montreal"'],
   /** Headlines im Fließtext, teils 400. Die laufen erst beim Scrollen. */
@@ -48,28 +48,28 @@ export const SCHRIFT = {
 
 /* Ein Versprechen je Schnitt, beim ersten Zugriff angelegt. Ein einzelner
    unbekannter Schnitt darf die übrigen nicht mitreißen. */
-const versprechen = new Map();
+const promises = new Map();
 
-function ladeSchnitt(schnitt) {
-  if (!versprechen.has(schnitt)) {
-    versprechen.set(schnitt, document.fonts.load(schnitt).catch(() => {}));
+function loadFace(face) {
+  if (!promises.has(face)) {
+    promises.set(face, document.fonts.load(face).catch(() => {}));
   }
-  return versprechen.get(schnitt);
+  return promises.get(face);
 }
 
 /* Sofort anstoßen — das ist der ganze Trick. Dieses Modul wird vom
    Einstiegspunkt importiert und läuft damit im ersten Skriptdurchlauf, also
    bevor die übrigen Schnitte der Seite mit dem Laden anfangen. */
-Object.values(SCHRIFT).flat().forEach(ladeSchnitt);
+Object.values(FONTS).flat().forEach(loadFace);
 
 /**
- * @param {string|string[]} schnitte  CSS-Kurzschreibweise, z. B.
+ * @param {string|string[]} faces  CSS-Kurzschreibweise, z. B.
  *   `500 1em "PP Neue Montreal"`. Mehrere, wenn ein Abschnitt mehrere Schnitte
  *   setzt — gewartet wird dann auf alle.
- * @param {number} frist  Höchstwartezeit in Millisekunden.
+ * @param {number} timeout  Höchstwartezeit in Millisekunden.
  */
-export function warteAufSchrift(schnitte, frist = FRIST) {
-  const liste = Array.isArray(schnitte) ? schnitte : [schnitte];
+export function waitForFonts(faces, timeout = TIMEOUT) {
+  const list = Array.isArray(faces) ? faces : [faces];
 
   /* Zuerst synchron nachsehen, ob die Schnitte schon benutzbar sind. Das ist
      der entscheidende Griff — und der Grund, warum die Umstellung von
@@ -86,11 +86,11 @@ export function warteAufSchrift(schnitte, frist = FRIST) {
      `check()` ist die Frage, die wir wirklich stellen wollen: kann ich mit
      diesem Schnitt jetzt messen? */
   try {
-    if (liste.every((s) => document.fonts.check(s))) return Promise.resolve();
+    if (list.every((s) => document.fonts.check(s))) return Promise.resolve();
   } catch {
     // Ungültige Kurzschreibweise — dann eben über den Ladeweg.
   }
 
-  const geladen = Promise.all(liste.map(ladeSchnitt));
-  return Promise.race([geladen, new Promise((weiter) => setTimeout(weiter, frist))]);
+  const loaded = Promise.all(list.map(loadFace));
+  return Promise.race([loaded, new Promise((weiter) => setTimeout(weiter, timeout))]);
 }

@@ -4,9 +4,9 @@ import { presentationTool } from "sanity/presentation";
 import { visionTool } from "@sanity/vision";
 
 import { schemaTypes } from "./schemaTypes";
-import { structure, EINZELDOKUMENTE, OHNE_ROUTE } from "./structure";
+import { structure, SINGLETONS, UNROUTED } from "./structure";
 import { resolve } from "./structure/locations";
-import { PublishHinweis } from "./components/PublishNotice";
+import { PublishNotice } from "./components/PublishNotice";
 
 /**
  * Wo die Website läuft. Lokal der Dev-Server, in der Auslieferung die echte
@@ -55,7 +55,7 @@ export default defineConfig({
      components/PublishNotice.tsx — ohne ihn ist die naheliegende Erklärung
      „es funktioniert nicht", und der Anruf kommt, bevor der Build durch ist. */
   studio: {
-    components: { layout: PublishHinweis },
+    components: { layout: PublishNotice },
   },
 
   schema: {
@@ -68,9 +68,9 @@ export default defineConfig({
        hängen an einer festen ID. Ohne diesen Filter böte „Neu“ an, eine
        zweite Startseite zu erzeugen; die läge dann unter einer zufälligen ID
        und würde von der Website nie gefunden. */
-    templates: (vorlagen) =>
-      vorlagen.filter(
-        (v) => ![...EINZELDOKUMENTE, ...OHNE_ROUTE].includes(v.schemaType)
+    templates: (templates) =>
+      templates.filter(
+        (v) => ![...SINGLETONS, ...UNROUTED].includes(v.schemaType)
       ),
   },
 });

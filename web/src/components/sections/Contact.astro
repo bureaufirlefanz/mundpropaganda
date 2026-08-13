@@ -32,7 +32,7 @@ const { contactTitle, contactText } = await loadSettings();
    Inlays" gegen „Keramikinlays" in der Tabelle) und ohne Bezug dazu, was die
    Praxis tatsächlich anbietet. Wer eine Leistung umbenennt, benennt sie jetzt
    auch hier um. */
-const LEISTUNGEN = forTable(await loadServiceList()).map((l) => l.name);
+const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
 ---
 
 <Panel id="kontakt" topline="Kontakt" title={contactTitle} text={contactText}>
@@ -77,7 +77,7 @@ const LEISTUNGEN = forTable(await loadServiceList()).map((l) => l.name);
       <div class="c-field__control">
         <select id="f-service" name="service" required>
           <option value="">Leistung auswählen</option>
-          {LEISTUNGEN.map((l) => <option selected={l === service}>{l}</option>)}
+          {SERVICES.map((l) => <option selected={l === service}>{l}</option>)}
         </select>
       </div>
     </div>

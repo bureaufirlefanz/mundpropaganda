@@ -20,15 +20,15 @@ import { categoryLabel } from "../../lib/magazine";
 
 interface Props {
   /** Die Kategoriewerte, die unter den Beiträgen vorkommen. */
-  kategorien: string[];
+  categories: string[];
   /** Wie viele Beiträge es insgesamt gibt. */
-  gesamt: number;
+  total: number;
 }
 
-const { kategorien, gesamt } = Astro.props;
+const { categories, total } = Astro.props;
 ---
 
-{kategorien.length > 1 && (
+{categories.length > 1 && (
   <div class="c-filter" data-filter>
     {/* Nur das Zeichen. Ein Wort daneben erklärte nichts, was das Zeichen
         nicht schon sagt, und stünde bei jeder Kategorie in anderer Länge da —
@@ -37,17 +37,17 @@ const { kategorien, gesamt } = Astro.props;
         `aria-label`, weil es keine sichtbare Beschriftung gibt: Ohne das
         liest ein Vorlesegerät nur „Schaltfläche". */}
     <button
-      class="c-filter__knopf"
+      class="c-filter__button"
       type="button"
       aria-expanded="false"
       aria-controls="filter-optionen"
       aria-label="Nach Kategorie filtern"
-      data-filter-knopf
+      data-filter-button
     >
       <svg class="c-filter__icon" aria-hidden="true"><use href="#i-filter" /></svg>
       {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Knopf
           zugeklappt genauso aus wie ohne Auswahl. */}
-      <span class="c-filter__punkt" data-filter-punkt hidden></span>
+      <span class="c-filter__dot" data-filter-dot hidden></span>
     </button>
 
     {/* `hidden` im Markup, nicht nur per CSS: Ohne das wären die Optionen für
@@ -57,7 +57,7 @@ const { kategorien, gesamt } = Astro.props;
       <button class="c-filter__tag" type="button" data-filter-value="" aria-pressed="true">
         Alle
       </button>
-      {kategorien.map((k) => (
+      {categories.map((k) => (
         <button class="c-filter__tag" type="button" data-filter-value={k} aria-pressed="false">
           {categoryLabel(k)}
         </button>
@@ -84,7 +84,7 @@ const { kategorien, gesamt } = Astro.props;
      nicht gerundet, sondern die Untergrenze aus WCAG 2.5.5 für eine
      Zielfläche — bei einem 16px-Zeichen ohne Beschriftung ist das die
      Fläche, die man mit dem Daumen trifft. */
-  .c-filter__knopf {
+  .c-filter__button {
     position: relative;
     display: inline-grid;
     place-items: center;
@@ -103,7 +103,7 @@ const { kategorien, gesamt } = Astro.props;
 
   /* Der Punkt sitzt auf dem Rand, nicht daneben — sonst verschöbe er den
      Knopf, sobald er auftaucht. */
-  .c-filter__punkt {
+  .c-filter__dot {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -113,19 +113,19 @@ const { kategorien, gesamt } = Astro.props;
     background: var(--c-brand);
   }
 
-  .c-filter__punkt[hidden] {
+  .c-filter__dot[hidden] {
     display: none;
   }
 
   @media (hover: hover) {
-    .c-filter__knopf:hover {
+    .c-filter__button:hover {
       border-color: var(--c-text);
     }
   }
 
   /* Aufgeklappt bleibt der Knopf sichtbar gedrückt — sonst sieht man beim
      Blick auf das Panel nicht mehr, wozu es gehört. */
-  .c-filter__knopf[aria-expanded="true"] {
+  .c-filter__button[aria-expanded="true"] {
     background: var(--c-dark);
     border-color: var(--c-dark);
     color: var(--c-grey);

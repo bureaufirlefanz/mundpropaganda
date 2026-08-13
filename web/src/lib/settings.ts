@@ -32,12 +32,12 @@ export interface Social {
  * („P25"), es steckt zugleich die Hausnummer — daher stammt die Adresse.
  */
 /** Eine Zeile Öffnungszeit: „Mo–Do" links, „8–19 Uhr" rechts. */
-export interface Oeffnungszeit {
+export interface OpeningHours {
   days: string;
   time: string;
 }
 
-export interface Standort {
+export interface Location {
   shortCode: string;
   name: string;
   street: string;
@@ -48,7 +48,7 @@ export interface Standort {
   /* Klasse 2, je Standort. Eine leere Liste heißt: kein Zeitenblock. Erfundene
      Zeiten wären hier so teuer wie eine erfundene Rufnummer — jemand steht
      dann vor einer verschlossenen Tür. */
-  hours?: Oeffnungszeit[];
+  hours?: OpeningHours[];
   /* Für die Karte auf der Praxisseite. Beide fehlen oder beide sind da —
      `Locations.astro` prüft auf genau das. Ein geratener Punkt schickt
      jemanden an die falsche Tür, deshalb gibt es keinen Rückfall. */
@@ -62,10 +62,10 @@ export interface Standort {
  * für sich vor, ließe sich ein halber Balken bauen — „Google Reviews, 0
  * Bewertungen" ist schlechter als gar keiner.
  */
-export interface Bewertungen {
-  anbieter: string;
-  anzahl: number;
-  schnitt: number;
+export interface Reviews {
+  provider: string;
+  count: number;
+  average: number;
 }
 
 /**
@@ -73,7 +73,7 @@ export interface Bewertungen {
  * heißt das Site Settings; bis hierher stand es fest in `Base.astro`,
  * `public/robots.txt` und `public/_headers`.
  */
-export interface WebsiteEinstellungen {
+export interface SiteSettings {
   /** Hinter jedem Seitentitel im Tab und als `og:site_name`. */
   siteName: string;
   /** Symbol im Browser-Tab. Fehlt es, bleibt es bei der Wortmarke. */
@@ -91,17 +91,17 @@ export interface WebsiteEinstellungen {
 export interface Settings {
   phone: string;
   email: string;
-  locations: Standort[];
-  bewertungen?: Bewertungen;
+  locations: Location[];
+  reviews?: Reviews;
   social: Social;
   /* Der Kontaktbereich steht auf mehreren Seiten und ist überall derselbe —
      deshalb hier und nicht je Seite. */
   contactTitle: string;
   contactText?: string;
-  website: WebsiteEinstellungen;
+  website: SiteSettings;
 }
 
-/* Einmal je Build. Rahmen und Hero questions dasselbe Dokument ab. */
+/* Einmal je Build. Rahmen und Hero fragen dasselbe Dokument ab. */
 let cached: Promise<Settings> | null = null;
 
 export function loadSettings(): Promise<Settings> {
@@ -122,12 +122,12 @@ export function loadSettings(): Promise<Settings> {
 
       /* Klasse 2, alles oder nichts. `!= null` und nicht `||`: Ein Schnitt von
          0 ist ein gepflegter Wert und keine Lücke. */
-      bewertungen:
+      reviews:
         d?.reviewsProvider && d?.reviewsCount != null && d?.reviewsAverage != null
           ? {
-              anbieter: d.reviewsProvider,
-              anzahl: d.reviewsCount,
-              schnitt: d.reviewsAverage,
+              provider: d.reviewsProvider,
+              count: d.reviewsCount,
+              average: d.reviewsAverage,
             }
           : undefined,
 
@@ -170,8 +170,8 @@ export function loadSettings(): Promise<Settings> {
 }
 
 /** „5,0 von 5" — deutsches Dezimalkomma, immer eine Nachkommastelle. */
-export const schnittText = (value: number) =>
+export const averageText = (value: number) =>
   `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} von 5`;
 
 /** Telefonnummer als wählbarer Link: alles außer Ziffern und führendem Plus. */
-export const telLink = (nummer: string) => `tel:${nummer.replace(/(?!^\+)[^\d]/g, "")}`;
+export const telLink = (number: string) => `tel:${number.replace(/(?!^\+)[^\d]/g, "")}`;

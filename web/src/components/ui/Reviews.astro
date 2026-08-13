@@ -5,25 +5,25 @@
  * Klasse 2: Sind sie dort nicht gepflegt, erscheint der Balken gar nicht.
  * Bis Aufgabe 4 fiel er auf die Zahlen aus dem Prototyp zurück — 272
  * Bewertungen bei 5,0, für eine Praxis, die davon nichts wusste. Eine
- * erfundene Bewertungszahl ist die Slocations Rückfall, die nicht nur Vertrauen
+ * erfundene Bewertungszahl ist die Sorte Rückfall, die nicht nur Vertrauen
  * kostet, sondern eine Aussage über die Praxis trifft, die niemand gedeckt
  * hat.
  */
-import { loadSettings, schnittText } from "../../lib/settings";
+import { loadSettings, averageText } from "../../lib/settings";
 
-const { bewertungen } = await loadSettings();
-const sterne = bewertungen ? Math.round(bewertungen.schnitt) : 0;
+const { reviews } = await loadSettings();
+const stars = reviews ? Math.round(reviews.average) : 0;
 ---
 
-{bewertungen && (
+{reviews && (
 <div class="c-reviews">
   <div class="c-reviews__meta">
-    <span>{bewertungen.anbieter}</span>
-    <span>{bewertungen.anzahl} Bewertungen</span>
-    <span>{schnittText(bewertungen.schnitt)}</span>
+    <span>{reviews.provider}</span>
+    <span>{reviews.count} Bewertungen</span>
+    <span>{averageText(reviews.average)}</span>
   </div>
-  <div class="c-reviews__stars" aria-label={`${schnittText(bewertungen.schnitt)} Sternen`}>
-    {Array.from({ length: sterne }).map(() => (
+  <div class="c-reviews__stars" aria-label={`${averageText(reviews.average)} Sternen`}>
+    {Array.from({ length: stars }).map(() => (
       <svg aria-hidden="true"><use href="#i-star" /></svg>
     ))}
   </div>

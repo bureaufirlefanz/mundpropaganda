@@ -8,7 +8,7 @@
  * Prototyp lädt stattdessen main.js daneben, das beides ergänzt.
  */
 import { ScrollTrigger } from "./lib/gsap.js";
-import { warteAufSchrift, SCHRIFT } from "./lib/fonts.js";
+import { waitForFonts, FONTS } from "./lib/fonts.js";
 import { initScroll, initAnchors } from "./modules/scroll.js";
 import { initReveals, initSplitHeadlines } from "./modules/reveal.js";
 import { initHighlightMarkerTextReveal } from "./modules/marker.js";
@@ -45,19 +45,19 @@ document.documentElement.classList.add("js");
  * Ausgelöst wird beim ersten Scrollen, spätestens nach 2,5 s — bis dahin ist
  * die Choreografie durch. Beides nur einmal.
  */
-function wennGescrolltWird(arbeit) {
-  let erledigt = false;
+function whenScrolled(work) {
+  let done = false;
 
-  const los = () => {
-    if (erledigt) return;
-    erledigt = true;
-    window.removeEventListener("scroll", los);
-    clearTimeout(uhr);
-    arbeit();
+  const start = () => {
+    if (done) return;
+    done = true;
+    window.removeEventListener("scroll", start);
+    clearTimeout(timer);
+    work();
   };
 
-  const uhr = setTimeout(los, 2500);
-  window.addEventListener("scroll", los, { passive: true });
+  const timer = setTimeout(start, 2500);
+  window.addEventListener("scroll", start, { passive: true });
 }
 
 export function init() {
@@ -88,15 +88,15 @@ export function init() {
    * Zwei Frames, nicht einer: der erste kehrt zurück, bevor gezeichnet wurde,
    * der zweite liegt sicher dahinter. Zu sehen ist zu diesem Zeitpunkt nur der
    * Hero — alles, was hier später dran ist, steht ohnehin unter der Kante. */
-  const nachDemErstenBild = (arbeit) =>
-    requestAnimationFrame(() => requestAnimationFrame(arbeit));
+  const afterFirstPaint = (work) =>
+    requestAnimationFrame(() => requestAnimationFrame(work));
 
-  nachDemErstenBild(() => {
+  afterFirstPaint(() => {
     initReveals();
     initSplitHeadlines();
     /* Die Marker-Zeilen sind Mono-Typo und werden ebenfalls ausgemessen. Auf
        den Schnitt warten, nicht auf `document.fonts.ready` — s. lib/fonts.js. */
-    warteAufSchrift(SCHRIFT.mono).then(initHighlightMarkerTextReveal);
+    waitForFonts(FONTS.mono).then(initHighlightMarkerTextReveal);
 
     initServicesPreview();
     initStandards();
@@ -113,7 +113,7 @@ export function init() {
     initEmbeds();
     initApplication();
 
-    wennGescrolltWird(() => {
+    whenScrolled(() => {
       /* Der durchlaufende Pfad misst seine Länge Stützstelle für Stützstelle
          im Bildschirmraum aus. Das ist auch nach dem Straffen der teuerste
          Posten des Starts (rund 70 ms fürs Messen, noch einmal so viel für das

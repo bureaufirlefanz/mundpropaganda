@@ -30,13 +30,13 @@ interface Props {
 }
 const { name, alt = "", sizes = "100vw", eager = false, parallax } = Astro.props;
 
-const liste = (BREITEN as Record<string, number[]>)[name];
+const list = (BREITEN as Record<string, number[]>)[name];
 
 /* Lauter Abbruch statt eines leeren Kastens: Ein Motiv, das die Pipeline
    nicht kennt, ist ein Tippfehler im Namen oder ein vergessenes
    `npm run images` — beides soll den Build anhalten und nicht erst auf der
    fertigen Seite auffallen. */
-if (!liste?.length) {
+if (!list?.length) {
   throw new Error(
     `Picture: Motiv „${name}" steht nicht in image-widths.json. ` +
       `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
@@ -44,8 +44,8 @@ if (!liste?.length) {
   );
 }
 
-const srcset = (ext: string) => liste.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
-const fallback = `/img/${name}-${liste[0]}.webp`;
+const srcset = (ext: string) => list.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
+const fallback = `/img/${name}-${list[0]}.webp`;
 ---
 <picture>
   <source type="image/avif" srcset={srcset("avif")} sizes={sizes} />

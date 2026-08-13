@@ -10,22 +10,22 @@
  * `transition:persist` hält das Element über den Wechsel hinweg am Leben,
  * sonst würde es mitten in der eigenen Bewegung ausgetauscht.
  */
-const SPALTEN = 5;
+const COLUMNS = 5;
 
 /* Die mittlere Spalte trägt das Zeichen. Gerechnet, nicht als 2 notiert:
    Bei einer geraden Spaltenzahl gäbe es keine Mitte, und der Wert wanderte
    still auf die falsche Spalte. */
-const MITTE = Math.floor(SPALTEN / 2);
+const MIDDLE = Math.floor(COLUMNS / 2);
 ---
 
 <div class="c-transition" data-transition aria-hidden="true" transition:persist>
   <div class="c-transition__panels">
-    {Array.from({ length: SPALTEN }).map((_, i) => (
+    {Array.from({ length: COLUMNS }).map((_, i) => (
       <div class="c-transition__panel">
         {/* Das Zeichen sitzt IM Block, nicht darüber: So läuft es mit der
             Spalte herein und wieder hinaus, statt über einer Bewegung zu
             schweben, zu der es nicht gehört. */}
-        {i === MITTE && (
+        {i === MIDDLE && (
           <span class="c-transition__mark">
             {/* Die Kontur steht hier ausgeschrieben statt als <use> aus dem
                 Sprite. Zwei Gründe: Sie ist keine Bedienoberflächen-Ikone,
@@ -155,28 +155,28 @@ const MITTE = Math.floor(SPALTEN / 2);
 
   const wrap = document.querySelector("[data-transition]");
   const columns = wrap ? [...wrap.querySelectorAll(".c-transition__panel")] : [];
-  const AUS = 0.55;
-  const EIN = 0.6;
+  const OUT = 0.55;
+  const IN = 0.6;
 
   if (columns.length) {
     /* Der Router hält an, bis das übergebene Versprechen erfüllt ist —
        dadurch deckt der Vorhang wirklich ab, bevor getauscht wird, statt
        parallel zum Austausch zu laufen. */
     document.addEventListener("astro:before-preparation", (e) => {
-      const ereignis = e as any;
-      const weiter = ereignis.loader;
-      ereignis.loader = async () => {
+      const event = e as any;
+      const next = event.loader;
+      event.loader = async () => {
         await gsap
           .timeline()
           .set(columns, { yPercent: 0 })
           .to(columns, {
             yPercent: 100,
-            duration: AUS,
+            duration: OUT,
             ease: "power3.inOut",
             stagger: { each: 0.05, from: "end" },
           })
           .then();
-        await weiter();
+        await next();
       };
     });
 
@@ -185,7 +185,7 @@ const MITTE = Math.floor(SPALTEN / 2);
     document.addEventListener("astro:after-swap", () => {
       gsap.to(columns, {
         yPercent: 200,
-        duration: EIN,
+        duration: IN,
         ease: "power3.inOut",
         stagger: { each: 0.05, from: "start" },
         onComplete: () => gsap.set(columns, { yPercent: 0 }),

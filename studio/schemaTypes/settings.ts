@@ -14,7 +14,7 @@ import { CogIcon } from "@sanity/icons/Cog";
  * heißt. Sie steht zuerst, weil sie das ganze Haus betrifft und nicht einen
  * Raum darin.
  */
-export const einstellungen = defineType({
+export const settings = defineType({
   name: "settings",
   title: "Einstellungen",
   type: "document",

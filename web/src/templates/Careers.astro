@@ -64,7 +64,7 @@ const figures =
     ? { topline: d.figuresTopline, headline: d.figuresHeadline, figures: d.figuresItems }
     : undefined;
 
-const vergleich =
+const comparison =
   d?.comparisonTopline && d.comparisonHeadline && d.comparisonColumns?.length && d.comparisonRows?.length
     ? {
         topline: d.comparisonTopline,
@@ -80,29 +80,29 @@ const voices =
     ? { topline: d.voicesTopline, headline: d.voicesHeadline, voices: d.voicesItems }
     : undefined;
 
-const ablauf =
+const process =
   d?.processHeadline && d.processStages?.length
     ? { headline: d.processHeadline, stages: d.processStages }
     : undefined;
 
-const woche =
+const week =
   d?.weekTopline && d.weekHeadline && d.weekText
     ? { topline: d.weekTopline, headline: d.weekHeadline, text: d.weekText }
     : undefined;
 
-const vorteile =
+const perks =
   d?.benefitsTopline && d.benefitsHeadline && d.benefitsItems?.length
     ? { topline: d.benefitsTopline, headline: d.benefitsHeadline, items: d.benefitsItems }
     : undefined;
 
-const gruende =
+const reasons =
   d?.reasonsTopline && d.reasonsHeadline && d.reasonsItems?.length
     ? { topline: d.reasonsTopline, headline: d.reasonsHeadline, items: d.reasonsItems }
     : undefined;
 
 /* Die Stellen sind der Zweck der Seite. Ohne ausgeschriebene Stelle entfällt
    der Abschnitt — dann trägt die Initiativbewerbung darunter die Seite. */
-const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
+const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 ---
 
 <Base
@@ -130,15 +130,15 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
   {/* Die 4-Tage-Woche als eigener Block und nicht als Zeile in der Liste
       darunter — sie ist das Argument, das die Seite trägt. */}
-  {woche && <Panel id="vier-tage" topline={woche.topline} title={woche.headline} text={woche.text} />}
+  {week && <Panel id="vier-tage" topline={week.topline} title={week.headline} text={week.text} />}
 
-  {vorteile && <Perks {...vorteile} />}
+  {perks && <Perks {...perks} />}
 
-  {vergleich && <Compare {...vergleich} />}
+  {comparison && <Compare {...comparison} />}
 
-  {gruende && <Reasons {...gruende} />}
+  {reasons && <Reasons {...reasons} />}
 
-  {zeigeStellen && d && (
+  {showJobs && d && (
     <Jobs
       id="stellen"
       topline={d.jobsTopline!}
@@ -151,7 +151,7 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
   {voices && <Voices {...voices} />}
 
-  {ablauf && <Timeline {...ablauf} />}
+  {process && <Timeline {...process} />}
 
   {/* Hinter dem Ablauf: Erst weiß man, was einen erwartet, dann bewirbt man
       sich. Davor wäre das Formular eine Aufforderung ohne Auskunft. */}
@@ -171,12 +171,12 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
       title={d.speculativeTitle}
       text={d.speculativeText ?? undefined}
     >
-      <div class="k-initiativ">
+      <div class="c-speculative">
         {d.speculativeParagraph && <p>{d.speculativeParagraph}</p>}
         {d.applicationEmail && (
-          <div class="k-initiativ__aktion">
+          <div class="c-speculative__action">
             <Button label="Initiativ bewerben" href={applicationLink(d.applicationEmail)} />
-            <a class="k-initiativ__mail" href={`mailto:${d.applicationEmail}`}>{d.applicationEmail}</a>
+            <a class="c-speculative__mail" href={`mailto:${d.applicationEmail}`}>{d.applicationEmail}</a>
           </div>
         )}
       </div>
@@ -187,7 +187,7 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 </Base>
 
 <style>
-  .k-initiativ {
+  .c-speculative {
     display: flex;
     flex-direction: column;
     gap: var(--sp-6);
@@ -196,7 +196,7 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     line-height: 1.45;
   }
 
-  .k-initiativ__aktion {
+  .c-speculative__action {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -205,7 +205,7 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
   /* Die Adresse steht neben dem Knopf, nicht statt seiner: Manche schreiben
      lieber aus ihrem eigenen Postfach, statt einen mailto-Link zu öffnen. */
-  .k-initiativ__mail {
+  .c-speculative__mail {
     font-family: var(--f-mono);
     font-size: var(--fs-text-small);
     letter-spacing: 0.04em;
@@ -213,7 +213,7 @@ const zeigeStellen = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     text-underline-offset: 4px;
   }
 
-  .k-initiativ__mail:hover {
+  .c-speculative__mail:hover {
     text-decoration-color: var(--c-brand);
     text-decoration-thickness: 2px;
   }

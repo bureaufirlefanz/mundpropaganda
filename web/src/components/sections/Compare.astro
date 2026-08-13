@@ -23,7 +23,7 @@
  *    WCAG 1.3.1. Es sind <h3> geworden; der Klassenname blieb.
  */
 
-export interface VergleichSpalte {
+export interface CompareColumn {
   name: string;
   /** Hebt eine Spalte hervor — hier die eigene. */
   emphasised?: boolean;
@@ -39,28 +39,28 @@ export interface VergleichSpalte {
  * kompakt, im Studio aber nicht abbildbar. Ein Redakteur kann keinen
  * TypeScript-Union eingeben; er wählt eine Darstellung aus vier.
  */
-export interface VergleichWert {
+export interface CompareValue {
   kind: "text" | "ja" | "nein" | "pille";
   text?: string;
 }
 
-export interface VergleichZeile {
+export interface CompareRow {
   name: string;
-  values: VergleichWert[];
+  values: CompareValue[];
 }
 
 interface Props {
   topline: string;
   headline: string;
-  columns: VergleichSpalte[];
-  lines: VergleichZeile[];
+  columns: CompareColumn[];
+  lines: CompareRow[];
   /** Kleingedrucktes unter der Tabelle. */
   note?: string;
 }
 
 const { topline, headline, columns, lines, note } = Astro.props;
 
-const caption = (w: VergleichWert) =>
+const caption = (w: CompareValue) =>
   w.kind === "ja" ? "enthalten" : w.kind === "nein" ? "nicht enthalten" : undefined;
 ---
 
@@ -132,7 +132,7 @@ const caption = (w: VergleichWert) =>
     </div>
   </div>
 
-  {note && <p class="s-compare__hinweis">{note}</p>}
+  {note && <p class="s-compare__note">{note}</p>}
 </section>
 
 <style>
@@ -159,7 +159,7 @@ const caption = (w: VergleichWert) =>
   /* Fließtext, also die Grundschrift — Mono ist der Auszeichnung
      vorbehalten: Toplines, Werte, Beschriftungen. Ein ganzer Absatz darin
      liest sich zäh. */
-  .s-compare__hinweis {
+  .s-compare__note {
     max-width: 76ch;
     margin-top: var(--sp-4);
     font-size: var(--fs-text-small);

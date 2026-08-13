@@ -39,7 +39,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
 
 <section class="s-team" id={id}>
   {isCmsImage(photo) && (
-    <div class="s-team__foto" data-reveal="scale">
+    <div class="s-team__photo" data-reveal="scale">
       <CmsImage
         source={photo}
         alt=""
@@ -56,9 +56,9 @@ const { id, topline, headline, text, photo, members } = Astro.props;
       {text && <p class="s-team__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
     </div>
 
-    <ul class="s-team__raster" data-reveal-stagger="0.06">
+    <ul class="s-team__grid" data-reveal-stagger="0.06">
       {members.map((p) => (
-        <li class="s-team__zelle" data-reveal-child>
+        <li class="s-team__cell" data-reveal-child>
           {/* Der Link umschließt die ganze Kachel — ein Tippziel von 300px
               Höhe statt eines Namens von 20px. */}
           <a class="c-member" href={`/praxis/${p.slug}`}>
@@ -71,7 +71,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
                   sizes="(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 24vw"
                 />
               ) : (
-                <span class="c-member__ohne" aria-hidden="true">
+                <span class="c-member__fallback" aria-hidden="true">
                   {p.name.replace(/^(Dr\.|Prof\.)\s*/, "").charAt(0)}
                 </span>
               )}
@@ -81,7 +81,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
               <span class="c-member__name">{p.name}</span>
               <span class="c-member__role">{p.role}</span>
               {p.text && <span class="c-member__text">{p.text}</span>}
-              <span class="c-member__mehr" aria-hidden="true">
+              <span class="c-member__more" aria-hidden="true">
                 Profil
                 <svg viewBox="0 0 24 24" width="14" height="14">
                   <path
@@ -108,7 +108,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   /* Über die volle Fensterbreite, oben gebogen wie die Linien im
      Hintergrund. Unten nur leicht gebrochen — das Foto soll die Section
      tragen und nicht darin schweben. */
-  .s-team__foto {
+  .s-team__photo {
     width: 100vw;
     margin-inline: calc(50% - 50vw);
     margin-bottom: clamp(56px, 7vw, 120px);
@@ -119,7 +119,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   }
 
   /* :global(img), weil das Bild aus CmsImage.astro kommt. */
-  .s-team__foto :global(img) {
+  .s-team__photo :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -147,7 +147,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     color: var(--c-text-muted);
   }
 
-  .s-team__raster {
+  .s-team__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
     gap: clamp(32px, 3.5vw, 56px) var(--site-gutter);
@@ -190,7 +190,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   }
 
   /* Ohne Porträt: die Initiale auf Markenfläche. Kein Platzhaltergesicht. */
-  .c-member__ohne {
+  .c-member__fallback {
     position: absolute;
     inset: 0;
     display: grid;
@@ -232,7 +232,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   /* `margin-top: auto` schiebt die Zeile an den unteren Rand der Kachel —
      bei ungleich langen Kurzprofilen stehen sie damit trotzdem auf einer
      Linie. */
-  .c-member__mehr {
+  .c-member__more {
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
@@ -243,11 +243,11 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     text-transform: uppercase;
   }
 
-  .c-member__mehr svg {
+  .c-member__more svg {
     transition: translate var(--d-base) var(--e-out);
   }
 
-  .c-member:hover .c-member__mehr svg {
+  .c-member:hover .c-member__more svg {
     translate: 4px 0;
   }
 
@@ -262,7 +262,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
       padding-block: var(--section-space-sm);
     }
 
-    .s-team__foto {
+    .s-team__photo {
       aspect-ratio: 4 / 3;
     }
   }

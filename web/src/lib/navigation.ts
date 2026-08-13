@@ -28,15 +28,12 @@ export type LinkValue = NonNullable<Navigation["mainMenu"]>[number];
  * ändert sich selten; wenn sie sich ändert, bricht `web:check` an der
  * Routen-Deckung.
  */
-/* Links der Typname (englisch, wie im Schema), rechts das Verzeichnis in der
-   Adresse (deutsch, wie die Website). Beides zu verwechseln kostete bei der
-   Sprachumstellung sämtliche Menü- und Fußlinks: Die Schlüssel hießen noch
-   `startseite` und `karriere`, die Dokumente längst `homepage` und `careers`.
-   `documentPath` fand nichts, gab `null` zurück, und `resolved()` verwirft
-   jeden Verweis ohne Ziel — das Menü war leer, ohne dass etwas kaputt war. */
 /**
  * Die zweite Hälfte des Pfadmodells — die erste steht in
  * `studio/lib/paths.ts`.
+ *
+ * Links der Typname (englisch, wie im Schema), rechts das Verzeichnis in der
+ * Adresse (deutsch, wie die Website).
  *
  * **Sie müssen übereinstimmen, und sie tun es nicht von selbst.** Genau hier
  * ist es schon einmal auseinandergelaufen: Nach der Sprachmigration standen
@@ -66,11 +63,11 @@ const FIXED_PATHS: Record<string, string> = {
   careers: "/karriere",
 };
 
-function documentPath(typ?: string, slug?: string): string | null {
-  if (!typ) return null;
-  if (typ in FIXED_PATHS) return FIXED_PATHS[typ];
+function documentPath(type?: string, slug?: string): string | null {
+  if (!type) return null;
+  if (type in FIXED_PATHS) return FIXED_PATHS[type];
   if (!slug) return null;
-  if (typ in DIRECTORIES) return `/${DIRECTORIES[typ]}/${slug}`;
+  if (type in DIRECTORIES) return `/${DIRECTORIES[type]}/${slug}`;
   /* Rechtstexte und Pillar Pages liegen auf der obersten Ebene. */
   return `/${slug}`;
 }
@@ -89,33 +86,33 @@ function documentPath(typ?: string, slug?: string): string | null {
 export function linkHref(
   v: LinkValue | undefined | null,
   currentPath: string,
-  kontakt: { phone: string; email: string }
+  contact: { phone: string; email: string }
 ): string | null {
   if (!v) return null;
 
-  if (v.kind === "email") return kontakt.email ? `mailto:${kontakt.email}` : null;
-  if (v.kind === "phone") return kontakt.phone ? telLink(kontakt.phone) : null;
+  if (v.kind === "email") return contact.email ? `mailto:${contact.email}` : null;
+  if (v.kind === "phone") return contact.phone ? telLink(contact.phone) : null;
   if (v.kind === "external") return v.url || null;
 
-  const pfad = documentPath(v.target?._type, v.target?.slug ?? undefined);
-  if (!pfad) return null;
-  if (!v.anchor) return pfad;
+  const path = documentPath(v.target?._type, v.target?.slug ?? undefined);
+  if (!path) return null;
+  if (!v.anchor) return path;
 
   /* Trailing slash abziehen, damit „/karriere" und „/karriere/" als dieselbe
      Seite gelten — Astro legt jede Seite als Verzeichnis ab, und der Browser
      steht danach auf der Fassung mit Schrägstrich. */
-  const hier = currentPath.replace(/\/+$/, "") || "/";
-  const dort = pfad.replace(/\/+$/, "") || "/";
-  return hier === dort ? `#${v.anchor}` : `${pfad}#${v.anchor}`;
+  const here = currentPath.replace(/\/+$/, "") || "/";
+  const there = path.replace(/\/+$/, "") || "/";
+  return here === there ? `#${v.anchor}` : `${path}#${v.anchor}`;
 }
 
 /** Verweise mit Ziel, fertig zum Rendern. Was kein Ziel hat, fällt raus. */
 export async function resolved(
-  verweise: (LinkValue | null)[] | undefined | null,
+  links: (LinkValue | null)[] | undefined | null,
   currentPath: string
 ): Promise<{ text: string; href: string }[]> {
   const { phone, email } = await loadSettings();
-  return (verweise ?? [])
+  return (links ?? [])
     .filter((v): v is LinkValue => Boolean(v))
     .map((v) => ({ text: v.text ?? "", href: linkHref(v, currentPath, { phone, email }) }))
     .filter((v): v is { text: string; href: string } => Boolean(v.text && v.href));

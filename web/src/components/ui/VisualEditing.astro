@@ -29,7 +29,7 @@
    * Deshalb hier, an der einen Stelle, die es nur in der Vorschau gibt: Ein
    * Klick auf einen seiteninternen Link bekommt das Präfix vorgesetzt.
    * Sprungmarken (#kontakt) und fremde Ziele bleiben unangetastet. */
-  const PRAEFIX = "/preview";
+  const PREFIX = "/preview";
 
   document.addEventListener(
     "click",
@@ -38,11 +38,11 @@
       if (!a) return;
 
       const target = a.getAttribute("href");
-      if (!target?.startsWith("/") || target.startsWith(PRAEFIX + "/") || target === PRAEFIX) return;
+      if (!target?.startsWith("/") || target.startsWith(PREFIX + "/") || target === PREFIX) return;
 
       e.preventDefault();
       /* Über den Astro-Router, damit die Module nicht neu anlaufen müssen. */
-      window.location.assign(PRAEFIX + target);
+      window.location.assign(PREFIX + target);
     },
     /* In der Capture-Phase: Der Router von Astro hängt selbst am Klick, und
        wer später kommt, sieht das Ereignis nicht mehr. */
@@ -55,10 +55,10 @@
   enableVisualEditing({
     history: {
       subscribe: (navigate) => {
-        const melde = () =>
+        const notify = () =>
           navigate({ type: "push", url: location.pathname + location.search });
-        document.addEventListener("astro:page-load", melde);
-        return () => document.removeEventListener("astro:page-load", melde);
+        document.addEventListener("astro:page-load", notify);
+        return () => document.removeEventListener("astro:page-load", notify);
       },
       update: (update) => {
         if (update.type === "push" || update.type === "replace") {

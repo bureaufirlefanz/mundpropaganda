@@ -1,73 +1,73 @@
-import { leistung } from "./service";
-import { einstellungen } from "./settings";
+import { service } from "./service";
+import { settings } from "./settings";
 
 import { seo } from "./objects/seo";
 import { link } from "./objects/link";
-import { bild } from "./objects/picture";
+import { picture } from "./objects/picture";
 import {
-  abschnitte,
-  abschnittIntro,
-  abschnittFacts,
-  abschnittCompare,
-  abschnittTimeline,
-  abschnittVoices,
-  abschnittStatement,
-  abschnittSchritte,
-  abschnittPreise,
-  abschnittFaq,
-  abschnittKontakt,
+  sectionsArray,
+  sectionIntro,
+  sectionFacts,
+  sectionCompare,
+  sectionTimeline,
+  sectionVoices,
+  sectionStatement,
+  sectionSteps,
+  sectionPricing,
+  sectionFaq,
+  sectionContact,
 } from "./objects/sections";
 
-import { startseite } from "./documents/homepage";
+import { homepage } from "./documents/homepage";
 import {
-  leistungenIndex,
-  magazinIndex,
-  kontakt,
-  notdienst,
+  servicesIndex,
+  magazineIndex,
+  contactPage,
+  emergency,
 } from "./documents/single-pages";
-import { karriere } from "./documents/careers";
+import { careers } from "./documents/careers";
 /* Praxis hat einen eigenen Typ, seit sie eine Seite hat: feste Abfolge statt
    Baukasten, wie bei der Karriereseite. */
-import { praxis } from "./documents/practice";
+import { practice } from "./documents/practice";
 
-import { beitrag, pillar, rechtstext, person, stelle } from "./documents/collections";
+import { post, pillar, legalPage, person, job } from "./documents/collections";
 import { navigation, footer } from "./documents/chrome";
 
 export const schemaTypes = [
   /* Bausteine zuerst — die Dokumente verweisen darauf. Die Reihenfolge ist
      für Sanity egal, für das Lesen nicht. */
   seo,
-  bild,
+  picture,
   link,
-  abschnittIntro,
-  abschnittFacts,
-  abschnittCompare,
-  abschnittTimeline,
-  abschnittVoices,
-  abschnittStatement,
-  abschnittSchritte,
-  abschnittPreise,
-  abschnittFaq,
-  abschnittKontakt,
-  abschnitte,
+  sectionIntro,
+  sectionFacts,
+  sectionCompare,
+  sectionTimeline,
+  sectionVoices,
+  sectionStatement,
+  sectionSteps,
+  sectionPricing,
+  sectionFaq,
+  sectionContact,
+  sectionsArray,
 
   /* Einzelseiten */
-  startseite,
-  leistungenIndex,
-  praxis,
-  magazinIndex,
-  karriere,
-  kontakt,
-  notdienst,
-  einstellungen,
+  homepage,
+  servicesIndex,
+  practice,
+  magazineIndex,
+  careers,
+  contactPage,
+  emergency,
+  settings,
   navigation,
   footer,
 
   /* Sammlungen */
-  leistung,
-  beitrag,
+  service,
+  post,
   pillar,
-  rechtstext,
+  legalPage,
   person,
-  stelle,
+  job,
 ];

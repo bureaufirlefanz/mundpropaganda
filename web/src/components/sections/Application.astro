@@ -52,47 +52,47 @@ const { id, topline, headline, text, jobs, fallbackEmail } = Astro.props;
 /* Nur Stellen, die überhaupt eine Adresse haben — eigene oder allgemeine.
    Eine Rolle zur Wahl zu stellen, deren Bewerbung nirgends ankommt, ist
    schlimmer, als sie wegzulassen. */
-const waehlbar = jobs.filter((j) => j.applicationEmail || fallbackEmail);
+const selectable = jobs.filter((j) => j.applicationEmail || fallbackEmail);
 
-const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
+const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 ---
 
-{waehlbar.length > 0 && (
+{selectable.length > 0 && (
   <Panel id={id} topline={topline} title={headline} text={text}>
     <form class="c-apply" data-apply novalidate>
       {/* Der Fortschritt. `aria-hidden`, weil jede Legende die Schrittzahl
           als sr-only-Zusatz trägt („Schritt 2 von 4") — dieselbe Auskunft
           zweimal vorgelesen hilft niemandem. */}
-      <ol class="c-apply__fortschritt" aria-hidden="true">
-        {SCHRITTE.map((name, i) => (
-          <li class="c-apply__marke" data-apply-marke={i}>
-            <span class="c-apply__marke-zahl">{i + 1}</span>
-            <span class="c-apply__marke-name">{name}</span>
+      <ol class="c-apply__progress" aria-hidden="true">
+        {STEPS.map((name, i) => (
+          <li class="c-apply__marker" data-apply-marker={i}>
+            <span class="c-apply__marker-number">{i + 1}</span>
+            <span class="c-apply__marker-label">{name}</span>
           </li>
         ))}
       </ol>
 
       {/* ── Schritt 1: Rolle ─────────────────────────────────────────── */}
-      <fieldset class="c-apply__schritt" data-apply-schritt="0">
-        <legend class="c-apply__legende">
+      <fieldset class="c-apply__step" data-apply-step="0">
+        <legend class="c-apply__legend">
           <span class="sr-only">Schritt 1 von 4: </span>Ich bewerbe mich auf die Anstellung als
         </legend>
 
-        <div class="c-apply__rollen">
-          {waehlbar.map((j, i) => (
-            <label class="c-apply__rolle">
+        <div class="c-apply__roles">
+          {selectable.map((j, i) => (
+            <label class="c-apply__role">
               <input
                 type="radio"
-                name="rolle"
+                name="role"
                 value={j.title}
-                data-apply-rolle={j.handle}
+                data-apply-role={j.handle}
                 data-apply-mail={j.applicationEmail || fallbackEmail}
                 required={i === 0}
               />
-              <span class="c-apply__rolle-text">
-                <span class="c-apply__rolle-titel">{j.title}</span>
+              <span class="c-apply__role-text">
+                <span class="c-apply__role-title">{j.title}</span>
                 {(j.kind || j.location) && (
-                  <span class="c-apply__rolle-info">
+                  <span class="c-apply__role-meta">
                     {[j.kind, j.location].filter(Boolean).join(" · ")}
                   </span>
                 )}
@@ -103,8 +103,8 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
       </fieldset>
 
       {/* ── Schritt 2: Kontakt ───────────────────────────────────────── */}
-      <fieldset class="c-apply__schritt" data-apply-schritt="1" hidden>
-        <legend class="c-apply__legende">
+      <fieldset class="c-apply__step" data-apply-step="1" hidden>
+        <legend class="c-apply__legend">
           <span class="sr-only">Schritt 2 von 4: </span>Wie erreichen wir dich?
         </legend>
 
@@ -127,38 +127,38 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
         <div class="c-field" data-field>
           <label class="c-field__label" for="a-tel">Telefon</label>
           <div class="c-field__control">
-            <input id="a-tel" name="telefon" type="tel" autocomplete="tel" />
+            <input id="a-tel" name="phone" type="tel" autocomplete="tel" />
           </div>
         </div>
       </fieldset>
 
       {/* ── Schritt 3: Fragen je Rolle ───────────────────────────────── */}
-      <fieldset class="c-apply__schritt" data-apply-schritt="2" hidden>
-        <legend class="c-apply__legende">
+      <fieldset class="c-apply__step" data-apply-step="2" hidden>
+        <legend class="c-apply__legend">
           <span class="sr-only">Schritt 3 von 4: </span>Zwei Fragen zur Stelle
         </legend>
 
-        {waehlbar.map((j) => (
-          <div class="c-apply__fragen" data-apply-fragen={j.handle} hidden>
+        {selectable.map((j) => (
+          <div class="c-apply__questions" data-apply-questions={j.handle} hidden>
             {(j.applicationQuestions ?? []).map((f, i) => {
-              const feldId = `a-${j.handle}-${i}`;
+              const fieldId = `a-${j.handle}-${i}`;
               return (
                 <div class="c-field" data-field>
-                  <label class="c-field__label" for={feldId}>
+                  <label class="c-field__label" for={fieldId}>
                     {f.label} {f.required && <span>*</span>}
                   </label>
                   <div class="c-field__control">
                     {f.kind === "long" ? (
-                      <textarea id={feldId} name={f.label} rows="4" required={f.required} disabled />
+                      <textarea id={fieldId} name={f.label} rows="4" required={f.required} disabled />
                     ) : f.kind === "choice" ? (
-                      <select id={feldId} name={f.label} required={f.required} disabled>
+                      <select id={fieldId} name={f.label} required={f.required} disabled>
                         <option value="">Bitte wählen</option>
                         {(f.choices ?? []).map((w) => (
                           <option value={w}>{w}</option>
                         ))}
                       </select>
                     ) : (
-                      <input id={feldId} name={f.label} type="text" required={f.required} disabled />
+                      <input id={fieldId} name={f.label} type="text" required={f.required} disabled />
                     )}
                     <span class="c-field__error" aria-hidden="true">!</span>
                   </div>
@@ -170,22 +170,22 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
       </fieldset>
 
       {/* ── Schritt 4: Nachricht ─────────────────────────────────────── */}
-      <fieldset class="c-apply__schritt" data-apply-schritt="3" hidden>
-        <legend class="c-apply__legende">
+      <fieldset class="c-apply__step" data-apply-step="3" hidden>
+        <legend class="c-apply__legend">
           <span class="sr-only">Schritt 4 von 4: </span>Willst du uns noch etwas sagen?
         </legend>
 
         <div class="c-field" data-field>
           <label class="c-field__label" for="a-text">Nachricht</label>
           <div class="c-field__control">
-            <textarea id="a-text" name="nachricht" rows="5"></textarea>
+            <textarea id="a-text" name="message" rows="5"></textarea>
           </div>
         </div>
 
         {/* Ehrlich sein, statt zu überraschen: Der Knopf öffnet das
             E-Mail-Programm. Wer das nicht erwartet, hält es für einen
             Fehler und bewirbt sich nicht. */}
-        <p class="c-apply__hinweis">
+        <p class="c-apply__note">
           Der Knopf öffnet dein E-Mail-Programm mit allem, was du hier
           eingetragen hast. Lebenslauf und Zeugnisse hängst du dort an und
           schickst die Mail ab.
@@ -193,8 +193,8 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
       </fieldset>
 
       {/* ── Steuerung ────────────────────────────────────────────────── */}
-      <div class="c-apply__steuerung">
-        <button class="c-apply__zurueck" type="button" data-apply-zurueck hidden>
+      <div class="c-apply__controls">
+        <button class="c-apply__back" type="button" data-apply-back hidden>
           Zurück
         </button>
         {/* Die Hülle trägt das Steuer-Attribut, der Knopf kommt aus der
@@ -202,10 +202,10 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
             nackt: Die Optik liegt scoped in Button.astro, und dieses Markup
             bekäme eine andere Scope-Kennung. Klicks steigen zur Hülle auf,
             `hidden` an ihr versteckt den Knopf mit. */}
-        <span class="c-apply__weiter" data-apply-weiter>
+        <span class="c-apply__next" data-apply-next>
           <Button label="Weiter" type="button" />
         </span>
-        <span class="c-apply__absenden" data-apply-absenden hidden>
+        <span class="c-apply__submit" data-apply-submit hidden>
           <Button label="Bewerbung schreiben" href="#" />
         </span>
       </div>
@@ -223,7 +223,7 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 
   /* --- Fortschritt ------------------------------------------------------ */
 
-  .c-apply__fortschritt {
+  .c-apply__progress {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2) var(--sp-5);
@@ -232,7 +232,7 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     list-style: none;
   }
 
-  .c-apply__marke {
+  .c-apply__marker {
     display: flex;
     align-items: center;
     gap: var(--sp-2);
@@ -244,11 +244,11 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 
   /* Der aktuelle Schritt und alle davor sind voll deckend — man soll sehen,
      wie weit man ist, nicht nur wo. Das Attribut setzt application.js. */
-  .c-apply__marke[data-erreicht] {
+  .c-apply__marker[data-reached] {
     opacity: 1;
   }
 
-  .c-apply__marke-zahl {
+  .c-apply__marker-number {
     display: grid;
     place-items: center;
     width: 1.8em;
@@ -259,7 +259,7 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     line-height: 1;
   }
 
-  .c-apply__marke[data-aktiv] .c-apply__marke-zahl {
+  .c-apply__marker[data-active] .c-apply__marker-number {
     background: var(--c-brand);
     border-color: var(--c-brand);
     color: var(--c-dark);
@@ -270,7 +270,7 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
   /* `border: 0` und `padding: 0`: Der Browser gibt <fieldset> einen eigenen
      Rahmen und Innenabstand, die hier nur stören. Das Element bleibt, weil
      es die Felder für Vorlesegeräte zu einer Gruppe zusammenfasst. */
-  .c-apply__schritt {
+  .c-apply__step {
     display: flex;
     flex-direction: column;
     gap: var(--sp-5);
@@ -280,7 +280,7 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     border: 0;
   }
 
-  .c-apply__legende {
+  .c-apply__legend {
     padding: 0;
     margin-bottom: var(--sp-2);
     font-size: var(--fs-text-large);
@@ -289,13 +289,13 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 
   /* --- Rollenwahl ------------------------------------------------------- */
 
-  .c-apply__rollen {
+  .c-apply__roles {
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
   }
 
-  .c-apply__rolle {
+  .c-apply__role {
     display: flex;
     align-items: flex-start;
     gap: var(--sp-3);
@@ -307,60 +307,60 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
       background var(--d-base) var(--e-out);
   }
 
-  .c-apply__rolle:hover {
+  .c-apply__role:hover {
     border-color: var(--c-dark);
   }
 
   /* `:has()` statt einer Klasse vom Skript: Der Zustand steht schon im
      Formular, ein zweiter im DOM liefe auseinander. */
-  .c-apply__rolle:has(input:checked) {
+  .c-apply__role:has(input:checked) {
     border-color: var(--c-dark);
     background: color-mix(in srgb, var(--c-brand) 14%, transparent);
   }
 
-  .c-apply__rolle:has(input:focus-visible) {
+  .c-apply__role:has(input:focus-visible) {
     outline: 2px solid var(--c-dark);
     outline-offset: 2px;
   }
 
-  .c-apply__rolle input {
+  .c-apply__role input {
     flex: 0 0 auto;
     margin-top: 0.2em;
     accent-color: var(--c-dark);
   }
 
-  .c-apply__rolle-text {
+  .c-apply__role-text {
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
 
-  .c-apply__rolle-titel {
+  .c-apply__role-title {
     font-size: var(--fs-text-main);
     line-height: 1.3;
   }
 
-  .c-apply__rolle-info {
+  .c-apply__role-meta {
     font-size: var(--fs-text-small);
     color: var(--c-text-muted);
   }
 
   /* --- Hinweis und Steuerung -------------------------------------------- */
 
-  .c-apply__hinweis {
+  .c-apply__note {
     font-size: var(--fs-text-small);
     line-height: 1.5;
     color: var(--c-text-muted);
   }
 
-  .c-apply__steuerung {
+  .c-apply__controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--sp-4);
   }
 
-  .c-apply__zurueck {
+  .c-apply__back {
     padding: 0;
     border: 0;
     background: none;
@@ -372,14 +372,14 @@ const SCHRITTE = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     cursor: pointer;
   }
 
-  .c-apply__zurueck:hover {
+  .c-apply__back:hover {
     color: var(--c-dark);
   }
 
   /* Der Weiter-Knopf steht rechts vom Zurück-Link, aber vor dem Absenden —
      `margin-inline-start: auto` schiebt beide ans Ende der Reihe. */
-  .c-apply__weiter,
-  .c-apply__absenden {
+  .c-apply__next,
+  .c-apply__submit {
     margin-inline-start: auto;
   }
 </style>
