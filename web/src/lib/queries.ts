@@ -343,15 +343,18 @@ export const PRACTICE_QUERY = defineQuery(`
  *
  * Nur Personen mit Slug: Ohne ihn gäbe es keine Detailseite, und eine Kachel,
  * die ins Leere führt, ist schlechter als keine.
+ *
+ * **Ohne `image`.** Das Raster zeigt keine Porträts (die Begründung steht in
+ * `components/sections/Team.astro`), und eine Abfrage, die ein Bild holt, das
+ * niemand rendert, schleppt bei vierzehn Personen vierzehn Bildmetadaten
+ * durch den Build. Das Porträt holt `PERSON_QUERY` für die eigene Seite.
  */
 export const TEAM_QUERY = defineQuery(`
   *[_type == "person" && defined(slug.current)] | order(orderRank) {
     name,
     "slug": slug.current,
     role,
-    text,
-    image${BILD},
-    "focusAreas": focusAreas[]->{ title, "slug": slug.current }
+    text
   }
 `);
 

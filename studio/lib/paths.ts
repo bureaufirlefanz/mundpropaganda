@@ -70,19 +70,11 @@ const TOP_LEVEL = ["pillar", "legalPage"];
 const DIRECTORIES: Record<string, string> = {
   service: "leistungen",
   post: "magazin",
-  /* `person` steht hier vorerst NICHT.
-     Der Eintrag lautete `person: "praxis"`, und er stimmte, solange es
-     Personenseiten gab. Seit der Team-Abschnitt nur noch Porträts zeigt,
-     werden sie nicht mehr gebaut (siehe `web/src/pages/praxis/[slug].astro`).
-     Stünde der Eintrag weiter hier, böte das Studio bei jeder Person einen
-     Verweis auf eine Adresse an, die 404 liefert — und das ist schlechter
-     als kein Verweis.
-
-     Zurück gehört er, sobald der Schalter in jener Datei wieder auf true
-     steht: der Typ `person` mit dem Verzeichnis `praxis`, so wie er hier
-     stand. Ausgeschrieben steht die Zeile bewusst NICHT im Kommentar — sie
-     wäre von einem Parser nicht von einem echten Eintrag zu unterscheiden.
-  */
+  /* `person` war zwischenzeitlich draußen: Solange der Team-Abschnitt nur
+     Porträts ohne Verweis zeigte, wurden die Personenseiten nicht gebaut, und
+     ein Eintrag hier hätte im Studio einen Verweis auf eine 404 angeboten.
+     Seit das Raster Namen und Verweise trägt, gibt es die Seiten wieder. */
+  person: "praxis",
 };
 
 /** Einzeldokumente und ihr fester Pfad. */

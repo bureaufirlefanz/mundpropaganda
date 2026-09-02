@@ -51,9 +51,16 @@ export const link = defineType({
       name: "target",
       title: "Seite",
       type: "reference",
+      /* Jeder Typ, den `pathFor()` in eine Adresse übersetzen kann, und keiner
+         mehr. Fehlt einer hier, ist die Seite im Studio nicht verlinkbar,
+         obwohl es sie gibt — genau das war mit „Praxis & Team" der Fall: Die
+         Seite stand, der Menüpunkt ließ sich aber nur über eine externe URL
+         setzen. Steht einer zu viel hier, führt der Verweis ins Leere. */
       to: [
         { type: "homepage" },
         { type: "service" },
+        { type: "practice" },
+        { type: "person" },
         { type: "magazineIndex" },
         { type: "post" },
         { type: "careers" },

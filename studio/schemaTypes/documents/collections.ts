@@ -262,18 +262,12 @@ export const person = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
-      name: "image",
-      title: "Porträt",
-      type: "picture",
-      description: "Hochformat. Ohne Bild bleibt die Kachel ein Namensfeld - das ist besser als ein fremdes Gesicht.",
-      group: "card",
-    }),
-    defineField({
       name: "text",
       title: "Kurzprofil",
       type: "text",
       rows: 4,
-      description: "Zwei Sätze für die Kachel.",
+      description:
+        "Zwei Sätze für die Kachel im Team-Raster. Sie tragen die Kachel, seit dort kein Bild mehr steht - je knapper, desto besser stehen die Kacheln nebeneinander.",
       group: "card",
     }),
     defineField({
@@ -286,6 +280,14 @@ export const person = defineType({
     }),
 
     /* --- Was nur die eigene Seite füllt ---------------------------------- */
+    defineField({
+      name: "image",
+      title: "Porträt",
+      type: "picture",
+      description:
+        "Hochformat. Erscheint auf der eigenen Seite der Person, nicht im Team-Raster - dort stehen alle mit Namen und ohne Bild, damit das Raster vollständig sein kann. Ohne Porträt zeigt die Seite die Initiale auf Markenfläche.",
+      group: "detail",
+    }),
     defineField({
       name: "quote",
       title: "Zitat",

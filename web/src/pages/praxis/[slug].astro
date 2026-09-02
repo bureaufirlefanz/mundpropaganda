@@ -14,30 +14,20 @@ import PersonContent from "../../templates/Person.astro";
 import { loadTeam, loadPerson } from "../../lib/practice";
 
 /**
- * Vorerst abgeschaltet.
+ * Zwischen dem 2026-08-29 und heute waren diese Seiten abgeschaltet.
  *
- * Der Team-Abschnitt der Praxisseite zeigt seit dem Umbau nur noch Porträts,
- * ohne Namen und ohne Verweis — so entschieden, bis die Personenseiten
- * inhaltlich stehen. Damit war jede Seite hier von nirgends mehr erreichbar:
- * gebaut, ausgeliefert, indexierbar, aber ohne einen einzigen Link.
+ * Der Grund war richtig: Der Team-Abschnitt zeigte damals nur Porträts, ohne
+ * Namen und ohne Verweis, und damit war jede Seite hier von nirgends
+ * erreichbar — gebaut, ausgeliefert, indexierbar, aber ohne einen einzigen
+ * Link. Die Routen-Deckung in `web:check` hat das gemeldet, und statt den
+ * Befund zu übergehen, wurden die Seiten nicht gebaut.
  *
- * Die Routen-Deckung in `web:check` hat genau das gemeldet, und der Befund
- * war richtig. Statt ihn zu übergehen bauen wir die Seiten nicht: Eine leere
- * Liste in `getStaticPaths` erzeugt keine Datei.
- *
- * **Zurückholen** heißt: `AKTIV` auf true, und in `Team.astro` die Kacheln
- * mit Name und Verweis wiederherstellen (der Kommentar dort sagt, wie).
- * Beides gehört zusammen — die Seite ohne den Verweis wäre wieder verwaist,
- * der Verweis ohne die Seite führte ins Leere.
+ * Seit das Raster in `Team.astro` wieder Namen und Verweise trägt, ist die
+ * Bedingung erfüllt und der Schalter weg. Beides gehört zusammen: die Seite
+ * ohne den Verweis wäre wieder verwaist, der Verweis ohne die Seite führte
+ * ins Leere. Wer eines von beiden ändert, ändert das andere mit.
  */
 export async function getStaticPaths() {
-  /* Der Schalter steht INNERHALB der Funktion.
-     Astro zieht `getStaticPaths` beim Bauen heraus und ruft es in einem
-     eigenen Modulzusammenhang auf — eine Konstante daneben im Frontmatter
-     existiert dort nicht, der Build brach mit „AKTIV is not defined" ab.
-     `astro check` sah das nicht: Für TypeScript ist der Zugriff gültig. */
-  const AKTIV = false;
-  if (!AKTIV) return [];
   const team = await loadTeam();
   return team.map((p) => ({ params: { slug: p.slug } }));
 }

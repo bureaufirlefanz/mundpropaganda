@@ -1192,7 +1192,7 @@ const RING_IMAGES = [
       <div class="d-stage">
         {team.length >= 2 ? (
           <AuthorNote
-            author={{ name: team[0]!.name, role: team[0]!.role, image: team[0]!.image, slug: team[0]!.slug }}
+            author={{ name: team[0]!.name, role: team[0]!.role, slug: team[0]!.slug }}
             reviewedBy={{ name: team[1]!.name, role: team[1]!.role, slug: team[1]!.slug }}
             lastReviewed={REVIEW_DATE}
             sources={prose?.note ? [{ text: prose.note.text }] : undefined}
