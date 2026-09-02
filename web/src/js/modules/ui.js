@@ -95,12 +95,19 @@ export function initBeforeAfter() {
       /* Der Wert muss auch angesagt werden, nicht nur gezeichnet: ohne
          aria-valuenow liest ein Vorlesegerät den Regler als leer vor. */
       handle.setAttribute("aria-valuenow", String(Math.round(position)));
-      handle.setAttribute("aria-valuetext", `${Math.round(position)} % nachher`);
+      handle.setAttribute(
+        "aria-valuetext",
+        `${Math.round(position)} % nachher`,
+      );
     };
 
     const setPos = (clientX) => {
       const rect = frame.getBoundingClientRect();
-      position = gsap.utils.clamp(0, 100, ((clientX - rect.left) / rect.width) * 100);
+      position = gsap.utils.clamp(
+        0,
+        100,
+        ((clientX - rect.left) / rect.width) * 100,
+      );
       apply();
     };
 
@@ -126,8 +133,11 @@ export function initBeforeAfter() {
        (WCAG 2.1.1). Die Schrittweiten folgen der Gepflogenheit für Regler:
        Pfeiltasten fein, Bild auf/ab grob, Pos1/Ende an den Anschlag. */
     handle?.addEventListener("keydown", (e) => {
-      const step = { ArrowLeft: -2, ArrowRight: 2, PageDown: -10, PageUp: 10 }[e.key];
-      if (step !== undefined) position = gsap.utils.clamp(0, 100, position + step);
+      const step = { ArrowLeft: -2, ArrowRight: 2, PageDown: -10, PageUp: 10 }[
+        e.key
+      ];
+      if (step !== undefined)
+        position = gsap.utils.clamp(0, 100, position + step);
       else if (e.key === "Home") position = 0;
       else if (e.key === "End") position = 100;
       else return;
@@ -159,26 +169,36 @@ export function initBeforeAfter() {
  *
  * Jede Meldung nennt auch, was zu tun ist. „Ungültige Eingabe" erfüllt 3.3.1,
  * aber nicht 3.3.3 — der Hinweis muss auf die Lösung zeigen.
+ *
+ * Exportiert, weil das Bewerbungsformular (`modules/application.js`) dieselben
+ * Felder mit denselben Regeln prüft. Zwei Fassungen desselben Satzes liefen
+ * beim nächsten Feinschliff auseinander.
  */
-function fehlertext(input) {
+export function errorText(input) {
   const v = input.validity;
   const art = (input.type || "").toLowerCase();
 
   if (v.valueMissing) {
     if (art === "checkbox") return "Bitte setze den Haken, um fortzufahren.";
-    if (input.tagName === "SELECT") return "Bitte wähle einen Eintrag aus der Liste.";
+    if (art === "radio") return "Bitte wähle eine der Möglichkeiten aus.";
+    if (input.tagName === "SELECT")
+      return "Bitte wähle einen Eintrag aus der Liste.";
     return "Bitte fülle dieses Feld aus.";
   }
   if (v.typeMismatch) {
-    if (art === "email") return "Bitte gib eine E-Mail-Adresse mit @ an, etwa name@beispiel.de.";
-    if (art === "tel") return "Bitte gib eine Telefonnummer an, nur Ziffern und Leerzeichen.";
-    if (art === "url") return "Bitte gib eine vollständige Adresse an, beginnend mit https://.";
+    if (art === "email")
+      return "Bitte gib eine E-Mail-Adresse mit @ an, etwa name@beispiel.de.";
+    if (art === "tel")
+      return "Bitte gib eine Telefonnummer an, nur Ziffern und Leerzeichen.";
+    if (art === "url")
+      return "Bitte gib eine vollständige Adresse an, beginnend mit https://.";
     return "Bitte prüfe das Format dieser Eingabe.";
   }
   if (v.tooShort) return `Bitte gib mindestens ${input.minLength} Zeichen ein.`;
   if (v.tooLong) return `Bitte kürze auf höchstens ${input.maxLength} Zeichen.`;
   if (v.rangeUnderflow) return `Bitte wähle einen Wert ab ${input.min}.`;
-  if (v.rangeOverflow) return `Bitte wähle einen Wert bis höchstens ${input.max}.`;
+  if (v.rangeOverflow)
+    return `Bitte wähle einen Wert bis höchstens ${input.max}.`;
   if (v.stepMismatch) return "Bitte wähle einen der zulässigen Schritte.";
   if (v.patternMismatch) return "Bitte halte dich an das vorgegebene Format.";
   return "Bitte prüfe diese Eingabe.";
@@ -194,7 +214,7 @@ function fehlertext(input) {
  * Beim Räumen wird der Faden wieder gelöst statt auf eine leere Meldung zu
  * zeigen — eine Beschreibung, die ins Leere greift, ist schlechter als keine.
  */
-function meldung(field, input, text) {
+export function setMessage(field, input, text) {
   const el = field.querySelector(".c-field__message");
   if (!el) return;
 
@@ -211,11 +231,48 @@ function meldung(field, input, text) {
   }
 }
 
+/**
+ * Absenden an Netlify Forms.
+ *
+ * Netlify nimmt die Einsendung an jedem Pfad der Website entgegen; entscheidend
+ * ist das Feld `form-name`, das im Markup steht. Gesendet wird als
+ * `FormData` und nicht als kodierte Zeichenkette, weil zwei Felder Dateien
+ * tragen — anders käme nur der Dateiname an.
+ *
+ * Der Rückgabewert ist die Meldung für die Statuszeile, nicht `true`/`false`:
+ * Was schiefging, muss dort stehen, wo jemand es liest.
+ *
+ * **Kein „Danke" ohne Antwort vom Server.** Genau das war der Fehler, den
+ * diese Funktion ablöst: Die alte Fassung schrieb die Bestätigung direkt nach
+ * der Prüfung hin, ohne je etwas verschickt zu haben.
+ */
+async function sende(form) {
+  const antwort = await fetch(form.getAttribute("action") || "/", {
+    method: "POST",
+    body: new FormData(form),
+  });
+  if (!antwort.ok) throw new Error(`Netlify antwortete mit ${antwort.status}`);
+}
+
+/** Was zu tun ist, wenn der Versand nicht geklappt hat. */
+function ersatzweg(form) {
+  const adresse = form.dataset.formFallback;
+  return adresse
+    ? `Das Absenden hat nicht geklappt. Bitte schreib uns an ${adresse} oder ruf an.`
+    : "Das Absenden hat nicht geklappt. Bitte ruf uns an oder versuch es später noch einmal.";
+}
+
 export function initForm() {
   document.querySelectorAll("[data-form]").forEach((form) => {
     const status = form.querySelector("[data-form-status]");
 
-    form.addEventListener("submit", (e) => {
+    /* Die Browserprüfung erst hier abschalten, nicht im Markup.
+       Stünde `novalidate` am Formular, prüfte ohne JavaScript niemand — der
+       Browser nicht, weil abgeschaltet, und das Modul nicht, weil es nicht
+       läuft. Netlify nähme dann leere Pflichtfelder entgegen. */
+    form.noValidate = true;
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       let firstInvalid = null;
       let anzahl = 0;
@@ -230,7 +287,7 @@ export function initForm() {
            `aria-invalid` ist die Auskunft fürs Vorlesegerät. */
         if (invalid) input.setAttribute("aria-invalid", "true");
         else input.removeAttribute("aria-invalid");
-        meldung(field, input, invalid ? fehlertext(input) : "");
+        setMessage(field, input, invalid ? errorText(input) : "");
         if (invalid) anzahl++;
         if (invalid && !firstInvalid) firstInvalid = field;
       });
@@ -248,20 +305,47 @@ export function initForm() {
         gsap.fromTo(
           firstInvalid,
           { x: -6 },
-          { x: 0, duration: 0.5, ease: "elastic.out(1, 0.35)" }
+          { x: 0, duration: 0.5, ease: "elastic.out(1, 0.35)" },
         );
         firstInvalid.querySelector("input, textarea, select")?.focus();
         return;
       }
 
-      const button = form.querySelector('[type="submit"] .c-btn__label');
-      if (button) button.textContent = "Danke - wir melden uns";
+      const button = form.querySelector('[type="submit"]');
+      const label = button?.querySelector(".c-btn__label");
+      const beschriftung = label?.textContent;
+
+      /* Sperren, solange gesendet wird: Ein zweiter Klick schickte dieselbe
+         Anfrage ein zweites Mal, und die Praxis sähe zwei Einsendungen. */
+      if (button) button.disabled = true;
+      if (label) label.textContent = "Wird gesendet";
       /* WCAG 2.2, 4.1.3: Die geänderte Aufschrift des Knopfes ist eine
          Änderung im Dokument, keine Meldung. Ohne diese Zeile erfährt niemand
          davon, der nicht gerade hinsieht. */
-      if (status) {
-        status.textContent =
-          "Danke, deine Anfrage ist eingegangen. Wir melden uns in Kürze.";
+      if (status) status.textContent = "Deine Anfrage wird gesendet.";
+
+      try {
+        await sende(form);
+        form.reset();
+        /* `form.reset()` leert das Dateifeld, lässt die gestylte Hülle
+           daneben aber auf dem Dateinamen stehen. */
+        form.querySelectorAll("[data-file-name]").forEach((el) => {
+          if (el.dataset.fileFallback) el.textContent = el.dataset.fileFallback;
+        });
+        form.querySelectorAll("[data-file]").forEach((wrap) => {
+          wrap.dataset.filled = "false";
+        });
+        if (label) label.textContent = "Danke - wir melden uns";
+        if (status) {
+          status.textContent =
+            "Danke, deine Anfrage ist eingegangen. Wir melden uns in Kürze.";
+        }
+      } catch {
+        /* Der Knopf wird wieder freigegeben: Der Versuch soll wiederholbar
+           sein. Nur die Aufschrift bleibt nicht auf „Wird gesendet" stehen. */
+        if (button) button.disabled = false;
+        if (label && beschriftung) label.textContent = beschriftung;
+        if (status) status.textContent = ersatzweg(form);
       }
     });
 
@@ -271,7 +355,7 @@ export function initForm() {
         if (field.dataset.invalid === "true") field.dataset.invalid = "false";
         const input = e.target;
         if (input.removeAttribute) input.removeAttribute("aria-invalid");
-        meldung(field, input, "");
+        setMessage(field, input, "");
       };
       field.addEventListener("input", raeumen);
       /* `change` zusätzlich: Ein Häkchen und eine Auswahlliste lösen kein
@@ -286,10 +370,15 @@ export function initForm() {
       const label = wrap.querySelector("[data-file-name]");
       if (!input || !label) return;
 
-      const fallback = label.textContent;
+      /* Die ursprüngliche Aufschrift („Foto auswählen") kommt ans Element und
+         nicht in eine Closure: `form.reset()` nach dem Absenden leert das
+         Feld, und wer die Aufschrift zurücksetzen will, muss von außen an sie
+         herankommen. */
+      label.dataset.fileFallback ??= label.textContent;
+
       input.addEventListener("change", () => {
         const file = input.files?.[0];
-        label.textContent = file ? file.name : fallback;
+        label.textContent = file ? file.name : label.dataset.fileFallback;
         wrap.dataset.filled = String(Boolean(file));
       });
     });

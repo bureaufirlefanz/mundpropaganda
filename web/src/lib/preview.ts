@@ -19,7 +19,8 @@ import { createClient, type SanityClient } from "@sanity/client";
 
 const PROJEKT = import.meta.env.PUBLIC_SANITY_PROJECT_ID;
 const DATENSATZ = import.meta.env.PUBLIC_SANITY_DATASET;
-const STUDIO = import.meta.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
+const STUDIO =
+  import.meta.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 
 /**
  * Der Token. **Ohne `PUBLIC_`** — sonst backte Astro ihn ins ausgelieferte
@@ -40,8 +41,12 @@ const STUDIO = import.meta.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:333
  */
 export function previewToken(): string | undefined {
   const laufzeit =
-    typeof process !== "undefined" ? process.env?.SANITY_API_READ_TOKEN : undefined;
-  return laufzeit || (import.meta.env.SANITY_API_READ_TOKEN as string | undefined);
+    typeof process !== "undefined"
+      ? process.env?.SANITY_API_READ_TOKEN
+      : undefined;
+  return (
+    laufzeit || (import.meta.env.SANITY_API_READ_TOKEN as string | undefined)
+  );
 }
 
 /* Am Token gemerkt, nicht global: Wechselt er zur Laufzeit, entsteht ein
@@ -70,44 +75,3 @@ export function previewClient(): SanityClient | null {
 
 /** Name des Cookies, das die Vorschau freischaltet. */
 export const PREVIEW_COOKIE = "mp-preview";
-
-/**
- * Welche Seite steckt hinter einem Pfad?
- *
- * Die Umkehrung von `pfadVon()` im Studio. Sie steht hier ausgeschrieben und
- * nicht als importierte Regel: Das Studio ist ein eigenes Paket, und ein
- * Import über die Ordnergrenze wäre der Rückschritt hinter Stufe A, den
- * `web/CLAUDE.md` verbietet. Läuft sie auseinander, zeigt die Vorschau auf
- * eine andere Seite als die Website — deshalb prüft `web:check` die
- * Routen-Deckung gegen dieselbe Quelle.
- */
-export type Target =
-  | { kind: "homepage" }
-  | { kind: "service"; slug: string }
-  | { kind: "magazineIndex" }
-  | { kind: "post"; slug: string }
-  | { kind: "careers" }
-  | { kind: "legalPage"; slug: string };
-
-export function targetFor(pfad: string): Target | null {
-  /* Führende und schließende Schrägstriche weg — Astro liefert den Rest-Pfad
-     mal mit, mal ohne, je nachdem ob die URL auf / endet. */
-  const teile = pfad.split("/").filter(Boolean);
-
-  if (teile.length === 0) return { kind: "homepage" };
-  if (teile[0] === "careers" && teile.length === 1) return { kind: "careers" };
-  if (teile[0] === "magazine") {
-    if (teile.length === 1) return { kind: "magazineIndex" };
-    if (teile.length === 2) return { kind: "post", slug: teile[1] };
-  }
-  if (teile[0] === "services" && teile.length === 2) {
-    return { kind: "service", slug: teile[1] };
-  }
-  /* Zuletzt, nicht zuerst: Rechtstexte liegen auf der obersten Ebene, und
-     `/karriere` läge dort auch. Erst die festen Pfade prüfen, dann den Rest
-     als Slug lesen — sonst verdeckte ein Rechtstext namens „careers" die
-     Karriereseite. Im Studio verhindert `slugFrei()` genau diesen Fall, aber
-     die Reihenfolge hier darf sich nicht darauf verlassen. */
-  if (teile.length === 1) return { kind: "legalPage", slug: teile[0] };
-  return null;
-}

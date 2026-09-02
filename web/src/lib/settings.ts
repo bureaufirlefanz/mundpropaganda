@@ -2,6 +2,7 @@ import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
 import { SETTINGS_QUERY } from "./queries";
 import { imageUrl, isCmsImage } from "./images";
+import { fallbackFor } from "./loading";
 
 /**
  * Die Angaben, die auf jeder Seite gleich sind. Ein Einzeldokument im Studio.
@@ -123,7 +124,9 @@ export function loadSettings(): Promise<Settings> {
       /* Klasse 2, alles oder nichts. `!= null` und nicht `||`: Ein Schnitt von
          0 ist ein gepflegter Wert und keine Lücke. */
       reviews:
-        d?.reviewsProvider && d?.reviewsCount != null && d?.reviewsAverage != null
+        d?.reviewsProvider &&
+        d?.reviewsCount != null &&
+        d?.reviewsAverage != null
           ? {
               provider: d.reviewsProvider,
               count: d.reviewsCount,
@@ -144,7 +147,9 @@ export function loadSettings(): Promise<Settings> {
          dass ein vergessenes Feld die Seite in den Index schiebt. */
       website: {
         siteName: d?.siteName || "Mundpropaganda",
-        faviconUrl: isCmsImage(d?.favicon) ? imageUrl(d.favicon, 512) : undefined,
+        faviconUrl: isCmsImage(d?.favicon)
+          ? imageUrl(d.favicon, 512)
+          : undefined,
         defaultDescription: d?.defaultDescription || undefined,
         shareImageUrl: isCmsImage(d?.shareImage)
           ? imageUrl(d.shareImage, 1200, 1.91)
@@ -155,16 +160,24 @@ export function loadSettings(): Promise<Settings> {
       },
     }))
     /* Kein Rückfall mehr im Fehlerfall. Ist das CMS nicht erreichbar, soll der
-       Build eine sichtbar leere Seite ergeben und nicht eine, die mit alten
-       Daten aus dem Prototyp vollständig aussieht. */
-    .catch(() => ({
-      phone: "",
-      email: "",
-      locations: [],
-      social: {},
-      contactTitle: "",
-      website: { siteName: "Mundpropaganda", searchEngines: false },
-    }));
+       Build abbrechen und nicht eine Seite ergeben, die mit alten Daten aus
+       dem Prototyp vollständig aussieht.
+
+       Die Einstellungen tragen Telefon, Adressen und den Suchmaschinen-
+       Schalter. Ein Build ohne sie wäre eine Praxisseite ohne Anschrift —
+       genau die Seite, die niemand bemerkt, weil sie sonst normal aussieht.
+       Lokal wird nur gewarnt, damit man ohne Netz weiterarbeiten kann; die
+       Werte unten sind dann der leere Stand. */
+    .catch(
+      fallbackFor("die Einstellungen", {
+        phone: "",
+        email: "",
+        locations: [],
+        social: {},
+        contactTitle: "",
+        website: { siteName: "Mundpropaganda", searchEngines: false },
+      }),
+    );
 
   return cached;
 }
@@ -174,4 +187,5 @@ export const averageText = (value: number) =>
   `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} von 5`;
 
 /** Telefonnummer als wählbarer Link: alles außer Ziffern und führendem Plus. */
-export const telLink = (number: string) => `tel:${number.replace(/(?!^\+)[^\d]/g, "")}`;
+export const telLink = (number: string) =>
+  `tel:${number.replace(/(?!^\+)[^\d]/g, "")}`;

@@ -12,8 +12,17 @@
  * Aufruf: npm run web:check   (setzt einen laufenden `npm run web` voraus)
  */
 import { starteBrowser, erwarteServer } from "./lib/chrome.mjs";
-import { VIEWPORTS, beobachte, scrolleDurch, messe, befunde, pruefeSeite, melde } from "./lib/smoke.mjs";
+import {
+  VIEWPORTS,
+  beobachte,
+  scrolleDurch,
+  messe,
+  befunde,
+  pruefeSeite,
+  melde,
+} from "./lib/smoke.mjs";
 import { pruefeSeite as wcagMessen, wcagBefunde } from "./lib/wcag.mjs";
+import { checkImages } from "./check-images.mjs";
 
 /* Standardmäßig der Dev-Server, aber umstellbar:
  *
@@ -44,7 +53,7 @@ async function findPages(browser) {
     return page.evaluate(() =>
       [...document.querySelectorAll('a[href^="/"]')]
         .map((a) => new URL(a.getAttribute("href"), location.origin).pathname)
-        .filter((p) => !/\.[a-z0-9]+$/i.test(p))
+        .filter((p) => !/\.[a-z0-9]+$/i.test(p)),
     );
   };
 
@@ -94,7 +103,9 @@ async function checkTransition(browser, target, vp) {
   await page.evaluate(() => document.fonts.ready);
   await scrolleDurch(page);
 
-  const vorher = await page.evaluate(() => window.__st?.getAll?.().length ?? null);
+  const vorher = await page.evaluate(
+    () => window.__st?.getAll?.().length ?? null,
+  );
 
   /* Den Moment direkt nach dem Austausch festhalten: der Router hat den neuen
      Inhalt eingesetzt, `init` läuft aber erst bei `astro:page-load`. Was hier
@@ -111,21 +122,21 @@ async function checkTransition(browser, target, vp) {
           htmlKlassen: document.documentElement.className,
           reveals: sichtbar(
             "[data-reveal], [data-reveal-child]",
-            (el) => parseFloat(getComputedStyle(el).opacity) > 0.05
+            (el) => parseFloat(getComputedStyle(el).opacity) > 0.05,
           ),
           splits: sichtbar(
             "[data-split], [data-hero-word]",
-            (el) => getComputedStyle(el).visibility !== "hidden"
+            (el) => getComputedStyle(el).visibility !== "hidden",
           ),
         };
       },
-      { once: true }
+      { once: true },
     );
   });
 
   const gewechselt = await page.evaluate(async (target) => {
     const link = [...document.querySelectorAll("a[href]")].find(
-      (a) => new URL(a.href).pathname === target
+      (a) => new URL(a.href).pathname === target,
     );
     if (!link) return false;
     link.click();
@@ -144,25 +155,35 @@ async function checkTransition(browser, target, vp) {
   } else {
     const nachTausch = await page.evaluate(() => window.__nachTausch ?? null);
     if (nachTausch && !nachTausch.htmlKlassen.split(/\s+/).includes("js")) {
-      list.push(`die Klasse „js" fehlt nach dem Austausch — keine Startregel greift`);
+      list.push(
+        `die Klasse „js" fehlt nach dem Austausch — keine Startregel greift`,
+      );
     }
     if (nachTausch?.reveals) {
-      list.push(`${nachTausch.reveals} Reveals stehen direkt nach dem Austausch schon sichtbar da`);
+      list.push(
+        `${nachTausch.reveals} Reveals stehen direkt nach dem Austausch schon sichtbar da`,
+      );
     }
     if (nachTausch?.splits) {
-      list.push(`${nachTausch.splits} Headlines stehen direkt nach dem Austausch schon sichtbar da`);
+      list.push(
+        `${nachTausch.splits} Headlines stehen direkt nach dem Austausch schon sichtbar da`,
+      );
     }
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await scrolleDurch(page);
     list.push(...befunde(beobachtet, await messe(page)));
 
-    const nachher = await page.evaluate(() => window.__st?.getAll?.().length ?? null);
+    const nachher = await page.evaluate(
+      () => window.__st?.getAll?.().length ?? null,
+    );
     // Die Trigger der alten Seite müssen weg sein. Grob doppelt so viele wie
     // vorher heißt: sie wurden nicht aufgeräumt und messen gegen Elemente,
     // die es nicht mehr gibt.
     if (vorher && nachher && nachher > vorher * 1.8) {
-      list.push(`ScrollTrigger stapeln sich: ${vorher} vor dem Wechsel, ${nachher} danach`);
+      list.push(
+        `ScrollTrigger stapeln sich: ${vorher} vor dem Wechsel, ${nachher} danach`,
+      );
     }
   }
 
@@ -179,7 +200,9 @@ async function checkTransition(browser, target, vp) {
 async function pruefeOhneBewegung(browser, path, vp) {
   const page = await browser.newPage();
   await page.setViewport({ width: vp.width, height: vp.height });
-  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" },
+  ]);
   const beobachtet = beobachte(page);
 
   await page.goto(BASE + path, { waitUntil: "networkidle2", timeout: 60000 });
@@ -196,20 +219,24 @@ async function pruefeOhneBewegung(browser, path, vp) {
     return [
       ...document.querySelectorAll(
         "[data-reveal], [data-reveal-child], [data-split], [data-hero-word]," +
-          " [data-hero-foot], [data-hero-scroll], [data-hero-tooth], [data-nav] .c-nav__inner"
+          " [data-hero-foot], [data-hero-scroll], [data-hero-tooth], [data-nav] .c-nav__inner",
       ),
     ]
       .filter((el) => {
         const s = getComputedStyle(el);
         if (s.visibility === "hidden") return true;
-        return el.getBoundingClientRect().height > 0 && parseFloat(s.opacity) < 0.05;
+        return (
+          el.getBoundingClientRect().height > 0 && parseFloat(s.opacity) < 0.05
+        );
       })
       .map(bezeichne);
   });
 
   const list = befunde(beobachtet, await messe(page));
   if (versteckt.length) {
-    list.push(`${versteckt.length} Element(e) bleiben ohne Bewegung verborgen: ${versteckt[0]}`);
+    list.push(
+      `${versteckt.length} Element(e) bleiben ohne Bewegung verborgen: ${versteckt[0]}`,
+    );
   }
   await page.close();
   return list;
@@ -225,7 +252,9 @@ async function pruefeOhneBewegung(browser, path, vp) {
 async function pruefeBarrierefreiheit(browser, path, vp) {
   const page = await browser.newPage();
   await page.setViewport({ width: vp.width, height: vp.height });
-  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" },
+  ]);
   await page.goto(BASE + path, { waitUntil: "networkidle2", timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 1200));
@@ -264,8 +293,12 @@ async function checkRouteCoverage(browser, gefundeneSeiten) {
   for (const [typ, path] of Object.entries(FIXED_PATHS)) {
     if (!zeigtStudio(typ)) continue;
     checked++;
-    const response = await seite.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 30000 });
-    if (!response || response.status() >= 400) missing.push({ typ, path, status: response?.status() ?? 0 });
+    const response = await seite.goto(BASE + path, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+    if (!response || response.status() >= 400)
+      missing.push({ typ, path, status: response?.status() ?? 0 });
   }
   await seite.close();
 
@@ -302,9 +335,13 @@ async function checkRouteCoverage(browser, gefundeneSeiten) {
 
   console.log(`  ✗ ${missing.length} Dokumenttyp(en) ohne Seite`);
   for (const { typ, path, status } of missing) {
-    console.log(`      ${typ.padEnd(16)} ${path.padEnd(14)} ${status || "keine Route"}`);
+    console.log(
+      `      ${typ.padEnd(16)} ${path.padEnd(14)} ${status || "keine Route"}`,
+    );
   }
-  console.log(`      Entweder die Seite bauen oder den Typ aus studio/structure/index.ts nehmen.`);
+  console.log(
+    `      Entweder die Seite bauen oder den Typ aus studio/structure/index.ts nehmen.`,
+  );
   return missing.length;
 }
 
@@ -322,7 +359,7 @@ async function loadHiddenTypes() {
   return [...match[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
 }
 
-async function loadPathModel() {
+async function loadPathModel(datei = "studio/lib/paths.ts") {
   const { readFile } = await import("node:fs/promises");
   /* Kommentare weg, bevor gesucht wird.
 
@@ -331,19 +368,28 @@ async function loadPathModel() {
      ein echter Eintrag — und wurde als solcher gezählt. Gemessen: Die
      Routen-Deckung meldete einen Typ als „ohne Seite", dessen Eintrag längst
      im Kommentar stand und der gar keine Seite mehr haben sollte. */
-  const source = (await readFile("studio/lib/paths.ts", "utf8"))
+  const source = (await readFile(datei, "utf8"))
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/^\s*\/\/.*$/gm, "");
 
+  /* `as const satisfies …` darf hinter der Klammer stehen: Die Fassung unter
+     `web/` braucht es, damit der Typ `Target` aus den Schlüsseln entsteht. */
   const block = (name) => {
-    const match = source.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
-    if (!match) throw new Error(`In studio/lib/paths.ts fehlt ${name} — Routen-Deckung nicht prüfbar.`);
+    const match = source.match(
+      new RegExp(
+        `${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}])(?:\\s+as\\s+const)?(?:\\s+satisfies[^;]*)?\\s*;`,
+      ),
+    );
+    if (!match)
+      throw new Error(
+        `In ${datei} fehlt ${name} — Routen-Deckung nicht prüfbar.`,
+      );
     return match[1];
   };
 
   const paare = (roh) =>
     Object.fromEntries(
-      [...roh.matchAll(/(\w+)\s*:\s*"([^"]+)"/g)].map((m) => [m[1], m[2]])
+      [...roh.matchAll(/(\w+)\s*:\s*"([^"]+)"/g)].map((m) => [m[1], m[2]]),
     );
 
   return {
@@ -354,77 +400,85 @@ async function loadPathModel() {
 }
 
 /**
- * Jede Bildadresse im gebauten HTML muss auf eine Datei zeigen.
+ * Die beiden Hälften des Pfadmodells müssen dasselbe sagen.
  *
- * Der Fall, der das nötig gemacht hat: `Picture` bekam die Breiten als Text
- * mitgegeben, die Pipeline deckelt sie aber auf die Breite der Quelle.
- * `treatment-02` ist 1920px breit, das Markup forderte 2200 an. Auf breiten
- * Schirmen wählte der Browser genau diese Kandidatin, bekam 404 und zeigte
- * nichts — auf der Veneers-Seite die erste Bild-Text-Zeile. Kein Test schlug
- * an: Die Seite war gültig, das Bild fehlte nur.
+ * `studio/lib/paths.ts` baut die Adresse eines Dokuments, `web/src/lib/paths.ts`
+ * baut sie ebenso und liest sie zusätzlich zurück (`targetFor`, die Vorschau).
+ * Sie können nicht importiert werden — das Studio ist ein eigenes Paket, und
+ * ein Import über die Ordnergrenze wäre der Rückschritt hinter Stufe A.
+ * Verglichen werden können sie schon.
  *
- * Gelesen wird aus `dist/`, nicht über das Netz. Ein srcset hat bis zu fünf
- * Kandidatinnen, von denen der Browser genau eine holt — über HTTP fiele
- * immer nur die auf, die dieses Fenster gerade wählt.
+ * Der Fall, der das nötig gemacht hat: Nach der Sprachmigration prüfte
+ * `targetFor` weiter auf `careers`, `magazine` und `services`, während die
+ * Website `/karriere`, `/magazin` und `/leistungen` auslieferte. Aus dem
+ * Studio ließ sich damit keine Seite in der Vorschau öffnen außer der
+ * Startseite. Beide Hälften sahen für sich stimmig aus; nur nebeneinander
+ * fiel es auf.
+ *
+ * Verglichen wird gegen das Studio OHNE die ausgeblendeten Typen: `pillar`,
+ * `servicesIndex`, `contactPage` und `notdienst` haben im Studio einen Pfad
+ * für später, aber keine Seite — die Website kennt sie deshalb zu Recht nicht.
  */
-async function checkImages() {
-  const { readFile, readdir, access } = await import("node:fs/promises");
-  const { join, relative } = await import("node:path");
+async function checkPathModel() {
+  const studio = await loadPathModel("studio/lib/paths.ts");
+  const web = await loadPathModel("web/src/lib/paths.ts");
+  const ausgeblendet = await loadHiddenTypes();
 
-  async function allHtml(dir) {
-    const raus = [];
-    for (const eintrag of await readdir(dir, { withFileTypes: true })) {
-      const path = join(dir, eintrag.name);
-      if (eintrag.isDirectory()) raus.push(...(await allHtml(path)));
-      else if (eintrag.name.endsWith(".html")) raus.push(path);
+  const ohneVersteckte = (tabelle) =>
+    Object.fromEntries(
+      Object.entries(tabelle).filter(([typ]) => !ausgeblendet.includes(typ)),
+    );
+
+  const befunde = [];
+  const vergleiche = (name, a, b) => {
+    const typen = new Set([...Object.keys(a), ...Object.keys(b)]);
+    for (const typ of [...typen].sort()) {
+      if (a[typ] === b[typ]) continue;
+      befunde.push(
+        `${name}: ${typ} — Studio ${a[typ] ? `„${a[typ]}"` : "fehlt"}, Website ${b[typ] ? `„${b[typ]}"` : "fehlt"}`,
+      );
     }
-    return raus;
+  };
+
+  vergleiche(
+    "FIXED_PATHS",
+    ohneVersteckte(studio.FIXED_PATHS),
+    web.FIXED_PATHS,
+  );
+  vergleiche(
+    "DIRECTORIES",
+    ohneVersteckte(studio.DIRECTORIES),
+    web.DIRECTORIES,
+  );
+
+  const studioTop = studio.TOP_LEVEL.filter(
+    (typ) => !ausgeblendet.includes(typ),
+  );
+  for (const typ of new Set([...studioTop, ...web.TOP_LEVEL])) {
+    if (studioTop.includes(typ) === web.TOP_LEVEL.includes(typ)) continue;
+    befunde.push(
+      `TOP_LEVEL: ${typ} — nur ${studioTop.includes(typ) ? "im Studio" : "auf der Website"}`,
+    );
   }
 
-  const wurzel = "web/dist";
-  let dateien;
-  try {
-    dateien = await allHtml(wurzel);
-  } catch {
-    console.log("  (kein web/dist — übersprungen)");
+  const geprueft =
+    Object.keys(web.FIXED_PATHS).length +
+    Object.keys(web.DIRECTORIES).length +
+    web.TOP_LEVEL.length;
+
+  if (!befunde.length) {
+    console.log(
+      `  ✓ ${geprueft} Einträge stimmen zwischen Studio und Website überein`,
+    );
     return 0;
   }
 
-  /* Adresse -> Seiten, auf denen sie steht. So nennt die Meldung nicht nur
-     die fehlende Datei, sondern auch, wo man sie sieht. */
-  const referenzen = new Map();
-  for (const file of dateien) {
-    const html = await readFile(file, "utf8");
-    for (const match of html.matchAll(/(?:src|srcset)="([^"]+)"/g)) {
-      for (const teil of match[1].split(",")) {
-        const url = teil.trim().split(/\s+/)[0];
-        if (!url.startsWith("/") || url.startsWith("//")) continue;
-        if (!/\.(avif|webp|png|jpe?g|gif|svg)$/i.test(url)) continue;
-        if (!referenzen.has(url)) referenzen.set(url, new Set());
-        referenzen.get(url).add("/" + relative(wurzel, file).replace(/index\.html$/, ""));
-      }
-    }
-  }
-
-  const missing = [];
-  for (const url of referenzen.keys()) {
-    try {
-      await access(join(wurzel, decodeURIComponent(url)));
-    } catch {
-      missing.push(url);
-    }
-  }
-
-  if (!missing.length) {
-    console.log(`  ✓ ${referenzen.size} Bildadressen zeigen auf vorhandene Dateien`);
-    return 0;
-  }
-  for (const url of missing.sort()) {
-    const wo = [...referenzen.get(url)].sort();
-    console.log(`  ✗ ${url}`);
-    console.log(`      steht auf: ${wo.slice(0, 3).join(", ")}${wo.length > 3 ? ` und ${wo.length - 3} weiteren` : ""}`);
-  }
-  return missing.length;
+  console.log(`  ✗ ${befunde.length} Abweichung(en) im Pfadmodell`);
+  for (const b of befunde) console.log(`      ${b}`);
+  console.log(
+    `      Beide Hälften: studio/lib/paths.ts und web/src/lib/paths.ts.`,
+  );
+  return befunde.length;
 }
 
 /**
@@ -463,25 +517,36 @@ async function checkStyleguideColours() {
 
   const block = guide.match(/const HEX = \{([^}]*)\}/s);
   if (!block) {
-    console.log("  ✗ Farbtafel im Styleguide nicht gefunden — Aufbau geändert?");
+    console.log(
+      "  ✗ Farbtafel im Styleguide nicht gefunden — Aufbau geändert?",
+    );
     return 1;
   }
 
-  const gefunden = [...block[1].matchAll(/"?([a-z0-9-]+)"?:\s*"(#[0-9a-fA-F]{6})"/g)];
+  const gefunden = [
+    ...block[1].matchAll(/"?([a-z0-9-]+)"?:\s*"(#[0-9a-fA-F]{6})"/g),
+  ];
   let schief = 0;
 
   for (const [, name, hex] of gefunden) {
     const token = tokens.match(new RegExp(`--c-${name}:\\s*(#[0-9a-fA-F]{6})`));
     if (!token) {
-      console.log(`  ✗ --c-${name} steht im Styleguide, aber nicht in tokens.css`);
+      console.log(
+        `  ✗ --c-${name} steht im Styleguide, aber nicht in tokens.css`,
+      );
       schief++;
     } else if (token[1].toLowerCase() !== hex.toLowerCase()) {
-      console.log(`  ✗ --c-${name}: tokens.css sagt ${token[1]}, der Styleguide zeigt ${hex}`);
+      console.log(
+        `  ✗ --c-${name}: tokens.css sagt ${token[1]}, der Styleguide zeigt ${hex}`,
+      );
       schief++;
     }
   }
 
-  if (!schief) console.log(`  ✓ ${gefunden.length} Farben im Styleguide stimmen mit tokens.css überein`);
+  if (!schief)
+    console.log(
+      `  ✓ ${gefunden.length} Farben im Styleguide stimmen mit tokens.css überein`,
+    );
   return schief;
 }
 
@@ -540,7 +605,9 @@ async function checkAnchors() {
   }
   for (const [anker, pages] of je) {
     console.log(`  ✗ #${anker} — kein Element mit dieser id`);
-    console.log(`      verlinkt auf: ${pages.slice(0, 3).join(", ")}${pages.length > 3 ? ` und ${pages.length - 3} weiteren` : ""}`);
+    console.log(
+      `      verlinkt auf: ${pages.slice(0, 3).join(", ")}${pages.length > 3 ? ` und ${pages.length - 3} weiteren` : ""}`,
+    );
   }
   return je.size;
 }
@@ -554,7 +621,10 @@ let problems = 0;
 for (const [i, vp] of VIEWPORTS.entries()) {
   const pages = i === 0 ? PAGES : PAGES.slice(0, VOLL);
   console.log(`\n── ${vp.name} (${vp.width}×${vp.height}) ──`);
-  if (i === 1) console.log(`  (nur die ersten ${VOLL} Seiten — die übrigen teilen sich deren Route)`);
+  if (i === 1)
+    console.log(
+      `  (nur die ersten ${VOLL} Seiten — die übrigen teilen sich deren Route)`,
+    );
   for (const path of pages) {
     problems += melde(path, await pruefeSeite(browser, BASE + path, vp));
   }
@@ -562,7 +632,10 @@ for (const [i, vp] of VIEWPORTS.entries()) {
 
 console.log(`\n── Ohne Bewegung (prefers-reduced-motion) ──`);
 for (const path of PAGES) {
-  problems += melde(path, await pruefeOhneBewegung(browser, path, VIEWPORTS[0]));
+  problems += melde(
+    path,
+    await pruefeOhneBewegung(browser, path, VIEWPORTS[0]),
+  );
 }
 
 /* JEDE Seite, nicht mehr eine Auswahl.
@@ -589,12 +662,18 @@ console.log(`\n── Barrierefreiheit (WCAG 2.2 AA) ──`);
 let unpruefbar = 0;
 const BARRIERE = PAGES;
 for (const path of BARRIERE) {
-  const { list, result } = await pruefeBarrierefreiheit(browser, path, VIEWPORTS[0]);
+  const { list, result } = await pruefeBarrierefreiheit(
+    browser,
+    path,
+    VIEWPORTS[0],
+  );
   unpruefbar += result.unpruefbar.length;
   problems += melde(path, list);
 }
 if (unpruefbar) {
-  console.log(`  (${unpruefbar} Textstellen liegen auf Bildern oder Verläufen — Kontrast dort nicht rechenbar)`);
+  console.log(
+    `  (${unpruefbar} Textstellen liegen auf Bildern oder Verläufen — Kontrast dort nicht rechenbar)`,
+  );
 }
 
 // Der Wechsel einmal auf Desktop — er hängt nicht am Breakpoint, und drei
@@ -602,8 +681,14 @@ if (unpruefbar) {
 const target = PAGES.find((p) => p !== "/");
 if (target) {
   console.log(`\n── Seitenwechsel (Router) ──`);
-  problems += melde(`/ → ${target}`, await checkTransition(browser, target, VIEWPORTS[0]));
+  problems += melde(
+    `/ → ${target}`,
+    await checkTransition(browser, target, VIEWPORTS[0]),
+  );
 }
+
+console.log(`\n── Pfadmodell ──`);
+problems += await checkPathModel();
 
 console.log(`\n── Routen-Deckung ──`);
 problems += await checkRouteCoverage(browser, PAGES);

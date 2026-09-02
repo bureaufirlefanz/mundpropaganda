@@ -3,6 +3,7 @@ import { withoutNull, type WithoutNull } from "./without-null";
 import type { SERVICE_QUERY_RESULT } from "./sanity.types";
 import { SERVICE_QUERY } from "./queries";
 import { loadServiceList } from "./service-list";
+import { fallbackFor } from "./loading";
 
 /**
  * Welche Leistungsseiten gebaut werden — dieselbe Liste, aus der auch
@@ -48,11 +49,8 @@ export type Service = NonNullable<WithoutNull<SERVICE_QUERY_RESULT>>;
  * dann ihren Titel aus der Liste und sonst nichts Erfundenes.
  */
 export async function loadService(slug: string): Promise<Service | undefined> {
-  try {
-    return withoutNull(await sanityClient.fetch(SERVICE_QUERY, { slug })) ?? undefined;
-  } catch {
-    /* Ist das CMS nicht erreichbar, soll die Seite sichtbar leer sein und
-       nicht mit fremdem Inhalt gefüllt. */
-    return undefined;
-  }
+  return sanityClient
+    .fetch(SERVICE_QUERY, { slug })
+    .then((d) => withoutNull(d) ?? undefined)
+    .catch(fallbackFor("eine Leistungsseite", undefined));
 }

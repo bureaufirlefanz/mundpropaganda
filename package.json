@@ -11,6 +11,7 @@
     "format:check": "prettier --check .",
     "check:types": "npm run types && npm --prefix web run check && npm run studio:check",
     "check:css": "node scripts/check-css.mjs",
+    "check:images": "node scripts/check-images.mjs",
     "proto:dev": "vite --config prototypen/vite/vite.config.js",
     "proto:build": "vite build --config prototypen/vite/vite.config.js",
     "proto:preview": "vite preview --config prototypen/vite/vite.config.js",

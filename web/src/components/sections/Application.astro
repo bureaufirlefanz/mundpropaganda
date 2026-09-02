@@ -28,10 +28,19 @@
  * auf. Es kann dafür keine Anhänge — Lebenslauf und Zeugnisse hängt die
  * Bewerberin selbst an die geöffnete Mail.
  *
- * Der richtige Versand mit Datei-Upload steht als Aufgabe 15 in
+ * Der richtige Versand mit Datei-Upload steht als Aufgabe 17 in
  * `CMS-UMBAU.md`. Bis dahin gilt: Dieses Formular verliert nichts, weil es
- * nichts selbst verschickt — anders als das Kontaktformular, das bis heute
- * `preventDefault()` ruft und dann „Danke" auf den Knopf schreibt.
+ * nichts selbst verschickt. Das Kontaktformular geht seit dem Umbau an
+ * Netlify Forms; hier ginge das auch, kostet aber die Anhänge — Netlify nimmt
+ * pro Einsendung Dateien entgegen, Lebenslauf UND Zeugnisse sind aber
+ * regelmäßig mehr, als ein Formularfeld trägt.
+ *
+ * ── Fehlermeldungen ──────────────────────────────────────────────────────
+ *
+ * Jedes Feld trägt eine leere `.c-field__message` mit eigener ID. Das Modul
+ * schreibt den Grund hinein und verknüpft ihn über `aria-describedby` mit dem
+ * Feld. Vorher gab es nur `aria-invalid` und einen Fokussprung: Ein
+ * Vorlesegerät sagte „ungültig" und nicht, was fehlt (WCAG 3.3.3).
  */
 import Panel from "../ui/Panel.astro";
 import Button from "../ui/Button.astro";
@@ -57,161 +66,234 @@ const selectable = jobs.filter((j) => j.applicationEmail || fallbackEmail);
 const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 ---
 
-{selectable.length > 0 && (
-  <Panel id={id} topline={topline} title={headline} text={text}>
-    <form class="c-apply" data-apply novalidate>
-      {/* Der Fortschritt. `aria-hidden`, weil jede Legende die Schrittzahl
+{
+  selectable.length > 0 && (
+    <Panel id={id} topline={topline} title={headline} text={text}>
+      <form class="c-apply" data-apply novalidate>
+        {/* Der Fortschritt. `aria-hidden`, weil jede Legende die Schrittzahl
           als sr-only-Zusatz trägt („Schritt 2 von 4") — dieselbe Auskunft
           zweimal vorgelesen hilft niemandem. */}
-      <ol class="c-apply__progress" aria-hidden="true">
-        {STEPS.map((name, i) => (
-          <li class="c-apply__marker" data-apply-marker={i}>
-            <span class="c-apply__marker-number">{i + 1}</span>
-            <span class="c-apply__marker-label">{name}</span>
-          </li>
-        ))}
-      </ol>
-
-      {/* ── Schritt 1: Rolle ─────────────────────────────────────────── */}
-      <fieldset class="c-apply__step" data-apply-step="0">
-        <legend class="c-apply__legend">
-          <span class="sr-only">Schritt 1 von 4: </span>Ich bewerbe mich auf die Anstellung als
-        </legend>
-
-        <div class="c-apply__roles">
-          {selectable.map((j, i) => (
-            <label class="c-apply__role">
-              <input
-                type="radio"
-                name="role"
-                value={j.title}
-                data-apply-role={j.handle}
-                data-apply-mail={j.applicationEmail || fallbackEmail}
-                required={i === 0}
-              />
-              <span class="c-apply__role-text">
-                <span class="c-apply__role-title">{j.title}</span>
-                {(j.kind || j.location) && (
-                  <span class="c-apply__role-meta">
-                    {[j.kind, j.location].filter(Boolean).join(" · ")}
-                  </span>
-                )}
-              </span>
-            </label>
+        <ol class="c-apply__progress" aria-hidden="true">
+          {STEPS.map((name, i) => (
+            <li class="c-apply__marker" data-apply-marker={i}>
+              <span class="c-apply__marker-number">{i + 1}</span>
+              <span class="c-apply__marker-label">{name}</span>
+            </li>
           ))}
-        </div>
-      </fieldset>
+        </ol>
 
-      {/* ── Schritt 2: Kontakt ───────────────────────────────────────── */}
-      <fieldset class="c-apply__step" data-apply-step="1" hidden>
-        <legend class="c-apply__legend">
-          <span class="sr-only">Schritt 2 von 4: </span>Wie erreichen wir dich?
-        </legend>
+        {/* ── Schritt 1: Rolle ─────────────────────────────────────────── */}
+        <fieldset class="c-apply__step" data-apply-step="0">
+          <legend class="c-apply__legend">
+            <span class="sr-only">Schritt 1 von 4: </span>Ich bewerbe mich auf
+            die Anstellung als
+          </legend>
 
-        <div class="c-field" data-field>
-          <label class="c-field__label" for="a-name">Name <span>*</span></label>
-          <div class="c-field__control">
-            <input id="a-name" name="name" type="text" autocomplete="name" required />
-            <span class="c-field__error" aria-hidden="true">!</span>
+          <div class="c-apply__roles">
+            {selectable.map((j, i) => (
+              <label class="c-apply__role">
+                <input
+                  type="radio"
+                  name="role"
+                  value={j.title}
+                  data-apply-role={j.handle}
+                  data-apply-mail={j.applicationEmail || fallbackEmail}
+                  required={i === 0}
+                />
+                <span class="c-apply__role-text">
+                  <span class="c-apply__role-title">{j.title}</span>
+                  {(j.kind || j.location) && (
+                    <span class="c-apply__role-meta">
+                      {[j.kind, j.location].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
+                </span>
+              </label>
+            ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div class="c-field" data-field>
-          <label class="c-field__label" for="a-mail">E-Mail-Adresse <span>*</span></label>
-          <div class="c-field__control">
-            <input id="a-mail" name="email" type="email" autocomplete="email" required />
-            <span class="c-field__error" aria-hidden="true">!</span>
+        {/* ── Schritt 2: Kontakt ───────────────────────────────────────── */}
+        <fieldset class="c-apply__step" data-apply-step="1" hidden>
+          <legend class="c-apply__legend">
+            <span class="sr-only">Schritt 2 von 4: </span>Wie erreichen wir
+            dich?
+          </legend>
+
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="a-name">
+              Name <span>*</span>
+            </label>
+            <div class="c-field__control">
+              <input
+                id="a-name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                required
+              />
+              <span class="c-field__error" aria-hidden="true">
+                !
+              </span>
+            </div>
+            <p class="c-field__message" id="a-name-message" hidden />
           </div>
-        </div>
 
-        <div class="c-field" data-field>
-          <label class="c-field__label" for="a-tel">Telefon</label>
-          <div class="c-field__control">
-            <input id="a-tel" name="phone" type="tel" autocomplete="tel" />
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="a-mail">
+              E-Mail-Adresse <span>*</span>
+            </label>
+            <div class="c-field__control">
+              <input
+                id="a-mail"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+              />
+              <span class="c-field__error" aria-hidden="true">
+                !
+              </span>
+            </div>
+            <p class="c-field__message" id="a-mail-message" hidden />
           </div>
-        </div>
-      </fieldset>
 
-      {/* ── Schritt 3: Fragen je Rolle ───────────────────────────────── */}
-      <fieldset class="c-apply__step" data-apply-step="2" hidden>
-        <legend class="c-apply__legend">
-          <span class="sr-only">Schritt 3 von 4: </span>Zwei Fragen zur Stelle
-        </legend>
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="a-tel">
+              Telefon
+            </label>
+            <div class="c-field__control">
+              <input id="a-tel" name="phone" type="tel" autocomplete="tel" />
+            </div>
+            <p class="c-field__message" id="a-tel-message" hidden />
+          </div>
+        </fieldset>
 
-        {selectable.map((j) => (
-          <div class="c-apply__questions" data-apply-questions={j.handle} hidden>
-            {(j.applicationQuestions ?? []).map((f, i) => {
-              const fieldId = `a-${j.handle}-${i}`;
-              return (
-                <div class="c-field" data-field>
-                  <label class="c-field__label" for={fieldId}>
-                    {f.label} {f.required && <span>*</span>}
-                  </label>
-                  <div class="c-field__control">
-                    {f.kind === "long" ? (
-                      <textarea id={fieldId} name={f.label} rows="4" required={f.required} disabled />
-                    ) : f.kind === "choice" ? (
-                      <select id={fieldId} name={f.label} required={f.required} disabled>
-                        <option value="">Bitte wählen</option>
-                        {(f.choices ?? []).map((w) => (
-                          <option value={w}>{w}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input id={fieldId} name={f.label} type="text" required={f.required} disabled />
-                    )}
-                    <span class="c-field__error" aria-hidden="true">!</span>
+        {/* ── Schritt 3: Fragen je Rolle ───────────────────────────────── */}
+        <fieldset class="c-apply__step" data-apply-step="2" hidden>
+          <legend class="c-apply__legend">
+            <span class="sr-only">Schritt 3 von 4: </span>Zwei Fragen zur Stelle
+          </legend>
+
+          {selectable.map((j) => (
+            <div
+              class="c-apply__questions"
+              data-apply-questions={j.handle}
+              hidden
+            >
+              {(j.applicationQuestions ?? []).map((f, i) => {
+                const fieldId = `a-${j.handle}-${i}`;
+                return (
+                  <div class="c-field" data-field>
+                    <label class="c-field__label" for={fieldId}>
+                      {f.label} {f.required && <span>*</span>}
+                    </label>
+                    <div class="c-field__control">
+                      {f.kind === "long" ? (
+                        <textarea
+                          id={fieldId}
+                          name={f.label}
+                          rows="4"
+                          required={f.required}
+                          disabled
+                        />
+                      ) : f.kind === "choice" ? (
+                        <select
+                          id={fieldId}
+                          name={f.label}
+                          required={f.required}
+                          disabled
+                        >
+                          <option value="">Bitte wählen</option>
+                          {(f.choices ?? []).map((w) => (
+                            <option value={w}>{w}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          id={fieldId}
+                          name={f.label}
+                          type="text"
+                          required={f.required}
+                          disabled
+                        />
+                      )}
+                      <span class="c-field__error" aria-hidden="true">
+                        !
+                      </span>
+                    </div>
+                    <p
+                      class="c-field__message"
+                      id={`${fieldId}-message`}
+                      hidden
+                    />
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+          ))}
+        </fieldset>
+
+        {/* ── Schritt 4: Nachricht ─────────────────────────────────────── */}
+        <fieldset class="c-apply__step" data-apply-step="3" hidden>
+          <legend class="c-apply__legend">
+            <span class="sr-only">Schritt 4 von 4: </span>Willst du uns noch
+            etwas sagen?
+          </legend>
+
+          <div class="c-field" data-field>
+            <label class="c-field__label" for="a-text">
+              Nachricht
+            </label>
+            <div class="c-field__control">
+              <textarea id="a-text" name="message" rows="5" />
+            </div>
+            <p class="c-field__message" id="a-text-message" hidden />
           </div>
-        ))}
-      </fieldset>
 
-      {/* ── Schritt 4: Nachricht ─────────────────────────────────────── */}
-      <fieldset class="c-apply__step" data-apply-step="3" hidden>
-        <legend class="c-apply__legend">
-          <span class="sr-only">Schritt 4 von 4: </span>Willst du uns noch etwas sagen?
-        </legend>
-
-        <div class="c-field" data-field>
-          <label class="c-field__label" for="a-text">Nachricht</label>
-          <div class="c-field__control">
-            <textarea id="a-text" name="message" rows="5"></textarea>
-          </div>
-        </div>
-
-        {/* Ehrlich sein, statt zu überraschen: Der Knopf öffnet das
+          {/* Ehrlich sein, statt zu überraschen: Der Knopf öffnet das
             E-Mail-Programm. Wer das nicht erwartet, hält es für einen
             Fehler und bewirbt sich nicht. */}
-        <p class="c-apply__note">
-          Der Knopf öffnet dein E-Mail-Programm mit allem, was du hier
-          eingetragen hast. Lebenslauf und Zeugnisse hängst du dort an und
-          schickst die Mail ab.
-        </p>
-      </fieldset>
+          <p class="c-apply__note">
+            Der Knopf öffnet dein E-Mail-Programm mit allem, was du hier
+            eingetragen hast. Lebenslauf und Zeugnisse hängst du dort an und
+            schickst die Mail ab.
+          </p>
+        </fieldset>
 
-      {/* ── Steuerung ────────────────────────────────────────────────── */}
-      <div class="c-apply__controls">
-        <button class="c-apply__back" type="button" data-apply-back hidden>
-          Zurück
-        </button>
-        {/* Die Hülle trägt das Steuer-Attribut, der Knopf kommt aus der
+        {/* ── Steuerung ────────────────────────────────────────────────── */}
+        <div class="c-apply__controls">
+          <button class="c-apply__back" type="button" data-apply-back hidden>
+            Zurück
+          </button>
+          {/* Die Hülle trägt das Steuer-Attribut, der Knopf kommt aus der
             Komponente. Ein von Hand geschriebenes `class="c-btn"` bliebe
             nackt: Die Optik liegt scoped in Button.astro, und dieses Markup
             bekäme eine andere Scope-Kennung. Klicks steigen zur Hülle auf,
             `hidden` an ihr versteckt den Knopf mit. */}
-        <span class="c-apply__next" data-apply-next>
-          <Button label="Weiter" type="button" />
-        </span>
-        <span class="c-apply__submit" data-apply-submit hidden>
-          <Button label="Bewerbung schreiben" href="#" />
-        </span>
-      </div>
-    </form>
-  </Panel>
-)}
+          <span class="c-apply__next" data-apply-next>
+            <Button label="Weiter" type="button" />
+          </span>
+          <span class="c-apply__submit" data-apply-submit hidden>
+            <Button label="Bewerbung schreiben" href="#" />
+          </span>
+        </div>
+
+        {/* WCAG 2.2, 4.1.3. Dieselbe Rolle wie im Kontaktformular: Der
+          Schrittwechsel und die Zahl der offenen Felder sind Auskünfte, keine
+          Störungen. Die Region steht von Anfang an im Dokument und bleibt
+          leer — eine erst beim Fehler eingefügte wird von manchen
+          Vorlesegeräten nicht beobachtet. */}
+        <p
+          class="c-apply__status"
+          data-apply-status
+          role="status"
+          aria-live="polite"
+        />
+      </form>
+    </Panel>
+  )
+}
 
 <style>
   .c-apply {
@@ -219,6 +301,15 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     flex-direction: column;
     gap: var(--sp-8);
     max-width: 58ch;
+  }
+
+  /* Leer und ohne Rand, solange nichts zu sagen ist: `:empty` verhindert,
+     dass ein Abstand entsteht, wo noch kein Satz steht. */
+  .c-apply__status:not(:empty) {
+    margin-top: var(--sp-4);
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: var(--c-text-muted);
   }
 
   /* --- Fortschritt ------------------------------------------------------ */
@@ -306,7 +397,8 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     border: var(--bw) solid var(--c-line);
     border-radius: var(--r-md);
     cursor: pointer;
-    transition: border-color var(--d-base) var(--e-out),
+    transition:
+      border-color var(--d-base) var(--e-out),
       background var(--d-base) var(--e-out);
   }
 

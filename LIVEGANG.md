@@ -61,21 +61,39 @@ schmerzhaft, aber billiger als eine Abmahnung nach dem Livegang.
 Dasselbe gilt für `Prices.astro`: Preisangaben bei zahnärztlichen Leistungen
 müssen zur GOZ passen und dürfen nicht irreführen.
 
-### B4. Das Formular versendet nichts
+### B4. Das Formular versendet nichts — erledigt am 2026-09-02
 
-`Contact.astro` prüft clientseitig und schickt nichts — wie im Prototyp
-vermerkt. Für eine Praxisseite ist das der wichtigste Weg zum Termin.
+`Contact.astro` geht jetzt an **Netlify Forms**: `name="contact"`, das
+versteckte `form-name`, `data-netlify` und eine Honigtopf-Falle. Gesendet wird
+per `fetch` als `FormData`, damit die beiden Dateifelder mitkommen. Die
+Bestätigung steht erst da, wenn der Server geantwortet hat; scheitert der
+Versand, nennt die Meldung die E-Mail-Adresse der Praxis, und die Eingaben
+bleiben stehen.
 
-**Empfehlung: Netlify Forms.** Kostet in allen Plänen nichts, unbegrenzte
-Einsendungen, kein zusätzlicher Anbieter in der Datenschutzerklärung außer dem
-Hoster, der ohnehin drinsteht. `netlify` und `netlify-honeypot` ans `<form>`,
-fertig.
+Vorher rief das Formular `preventDefault()` und schrieb „Danke, deine Anfrage
+ist eingegangen" — ohne je etwas verschickt zu haben. Wer es ausfüllte,
+wartete auf eine Antwort auf eine Nachricht, die niemand bekommen hat.
 
-**Wichtig zum Zuschnitt:** Das Formular fragt Name, Kontakt, Wunschtermin und
-eine kurze Nachricht — und sagt ausdrücklich dazu, dass keine Beschwerden oder
-Befunde eingetragen werden sollen. Sobald ein Patient Gesundheitsdaten
-einträgt, gilt Art. 9 DSGVO, und die Anforderungen steigen deutlich. Der Satz
-über dem Feld ist die billigste Absicherung, die es gibt.
+**Was noch zu tun ist, und zwar bei Netlify, nicht im Code:**
+
+1. Im Netlify-Projekt unter _Forms_ prüfen, dass „contact" nach dem nächsten
+   Deploy auftaucht. Netlify durchsucht das gebaute HTML; ohne Deploy gibt es
+   das Formular dort nicht.
+2. Eine **Benachrichtigung** einrichten (_Forms → Settings → Form
+   notifications_), sonst liegen die Einsendungen im Netlify-Konto und niemand
+   sieht sie.
+3. Ohne JavaScript zeigt Netlify seine eigene Bestätigungsseite. Wer eine
+   eigene will, legt `/danke` an und trägt sie als `action` ein.
+
+**Offen und eine Entscheidung der Praxis, keine des Codes:** Das Formular
+fragt heute „Foto deiner Zähne" und auf der Veneers-Seite zusätzlich ein
+vorhandenes Angebot ab. Beides sind Gesundheitsdaten im Sinne von Art. 9
+DSGVO, sobald jemand sie einträgt — und anders als beim reinen Terminwunsch
+steigen damit die Anforderungen an Einwilligung, Speicherort und Löschfrist
+deutlich. Drei Wege stehen offen: das Foto-Feld entfernen, es behalten und die
+Einwilligung entsprechend formulieren, oder die Einsendungen nicht bei Netlify
+liegen lassen, sondern per Benachrichtigung an die Praxis weiterreichen und
+dort löschen. Das gehört vor den Livegang geklärt.
 
 ### B5. Die Indexsperre entfernen
 
@@ -174,18 +192,18 @@ Stand 05.08.2026, USD-Beträge ohne Umrechnungsaufschlag.
 
 ## Laufend
 
-| Posten | Anbieter | Preis | Anmerkung |
-|---|---|---|---|
-| Hosting | Netlify **Free** | 0 $ | 300 Credits/Monat, harte Grenze |
-| Hosting | Netlify **Personal** | **9 $/Monat** | 1.000 Credits — die realistische Wahl |
-| CMS | Sanity **Free** | 0 $ | Visual Editing inklusive, s. u. |
-| CMS | Sanity **Growth** | 15 $/Platz/Monat | erst nötig, wenn Rollen oder Terminplanung gebraucht werden |
-| Formular | Netlify Forms | 0 $ | unbegrenzt, in allen Plänen enthalten |
-| Statistik | Plausible Starter | **9 $/Monat** | 10k Aufrufe, EU-gehostet, ohne Cookies |
-| Statistik | Umami selbst betrieben | 0 $ | braucht einen Server, also nicht wirklich 0 |
-| Domain `.de` | Registrar | ~1 $/Monat | 10–15 € im Jahr |
-| Erreichbarkeit | UptimeRobot Free | 0 $ | |
-| Fehlerprotokoll | Sentry Free | 0 $ | optional |
+| Posten          | Anbieter               | Preis            | Anmerkung                                                   |
+| --------------- | ---------------------- | ---------------- | ----------------------------------------------------------- |
+| Hosting         | Netlify **Free**       | 0 $              | 300 Credits/Monat, harte Grenze                             |
+| Hosting         | Netlify **Personal**   | **9 $/Monat**    | 1.000 Credits — die realistische Wahl                       |
+| CMS             | Sanity **Free**        | 0 $              | Visual Editing inklusive, s. u.                             |
+| CMS             | Sanity **Growth**      | 15 $/Platz/Monat | erst nötig, wenn Rollen oder Terminplanung gebraucht werden |
+| Formular        | Netlify Forms          | 0 $              | unbegrenzt, in allen Plänen enthalten                       |
+| Statistik       | Plausible Starter      | **9 $/Monat**    | 10k Aufrufe, EU-gehostet, ohne Cookies                      |
+| Statistik       | Umami selbst betrieben | 0 $              | braucht einen Server, also nicht wirklich 0                 |
+| Domain `.de`    | Registrar              | ~1 $/Monat       | 10–15 € im Jahr                                             |
+| Erreichbarkeit  | UptimeRobot Free       | 0 $              |                                                             |
+| Fehlerprotokoll | Sentry Free            | 0 $              | optional                                                    |
 
 **Drei Rechnungen:**
 
@@ -223,14 +241,14 @@ angefasst wird, und wechseln, sobald eine zweite Person dazukommt.
 
 Netlify rechnet seit Kurzem in Credits statt in Bandbreite:
 
-| Verbrauch | Credits |
-|---|---|
-| Produktions-Deploy | 15 je Stück |
-| Bandbreite | 20 je GB |
-| Web-Anfragen | 2 je 10.000 |
-| Rechenzeit (Preview-Route) | 10 je GB-Stunde |
-| Formular-Einsendungen | 0 |
-| Deploy-Vorschauen, Branch-Deploys | 0 |
+| Verbrauch                         | Credits         |
+| --------------------------------- | --------------- |
+| Produktions-Deploy                | 15 je Stück     |
+| Bandbreite                        | 20 je GB        |
+| Web-Anfragen                      | 2 je 10.000     |
+| Rechenzeit (Preview-Route)        | 10 je GB-Stunde |
+| Formular-Einsendungen             | 0               |
+| Deploy-Vorschauen, Branch-Deploys | 0               |
 
 Überschlag für eine Praxisseite mit ~3.000 Besuchen im Monat:
 
@@ -256,11 +274,11 @@ sich bei 9 $ Ersparnis im Monat nicht.
 
 ## Einmalig
 
-| Posten | Kosten | Anmerkung |
-|---|---|---|
+| Posten              | Kosten                       | Anmerkung                                                    |
+| ------------------- | ---------------------------- | ------------------------------------------------------------ |
 | **Schriftlizenzen** | **offen, evtl. dreistellig** | PP Neue Montreal + GT Pressura, Webfont-Lizenz nach Aufrufen |
-| Rechtsprüfung | 300–800 € | Impressum, Datenschutz, HWG-Prüfung der vier Bausteine |
-| Fotografie | projektabhängig | Praxis, Team, Behandlungen |
+| Rechtsprüfung       | 300–800 €                    | Impressum, Datenschutz, HWG-Prüfung der vier Bausteine       |
+| Fotografie          | projektabhängig              | Praxis, Team, Behandlungen                                   |
 
 Die Schriftlizenzen sind der Posten, den ich als Erstes klären würde. Nicht
 weil er groß ist, sondern weil er unbekannt ist — und weil eine unlizenzierte

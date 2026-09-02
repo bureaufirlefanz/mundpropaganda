@@ -29,9 +29,12 @@ import Magazine from "../../templates/Magazine.astro";
 import Post from "../../templates/Post.astro";
 import CareersContent from "../../templates/Careers.astro";
 import LegalPage from "../../templates/LegalPage.astro";
+import PracticeContent from "../../templates/Practice.astro";
+import PersonContent from "../../templates/Person.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
-import { previewClient, targetFor, PREVIEW_COOKIE } from "../../lib/preview";
+import { previewClient, PREVIEW_COOKIE } from "../../lib/preview";
+import { targetFor } from "../../lib/paths";
 import {
   HOMEPAGE_QUERY,
   SERVICE_QUERY,
@@ -43,14 +46,27 @@ import {
   SERVICE_LIST_QUERY,
   LEGAL_PAGE_QUERY,
   RELATED_QUERY,
+  PRACTICE_QUERY,
+  TEAM_QUERY,
+  PERSON_QUERY,
 } from "../../lib/queries";
 import { withoutNull } from "../../lib/without-null";
 import type { HomepageContent } from "../../lib/homepage";
 import type { Service as ServiceData } from "../../lib/services";
-import type { Post as PostData, FullPost, MagazineIntro } from "../../lib/magazine";
+import type {
+  Post as PostData,
+  FullPost,
+  MagazineIntro,
+} from "../../lib/magazine";
 import type { CareersContent as CareersData, Job } from "../../lib/careers";
 import type { ServiceEntry } from "../../lib/service-list";
 import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
+import type {
+  PracticeContent as PracticeData,
+  Member,
+  PersonContent as PersonData,
+} from "../../lib/practice";
+import { loadSettings } from "../../lib/settings";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
@@ -59,7 +75,7 @@ import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
 if (Astro.cookies.get(PREVIEW_COOKIE)?.value !== "an") {
   return new Response(
     "Vorschau nicht freigeschaltet. Sie wird aus dem Studio heraus geöffnet.",
-    { status: 401, headers: { "content-type": "text/plain; charset=utf-8" } }
+    { status: 401, headers: { "content-type": "text/plain; charset=utf-8" } },
   );
 }
 
@@ -67,12 +83,13 @@ const client = previewClient();
 if (!client) {
   return new Response(
     "SANITY_API_READ_TOKEN fehlt. Ohne Token gibt die API keine Entwürfe heraus.",
-    { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } }
+    { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } },
   );
 }
 
 const target = targetFor(Astro.params.path ?? "");
-if (!target) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+if (!target)
+  return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
 
 /* Kein Zwischenspeichern wie in den Ladefunktionen unter `lib/`: Die Vorschau
    läuft je Aufruf frisch, das ist ihr Zweck. */
@@ -89,10 +106,13 @@ let content: {
   post?: FullPost;
   careers?: CareersData;
   legalPage?: LegalPageData;
+  practice?: PracticeData;
+  person?: PersonData;
+  team: Member[];
   posts: PostData[];
   jobs: Job[];
   title: string;
-} = { posts: [], jobs: [], title: "" };
+} = { team: [], posts: [], jobs: [], title: "" };
 
 if (target.kind === "homepage") {
   const [data, posts] = await Promise.all([
@@ -111,7 +131,10 @@ if (target.kind === "homepage") {
     ...content,
     service: data,
     posts: posts ?? [],
-    title: data?.title || (list ?? []).find((l) => l.slug === target.slug)?.name || "",
+    title:
+      data?.title ||
+      (list ?? []).find((l) => l.slug === target.slug)?.name ||
+      "",
     homepage: home,
   };
 } else if (target.kind === "magazineIndex") {
@@ -130,12 +153,37 @@ if (target.kind === "homepage") {
         slug: target.slug,
       })) ?? [])
     : [];
-  content = { ...content, post: data, title: data?.title ?? "", posts: related };
+  content = {
+    ...content,
+    post: data,
+    title: data?.title ?? "",
+    posts: related,
+  };
+} else if (target.kind === "practice") {
+  const [data, team] = await Promise.all([
+    load<PracticeData>(PRACTICE_QUERY),
+    load<Member[]>(TEAM_QUERY),
+  ]);
+  content = { ...content, practice: data, team: team ?? [] };
+} else if (target.kind === "person") {
+  const data = await load<PersonData>(PERSON_QUERY, { slug: target.slug });
+  /* Anders als bei den übrigen Sammlungen gibt es hier keine Liste, gegen die
+     sich der Slug prüfen ließe — und ein Entwurf ohne Namen ist keine Seite. */
+  if (!data)
+    return new Response("Für diesen Pfad gibt es keine Seite.", {
+      status: 404,
+    });
+  content = { ...content, person: data, title: data.name ?? "" };
 } else if (target.kind === "legalPage") {
-  const data = await load<LegalPageData>(LEGAL_PAGE_QUERY, { slug: target.slug });
+  const data = await load<LegalPageData>(LEGAL_PAGE_QUERY, {
+    slug: target.slug,
+  });
   /* `targetFor` liest jeden einteiligen Pfad als Rechtstext — er kann nicht
      wissen, welche Slugs es gibt. Ohne Dokument ist es keine Seite. */
-  if (!data) return new Response("Für diesen Pfad gibt es keine Seite.", { status: 404 });
+  if (!data)
+    return new Response("Für diesen Pfad gibt es keine Seite.", {
+      status: 404,
+    });
   content = { ...content, legalPage: data, title: data.title ?? "" };
 } else {
   const [data, jobs] = await Promise.all([
@@ -144,34 +192,70 @@ if (target.kind === "homepage") {
   ]);
   content = { ...content, careers: data, jobs: jobs ?? [] };
 }
+const { locations } = await loadSettings();
 ---
 
-{target.kind === "homepage" && content.homepage && (
-  <Home data={content.homepage} posts={content.posts} />
-)}
+{
+  target.kind === "homepage" && content.homepage && (
+    <Home data={content.homepage} posts={content.posts} />
+  )
+}
 
-{target.kind === "service" && (
-  <Service
-    data={content.service}
-    title={content.title}
-    slug={target.slug ?? ""}
-    stories={content.homepage?.storiesItems ?? []}
-    posts={content.posts}
-  />
-)}
+{
+  target.kind === "service" && (
+    <Service
+      data={content.service}
+      title={content.title}
+      slug={target.slug ?? ""}
+      stories={content.homepage?.storiesItems ?? []}
+      posts={content.posts}
+    />
+  )
+}
 
-{target.kind === "magazineIndex" && (
-  <Magazine intro={content.magazineIntro} posts={content.posts} />
-)}
+{
+  target.kind === "magazineIndex" && (
+    <Magazine intro={content.magazineIntro} posts={content.posts} />
+  )
+}
 
-{target.kind === "post" && (
-  <Post data={content.post} title={content.title} related={content.posts} />
-)}
+{
+  target.kind === "post" && (
+    <Post data={content.post} title={content.title} related={content.posts} />
+  )
+}
 
-{target.kind === "careers" && <CareersContent data={content.careers} jobs={content.jobs} />}
+{
+  target.kind === "careers" && (
+    <CareersContent data={content.careers} jobs={content.jobs} />
+  )
+}
 
-{target.kind === "legalPage" && (
-  <LegalPage data={content.legalPage} title={content.title} />
-)}
+{
+  target.kind === "legalPage" && (
+    <LegalPage data={content.legalPage} title={content.title} />
+  )
+}
+
+{
+  /* Die Standorte kommen aus den Einstellungen und damit aus dem
+    veröffentlichten Stand — dieselbe Einschränkung wie beim Rahmen, oben im
+    Kopf dieser Datei beschrieben. */
+}
+{
+  target.kind === "practice" && (
+    <PracticeContent
+      data={content.practice}
+      team={content.team}
+      locations={locations}
+    />
+  )
+}
+
+{
+  target.kind === "person" && content.person && (
+    <PersonContent person={content.person} />
+  )
+}
 
 <VisualEditing />

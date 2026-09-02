@@ -23,6 +23,10 @@
  *    die Mail, dass sie gekürzt wurde. Stillschweigend die Hälfte einer
  *    Bewerbung zu verlieren, ist der schlechteste aller Ausgänge.
  */
+/* Aus dem Kontaktformular geliehen: Beide prüfen dieselben Felder nach
+   denselben Regeln, und zwei Fassungen desselben Satzes liefen beim nächsten
+   Feinschliff auseinander. */
+import { errorText, setMessage } from "./ui.js";
 
 /** Ab hier gilt eine mailto-Adresse als gefährlich lang. */
 const MAX_LENGTH = 1900;
@@ -35,6 +39,7 @@ export function initApplication() {
     const nextButton = form.querySelector("[data-apply-next]");
     const submitWrap = form.querySelector("[data-apply-submit]");
     const submitLink = submitWrap?.querySelector("a");
+    const status = form.querySelector("[data-apply-status]");
     if (!steps.length || !nextButton || !submitWrap) return;
 
     let current = 0;
@@ -46,12 +51,13 @@ export function initApplication() {
       const choice = selectedRole();
       if (!choice) return null;
       return form.querySelector(
-        `[data-apply-questions="${CSS.escape(choice.dataset.applyRole)}"]`
+        `[data-apply-questions="${CSS.escape(choice.dataset.applyRole)}"]`,
       );
     };
 
     /** Hat die gewählte Rolle überhaupt eigene Fragen? */
-    const hasQuestions = () => Boolean(questionsBlock()?.querySelector(".c-field"));
+    const hasQuestions = () =>
+      Boolean(questionsBlock()?.querySelector(".c-field"));
 
     /**
      * Blendet die Fragen der gewählten Rolle ein und schaltet alle anderen
@@ -103,6 +109,11 @@ export function initApplication() {
       ].filter((f) => !f.disabled);
 
       let firstInvalid = null;
+      let offen = 0;
+      /* Eine Gruppe von Radio-Knöpfen ist EINE Angabe, nicht fünf. Ohne das
+         meldete der erste Schritt „5 Felder brauchen noch eine Angabe", wo
+         nur eine Stelle zu wählen war. */
+      const gezaehlt = new Set();
       fields.forEach((field) => {
         const group = field.closest("[data-field]");
         const invalid = !field.checkValidity();
@@ -113,6 +124,18 @@ export function initApplication() {
            abgelehntes Pflichtfeld als gültig. */
         if (invalid) field.setAttribute("aria-invalid", "true");
         else field.removeAttribute("aria-invalid");
+        /* Der Grund im Klartext, verknüpft über `aria-describedby`. Dieselbe
+           Funktion wie im Kontaktformular — „ungültig" allein erfüllt 3.3.1,
+           aber nicht 3.3.3. */
+        if (group) setMessage(group, field, invalid ? errorText(field) : "");
+        if (invalid) {
+          const schluessel =
+            field.type === "radio" ? `radio:${field.name}` : field;
+          if (!gezaehlt.has(schluessel)) {
+            gezaehlt.add(schluessel);
+            offen++;
+          }
+        }
         if (invalid && !firstInvalid) firstInvalid = field;
       });
 
@@ -120,9 +143,16 @@ export function initApplication() {
          Zustand hängen könnte — hier genügt der Fokus auf die erste
          Möglichkeit. */
       if (firstInvalid) {
+        if (status) {
+          status.textContent =
+            offen === 1
+              ? "Ein Feld braucht noch eine Angabe. Der Fokus steht darauf."
+              : `${offen} Felder brauchen noch eine Angabe. Der Fokus steht auf dem ersten.`;
+        }
         firstInvalid.focus();
         return false;
       }
+      if (status) status.textContent = "";
       return true;
     }
 
@@ -135,7 +165,8 @@ export function initApplication() {
       const choice = selectedRole();
       if (!choice || !submitLink) return;
 
-      const valueOf = (name) => form.querySelector(`[name="${CSS.escape(name)}"]`)?.value?.trim() ?? "";
+      const valueOf = (name) =>
+        form.querySelector(`[name="${CSS.escape(name)}"]`)?.value?.trim() ?? "";
 
       const lines = [
         `Stelle: ${choice.value}`,
@@ -173,11 +204,15 @@ export function initApplication() {
           .length;
 
       if (urlLength() > MAX_LENGTH && message) {
-        const notice = "\n\n[Der Text war zu lang für diese Vorschau und wurde gekürzt. Bitte hier ergänzen.]";
+        const notice =
+          "\n\n[Der Text war zu lang für diese Vorschau und wurde gekürzt. Bitte hier ergänzen.]";
         let truncated = message;
         while (truncated.length > 40 && urlLength() > MAX_LENGTH) {
           truncated = truncated.slice(0, Math.floor(truncated.length * 0.8));
-          text = [...lines.slice(0, lines.lastIndexOf(message)), truncated + notice].join("\n");
+          text = [
+            ...lines.slice(0, lines.lastIndexOf(message)),
+            truncated + notice,
+          ].join("\n");
         }
       }
 
@@ -186,9 +221,9 @@ export function initApplication() {
 
     /* --- Verdrahtung ---------------------------------------------------- */
 
-    form.querySelectorAll('input[name="role"]').forEach((r) =>
-      r.addEventListener("change", updateQuestions)
-    );
+    form
+      .querySelectorAll('input[name="role"]')
+      .forEach((r) => r.addEventListener("change", updateQuestions));
 
     nextButton.addEventListener("click", () => {
       if (!stepIsValid()) return;

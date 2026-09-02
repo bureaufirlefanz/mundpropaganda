@@ -26,6 +26,13 @@ on:
     branches: [main]
   pull_request:
 
+# Der Lauf liest nur. Ohne diese Zeile bekäme der Token die Rechte, die im
+# Repository voreingestellt sind — und das ist bei älteren Einstellungen
+# Schreibrecht auf alles. Ein Skript aus einem Pull Request liefe damit mit
+# Schreibrecht.
+permissions:
+  contents: read
+
 # Ein zweiter Push auf denselben Zweig macht den ersten Lauf gegenstandslos.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -84,3 +91,14 @@ jobs:
       # nicht nach fünf.
       - name: Build
         run: npm run web:build
+
+      # Braucht den Build davor und keinen Browser.
+      #
+      # Der Fall: Von 660 Dateien unter web/public/img waren 128 versioniert.
+      # Auf dem Rechner lagen alle, im Repository nicht — und Netlify baut aus
+      # main. Der Runner klont das Repository, also fehlen hier genau die
+      # Dateien, die auch beim Deploy fehlen würden. Gemessen waren es 43
+      # Bildadressen ohne Datei, darunter die ersten Bilder von /praxis und
+      # /veneers-berlin.
+      - name: Bilddateien
+        run: npm run check:images

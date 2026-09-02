@@ -7,6 +7,7 @@ import type {
   PERSON_QUERY_RESULT,
 } from "./sanity.types";
 import type { WithoutNull } from "./without-null";
+import { fallbackFor } from "./loading";
 
 /**
  * Die Praxisseite und das Team.
@@ -28,7 +29,7 @@ export function loadPractice(): Promise<PracticeContent | undefined> {
     .fetch(PRACTICE_QUERY)
     .then(withoutNull)
     .then((d) => d ?? undefined)
-    .catch(() => undefined);
+    .catch(fallbackFor("die Praxisseite", undefined));
   return cached;
 }
 
@@ -43,7 +44,7 @@ export function loadTeam(): Promise<Member[]> {
     .fetch(TEAM_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
-    .catch(() => []);
+    .catch(fallbackFor("das Team", []));
   return cachedTeam;
 }
 
@@ -52,5 +53,5 @@ export function loadPerson(slug: string): Promise<PersonContent | undefined> {
     .fetch(PERSON_QUERY, { slug })
     .then(withoutNull)
     .then((d) => d ?? undefined)
-    .catch(() => undefined);
+    .catch(fallbackFor("eine Person", undefined));
 }

@@ -87,7 +87,8 @@ export const SERVICE_LIST_QUERY = defineQuery(`
  * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
  * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
  */
-export const SERVICE_QUERY = defineQuery(`*[_type == "service" && slug.current == $slug][0]{
+export const SERVICE_QUERY =
+  defineQuery(`*[_type == "service" && slug.current == $slug][0]{
   title,
   topline,
   seoDescription,
@@ -221,7 +222,8 @@ export const POSTS_QUERY = defineQuery(`
  * und TypeGen fand danach null Abfragen in der Datei — mit der Folge, dass
  * jedes Ergebnis `any` wurde und 34 Bausteine ihre Typen verloren.
  */
-export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]{
+export const POST_QUERY =
+  defineQuery(`*[_type == "post" && slug.current == $slug][0]{
   "slug": slug.current,
   title,
   date,
@@ -250,7 +252,8 @@ export const LEGAL_PAGES_QUERY = defineQuery(`
   }
 `);
 
-export const LEGAL_PAGE_QUERY = defineQuery(`*[_type == "legalPage" && slug.current == $slug][0]{
+export const LEGAL_PAGE_QUERY =
+  defineQuery(`*[_type == "legalPage" && slug.current == $slug][0]{
   title,
   text[]{ ..., _type == "image" => ${BILD} },
   seo

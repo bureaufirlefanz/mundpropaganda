@@ -124,7 +124,7 @@ const settings = await loadSettings();
    nichts daran, dass es der Inhalt ist, den die Seite wirklich zeigt. */
 function pillarSection<T extends PillarSection["_type"]>(type: T) {
   return veneersPillar.sections.find(
-    (s): s is Extract<PillarSection, { _type: T }> => s._type === type
+    (s): s is Extract<PillarSection, { _type: T }> => s._type === type,
   );
 }
 
@@ -137,18 +137,24 @@ const ctaBand = pillarSection("ctaBand");
 const QUICK_FACTS = [
   { label: "Telefon", value: settings.phone },
   { label: "E-Mail", value: settings.email },
-  ...settings.locations.map((o) => ({ label: o.name, value: `${o.street}, ${o.city}` })),
+  ...settings.locations.map((o) => ({
+    label: o.name,
+    value: `${o.street}, ${o.city}`,
+  })),
 ];
 
 /* Der Textabschnitt mit Beleg - er trägt Bild, Fließtext UND den abgesetzten
    Kasten, zeigt also alle drei Teile des Bausteins auf einmal. */
 const prose = veneersPillar.sections.find(
-  (s): s is Extract<PillarSection, { _type: "prose" }> => s._type === "prose" && Boolean(s.note)
+  (s): s is Extract<PillarSection, { _type: "prose" }> =>
+    s._type === "prose" && Boolean(s.note),
 );
 
 /* Die Kategorien, unter denen wirklich etwas liegt - dieselbe Ableitung wie
    in `PostList.astro`, weil der Filter hier ohne sein Raster steht. */
-const POST_CATEGORIES = [...new Set(posts.map((p) => p.category).filter(Boolean))] as string[];
+const POST_CATEGORIES = [
+  ...new Set(posts.map((p) => p.category).filter(Boolean)),
+] as string[];
 
 /**
  * Beispieldaten: die Kapitel dieser Katalogseite selbst.
@@ -164,9 +170,19 @@ const POST_CATEGORIES = [...new Set(posts.map((p) => p.category).filter(Boolean)
  */
 const PAGE_HEADINGS: Heading[] = [
   { key: "controls", id: "bedienelemente", text: "Bedienelemente", level: 2 },
-  { key: "surfaces", id: "flaechen", text: "Flächen, Bilder, Zierrat", level: 2 },
+  {
+    key: "surfaces",
+    id: "flaechen",
+    text: "Flächen, Bilder, Zierrat",
+    level: 2,
+  },
   { key: "sections", id: "sections", text: "Sections", level: 2 },
-  { key: "reading", id: "lesehilfen", text: "Verzeichnis und Belege", level: 2 },
+  {
+    key: "reading",
+    id: "lesehilfen",
+    text: "Verzeichnis und Belege",
+    level: 2,
+  },
   { key: "chrome", id: "rahmen", text: "Seitenrahmen", level: 2 },
 ];
 
@@ -202,65 +218,58 @@ const CHROME = [
   {
     name: "Hero",
     path: "components/sections/Hero.astro",
-    text:
-      "Der Seitenkopf der Startseite: Wortmarke über zwei Zeilen, der Zahn dazwischen - „MUND“ liegt dahinter, „PROPAGANDA“ davor. Die Wortmarke ist zugleich die h1 der Seite. Trägt die Auftrittschoreografie: Maske über der Schrift, Nav von oben, Bewertungsleiste und Scroll-Knopf zuletzt.",
+    text: "Der Seitenkopf der Startseite: Wortmarke über zwei Zeilen, der Zahn dazwischen - „MUND“ liegt dahinter, „PROPAGANDA“ davor. Die Wortmarke ist zugleich die h1 der Seite. Trägt die Auftrittschoreografie: Maske über der Schrift, Nav von oben, Bewertungsleiste und Scroll-Knopf zuletzt.",
     reason: "Füllt ein ganzes Fenster und läuft genau einmal je Dokument an.",
     viewAt: "/",
   },
   {
     name: "ServiceHero",
     path: "components/sections/ServiceHero.astro",
-    text:
-      "Derselbe Auftritt für die Leistungsseiten, aber mit Titel statt Wortmarke und einem Bild rechts. Hängt an denselben data-Attributen wie der große Hero, deshalb greift dieselbe Choreografie ohne eigenen Code.",
+    text: "Derselbe Auftritt für die Leistungsseiten, aber mit Titel statt Wortmarke und einem Bild rechts. Hängt an denselben data-Attributen wie der große Hero, deshalb greift dieselbe Choreografie ohne eigenen Code.",
     reason: "Wie oben - ein zweiter Seitenkopf im Dokument.",
     viewAt: "/leistungen/veneers",
   },
   {
     name: "Nav",
     path: "components/ui/Nav.astro",
-    text:
-      "Die fixierte Leiste samt Menü. Überlebt Seitenwechsel über transition:persist, damit sie beim Wechsel nicht neu einfliegt.",
+    text: "Die fixierte Leiste samt Menü. Überlebt Seitenwechsel über transition:persist, damit sie beim Wechsel nicht neu einfliegt.",
     reason: "Fixiert - läge über jedem Beispiel auf dieser Seite.",
     viewAt: "/",
   },
   {
     name: "Footer",
     path: "components/ui/Footer.astro",
-    text:
-      "Der Seitenfuß: Kontakt, beide Praxen mit Anschrift, Leistungen und Rechtliches. Die Leistungsliste kommt aus derselben Quelle wie Menü und Services-Tabelle - drei Aufzählungen, eine Wahrheit.",
+    text: "Der Seitenfuß: Kontakt, beide Praxen mit Anschrift, Leistungen und Rechtliches. Die Leistungsliste kommt aus derselben Quelle wie Menü und Services-Tabelle - drei Aufzählungen, eine Wahrheit.",
     reason: "Schließt eine Seite ab; mitten im Dokument ergäbe er keinen Sinn.",
     viewAt: "/",
   },
   {
     name: "Backdrop / Transition",
     path: "components/ui/Backdrop.astro · Transition.astro",
-    text:
-      "Zwei Ebenen hinter und über allem: der körnige Hintergrund und die Schicht, die beim Seitenwechsel überblendet.",
+    text: "Zwei Ebenen hinter und über allem: der körnige Hintergrund und die Schicht, die beim Seitenwechsel überblendet.",
     reason: "Ganzflächig und unsichtbar, solange nichts passiert.",
     viewAt: "jeder Seitenwechsel",
   },
   {
     name: "Thread",
     path: "components/ui/Thread.astro",
-    text:
-      "Der durchlaufende Faden, der sich beim Scrollen über die ganze Seite zeichnet. Misst seinen Pfad einmal aus und liest die Transformationsmatrix dabei nur ein einziges Mal - die frühere Fassung tat das je Messpunkt und blockierte den Hauptstrang über eine Sekunde.",
+    text: "Der durchlaufende Faden, der sich beim Scrollen über die ganze Seite zeichnet. Misst seinen Pfad einmal aus und liest die Transformationsmatrix dabei nur ein einziges Mal - die frühere Fassung tat das je Messpunkt und blockierte den Hauptstrang über eine Sekunde.",
     reason: "Bezieht sich auf die Höhe des gesamten Dokuments.",
     viewAt: "/",
   },
   {
     name: "Icons",
     path: "components/ui/Icons.astro",
-    text:
-      "Das SVG-Sprite, einmal je Dokument. Alle Symbole liegen darin und werden per <use> aufgerufen.",
+    text: "Das SVG-Sprite, einmal je Dokument. Alle Symbole liegen darin und werden per <use> aufgerufen.",
     reason: "Unsichtbar - es ist die Quelle, nicht die Darstellung.",
     viewAt: "/design/styleguide",
   },
   {
     name: "CmsImage",
     path: "components/ui/CmsImage.astro",
-    text:
-      "Bild aus Sanity: baut srcset, respektiert den im Studio gesetzten Bildausschnitt und zeigt eine unscharfe Vorschau, bis das Motiv da ist. Fällt auf ein lokales Bild zurück, solange im CMS nichts liegt.",
-    reason: "Braucht ein Bildobjekt aus dem CMS; das lokale Gegenstück ist Picture.",
+    text: "Bild aus Sanity: baut srcset, respektiert den im Studio gesetzten Bildausschnitt und zeigt eine unscharfe Vorschau, bis das Motiv da ist. Fällt auf ein lokales Bild zurück, solange im CMS nichts liegt.",
+    reason:
+      "Braucht ein Bildobjekt aus dem CMS; das lokale Gegenstück ist Picture.",
     viewAt: "/leistungen/veneers",
   },
 ];
@@ -268,9 +277,19 @@ const CHROME = [
 const SHORT_QUESTIONS = (service?.faq ?? []).slice(0, 3);
 
 const RING_IMAGES = [
-  { name: "praxis-03", widths: "640,1024", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
+  {
+    name: "praxis-03",
+    widths: "640,1024",
+    alt: "Behandlungsräume mit Tageslicht",
+    caption: "Prenzlauer Allee",
+  },
   { name: "praxis-01", widths: "640", alt: "Empfangsbereich" },
-  { name: "praxis-02", widths: "640", alt: "Wartebereich", caption: "Christburger Straße" },
+  {
+    name: "praxis-02",
+    widths: "640",
+    alt: "Wartebereich",
+    caption: "Christburger Straße",
+  },
   { name: "abstract-01", widths: "640,1024" },
   { name: "abstract-02", widths: "640,1024" },
 ];
@@ -284,24 +303,30 @@ const RING_IMAGES = [
       <p class="d-section__text">
         Jeder Baustein der Seite mit Beschreibung, Quellpfad und lebendem
         Beispiel. Farben, Typografie und Bewegungswerte stehen nicht hier,
-        sondern im <a class="c-link" href="/design/styleguide">Styleguide</a> -
-        zweimal dieselbe Sache zu zeigen heißt, sie zweimal pflegen zu müssen.
+        sondern im <a class="c-link" href="/design/styleguide">Styleguide</a> - zweimal
+        dieselbe Sache zu zeigen heißt, sie zweimal pflegen zu müssen.
       </p>
       <p class="d-section__text">
         Die Beispiele laufen mit denselben Beispieldaten, die auch die
         Leistungsseiten versorgen, solange im CMS nichts gepflegt ist. Ändert
-        sich eine Komponente, ändert sich diese Seite mit - sie zeigt die
-        echten Bausteine, keine Nachbauten.
+        sich eine Komponente, ändert sich diese Seite mit - sie zeigt die echten
+        Bausteine, keine Nachbauten.
       </p>
     </div>
   </section>
 
   {/* ================= Bedienelemente ================= */}
-  {/* Die `id` an jedem Kapitel ist das Ziel der Verzeichnis-Beispiele weiter
+  {
+    /* Die `id` an jedem Kapitel ist das Ziel der Verzeichnis-Beispiele weiter
       unten; `data-toc-target` ist zusätzlich das, woran `toc.js` erkennt, in
       welchem Kapitel gerade gelesen wird. Beides steht hier, damit die drei
-      Verzeichnisbausteine mit echten Sprungmarken laufen. */}
-  <section class="d-section" id="bedienelemente" data-toc-target="bedienelemente">
+      Verzeichnisbausteine mit echten Sprungmarken laufen. */
+  }
+  <section
+    class="d-section"
+    id="bedienelemente"
+    data-toc-target="bedienelemente"
+  >
     <div class="d-section__header">
       <span class="d-section__number">01</span>
       <h2 class="d-section__title">Bedienelemente</h2>
@@ -314,10 +339,11 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Zweiteilig: Pille mit Beschriftung, daneben abgesetzt der runde Pfeil.
-        Rendert je nach Zweck <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>
+        Rendert je nach Zweck <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code
+        >
         oder <code>&lt;span&gt;</code> - Letzteres, wo er innerhalb eines bereits
-        verlinkten Bereichs sitzt, weil verschachtelte Links der Parser nicht
-        zulässt und das Layout dabei zerfällt.
+        verlinkten Bereichs sitzt, weil verschachtelte Links der Parser nicht zulässt
+        und das Layout dabei zerfällt.
       </p>
       <div class="d-stage d-stage--row">
         <Button label="Termin buchen" href="#" />
@@ -363,22 +389,27 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/ui/Filter.astro</span>
       </div>
       <p class="d-sample__text">
-        Der Kategoriefilter des Magazins: ein Knopf, der die belegten
-        Kategorien ausklappt. Ohne JavaScript ist er unsichtbar - er blendet
-        Karten aus, statt eine Liste zu bauen, und ein Knopf, der ohne Skript
-        nichts tut, wäre schlechter als keiner.
+        Der Kategoriefilter des Magazins: ein Knopf, der die belegten Kategorien
+        ausklappt. Ohne JavaScript ist er unsichtbar - er blendet Karten aus,
+        statt eine Liste zu bauen, und ein Knopf, der ohne Skript nichts tut,
+        wäre schlechter als keiner.
       </p>
       <p class="d-sample__text">
         Er zeigt sich nur zusammen mit einem Beitragsraster. Auf dieser Seite
-        greift er deshalb über <em>alle</em> Beitragskarten hinweg - Karussell,
-        Einzelkarte und das Raster im nächsten Kapitel -, während er im Einsatz
-        genau ein Raster vor sich hat. Und das Modul verdrahtet je Dokument den
-        ersten Filter (<code>querySelector</code>, Einzahl): Dieser hier ist
-        der lebende, der zweite steckt in <code>PostList</code> und bleibt auf
-        dieser Seite untätig.
+        greift er deshalb über <em>alle</em> Beitragskarten hinweg - Karussell, Einzelkarte
+        und das Raster im nächsten Kapitel -, während er im Einsatz genau ein Raster
+        vor sich hat. Und das Modul verdrahtet je Dokument den ersten Filter (<code
+          >querySelector</code
+        >, Einzahl): Dieser hier ist der lebende, der zweite steckt in <code
+          >PostList</code
+        > und bleibt auf dieser Seite untätig.
       </p>
       <div class="d-stage">
-        {POST_CATEGORIES.length ? <Filter categories={POST_CATEGORIES} total={posts.length} /> : null}
+        {
+          POST_CATEGORIES.length ? (
+            <Filter categories={POST_CATEGORIES} total={posts.length} />
+          ) : null
+        }
       </div>
     </div>
   </section>
@@ -401,7 +432,11 @@ const RING_IMAGES = [
         steht, steckt darin.
       </p>
       <div class="d-stage d-stage--borderless">
-        <Panel topline="Beispiel" title="Ein Panel" text="Die Zusatzzeile ist wahlfrei.">
+        <Panel
+          topline="Beispiel"
+          title="Ein Panel"
+          text="Die Zusatzzeile ist wahlfrei."
+        >
           <p style="max-width: 60ch">Beliebiger Inhalt im Schlitz.</p>
         </Panel>
       </div>
@@ -414,12 +449,16 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Responsives Bild aus der lokalen Bildpipeline. AVIF zuerst, WebP als
-        Rückfall; der <code>src</code> zeigt auf die kleinste Breite, damit
-        alte Browser ohne <code>srcset</code> nicht das größte Bild ziehen.
-        Nimmt wahlweise einen Parallax-Wert entgegen.
+        Rückfall; der <code>src</code> zeigt auf die kleinste Breite, damit alte Browser
+        ohne <code>srcset</code> nicht das größte Bild ziehen. Nimmt wahlweise einen
+        Parallax-Wert entgegen.
       </p>
       <div class="d-stage" style="max-width: 520px">
-        <Picture name="praxis-01" alt="Empfangsbereich Prenzlauer Allee" sizes="480px" />
+        <Picture
+          name="praxis-01"
+          alt="Empfangsbereich Prenzlauer Allee"
+          sizes="480px"
+        />
       </div>
     </div>
 
@@ -430,13 +469,13 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Die Motive sitzen auf einem Zylinder, der Betrachter steht innen: die
-        Wölbung geht nach innen, die Karten laufen an den Rändern über das
-        Bild hinaus. Läuft langsam von selbst, rollt sanft aus, sobald der
-        Zeiger darauf steht, und lässt sich ziehen - ein Pixel Zeigerweg
-        entspricht einem Pixel Kartenweg. Radius und Perspektive rechnet das
-        Modul aus der gemessenen Kartenbreite, damit die Krümmung bei jeder
-        Fenstergröße dieselbe ist. Über die beiden Knöpfe und die Pfeiltasten
-        auch ohne Maus bedienbar.
+        Wölbung geht nach innen, die Karten laufen an den Rändern über das Bild
+        hinaus. Läuft langsam von selbst, rollt sanft aus, sobald der Zeiger
+        darauf steht, und lässt sich ziehen - ein Pixel Zeigerweg entspricht
+        einem Pixel Kartenweg. Radius und Perspektive rechnet das Modul aus der
+        gemessenen Kartenbreite, damit die Krümmung bei jeder Fenstergröße
+        dieselbe ist. Über die beiden Knöpfe und die Pfeiltasten auch ohne Maus
+        bedienbar.
       </p>
       <div class="d-stage d-stage--borderless">
         <ImageRing images={RING_IMAGES} label="Beispielring" />
@@ -450,10 +489,13 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Der Zierring aus konzentrischen Kreisen. Rein dekorativ und deshalb für
-        Vorlesegeräte ausgeblendet. Das Gegenstück <code>ToothLines</code> legt
-        dieselbe Handschrift als offene Linien hinter den Hero.
+        Vorlesegeräte ausgeblendet. Das Gegenstück <code>ToothLines</code> legt dieselbe
+        Handschrift als offene Linien hinter den Hero.
       </p>
-      <div class="d-stage d-stage--dark" style="position: relative; min-height: 280px; overflow: hidden">
+      <div
+        class="d-stage d-stage--dark"
+        style="position: relative; min-height: 280px; overflow: hidden"
+      >
         <ToothRings />
       </div>
     </div>
@@ -471,7 +513,11 @@ const RING_IMAGES = [
         deshalb stapelt sie dort.
       </p>
       <div class="d-stage" style="max-width: 560px">
-        {posts.length ? <PostCard post={posts[0]!} sizes="500px" withButton /> : null}
+        {
+          posts.length ? (
+            <PostCard post={posts[0]!} sizes="500px" withButton />
+          ) : null
+        }
       </div>
     </div>
 
@@ -482,40 +528,43 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Ein Bild im Fließtext eines Beitrags, in drei Breiten:
-        <code>column</code> bleibt in der Textspalte, <code>wide</code> reicht
-        bis an den rechten Rand des Satzspiegels, <code>full</code> bricht über
-        die volle Fensterbreite aus. Sie unterscheiden sich erst im Satzspiegel
-        eines Beitrags; hier stünde <code>wide</code> auf der Bühne, damit das
-        Beispiel den Kasten nicht sprengt. Was der Browser lädt, hängt an der
-        Breite - ein Bild in der Textspalte fordert nie 2.200px an.
+        <code>column</code> bleibt in der Textspalte, <code>wide</code> reicht bis
+        an den rechten Rand des Satzspiegels, <code>full</code> bricht über die volle
+        Fensterbreite aus. Sie unterscheiden sich erst im Satzspiegel eines Beitrags;
+        hier stünde <code>wide</code> auf der Bühne, damit das Beispiel den Kasten
+        nicht sprengt. Was der Browser lädt, hängt an der Breite - ein Bild in der
+        Textspalte fordert nie 2.200px an.
       </p>
-      {content.splitImage ? (
-        <div class="d-stage">
-          <PostImage
-            node={{
-              image: content.splitImage,
-              width: "wide",
-              caption: "Bildunterschrift, wahlfrei - hier als Beispiel gesetzt.",
-            }}
-          />
-        </div>
-      ) : (
-        /* Kein leerer Kasten, sondern der Grund: Der Baustein prüft mit
+      {
+        content.splitImage ? (
+          <div class="d-stage">
+            <PostImage
+              node={{
+                image: content.splitImage,
+                width: "wide",
+                caption:
+                  "Bildunterschrift, wahlfrei - hier als Beispiel gesetzt.",
+              }}
+            />
+          </div>
+        ) : (
+          /* Kein leerer Kasten, sondern der Grund: Der Baustein prüft mit
            `isCmsImage()` und zeigt nur Bilder aus dem CMS - ein Motivname aus
            der lokalen Pipeline geht durch diese Prüfung nicht, obwohl
            `CmsImage` ihn auflösen könnte. Im Datenbestand liegt derzeit kein
            gepflegtes Bild, also gibt es hier nichts zu zeigen. Sobald eines
            im Studio hängt, steht das Beispiel von selbst da. */
-        <div class="d-note">
-          <p>
-            <strong>Kein lebendes Beispiel:</strong> Der Baustein zeigt
-            ausschließlich Bilder aus dem CMS - ein Motivname aus der lokalen
-            Bildpipeline kommt an seiner Prüfung nicht vorbei. Im Datenbestand
-            ist derzeit kein Bild gepflegt, also rendert er nichts. Sobald im
-            Studio eines hängt, steht das Beispiel hier von selbst.
-          </p>
-        </div>
-      )}
+          <div class="d-note">
+            <p>
+              <strong>Kein lebendes Beispiel:</strong> Der Baustein zeigt
+              ausschließlich Bilder aus dem CMS - ein Motivname aus der lokalen
+              Bildpipeline kommt an seiner Prüfung nicht vorbei. Im Datenbestand
+              ist derzeit kein Bild gepflegt, also rendert er nichts. Sobald im
+              Studio eines hängt, steht das Beispiel hier von selbst.
+            </p>
+          </div>
+        )
+      }
     </div>
   </section>
 
@@ -538,11 +587,16 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Text links, Bildmaske rechts. Die Maske wird per <code>clip-path</code>
-        beschnitten statt über <code>overflow</code> - bei gerundeten Ecken und
-        beschleunigten Kindern zeigte sich sonst eine Haarlinie an der Kante.
+        beschnitten statt über <code>overflow</code> - bei gerundeten Ecken und beschleunigten
+        Kindern zeigte sich sonst eine Haarlinie an der Kante.
       </p>
       <div class="d-live">
-        <Split topline={content.splitTopline} title={content.splitTitle} paragraphs={content.splitParagraphs} image={content.splitImage} />
+        <Split
+          topline={content.splitTopline}
+          title={content.splitTitle}
+          paragraphs={content.splitParagraphs}
+          image={content.splitImage}
+        />
       </div>
     </div>
 
@@ -552,9 +606,10 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Services.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Die Leistungstabelle. Zeilen und Preise kommen aus der Leistungs-Collection
-        im Studio, dieselbe Quelle wie Menü und Fuß. Beim Überfahren färbt sich
-        die Linie mit, und eine Bildvorschau folgt dem Zeiger.
+        Die Leistungstabelle. Zeilen und Preise kommen aus der
+        Leistungs-Collection im Studio, dieselbe Quelle wie Menü und Fuß. Beim
+        Überfahren färbt sich die Linie mit, und eine Bildvorschau folgt dem
+        Zeiger.
       </p>
       <div class="d-live"><Services title={content.servicesTitle} /></div>
     </div>
@@ -568,7 +623,12 @@ const RING_IMAGES = [
         Nummerierte Auswahlliste links, Bild rechts in der Zahnmaske. Die Liste
         klappt immer genau einen Eintrag auf und wandert von selbst weiter.
       </p>
-      <div class="d-live"><Standards title={content.standardsTitle} items={content.standardsItems} /></div>
+      <div class="d-live">
+        <Standards
+          title={content.standardsTitle}
+          items={content.standardsItems}
+        />
+      </div>
     </div>
 
     <div class="d-example">
@@ -582,7 +642,19 @@ const RING_IMAGES = [
         hat eine feste Höhe - mit Mindesthöhe trug der längste Eintrag sie über
         das Maß hinaus und das ganze Band sprang beim Durchlaufen.
       </p>
-      <div class="d-live">{service?.benefits?.topline && service.benefits.headline && service.benefits.items?.length ? <Benefits topline={service.benefits.topline} headline={service.benefits.headline} items={service.benefits.items} /> : null}</div>
+      <div class="d-live">
+        {
+          service?.benefits?.topline &&
+          service.benefits.headline &&
+          service.benefits.items?.length ? (
+            <Benefits
+              topline={service.benefits.topline}
+              headline={service.benefits.headline}
+              items={service.benefits.items}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -592,12 +664,17 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Die Standorte. Zwei Darstellungen derselben Motive:
-        <code>variant="reihe"</code> lässt die Bildreihe beim Scrollen
-        waagerecht durchlaufen, <code>variant="ring"</code> setzt sie auf den
-        Zylinder. Darunter die beiden Praxen mit Anschrift, aus den
-        Einstellungen. Hier steht die Reihe - den Ring zeigt der Baustein oben.
+        <code>variant="reihe"</code> lässt die Bildreihe beim Scrollen waagerecht
+        durchlaufen, <code>variant="ring"</code> setzt sie auf den Zylinder. Darunter
+        die beiden Praxen mit Anschrift, aus den Einstellungen. Hier steht die Reihe
+        - den Ring zeigt der Baustein oben.
       </p>
-      <div class="d-live"><Gallery title={content.locationsTitle} images={content.locationsImages} /></div>
+      <div class="d-live">
+        <Gallery
+          title={content.locationsTitle}
+          images={content.locationsImages}
+        />
+      </div>
     </div>
 
     <div class="d-example">
@@ -605,9 +682,16 @@ const RING_IMAGES = [
         <span class="d-sample__name">Experts</span>
         <span class="d-sample__path">components/sections/Experts.astro</span>
       </div>
-      <p class="d-sample__text d-indented">Das Team - Bild, Namen, Kurzprofil.</p>
+      <p class="d-sample__text d-indented">
+        Das Team - Bild, Namen, Kurzprofil.
+      </p>
       <div class="d-live">
-        <Experts title={content.expertsTitle} names={content.expertsNames} paragraphs={content.expertsParagraphs} image={content.expertsImage} />
+        <Experts
+          title={content.expertsTitle}
+          names={content.expertsNames}
+          paragraphs={content.expertsParagraphs}
+          image={content.expertsImage}
+        />
       </div>
     </div>
 
@@ -634,7 +718,19 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Einstiegstext: Überschrift links, zwei Textspalten daneben.
       </p>
-      <div class="d-live">{service?.intro?.topline && service.intro.headline && service.intro.columns?.length ? <Intro topline={service.intro.topline} headline={service.intro.headline} columns={service.intro.columns} /> : null}</div>
+      <div class="d-live">
+        {
+          service?.intro?.topline &&
+          service.intro.headline &&
+          service.intro.columns?.length ? (
+            <Intro
+              topline={service.intro.topline}
+              headline={service.intro.headline}
+              columns={service.intro.columns}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -643,22 +739,42 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Statement.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Ein einzelner Satz über die volle Breite. Trennt zwei inhaltliche
-        Blöcke und gibt der Seite Luft.
+        Ein einzelner Satz über die volle Breite. Trennt zwei inhaltliche Blöcke
+        und gibt der Seite Luft.
       </p>
-      <div class="d-live">{service?.statement?.topline && service.statement.text ? <Statement topline={service.statement.topline} text={service.statement.text} /> : null}</div>
+      <div class="d-live">
+        {
+          service?.statement?.topline && service.statement.text ? (
+            <Statement
+              topline={service.statement.topline}
+              text={service.statement.text}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
       <div class="d-sample__header d-sample__header--wide">
         <span class="d-sample__name">BeforeAfter</span>
-        <span class="d-sample__path">components/sections/BeforeAfter.astro</span>
+        <span class="d-sample__path">components/sections/BeforeAfter.astro</span
+        >
       </div>
       <p class="d-sample__text d-indented">
-        Zwei Aufnahmen übereinander, dazwischen ein Schieberegler. Über
-        Tastatur bedienbar, nicht nur per Zeiger.
+        Zwei Aufnahmen übereinander, dazwischen ein Schieberegler. Über Tastatur
+        bedienbar, nicht nur per Zeiger.
       </p>
-      <div class="d-live">{service?.beforeAfter?.topline ? <BeforeAfter topline={service.beforeAfter.topline} before={service.beforeAfter.before} after={service.beforeAfter.after} /> : null}</div>
+      <div class="d-live">
+        {
+          service?.beforeAfter?.topline ? (
+            <BeforeAfter
+              topline={service.beforeAfter.topline}
+              before={service.beforeAfter.before}
+              after={service.beforeAfter.after}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -666,9 +782,15 @@ const RING_IMAGES = [
         <span class="d-sample__name">Steps</span>
         <span class="d-sample__path">components/sections/Steps.astro</span>
       </div>
-      <p class="d-sample__text d-indented">Der Behandlungsablauf als nummerierte Folge.</p>
+      <p class="d-sample__text d-indented">
+        Der Behandlungsablauf als nummerierte Folge.
+      </p>
       <div class="d-live">
-        {service?.steps?.title && service.steps.items?.length ? <Steps title={service.steps.title} steps={service.steps.items} /> : null}
+        {
+          service?.steps?.title && service.steps.items?.length ? (
+            <Steps title={service.steps.title} steps={service.steps.items} />
+          ) : null
+        }
       </div>
     </div>
 
@@ -678,7 +800,9 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Prices.astro</span>
       </div>
       <p class="d-sample__text d-indented">Die Preiskarten einer Leistung.</p>
-      <div class="d-live">{service?.pricing?.length ? <Prices pricing={service.pricing} /> : null}</div>
+      <div class="d-live">
+        {service?.pricing?.length ? <Prices pricing={service.pricing} /> : null}
+      </div>
     </div>
 
     <div class="d-example">
@@ -689,7 +813,13 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt.
       </p>
-      <div class="d-live">{service?.features?.length ? <Features lines={service.features} /> : null}</div>
+      <div class="d-live">
+        {
+          service?.features?.length ? (
+            <Features lines={service.features} />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -702,7 +832,12 @@ const RING_IMAGES = [
         Standorte-Reihe - dieselbe Mechanik, andere Auswahlangaben.
       </p>
       <div class="d-live">
-        <Magazine topline={content.magazineTopline} title={content.magazineTitle} text={content.magazineText} posts={posts} />
+        <Magazine
+          topline={content.magazineTopline}
+          title={content.magazineTitle}
+          text={content.magazineText}
+          posts={posts}
+        />
       </div>
     </div>
 
@@ -713,9 +848,16 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Das Akkordeon im Panel. Die Fragen kommen je Seite von woanders - auf
-        den Leistungsseiten aus dem CMS, auf der Startseite aus der Seite selbst.
+        den Leistungsseiten aus dem CMS, auf der Startseite aus der Seite
+        selbst.
       </p>
-      <div class="d-live"><Faq title={content.faqTitle} text={content.faqText} questions={content.faq} /></div>
+      <div class="d-live">
+        <Faq
+          title={content.faqTitle}
+          text={content.faqText}
+          questions={content.faq}
+        />
+      </div>
     </div>
 
     <div class="d-example">
@@ -725,10 +867,20 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Zahlenleiste. Die Werte zählen beim Hereinscrollen hoch - der Zielwert
-        steht im Markup, das Skript setzt ihn nur kurz auf null. Ohne
-        JavaScript und ohne Bewegung steht sofort die richtige Zahl da.
+        steht im Markup, das Skript setzt ihn nur kurz auf null. Ohne JavaScript
+        und ohne Bewegung steht sofort die richtige Zahl da.
       </p>
-      <div class="d-live">{careers?.figuresItems?.length ? <Facts topline="Beispiel" headline="Was sich nachrechnen lässt" figures={careers.figuresItems} /> : null}</div>
+      <div class="d-live">
+        {
+          careers?.figuresItems?.length ? (
+            <Facts
+              topline="Beispiel"
+              headline="Was sich nachrechnen lässt"
+              figures={careers.figuresItems}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -738,11 +890,22 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Offene Stellen, jede Zeile klappt auf. Bringt kein eigenes JavaScript
-        mit: Die Zeilen tragen dieselben data-Attribute wie das Akkordeon,
-        damit greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
+        mit: Die Zeilen tragen dieselben data-Attribute wie das Akkordeon, damit
+        greift dasselbe Modul. Die Überschrift steckt im Knopf, damit
         Vorlesegeräte beim Ansteuern den Stellentitel ausgeben.
       </p>
-      <div class="d-live">{jobs.length ? <Jobs topline="Beispiel" headline="Offene Stellen" jobs={jobs.slice(0, 2)} applicationEmail={careers?.applicationEmail ?? ""} /> : null}</div>
+      <div class="d-live">
+        {
+          jobs.length ? (
+            <Jobs
+              topline="Beispiel"
+              headline="Offene Stellen"
+              jobs={jobs.slice(0, 2)}
+              applicationEmail={careers?.applicationEmail ?? ""}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -751,15 +914,25 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Compare.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Vergleichstabelle. Die ganze Breitenaufteilung hängt an einer
-        Custom Property - <code>--columns-in-view</code> setzt, in wie viele
-        Spalten sich jede Zeile teilt; Kopf und Zellen richten sich danach
-        aus, ohne dass eine Breite von Hand nachgezogen werden müsste. Der
-        Kopf bleibt beim Scrollen unter der Leiste stehen. Zellen nehmen
-        Text, ein Ja/Nein-Zeichen oder eine Pille.
+        Vergleichstabelle. Die ganze Breitenaufteilung hängt an einer Custom
+        Property - <code>--columns-in-view</code> setzt, in wie viele Spalten sich
+        jede Zeile teilt; Kopf und Zellen richten sich danach aus, ohne dass eine
+        Breite von Hand nachgezogen werden müsste. Der Kopf bleibt beim Scrollen unter
+        der Leiste stehen. Zellen nehmen Text, ein Ja/Nein-Zeichen oder eine Pille.
       </p>
       <div class="d-live">
-        {careers?.comparisonColumns?.length && careers.comparisonRows?.length ? <Compare topline="Beispiel" headline="Vergleich" columns={careers.comparisonColumns} lines={careers.comparisonRows.slice(0, 5)} note={careers.comparisonNote ?? undefined} /> : null}
+        {
+          careers?.comparisonColumns?.length &&
+          careers.comparisonRows?.length ? (
+            <Compare
+              topline="Beispiel"
+              headline="Vergleich"
+              columns={careers.comparisonColumns}
+              lines={careers.comparisonRows.slice(0, 5)}
+              note={careers.comparisonNote ?? undefined}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -770,10 +943,20 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Zitatkarten, versetzt statt in einer Reihe. Der Versatz steckt in den
-        Daten, nicht in <code>:nth-child</code> - bei einer vierten Voice
-        bräuchte eine Regel nach Position sonst eine neue Ausnahme.
+        Daten, nicht in <code>:nth-child</code> - bei einer vierten Voice bräuchte
+        eine Regel nach Position sonst eine neue Ausnahme.
       </p>
-      <div class="d-live">{careers?.voicesItems?.length ? <Voices topline="Beispiel" headline="Stimmen" voices={careers.voicesItems} /> : null}</div>
+      <div class="d-live">
+        {
+          careers?.voicesItems?.length ? (
+            <Voices
+              topline="Beispiel"
+              headline="Stimmen"
+              voices={careers.voicesItems}
+            />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -783,12 +966,18 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Ein Ablauf als Bahn: Die Linie zieht sich beim Scrollen entlang, die
-        Marken springen an, sobald sie erreicht sind. Unter 900px kippt die
-        Bahn in die Senkrechte. Die gefüllte Linie ist der voreingestellte
-        Zustand - ohne JavaScript steht sie vollständig da, eine leere Bahn
-        wäre eine falsche Aussage über den Ablauf.
+        Marken springen an, sobald sie erreicht sind. Unter 900px kippt die Bahn
+        in die Senkrechte. Die gefüllte Linie ist der voreingestellte Zustand -
+        ohne JavaScript steht sie vollständig da, eine leere Bahn wäre eine
+        falsche Aussage über den Ablauf.
       </p>
-      <div class="d-live">{careers?.processStages?.length ? <Timeline headline="Ablauf" stages={careers.processStages} /> : null}</div>
+      <div class="d-live">
+        {
+          careers?.processStages?.length ? (
+            <Timeline headline="Ablauf" stages={careers.processStages} />
+          ) : null
+        }
+      </div>
     </div>
 
     <div class="d-example">
@@ -798,13 +987,24 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text d-indented">
         Die Praxis in eigenen Worten: Text links, Bild rechts, Zahlen darunter.
-        Das Bild klebt beim Scrollen und der Text läuft daran vorbei - nicht
-        des Effekts wegen, sondern weil die rechte Hälfte sonst auf halber
-        Strecke leer stünde. Auf schmalen Fenstern klebt nichts, dort stapelt
-        alles.
+        Das Bild klebt beim Scrollen und der Text läuft daran vorbei - nicht des
+        Effekts wegen, sondern weil die rechte Hälfte sonst auf halber Strecke
+        leer stünde. Auf schmalen Fenstern klebt nichts, dort stapelt alles.
       </p>
       <div class="d-live">
-        {practice?.storyTopline && practice.storyHeadline && practice.storyColumns?.length ? <Story topline={practice.storyTopline} headline={practice.storyHeadline} columns={practice.storyColumns} image={practice.storyImage} figures={practice.figures ?? undefined} /> : null}
+        {
+          practice?.storyTopline &&
+          practice.storyHeadline &&
+          practice.storyColumns?.length ? (
+            <Story
+              topline={practice.storyTopline}
+              headline={practice.storyHeadline}
+              columns={practice.storyColumns}
+              image={practice.storyImage}
+              figures={practice.figures ?? undefined}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -821,7 +1021,18 @@ const RING_IMAGES = [
         wäre eine Floskel.
       </p>
       <div class="d-live">
-        {practice?.valuesTopline && practice.valuesHeadline && practice.valuesItems?.length ? <Values topline={practice.valuesTopline} headline={practice.valuesHeadline} text={practice.valuesText ?? undefined} items={practice.valuesItems} /> : null}
+        {
+          practice?.valuesTopline &&
+          practice.valuesHeadline &&
+          practice.valuesItems?.length ? (
+            <Values
+              topline={practice.valuesTopline}
+              headline={practice.valuesHeadline}
+              text={practice.valuesText ?? undefined}
+              items={practice.valuesItems}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -834,11 +1045,21 @@ const RING_IMAGES = [
         Gruppenfoto über die volle Breite, darunter das Raster. Die Reihenfolge
         ist der Punkt: Wer mit dem Raster beginnt, zeigt eine Personaldatenbank.
         Jede Kachel führt auf eine eigene Adresse unter <code>/praxis/</code>
-        statt an Ort und Stelle aufzuklappen - eine Adresse lässt sich teilen
-        und finden.
+        statt an Ort und Stelle aufzuklappen - eine Adresse lässt sich teilen und
+        finden.
       </p>
       <div class="d-live">
-        {practice?.teamTopline && practice.teamHeadline && team.length ? <Team topline={practice.teamTopline} headline={practice.teamHeadline} text={practice.teamText ?? undefined} photo={practice.teamPhoto} members={team} /> : null}
+        {
+          practice?.teamTopline && practice.teamHeadline && team.length ? (
+            <Team
+              topline={practice.teamTopline}
+              headline={practice.teamHeadline}
+              text={practice.teamText ?? undefined}
+              photo={practice.teamPhoto}
+              members={team}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -855,7 +1076,15 @@ const RING_IMAGES = [
         Koordinaten entfällt die Karte, die Anschrift bleibt.
       </p>
       <div class="d-live">
-        {settings.locations.length ? <Locations topline="Beispiel" headline="Zwei Praxen in Prenzlauer Berg" locations={settings.locations} /> : null}
+        {
+          settings.locations.length ? (
+            <Locations
+              topline="Beispiel"
+              headline="Zwei Praxen in Prenzlauer Berg"
+              locations={settings.locations}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -865,14 +1094,25 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Perks.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Was die Praxis bietet, als überfliegbare Liste. Nicht zu verwechseln
-        mit <code>Benefits</code>, dem dunklen Band der Leistungsseite.
-        Mehrspaltig über <code>columns</code> und nicht über ein Raster: Die
-        Punkte sind unterschiedlich lang, ein Raster erzwänge gleich hohe
-        Zellen und risse Lücken.
+        Was die Praxis bietet, als überfliegbare Liste. Nicht zu verwechseln mit <code
+          >Benefits</code
+        >, dem dunklen Band der Leistungsseite. Mehrspaltig über <code
+          >columns</code
+        > und nicht über ein Raster: Die Punkte sind unterschiedlich lang, ein Raster
+        erzwänge gleich hohe Zellen und risse Lücken.
       </p>
       <div class="d-live">
-        {careers?.benefitsTopline && careers.benefitsHeadline && careers.benefitsItems?.length ? <Perks topline={careers.benefitsTopline} headline={careers.benefitsHeadline} items={careers.benefitsItems} /> : null}
+        {
+          careers?.benefitsTopline &&
+          careers.benefitsHeadline &&
+          careers.benefitsItems?.length ? (
+            <Perks
+              topline={careers.benefitsTopline}
+              headline={careers.benefitsHeadline}
+              items={careers.benefitsItems}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -888,7 +1128,17 @@ const RING_IMAGES = [
         Ziffernkreise wie im Ablauf und in der Leistungstabelle.
       </p>
       <div class="d-live">
-        {careers?.reasonsTopline && careers.reasonsHeadline && careers.reasonsItems?.length ? <Reasons topline={careers.reasonsTopline} headline={careers.reasonsHeadline} items={careers.reasonsItems} /> : null}
+        {
+          careers?.reasonsTopline &&
+          careers.reasonsHeadline &&
+          careers.reasonsItems?.length ? (
+            <Reasons
+              topline={careers.reasonsTopline}
+              headline={careers.reasonsHeadline}
+              items={careers.reasonsItems}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -898,33 +1148,51 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/VideoBlock.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Ein YouTube-Video, das erst auf Klick lädt. Bis dahin geht keine
-        einzige Anfrage nach außen - ein eingebettetes <code>iframe</code>
-        kontaktiert Googles Server schon beim Laden der Seite und bräuchte
-        deshalb ein Einwilligungsbanner. Nach dem Klick läuft es über
+        Ein YouTube-Video, das erst auf Klick lädt. Bis dahin geht keine einzige
+        Anfrage nach außen - ein eingebettetes <code>iframe</code>
+        kontaktiert Googles Server schon beim Laden der Seite und bräuchte deshalb
+        ein Einwilligungsbanner. Nach dem Klick läuft es über
         <code>youtube-nocookie.com</code>. Ohne lesbare Kennung in der Adresse
         rendert der Baustein nichts.
       </p>
       <div class="d-live">
-        {careers?.videoUrl ? <VideoBlock url={careers.videoUrl} title={careers.videoTitle ?? undefined} poster={careers.videoPoster} /> : null}
+        {
+          careers?.videoUrl ? (
+            <VideoBlock
+              url={careers.videoUrl}
+              title={careers.videoTitle ?? undefined}
+              poster={careers.videoPoster}
+            />
+          ) : null
+        }
       </div>
     </div>
 
     <div class="d-example">
       <div class="d-sample__header d-sample__header--wide">
         <span class="d-sample__name">Application</span>
-        <span class="d-sample__path">components/sections/Application.astro</span>
+        <span class="d-sample__path">components/sections/Application.astro</span
+        >
       </div>
       <p class="d-sample__text d-indented">
-        Das Bewerbungsformular in vier Schritten. Die Fragen aller Rollen
-        stehen im Markup, weil die Seite statisch ist und nichts nachladen
-        kann; was nicht zur gewählten Stelle gehört, wird
-        <code>disabled</code> - sonst prüfte der Browser Pflichtfelder mit, die
-        niemand sehen kann. Zur Wahl stehen nur Stellen, deren Bewerbung
-        irgendwo ankommt.
+        Das Bewerbungsformular in vier Schritten. Die Fragen aller Rollen stehen
+        im Markup, weil die Seite statisch ist und nichts nachladen kann; was
+        nicht zur gewählten Stelle gehört, wird
+        <code>disabled</code> - sonst prüfte der Browser Pflichtfelder mit, die niemand
+        sehen kann. Zur Wahl stehen nur Stellen, deren Bewerbung irgendwo ankommt.
       </p>
       <div class="d-live">
-        {jobs.length ? <Application topline="Beispiel" headline="In vier Schritten zu uns" text="Wähle die Stelle, auf die du dich bewirbst - die Fragen richten sich danach." jobs={jobs} fallbackEmail={careers?.applicationEmail ?? undefined} /> : null}
+        {
+          jobs.length ? (
+            <Application
+              topline="Beispiel"
+              headline="In vier Schritten zu uns"
+              text="Wähle die Stelle, auf die du dich bewirbst - die Fragen richten sich danach."
+              jobs={jobs}
+              fallbackEmail={careers?.applicationEmail ?? undefined}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -936,12 +1204,14 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Die Beiträge als Raster - die Übersicht unter <code>/magazin</code>.
         Zwei Spalten und dieselbe Karte wie im Karussell: Bei drei Spalten
-        fehlten der Komposition die rund 420px, die sie braucht, damit die
-        weiße Fläche den Text trägt. Die Antwort darauf ist die Spaltenzahl,
-        nicht eine zweite Karte. Den Filter darin bringt der Baustein selbst
-        mit - auf dieser Seite bleibt er untätig, siehe oben.
+        fehlten der Komposition die rund 420px, die sie braucht, damit die weiße
+        Fläche den Text trägt. Die Antwort darauf ist die Spaltenzahl, nicht
+        eine zweite Karte. Den Filter darin bringt der Baustein selbst mit - auf
+        dieser Seite bleibt er untätig, siehe oben.
       </p>
-      <div class="d-live">{posts.length ? <PostList posts={posts} /> : null}</div>
+      <div class="d-live">
+        {posts.length ? <PostList posts={posts} /> : null}
+      </div>
     </div>
 
     <div class="d-example">
@@ -950,16 +1220,24 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/QuickFacts.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        „Auf einen Blick" - Begriff und Angabe, ganz oben auf einer Pillar
-        Page. Eine Beschreibungsliste und keine Tabelle: Es gibt hier keine
-        zweite Achse, und eine Tabelle verspräche einen Vergleich, den der
-        Inhalt nicht hat. Kein Bild, damit der Block lesbar ist, bevor sonst
-        etwas geladen hat. Die Zeilen hier kommen aus den Einstellungen - der
-        Abschnitt steht in keinem gepflegten Inhalt mehr, und erfundene Angaben
-        zu einer Behandlung haben in einem Katalog nichts verloren.
+        „Auf einen Blick" - Begriff und Angabe, ganz oben auf einer Pillar Page.
+        Eine Beschreibungsliste und keine Tabelle: Es gibt hier keine zweite
+        Achse, und eine Tabelle verspräche einen Vergleich, den der Inhalt nicht
+        hat. Kein Bild, damit der Block lesbar ist, bevor sonst etwas geladen
+        hat. Die Zeilen hier kommen aus den Einstellungen - der Abschnitt steht
+        in keinem gepflegten Inhalt mehr, und erfundene Angaben zu einer
+        Behandlung haben in einem Katalog nichts verloren.
       </p>
       <div class="d-live">
-        {QUICK_FACTS.length ? <QuickFacts topline="Beispiel" headline="Auf einen Blick" items={QUICK_FACTS} /> : null}
+        {
+          QUICK_FACTS.length ? (
+            <QuickFacts
+              topline="Beispiel"
+              headline="Auf einen Blick"
+              items={QUICK_FACTS}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -971,22 +1249,28 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Das Inhaltsverzeichnis einer Pillar Page - ein Abschnitt im Lesefluss,
         nicht der klebende Streifen neben einem Beitrag. Randabfallende dunkle
-        Fläche links, Porträt rechts, die Einträge in zwei Spalten. Die
-        Nummern stehen im Markup und nicht als <code>counter()</code> im CSS:
-        Dieselbe Ziffer steht am Abschnitt und in der Abschnittsnavigation, wer
-        „7" hört, soll „7" wiederfinden - und ein CSS-Zähler wäre für ein
-        Vorleseprogramm unsichtbar. Ohne Bild füllt die dunkle Fläche die
-        ganze Breite. Hier mit den Kapiteln dieser Seite als Beispieldaten - so
-        springen die Einträge auch wirklich.
+        Fläche links, Porträt rechts, die Einträge in zwei Spalten. Die Nummern
+        stehen im Markup und nicht als <code>counter()</code> im CSS: Dieselbe Ziffer
+        steht am Abschnitt und in der Abschnittsnavigation, wer „7" hört, soll „7"
+        wiederfinden - und ein CSS-Zähler wäre für ein Vorleseprogramm unsichtbar.
+        Ohne Bild füllt die dunkle Fläche die ganze Breite. Hier mit den Kapiteln
+        dieser Seite als Beispieldaten - so springen die Einträge auch wirklich.
       </p>
       <div class="d-live">
-        {/* Der fertige Pfad und nicht der Motivname „experten": `CmsImage`
+        {
+          /* Der fertige Pfad und nicht der Motivname „experten": `CmsImage`
             reicht eine Zeichenkette unverändert als `src` durch, statt sie
             über `motifPath()` aufzulösen - ein Motivname landet dort heute
             als `src="experten"` im Markup und bleibt ein kaputtes Bild. Bis
             das im Baustein behoben ist, steht hier die Adresse, die es
-            wirklich gibt. */}
-        <Contents headings={PAGE_HEADINGS} headline="Inhalt dieser Seite" image="/img/experten-1017.webp" alt="" />
+            wirklich gibt. */
+        }
+        <Contents
+          headings={PAGE_HEADINGS}
+          headline="Inhalt dieser Seite"
+          image="/img/experten-1017.webp"
+          alt=""
+        />
       </div>
     </div>
 
@@ -998,15 +1282,25 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Der lange Textabschnitt: Bild über die Inhaltsbreite, darunter
         Überschrift links und Fließtext rechts. Der Rumpf ist Portable Text,
-        dieselbe Kette wie auf den Beitragsseiten. Ein Raster mit einem Elternteil,
-        kein <code>display: contents</code> und kein Subgrid - beides bricht
-        die Quellreihenfolge für Tastatur und Vorlesegeräte. Die Ebene der
-        Überschrift ist wählbar, weil eine übersprungene Ebene ein Verstoß
-        gegen WCAG 1.3.1 wäre. Der Beleg unten ist der eingebaute
+        dieselbe Kette wie auf den Beitragsseiten. Ein Raster mit einem
+        Elternteil, kein <code>display: contents</code> und kein Subgrid - beides
+        bricht die Quellreihenfolge für Tastatur und Vorlesegeräte. Die Ebene der
+        Überschrift ist wählbar, weil eine übersprungene Ebene ein Verstoß gegen WCAG
+        1.3.1 wäre. Der Beleg unten ist der eingebaute
         <code>SourceNote</code>.
       </p>
       <div class="d-live">
-        {prose ? <Prose id="beispiel-prose" body={prose.body} image={prose.image} side={prose.side} note={prose.note} /> : null}
+        {
+          prose ? (
+            <Prose
+              id="beispiel-prose"
+              body={prose.body}
+              image={prose.image}
+              side={prose.side}
+              note={prose.note}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -1018,12 +1312,22 @@ const RING_IMAGES = [
       <p class="d-sample__text d-indented">
         Ein schmales Handlungsband zwischen zwei Abschnitten: ein Satz, ein
         Knopf, eine Rufnummer. Kein Abschluss der Seite, sondern die Stelle
-        mitten im Text, an der jemand gerade ein Thema zu Ende gelesen hat.
-        Baut selbst keine Pfade und keine <code>tel:</code>-Links - beide
-        kommen fertig herein, sonst gäbe es das Adressschema zweimal.
+        mitten im Text, an der jemand gerade ein Thema zu Ende gelesen hat. Baut
+        selbst keine Pfade und keine <code>tel:</code>-Links - beide kommen
+        fertig herein, sonst gäbe es das Adressschema zweimal.
       </p>
       <div class="d-live">
-        {ctaBand ? <CtaBand headline={ctaBand.headline} text={ctaBand.text} actionLabel={ctaBand.actionLabel} actionHref={ctaBand.actionHref} image={ctaBand.image} /> : null}
+        {
+          ctaBand ? (
+            <CtaBand
+              headline={ctaBand.headline}
+              text={ctaBand.text}
+              actionLabel={ctaBand.actionLabel}
+              actionHref={ctaBand.actionHref}
+              image={ctaBand.image}
+            />
+          ) : null
+        }
       </div>
     </div>
 
@@ -1033,8 +1337,8 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/sections/Contact.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Das Kontaktformular im Panel, mit Vorauswahl der Leistung und einem
-        Feld für ein Foto.
+        Das Kontaktformular im Panel, mit Vorauswahl der Leistung und einem Feld
+        für ein Foto.
       </p>
       <div class="d-live"><Contact service={service?.title} /></div>
     </div>
@@ -1059,12 +1363,12 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/ui/TableOfContents.astro</span>
       </div>
       <p class="d-sample__text">
-        Das Verzeichnis neben einem Beitrag. Klebt in der linken Spalte und
-        hebt hervor, wo man gerade liest - das setzt <code>toc.js</code> über
-        die <code>data-toc-target</code>-Marken, die hier an den Kapiteln
-        dieser Seite hängen. Ohne JavaScript bleibt eine gewöhnliche Liste aus
-        Sprungmarken stehen, die vollständig funktioniert; deshalb gibt es
-        keinen verborgenen Startzustand.
+        Das Verzeichnis neben einem Beitrag. Klebt in der linken Spalte und hebt
+        hervor, wo man gerade liest - das setzt <code>toc.js</code> über die <code
+          >data-toc-target</code
+        >-Marken, die hier an den Kapiteln dieser Seite hängen. Ohne JavaScript
+        bleibt eine gewöhnliche Liste aus Sprungmarken stehen, die vollständig
+        funktioniert; deshalb gibt es keinen verborgenen Startzustand.
       </p>
       <div class="d-stage" style="max-width: 360px">
         <TableOfContents headings={PAGE_HEADINGS} title="Inhalt dieser Seite" />
@@ -1080,15 +1384,16 @@ const RING_IMAGES = [
         Dieselbe Liste als Pille am unteren Rand: Sie nennt den Abschnitt, in
         dem man gerade ist, und klappt beim Überfahren zur vollen Liste auf.
         Eine Seite bekommt entweder das Verzeichnis oder den Dock, nie beides.
-        Unter zwei Einträgen rendert er gar nichts, und er blendet sich nur
-        ein, solange die verlinkten Abschnitte im Blick sind.
+        Unter zwei Einträgen rendert er gar nichts, und er blendet sich nur ein,
+        solange die verlinkten Abschnitte im Blick sind.
       </p>
       <p class="d-sample__text">
-        Der Dock steht <code>position: fixed</code> am Fensterrand und läge auf
-        einer Katalogseite über allem anderen. Die Bühne unten trägt deshalb
-        ein <code>transform</code>: Ein transformiertes Element wird zum
-        Bezugsrahmen für fixierte Kinder, damit bleibt der Dock in seinem
-        Kasten - ohne dass an der Komponente selbst etwas geändert werden muss.
+        Der Dock steht <code>position: fixed</code> am Fensterrand und läge auf einer
+        Katalogseite über allem anderen. Die Bühne unten trägt deshalb ein <code
+          >transform</code
+        >: Ein transformiertes Element wird zum Bezugsrahmen für fixierte
+        Kinder, damit bleibt der Dock in seinem Kasten - ohne dass an der
+        Komponente selbst etwas geändert werden muss.
       </p>
       <div class="d-stage d-stage--dock">
         <SectionDock headings={PAGE_HEADINGS} label="Kapitel dieser Seite" />
@@ -1104,13 +1409,14 @@ const RING_IMAGES = [
         Der Zwischentitel im Fließtext eines Beitrags. Er ersetzt die
         eingebauten h2 und h3 von <code>astro-portabletext</code>, und der
         einzige Unterschied ist die Sprungmarke. Die wird hier nicht gerechnet,
-        sondern gelesen: <code>withHeadingIds()</code> hat sie vorher an den
-        Block geschrieben, aus derselben Liste, aus der das Verzeichnis
-        entsteht. Der Baustein bringt keine eigene Gestalt mit - was man sieht,
-        ist die Überschrift des Beitrags.
+        sondern gelesen: <code>withHeadingIds()</code> hat sie vorher an den Block
+        geschrieben, aus derselben Liste, aus der das Verzeichnis entsteht. Der Baustein
+        bringt keine eigene Gestalt mit - was man sieht, ist die Überschrift des Beitrags.
       </p>
       <div class="d-stage">
-        <TextHeading node={HEADING_NODE}>Ein Zwischentitel im Fließtext</TextHeading>
+        <TextHeading node={HEADING_NODE}
+          >Ein Zwischentitel im Fließtext</TextHeading
+        >
       </div>
     </div>
 
@@ -1121,12 +1427,15 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Die nummerierte Abschnittsüberschrift der Pillar Pages. Die Nummer
-        stammt nicht aus dem Inhalt, sondern aus der Position: Die Vorlage
-        zählt beim Verteilen mit, damit beim Umsortieren keine Lücke entsteht
-        und niemand zwei Stellen gleichzeitig pflegen muss.
+        stammt nicht aus dem Inhalt, sondern aus der Position: Die Vorlage zählt
+        beim Verteilen mit, damit beim Umsortieren keine Lücke entsteht und
+        niemand zwei Stellen gleichzeitig pflegen muss.
       </p>
       <div class="d-sample__stage">
-        <SectionHeading number={3} headline="Müssen die Zähne abgeschliffen werden?" />
+        <SectionHeading
+          number={3}
+          headline="Müssen die Zähne abgeschliffen werden?"
+        />
       </div>
     </div>
 
@@ -1137,10 +1446,11 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Das Werbefeld in der vierten Spalte des großen Menüs. Die ganze Karte
-        ist der Verweis; der Button darin ist deshalb <code>static</code> und
-        rendert ein <code>&lt;span&gt;</code> - ein <code>&lt;a&gt;</code> in
-        einem <code>&lt;a&gt;</code> zerlegt der Parser. Im Menü bekommt die
-        Karte rechts die Rundung des Panels, an dessen Kante sie sitzt.
+        ist der Verweis; der Button darin ist deshalb <code>static</code> und rendert
+        ein <code>&lt;span&gt;</code> - ein <code>&lt;a&gt;</code> in einem <code
+          >&lt;a&gt;</code
+        > zerlegt der Parser. Im Menü bekommt die Karte rechts die Rundung des Panels,
+        an dessen Kante sie sitzt.
       </p>
       <div class="d-sample__stage d-sample__stage--narrow">
         <NavPromo
@@ -1160,13 +1470,13 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Der abgesetzte Kasten für Studienbelege, Rechtstexte und Warnungen. Ein
-        <code>&lt;aside&gt;</code> ohne erfundene ARIA-Rolle - das Element sagt
-        bereits „gehört dazu, ist aber nicht der Hauptstrang".
-        <code>role="alert"</code> wäre falsch: Es unterbricht ein Vorlesegerät
-        mitten im Satz, und keiner dieser Hinweise ist so dringend. Die
-        Spielart färbt nur den Streifen links, nie die Fläche. Der Verweis
-        darunter ist wahlfrei und steht hier nicht - eine ausgedachte Adresse
-        wäre in einem Beleg das Letzte, was hier stehen dürfte.
+        <code>&lt;aside&gt;</code> ohne erfundene ARIA-Rolle - das Element sagt bereits
+        „gehört dazu, ist aber nicht der Hauptstrang".
+        <code>role="alert"</code> wäre falsch: Es unterbricht ein Vorlesegerät mitten
+        im Satz, und keiner dieser Hinweise ist so dringend. Die Spielart färbt nur
+        den Streifen links, nie die Fläche. Der Verweis darunter ist wahlfrei und
+        steht hier nicht - eine ausgedachte Adresse wäre in einem Beleg das Letzte,
+        was hier stehen dürfte.
       </p>
       <div class="d-stage">
         <SourceNote variant="source" title="Studienbeleg">
@@ -1182,22 +1492,32 @@ const RING_IMAGES = [
       </div>
       <p class="d-sample__text">
         Wer den Text geschrieben hat, wer ihn fachlich geprüft hat, wann das
-        zuletzt geschah und worauf er sich stützt. Medizinischer Text ohne
-        Autor ist eine Behauptung, hinter der niemand steht. Der Baustein
-        rendert gar nichts, solange nichts da ist - ein Platzhalter wie
-        „Redaktion" wäre selbst eine Aussage über die Urheberschaft. Hier mit
-        zwei Personen aus dem Team und der Quelle aus dem Textabschnitt oben;
-        das Prüfdatum ist erfunden.
+        zuletzt geschah und worauf er sich stützt. Medizinischer Text ohne Autor
+        ist eine Behauptung, hinter der niemand steht. Der Baustein rendert gar
+        nichts, solange nichts da ist - ein Platzhalter wie „Redaktion" wäre
+        selbst eine Aussage über die Urheberschaft. Hier mit zwei Personen aus
+        dem Team und der Quelle aus dem Textabschnitt oben; das Prüfdatum ist
+        erfunden.
       </p>
       <div class="d-stage">
-        {team.length >= 2 ? (
-          <AuthorNote
-            author={{ name: team[0]!.name, role: team[0]!.role, slug: team[0]!.slug }}
-            reviewedBy={{ name: team[1]!.name, role: team[1]!.role, slug: team[1]!.slug }}
-            lastReviewed={REVIEW_DATE}
-            sources={prose?.note ? [{ text: prose.note.text }] : undefined}
-          />
-        ) : null}
+        {
+          team.length >= 2 ? (
+            <AuthorNote
+              author={{
+                name: team[0]!.name,
+                role: team[0]!.role,
+                slug: team[0]!.slug,
+              }}
+              reviewedBy={{
+                name: team[1]!.name,
+                role: team[1]!.role,
+                slug: team[1]!.slug,
+              }}
+              lastReviewed={REVIEW_DATE}
+              sources={prose?.note ? [{ text: prose.note.text }] : undefined}
+            />
+          ) : null
+        }
       </div>
     </div>
   </section>
@@ -1216,17 +1536,32 @@ const RING_IMAGES = [
 
     <div class="d-sample">
       <div class="d-grid d-grid--wide">
-        {CHROME.map((r) => (
-          <div class="d-note">
-            <p class="d-sample__name" style="margin-bottom: var(--sp-1)">{r.name}</p>
-            <p class="d-sample__path" style="margin-bottom: var(--sp-3)">{r.path}</p>
-            <p style="margin-bottom: var(--sp-3)">{r.text}</p>
-            <p><strong>Nicht eingebettet:</strong> {r.reason}</p>
-            <p style="margin-top: var(--sp-2)">
-              Zu sehen: {r.viewAt.startsWith("/") ? <a class="c-link" href={r.viewAt}>{r.viewAt}</a> : r.viewAt}
-            </p>
-          </div>
-        ))}
+        {
+          CHROME.map((r) => (
+            <div class="d-note">
+              <p class="d-sample__name" style="margin-bottom: var(--sp-1)">
+                {r.name}
+              </p>
+              <p class="d-sample__path" style="margin-bottom: var(--sp-3)">
+                {r.path}
+              </p>
+              <p style="margin-bottom: var(--sp-3)">{r.text}</p>
+              <p>
+                <strong>Nicht eingebettet:</strong> {r.reason}
+              </p>
+              <p style="margin-top: var(--sp-2)">
+                Zu sehen:{" "}
+                {r.viewAt.startsWith("/") ? (
+                  <a class="c-link" href={r.viewAt}>
+                    {r.viewAt}
+                  </a>
+                ) : (
+                  r.viewAt
+                )}
+              </p>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>

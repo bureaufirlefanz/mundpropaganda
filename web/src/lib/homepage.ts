@@ -3,6 +3,7 @@ import { withoutNull } from "./without-null";
 import { HOMEPAGE_QUERY } from "./queries";
 import type { ImageSource } from "./images";
 import type { LinkValue } from "./navigation";
+import { fallbackFor } from "./loading";
 
 /**
  * Die Inhalte der Startseite aus dem CMS.
@@ -121,7 +122,7 @@ export function loadHomepage(): Promise<HomepageContent> {
     .fetch(HOMEPAGE_QUERY)
     .then(withoutNull)
     .then((d) => fillRequired(saeubere(d ?? {})))
-    .catch(() => fillRequired({}));
+    .catch(fallbackFor("die Startseite", fillRequired({})));
 
   return cached;
 }

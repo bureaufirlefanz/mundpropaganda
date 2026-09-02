@@ -2,6 +2,7 @@ import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
 import type { CAREERS_QUERY_RESULT, JOBS_QUERY_RESULT } from "./sanity.types";
 import { CAREERS_QUERY, JOBS_QUERY } from "./queries";
+import { fallbackFor } from "./loading";
 
 /**
  * Die Karriereseite aus dem CMS.
@@ -25,7 +26,7 @@ export type Job = NonNullable<WithoutNull<JOBS_QUERY_RESULT>>[number];
 /** Adresse für Bewerbungen mit vorbereitetem Betreff. */
 export const applicationLink = (mail: string, job?: { title?: string }) =>
   `mailto:${mail}?subject=${encodeURIComponent(
-    job?.title ? `Bewerbung: ${job.title}` : "Initiativbewerbung"
+    job?.title ? `Bewerbung: ${job.title}` : "Initiativbewerbung",
   )}`;
 
 let cached: Promise<CareersContent | undefined> | null = null;
@@ -36,7 +37,7 @@ export function loadCareers(): Promise<CareersContent | undefined> {
     .fetch(CAREERS_QUERY)
     .then(withoutNull)
     .then((d) => d ?? undefined)
-    .catch(() => undefined);
+    .catch(fallbackFor("die Karriereseite", undefined));
   return cached;
 }
 
@@ -52,6 +53,6 @@ export function loadJobs(): Promise<Job[]> {
     .fetch(JOBS_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
-    .catch(() => []);
+    .catch(fallbackFor("die Stellenliste", []));
   return cachedJobs;
 }

@@ -2,6 +2,7 @@ import { sanityClient } from "sanity:client";
 import { withoutNull } from "./without-null";
 import { SERVICE_LIST_QUERY } from "./queries";
 import type { CmsImageValue } from "./images";
+import { fallbackFor } from "./loading";
 
 /**
  * Die Leistungen als Aufzählung — für Services-Tabelle, Navigationsmenü und
@@ -54,7 +55,7 @@ export function loadServiceList(): Promise<ServiceEntry[]> {
     .fetch(SERVICE_LIST_QUERY)
     .then(withoutNull)
     .then((list) => list ?? [])
-    .catch(() => []);
+    .catch(fallbackFor("die Leistungsliste", []));
 
   return cached;
 }

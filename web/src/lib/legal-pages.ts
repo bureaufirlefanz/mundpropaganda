@@ -5,6 +5,7 @@ import type {
   LEGAL_PAGE_QUERY_RESULT,
 } from "./sanity.types";
 import { LEGAL_PAGES_QUERY, LEGAL_PAGE_QUERY } from "./queries";
+import { fallbackFor } from "./loading";
 
 /**
  * Impressum, Datenschutz, Barrierefreiheit.
@@ -20,7 +21,9 @@ import { LEGAL_PAGES_QUERY, LEGAL_PAGE_QUERY } from "./queries";
  * aus, steht unter fremdem Namen und ist rechtlich falsch.
  */
 
-export type LegalPageCard = NonNullable<WithoutNull<LEGAL_PAGES_QUERY_RESULT>>[number];
+export type LegalPageCard = NonNullable<
+  WithoutNull<LEGAL_PAGES_QUERY_RESULT>
+>[number];
 export type LegalPage = NonNullable<WithoutNull<LEGAL_PAGE_QUERY_RESULT>>;
 
 let cached: Promise<LegalPageCard[]> | null = null;
@@ -31,15 +34,16 @@ export function loadLegalPages(): Promise<LegalPageCard[]> {
     .fetch(LEGAL_PAGES_QUERY)
     .then(withoutNull)
     .then((liste) => liste ?? [])
-    .catch(() => []);
+    .catch(fallbackFor("die Rechtstexte", []));
   return cached;
 }
 
 /** Ein einzelner Rechtstext mit Fließtext. */
-export async function loadLegalPage(slug: string): Promise<LegalPage | undefined> {
-  try {
-    return withoutNull(await sanityClient.fetch(LEGAL_PAGE_QUERY, { slug })) ?? undefined;
-  } catch {
-    return undefined;
-  }
+export async function loadLegalPage(
+  slug: string,
+): Promise<LegalPage | undefined> {
+  return sanityClient
+    .fetch(LEGAL_PAGE_QUERY, { slug })
+    .then((d) => withoutNull(d) ?? undefined)
+    .catch(fallbackFor("einen Rechtstext", undefined));
 }

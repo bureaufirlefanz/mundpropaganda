@@ -1,6 +1,7 @@
 import { sanityClient } from "sanity:client";
 import { withoutNull, type WithoutNull } from "./without-null";
 import { stableMotif } from "./images";
+import { fallbackFor } from "./loading";
 import type {
   POSTS_QUERY_RESULT,
   POST_QUERY_RESULT,
@@ -30,7 +31,9 @@ import {
 
 export type Post = NonNullable<WithoutNull<POSTS_QUERY_RESULT>>[number];
 export type FullPost = NonNullable<WithoutNull<POST_QUERY_RESULT>>;
-export type MagazineIntro = NonNullable<WithoutNull<MAGAZINE_INDEX_QUERY_RESULT>>;
+export type MagazineIntro = NonNullable<
+  WithoutNull<MAGAZINE_INDEX_QUERY_RESULT>
+>;
 
 /** Klartext für die Kategorie-Pille auf der Karte. */
 const CATEGORIES: Record<string, string> = {
@@ -40,7 +43,8 @@ const CATEGORIES: Record<string, string> = {
   praxis: "Praxis",
 };
 
-export const categoryLabel = (value?: string) => (value ? (CATEGORIES[value] ?? value) : "");
+export const categoryLabel = (value?: string) =>
+  value ? (CATEGORIES[value] ?? value) : "";
 
 export const postPath = (slug: string) => `/magazin/${slug}`;
 
@@ -51,7 +55,12 @@ export const postPath = (slug: string) => `/magazin/${slug}`;
  * an seiner Position in einer Liste, damit Raster, Karussell und die eigene
  * Seite dasselbe Bild zeigen.
  */
-const MOTIFS = ["motion-04", "teeth-macro", "lab-veneers", "treatment-03"] as const;
+const MOTIFS = [
+  "motion-04",
+  "teeth-macro",
+  "lab-veneers",
+  "treatment-03",
+] as const;
 
 export const motifFor = (slug?: string) => stableMotif(MOTIFS, slug);
 
@@ -76,18 +85,17 @@ export function loadPosts(service?: string): Promise<Post[]> {
         .fetch(POSTS_QUERY, { service: service ?? null })
         .then(withoutNull)
         .then((liste) => liste ?? [])
-        .catch(() => [])
+        .catch(fallbackFor("die Magazinbeiträge", [])),
     );
   }
   return cached.get(key)!;
 }
 
 export async function loadPost(slug: string): Promise<FullPost | undefined> {
-  try {
-    return withoutNull(await sanityClient.fetch(POST_QUERY, { slug })) ?? undefined;
-  } catch {
-    return undefined;
-  }
+  return sanityClient
+    .fetch(POST_QUERY, { slug })
+    .then((d) => withoutNull(d) ?? undefined)
+    .catch(fallbackFor("einen Magazinbeitrag", undefined));
 }
 
 /**
@@ -98,21 +106,22 @@ export async function loadPost(slug: string): Promise<FullPost | undefined> {
  * Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches steht, ist
  * dieselbe stille Behauptung, die Aufgabe 4 überall abgeräumt hat.
  */
-export async function loadRelated(category?: string, slug?: string): Promise<Post[]> {
+export async function loadRelated(
+  category?: string,
+  slug?: string,
+): Promise<Post[]> {
   if (!category || !slug) return [];
-  try {
-    return withoutNull(await sanityClient.fetch(RELATED_QUERY, { category, slug })) ?? [];
-  } catch {
-    return [];
-  }
+  return sanityClient
+    .fetch(RELATED_QUERY, { category, slug })
+    .then((d) => withoutNull(d) ?? [])
+    .catch(fallbackFor("ähnliche Beiträge", []));
 }
 
 export async function loadMagazineIntro(): Promise<MagazineIntro | undefined> {
-  try {
-    return withoutNull(await sanityClient.fetch(MAGAZINE_INDEX_QUERY)) ?? undefined;
-  } catch {
-    return undefined;
-  }
+  return sanityClient
+    .fetch(MAGAZINE_INDEX_QUERY)
+    .then((d) => withoutNull(d) ?? undefined)
+    .catch(fallbackFor("den Magazin-Einstieg", undefined));
 }
 
 /**
@@ -143,5 +152,9 @@ export function readingTime(blocks: unknown): number {
 /** Deutsches Datum, wie es unter einem Beitrag steht. */
 export const dateLabel = (value?: string) =>
   value
-    ? new Date(value).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(value).toLocaleDateString("de-DE", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
     : "";
