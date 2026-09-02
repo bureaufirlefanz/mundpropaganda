@@ -13,7 +13,7 @@
 /** Im Seitenkontext ausgeführt. Gibt reine Daten zurück. */
 export function pruefeSeite() {
   const FOKUSSIERBAR =
-    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]),' +
+    "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled])," +
     ' textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
   /* --- Farben --------------------------------------------------------- */
@@ -34,7 +34,10 @@ export function pruefeSeite() {
 
     const rgb = wert.match(/^rgba?\(([^)]+)\)$/);
     if (rgb) {
-      const t = rgb[1].split(/[,\s/]+/).filter(Boolean).map(zahl);
+      const t = rgb[1]
+        .split(/[,\s/]+/)
+        .filter(Boolean)
+        .map(zahl);
       return { r: t[0], g: t[1], b: t[2], a: t.length > 3 ? t[3] : 1 };
     }
     return null;
@@ -70,9 +73,25 @@ export function pruefeSeite() {
   function grund(el) {
     let n = el;
     let gestapelt = [];
+    /* Deckkraft der Vorfahren, bis zu dem Element, dessen Grund am Ende
+       gilt.
+
+       Der Grund dafür: `getComputedStyle(el).color` kennt `opacity` nicht.
+       Steht am Zeilenelement `opacity: 0.42`, liest der Code weiterhin die
+       volle Schriftfarbe und rechnet 8.47:1 aus, während auf dem Schirm
+       2.14:1 stehen. Genau so ist es passiert — die gedämpften Zeilen in
+       Standards, Benefits und Contents liefen jahrelang durch diese Prüfung,
+       obwohl drei von ihnen unter 4.5:1 lagen.
+
+       Gezählt wird nur bis zum Grund: Was darüber liegt, dämpft Text und
+       Fläche gleichermaßen und ändert am Verhältnis nichts. */
+    let deckkraft = 1;
     while (n && n !== document.documentElement.parentNode) {
       const cs = getComputedStyle(n);
-      if (cs.backgroundImage && cs.backgroundImage !== "none") return { unbekannt: true };
+      const o = parseFloat(cs.opacity);
+      if (!Number.isNaN(o) && o < 1) deckkraft *= o;
+      if (cs.backgroundImage && cs.backgroundImage !== "none")
+        return { unbekannt: true };
       const f = farbe(cs.backgroundColor);
       if (f && f.a > 0) {
         gestapelt.push(f);
@@ -80,15 +99,18 @@ export function pruefeSeite() {
       }
       n = n.parentElement;
     }
-    if (!gestapelt.length) return { farbe: { r: 255, g: 255, b: 255, a: 1 } };
+    if (!gestapelt.length)
+      return { farbe: { r: 255, g: 255, b: 255, a: 1 }, deckkraft };
     // Von hinten nach vorn zusammenrechnen.
     let result = { r: 255, g: 255, b: 255, a: 1 };
     for (const f of gestapelt.reverse()) result = ueber(f, result);
-    return { farbe: result };
+    return { farbe: result, deckkraft };
   }
 
   const bezeichne = (el) => {
-    const kl = [...el.classList].filter((c) => !c.startsWith("astro-")).join(".");
+    const kl = [...el.classList]
+      .filter((c) => !c.startsWith("astro-"))
+      .join(".");
     return `${el.tagName.toLowerCase()}${kl ? "." + kl : ""}`;
   };
 
@@ -134,7 +156,10 @@ export function pruefeSeite() {
       continue;
     }
 
-    const eff = vorn.a < 1 ? ueber(vorn, g.farbe) : vorn;
+    /* Die Deckkraft der Vorfahren wirkt wie eine zweite Durchsichtigkeit der
+       Schriftfarbe: Beides multipliziert sich zu dem, was man sieht. */
+    const wirksam = { ...vorn, a: vorn.a * g.deckkraft };
+    const eff = wirksam.a < 1 ? ueber(wirksam, g.farbe) : wirksam;
     const v = verhaeltnis(eff, g.farbe);
 
     const groesse = parseFloat(cs.fontSize);
@@ -156,23 +181,37 @@ export function pruefeSeite() {
   /* --- 1.1.1 / 4.1.2 Namen --------------------------------------------- */
 
   const nameVon = (el) =>
-    (el.getAttribute("aria-label") || el.textContent || el.getAttribute("title") || "").trim();
+    (
+      el.getAttribute("aria-label") ||
+      el.textContent ||
+      el.getAttribute("title") ||
+      ""
+    ).trim();
 
   const ohneNamen = [...document.querySelectorAll("a[href], button")]
-    .filter((el) => sichtbar(el) && !nameVon(el) && el.getAttribute("aria-hidden") !== "true")
+    .filter(
+      (el) =>
+        sichtbar(el) &&
+        !nameVon(el) &&
+        el.getAttribute("aria-hidden") !== "true",
+    )
     .map(bezeichne);
 
   const bilderOhneAlt = [...document.querySelectorAll("img:not([alt])")].map(
-    (i) => (i.currentSrc || i.src || "").split("/").pop()
+    (i) => (i.currentSrc || i.src || "").split("/").pop(),
   );
 
   /* --- 3.3.2 Formularbeschriftungen ------------------------------------ */
 
-  const felderOhneLabel = [...document.querySelectorAll("input, select, textarea")]
+  const felderOhneLabel = [
+    ...document.querySelectorAll("input, select, textarea"),
+  ]
     .filter((f) => {
       if (f.type === "hidden") return false;
-      if (f.getAttribute("aria-label") || f.getAttribute("aria-labelledby")) return false;
-      if (f.id && document.querySelector(`label[for="${CSS.escape(f.id)}"]`)) return false;
+      if (f.getAttribute("aria-label") || f.getAttribute("aria-labelledby"))
+        return false;
+      if (f.id && document.querySelector(`label[for="${CSS.escape(f.id)}"]`))
+        return false;
       return !f.closest("label");
     })
     .map((f) => `${f.tagName.toLowerCase()}[name=${f.name || "?"}]`);
@@ -181,12 +220,17 @@ export function pruefeSeite() {
 
   const ebenen = [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")]
     .filter(sichtbar)
-    .map((h) => ({ n: Number(h.tagName[1]), text: h.textContent.trim().slice(0, 30) }));
+    .map((h) => ({
+      n: Number(h.tagName[1]),
+      text: h.textContent.trim().slice(0, 30),
+    }));
 
   const spruenge = [];
   for (let i = 1; i < ebenen.length; i++) {
     if (ebenen[i].n - ebenen[i - 1].n > 1) {
-      spruenge.push(`h${ebenen[i - 1].n} → h${ebenen[i].n} bei „${ebenen[i].text}"`);
+      spruenge.push(
+        `h${ebenen[i - 1].n} → h${ebenen[i].n} bei „${ebenen[i].text}"`,
+      );
     }
   }
   const h1 = ebenen.filter((e) => e.n === 1).length;
@@ -198,7 +242,9 @@ export function pruefeSeite() {
      -------------------------------------------------------------------- */
 
   const fokussierbar = [...document.querySelectorAll(FOKUSSIERBAR)].filter(
-    (el) => el.getBoundingClientRect().width > 0 || getComputedStyle(el).position === "fixed"
+    (el) =>
+      el.getBoundingClientRect().width > 0 ||
+      getComputedStyle(el).position === "fixed",
   );
   const erstes = fokussierbar[0];
   const sprungZiel = erstes?.getAttribute("href") || "";
@@ -211,7 +257,7 @@ export function pruefeSeite() {
        verschöbe nur den Ausschnitt, und der Tabulator liefe danach weiter in
        der Navigation. */
     zielFokussierbar: sprungZiel.startsWith("#")
-      ? document.querySelector(sprungZiel)?.hasAttribute("tabindex") ?? false
+      ? (document.querySelector(sprungZiel)?.hasAttribute("tabindex") ?? false)
       : false,
   };
 
@@ -233,8 +279,11 @@ export function pruefeSeite() {
 
   const ohneZweck = [...document.querySelectorAll("input")]
     .filter((f) => {
-      if (f.type === "hidden" || f.type === "file" || f.type === "checkbox") return false;
-      const erwartet = ZWECK[(f.name || "").toLowerCase()] || (f.type === "email" ? "email" : f.type === "tel" ? "tel" : null);
+      if (f.type === "hidden" || f.type === "file" || f.type === "checkbox")
+        return false;
+      const erwartet =
+        ZWECK[(f.name || "").toLowerCase()] ||
+        (f.type === "email" ? "email" : f.type === "tel" ? "tel" : null);
       return erwartet && !f.getAttribute("autocomplete");
     })
     .map((f) => `input[name=${f.name || "?"}]`);
@@ -245,7 +294,8 @@ export function pruefeSeite() {
      Erkannt daran, dass der Vorfahre ein Textabsatz ist.
      -------------------------------------------------------------------- */
 
-  const imFliesstext = (el) => Boolean(el.closest("p, li, address, dd, dt, blockquote, figcaption"));
+  const imFliesstext = (el) =>
+    Boolean(el.closest("p, li, address, dd, dt, blockquote, figcaption"));
 
   /* Die Abstandsausnahme, ausgeschrieben. Ein Ziel darf kleiner als 24 × 24
      sein, solange um seinen Mittelpunkt ein Kreis von 24px Durchmesser passt,
@@ -280,7 +330,10 @@ export function pruefeSeite() {
       if (r.width >= 24 && r.height >= 24) return false;
       return !genugAbstand({ el, r });
     })
-    .map(({ el, r }) => `${bezeichne(el)} ${Math.round(r.width)}×${Math.round(r.height)}`);
+    .map(
+      ({ el, r }) =>
+        `${bezeichne(el)} ${Math.round(r.width)}×${Math.round(r.height)}`,
+    );
 
   /* --- 1.4.11 Non-text Contrast: die Fokusanzeige ----------------------
      Gemessen wird die Umrissfarbe gegen den Grund dahinter. Ein Ring, den
@@ -307,8 +360,12 @@ export function pruefeSeite() {
      eingefügte Region nicht beobachtet wird.
      -------------------------------------------------------------------- */
 
-  const brauchtStatus = Boolean(document.querySelector("[data-form], [data-filter]"));
-  const hatStatus = Boolean(document.querySelector('[role="status"], [aria-live]'));
+  const brauchtStatus = Boolean(
+    document.querySelector("[data-form], [data-filter]"),
+  );
+  const hatStatus = Boolean(
+    document.querySelector('[role="status"], [aria-live]'),
+  );
 
   return {
     kontrast,
@@ -334,17 +391,23 @@ export function wcagBefunde(r) {
     const schlimmster = r.kontrast.sort((a, b) => a.ist - b.ist)[0];
     list.push(
       `${r.kontrast.length}× Kontrast unter AA — schlechtester ${schlimmster.ist}:1 statt ${schlimmster.soll}:1 ` +
-        `(${schlimmster.el}, ${schlimmster.groesse}px, „${schlimmster.text}")`
+        `(${schlimmster.el}, ${schlimmster.groesse}px, „${schlimmster.text}")`,
     );
   }
   if (r.ohneNamen.length) {
-    list.push(`${r.ohneNamen.length} Bedienelement(e) ohne zugänglichen Namen: ${r.ohneNamen[0]}`);
+    list.push(
+      `${r.ohneNamen.length} Bedienelement(e) ohne zugänglichen Namen: ${r.ohneNamen[0]}`,
+    );
   }
   if (r.bilderOhneAlt.length) {
-    list.push(`${r.bilderOhneAlt.length} Bild(er) ohne alt-Attribut: ${r.bilderOhneAlt[0]}`);
+    list.push(
+      `${r.bilderOhneAlt.length} Bild(er) ohne alt-Attribut: ${r.bilderOhneAlt[0]}`,
+    );
   }
   if (r.felderOhneLabel.length) {
-    list.push(`${r.felderOhneLabel.length} Formularfeld(er) ohne Beschriftung: ${r.felderOhneLabel[0]}`);
+    list.push(
+      `${r.felderOhneLabel.length} Formularfeld(er) ohne Beschriftung: ${r.felderOhneLabel[0]}`,
+    );
   }
   if (r.spruenge.length) {
     list.push(`Überschriftenebene übersprungen: ${r.spruenge[0]}`);
@@ -356,34 +419,42 @@ export function wcagBefunde(r) {
   /* --- WCAG 2.2 --------------------------------------------------------- */
 
   if (!r.sprung.vorhanden) {
-    list.push("2.4.1: Kein Sprung zum Inhalt als erstes fokussierbares Element");
+    list.push(
+      "2.4.1: Kein Sprung zum Inhalt als erstes fokussierbares Element",
+    );
   } else if (!r.sprung.zielExistiert) {
-    list.push("2.4.1: Der Sprung zum Inhalt zeigt auf eine id, die es nicht gibt");
+    list.push(
+      "2.4.1: Der Sprung zum Inhalt zeigt auf eine id, die es nicht gibt",
+    );
   } else if (!r.sprung.zielFokussierbar) {
-    list.push("2.4.1: Das Sprungziel hat kein tabindex und nimmt den Fokus nicht an");
+    list.push(
+      "2.4.1: Das Sprungziel hat kein tabindex und nimmt den Fokus nicht an",
+    );
   }
 
   if (r.ohneZweck.length) {
     list.push(
-      `1.3.5: ${r.ohneZweck.length} Feld(er) ohne autocomplete: ${r.ohneZweck.join(", ")}`
+      `1.3.5: ${r.ohneZweck.length} Feld(er) ohne autocomplete: ${r.ohneZweck.join(", ")}`,
     );
   }
 
   if (r.zuKlein.length) {
     list.push(
-      `2.5.8: ${r.zuKlein.length} Ziel(e) unter 24×24 außerhalb des Fließtexts: ${r.zuKlein[0]}`
+      `2.5.8: ${r.zuKlein.length} Ziel(e) unter 24×24 außerhalb des Fließtexts: ${r.zuKlein[0]}`,
     );
   }
 
   if (r.fokusKontrast && r.fokusKontrast.ist < r.fokusKontrast.soll) {
     list.push(
       `1.4.11: Fokusanzeige nur ${r.fokusKontrast.ist}:1 gegen den Grund, ` +
-        `${r.fokusKontrast.soll}:1 verlangt`
+        `${r.fokusKontrast.soll}:1 verlangt`,
     );
   }
 
   if (r.statusFehlt) {
-    list.push("4.1.3: Formular oder Filter auf der Seite, aber keine Statusregion");
+    list.push(
+      "4.1.3: Formular oder Filter auf der Seite, aber keine Statusregion",
+    );
   }
 
   return list;

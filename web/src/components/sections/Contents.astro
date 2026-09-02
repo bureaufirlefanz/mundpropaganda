@@ -47,34 +47,49 @@ interface Props {
 const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
 ---
 
-{headings.length > 0 && (
-  <section class="s-contents">
-    <div class="s-contents__inner">
-      <div class="s-contents__panel">
-          <h2 class="s-contents__title" id="inhalt" data-split="lines">{headline}</h2>
+{
+  headings.length > 0 && (
+    <section class="s-contents">
+      <div class="s-contents__inner">
+        <div class="s-contents__panel">
+          <h2 class="s-contents__title" id="inhalt" data-split="lines">
+            {headline}
+          </h2>
 
-          <ol class="s-contents__list" aria-labelledby="inhalt" data-reveal-stagger="0.03">
+          <ol
+            class="s-contents__list"
+            aria-labelledby="inhalt"
+            data-reveal-stagger="0.03"
+          >
             {headings.map((h, i) => (
               <li class="s-contents__item" data-reveal-child>
                 <a class="s-contents__link" href={`#${h.id}`}>
-                  <span class="c-number s-contents__num" aria-hidden="true">{i + 1}</span>
+                  <span class="c-number s-contents__num" aria-hidden="true">
+                    {i + 1}
+                  </span>
                   <span class="s-contents__label">{h.text}</span>
                 </a>
               </li>
             ))}
           </ol>
+        </div>
+
+        {image && (
+          <figure class="s-contents__media" data-reveal="scale">
+            <CmsImage
+              source={image}
+              alt={alt}
+              widths={[640, 1024, 1600]}
+              sizes="(max-width: 1000px) 100vw, 45vw"
+            />
+          </figure>
+        )}
+
+        {caption && <p class="s-contents__caption">{caption}</p>}
       </div>
-
-      {image && (
-        <figure class="s-contents__media" data-reveal="scale">
-          <CmsImage source={image} alt={alt} widths={[640, 1024, 1600]} sizes="(max-width: 1000px) 100vw, 45vw" />
-        </figure>
-      )}
-
-      {caption && <p class="s-contents__caption">{caption}</p>}
-    </div>
-  </section>
-)}
+    </section>
+  )
+}
 
 <style>
   /* Volle Fensterbreite: Die dunkle Fläche läuft links aus dem Bild.
@@ -193,8 +208,11 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
       transition: opacity var(--d-fast) var(--e-swift);
     }
 
+    /* 0.65 und nicht 0.5: Auch ein Zustand, der nur beim Überfahren gilt,
+       zeigt Text — und 0.5 ergab gemessen 3.34:1 gegen den dunklen Grund.
+       0.65 liegt bei 4.55:1 und tritt sichtbar genug zurück. */
     .s-contents__list:has(.s-contents__link:hover) .s-contents__link {
-      opacity: 0.5;
+      opacity: 0.65;
     }
 
     /* Derselbe Vorspann wie in der Regel darüber, plus `:hover` — sonst

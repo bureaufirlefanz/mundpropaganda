@@ -41,12 +41,18 @@ const { title, items } = Astro.props;
    gehört sein Bild hier ergänzt und nicht per modulo geraten. */
 const MOTIFS = [
   /* 0  Modernste Technik           das eigene Labor, hochformatig
-     1  Individuelle Beratung       Hannes am Beratungstisch, enger Ausschnitt
+     1  Individuelle Beratung       die Patientin im Gespräch, senkrecht gebaut
      2  Kompromisslose Qualität     die Arbeit an der Hand, im Labor
      3  Angenehme Atmosphäre        der Diffusor, hochformatig
-     4  Nachhaltig auf allen Ebenen das Lastenrad der Praxis */
+     4  Nachhaltig auf allen Ebenen das Lastenrad der Praxis
+
+     Vorher stand auf Platz 1 `beratung-hannes`: Hannes quer am Tisch, mit
+     einem Ausschnitt von 60/40 aus dem Bild geholt. In der hochformatigen
+     Silhouette blieb links Wand und unten Tischplatte übrig. Die Patientin
+     ist senkrecht aufgebaut, Kopf oben, Körper darunter, und füllt das
+     Format aus der Mitte heraus. */
   "labor-detail",
-  "beratung-hannes",
+  "beratung-patientin",
   "labor-hand-implantat",
   "diffusor-atmo",
   "lastenrad-nachhaltig",
@@ -61,33 +67,51 @@ const MOTIFS = [
  *
  * Nur wo die Mitte falsch liegt — die beiden Hochformate brauchen nichts. */
 const AUSSCHNITT: Record<string, string> = {
-  "beratung-hannes": "60% 40%",
+  /* Weit nach rechts, damit das Bild nach LINKS rückt: `object-position`
+     sagt, welcher Teil des Fotos an der Kante des Kastens anliegt. Aus der
+     Mitte lag ihr Gesicht genau auf der rechten Kante der Silhouette und
+     wurde halbiert.
+     
+     100% ist der Anschlag: die rechte Kante des Fotos an der rechten Kante
+     der Silhouette, weiter nach links geht nicht. Dabei kommt Hannes von
+     rechts ganz ins Bild, und aus dem Einzelporträt wird das Gespräch zu
+     zweit — was der Punkt „Individuelle Beratung" ohnehin behauptet. Die
+     Werte dazwischen sind die schlechteren: Bei 85 bis 92% steht nur ein
+     Stück seines Kopfes im Bild, und genau das sah angeschnitten aus. */
+  "beratung-patientin": "100% 50%",
   "labor-hand-implantat": "center 45%",
   "lastenrad-nachhaltig": "40% center",
 };
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            WIR SETZEN NEUE STANDARDS
-           ================================================================== */}
-      <section class="s-standards" data-standards>
-        <Thread />
+           ================================================================== */
+}
+<section class="s-standards" data-standards>
+  <Thread />
 
-        <div class="s-standards__figure" aria-hidden="true">
-          {/* Zwei Ebenen mit derselben Zahnmaske: die hintere ist minimal
+  <div class="s-standards__figure" aria-hidden="true">
+    {
+      /* Zwei Ebenen mit derselben Zahnmaske: die hintere ist minimal
                größer und liefert dadurch den weichen Rand. Alle Motive
-               liegen übereinander, active ist immer genau eines. */}
-          {/* Eines je Punkt, in derselben Reihenfolge — standards.js schaltet
+               liegen übereinander, active ist immer genau eines. */
+    }
+    {
+      /* Eines je Punkt, in derselben Reihenfolge — standards.js schaltet
               nach Index um. Als feste Fünferliste konnte das auseinanderlaufen,
-              sobald jemand einen sechsten Punkt anlegte. */}
-          <div class="s-standards__stage" data-standards-stage>
-            {items.map((e, i) => {
-              const motiv = MOTIFS[i % MOTIFS.length];
-              const stil = AUSSCHNITT[motiv]
-                ? `object-position: ${AUSSCHNITT[motiv]};`
-                : undefined;
+              sobald jemand einen sechsten Punkt anlegte. */
+    }
+    <div class="s-standards__stage" data-standards-stage>
+      {
+        items.map((e, i) => {
+          const motiv = MOTIFS[i % MOTIFS.length];
+          const stil = AUSSCHNITT[motiv]
+            ? `object-position: ${AUSSCHNITT[motiv]};`
+            : undefined;
 
-              /* `Picture` für die lokalen Motive und nicht `CmsImage` mit
+          /* `Picture` für die lokalen Motive und nicht `CmsImage` mit
                  einem Pfad: Nur das erste liefert AVIF und WebP als <source>
                  samt srcset. Vorher stand hier eine einzelne 1024er WebP —
                  die Bühne misst bei 1440px Fensterbreite rund 576 CSS-Pixel,
@@ -96,48 +120,59 @@ const AUSSCHNITT: Record<string, string> = {
 
                  1600 als größte Stufe deckt das ab; darüber lohnt es nicht,
                  die Maske schneidet ohnehin die Hälfte weg. */
-              return isCmsImage(e.image) ? (
-                <CmsImage
-                  source={e.image}
-                  alt=""
-                  widths={[640, 1024, 1600]}
-                  sizes="(max-width: 900px) 70vw, 40vw"
-                  style={stil}
-                  data-standards-img
-                />
-              ) : (
-                <Picture
-                  name={motiv}
-                  alt=""
-                  sizes="(max-width: 900px) 70vw, 40vw"
-                  style={stil}
-                  data-standards-img
-                />
-              );
-            })}
-          </div>
-          <ToothRings />
-        </div>
+          return isCmsImage(e.image) ? (
+            <CmsImage
+              source={e.image}
+              alt=""
+              widths={[640, 1024, 1600]}
+              sizes="(max-width: 900px) 70vw, 40vw"
+              style={stil}
+              data-standards-img
+            />
+          ) : (
+            <Picture
+              name={motiv}
+              alt=""
+              sizes="(max-width: 900px) 70vw, 40vw"
+              style={stil}
+              data-standards-img
+            />
+          );
+        })
+      }
+    </div>
+    <ToothRings />
+  </div>
 
-        <div class="container">
-          <h2 class="s-standards__title" data-split="lines">{title}</h2>
+  <div class="container">
+    <h2 class="s-standards__title" data-split="lines">{title}</h2>
 
-          <div class="s-standards__list" data-standards-list>
-          {items.map((e, i) => (
-            <div class="s-standards__row" data-standards-row data-active={i === 0 ? "true" : undefined}>
-              <span class="s-standards__num">{String(i + 1).padStart(2, "0")}</span>
-              <h3 class="s-standards__name">{e.name}</h3>
-              <p class="s-standards__text">{e.text}</p>
-              <span class="s-standards__bar" data-standards-bar><i></i></span>
-            </div>
-          ))}
+    <div class="s-standards__list" data-standards-list>
+      {
+        items.map((e, i) => (
+          <div
+            class="s-standards__row"
+            data-standards-row
+            data-active={i === 0 ? "true" : undefined}
+          >
+            <span class="s-standards__num">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="s-standards__name">{e.name}</h3>
+            <p class="s-standards__text">{e.text}</p>
+            <span class="s-standards__bar" data-standards-bar>
+              <i />
+            </span>
           </div>
+        ))
+      }
+    </div>
 
-          <div class="s-standards__foot">
-            <Button label="Termin buchen" href="#kontakt" variant="dark" />
-          </div>
-        </div>
-      </section>
+    <div class="s-standards__foot">
+      <Button label="Termin buchen" href="#kontakt" variant="dark" />
+    </div>
+  </div>
+</section>
 
 <style>
   /* Nummerierte Zeilen; die aktive Zeile ist voll deckend, der Rest gedimmt.
@@ -173,12 +208,26 @@ const AUSSCHNITT: Record<string, string> = {
   .s-standards__row {
     position: relative;
     display: grid;
-    grid-template-columns: clamp(48px, 5.1vw, 88px) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: clamp(48px, 5.1vw, 88px) minmax(0, 1fr) minmax(
+        0,
+        1fr
+      );
     gap: var(--site-gutter);
     align-items: start;
     padding-block: clamp(18px, 1.5vw, 26px);
     border-bottom: var(--bw) solid var(--c-line);
-    opacity: 0.42;
+    /* 0.75 und nicht 0.42.
+
+       Die inaktiven Zeilen sind kein Beiwerk: Alle fünf Standards stehen
+       hier als Text, und wer die Seite ohne Bewegung öffnet („Bewegung
+       reduzieren"), sieht sie dauerhaft in diesem Zustand. Gemessen ergab
+       0.42 einen Kontrast von 2.14:1 gegen den Grund — WCAG 1.4.3 verlangt
+       4.5:1 für Fließtext. 0.75 liegt bei 4.53:1.
+
+       Die Abstufung bleibt: die aktive Zeile steht bei 8.47:1, dazu Balken,
+       Ziffer und das wechselnde Bild. Das Gefälle trägt also mehr als die
+       Deckkraft allein. */
+    opacity: 0.75;
     cursor: default;
     transition: opacity var(--d-base) var(--e-swift);
   }

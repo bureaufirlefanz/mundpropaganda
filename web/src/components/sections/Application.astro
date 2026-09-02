@@ -328,15 +328,22 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     align-items: center;
     gap: var(--sp-2);
     font-size: var(--fs-label);
+    /* Die gedämpfte Schriftfarbe trägt das Zurücktreten allein.
+
+       Vorher lag zusätzlich `opacity: 0.5` darauf. Beides zusammen ergab eine
+       wirksame Deckkraft von 0.375 und gemessen 2.34:1 gegen den Grund — die
+       Namen der kommenden Schritte waren damit kaum lesbar, und sie sind das
+       Einzige, was verrät, was noch kommt. `--c-text-muted` allein liegt bei
+       4.53:1. */
     color: var(--c-text-muted);
-    opacity: 0.5;
-    transition: opacity var(--d-base) var(--e-out);
+    transition: color var(--d-base) var(--e-out);
   }
 
-  /* Der aktuelle Schritt und alle davor sind voll deckend — man soll sehen,
-     wie weit man ist, nicht nur wo. Das Attribut setzt application.js. */
+  /* Der aktuelle Schritt und alle davor stehen in voller Schriftfarbe — man
+     soll sehen, wie weit man ist, nicht nur wo. Das Attribut setzt
+     application.js. */
   .c-apply__marker[data-reached] {
-    opacity: 1;
+    color: var(--c-text);
   }
 
   .c-apply__marker-number {

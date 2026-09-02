@@ -8,7 +8,11 @@ import type { Entry } from "../../lib/shapes";
 import CmsImage from "../ui/CmsImage.astro";
 import { isCmsImage } from "../../lib/images";
 
-interface Props { topline: string; headline: string; items: Entry[] }
+interface Props {
+  topline: string;
+  headline: string;
+  items: Entry[];
+}
 const { topline, headline, items } = Astro.props;
 
 /* Klasse 3: die gestalteten Motive, positionsgenau. Sie kamen bis Aufgabe 4
@@ -28,30 +32,56 @@ const MOTIFS = [
   <div class="container s-benefits__inner">
     <div class="s-benefits__head">
       <span class="c-topline" data-reveal="fade">{topline}</span>
-      <h2 class="s-benefits__title" data-split="lines" data-split-delay="0.1">{headline}</h2>
+      <h2 class="s-benefits__title" data-split="lines" data-split-delay="0.1">
+        {headline}
+      </h2>
     </div>
 
     <div class="s-benefits__list" data-standards-list>
-      {items.map((e, i) => (
-        <div class="s-benefits__row" data-standards-row data-active={i === 0 ? "true" : undefined}>
-          <span class="s-benefits__num">{i + 1}</span>
-          <div class="s-benefits__body">
-            <h3 class="s-benefits__name">{e.name}</h3>
-            <div class="s-benefits__text"><p>{e.text}</p></div>
+      {
+        items.map((e, i) => (
+          <div
+            class="s-benefits__row"
+            data-standards-row
+            data-active={i === 0 ? "true" : undefined}
+          >
+            <span class="s-benefits__num">{i + 1}</span>
+            <div class="s-benefits__body">
+              <h3 class="s-benefits__name">{e.name}</h3>
+              <div class="s-benefits__text">
+                <p>{e.text}</p>
+              </div>
+            </div>
+            <span class="s-benefits__bar" data-standards-bar>
+              <i />
+            </span>
           </div>
-          <span class="s-benefits__bar" data-standards-bar><i></i></span>
-        </div>
-      ))}
+        ))
+      }
     </div>
 
-    <div class="s-benefits__media" data-reveal="right" data-reveal-trigger=".s-benefits">
+    <div
+      class="s-benefits__media"
+      data-reveal="right"
+      data-reveal-trigger=".s-benefits"
+    >
       <div class="s-benefits__stage" data-standards-stage>
-        {/* Alle Motive liegen übereinander, sichtbar ist immer genau eines —
+        {
+          /* Alle Motive liegen übereinander, sichtbar ist immer genau eines —
             das Modul blendet um. Deshalb ohne Alternativtext: die Bühne
-            trägt keine eigene Information, der Text steht in der Liste. */}
-        {items.map((e, i) => (
-          <CmsImage source={isCmsImage(e.image) ? e.image : MOTIFS[i % MOTIFS.length]} alt="" widths={[640, 1024, 1600]} sizes="50vw" data-standards-img />
-        ))}
+            trägt keine eigene Information, der Text steht in der Liste. */
+        }
+        {
+          items.map((e, i) => (
+            <CmsImage
+              source={isCmsImage(e.image) ? e.image : MOTIFS[i % MOTIFS.length]}
+              alt=""
+              widths={[640, 1024, 1600]}
+              sizes="50vw"
+              data-standards-img
+            />
+          ))
+        }
       </div>
     </div>
   </div>
@@ -137,12 +167,16 @@ const MOTIFS = [
   }
 
   .s-benefits__row:first-child {
-    border-top: var(--bw) solid
-      color-mix(in srgb, var(--c-bg) 22%, transparent);
+    border-top: var(--bw) solid color-mix(in srgb, var(--c-bg) 22%, transparent);
   }
 
   /* Ziffer im Kreis. Der inaktive Zustand ist nur gedimmt, nicht
-     ausgeblendet — die Liste soll als Ganzes lesbar bleiben. */
+     ausgeblendet — die Liste soll als Ganzes lesbar bleiben.
+
+     0.65 und nicht 0.55: Gemessen lag 0.55 bei 3.72:1 gegen den dunklen
+     Grund, und damit unter den 4.5:1, die WCAG 1.4.3 für Fließtext verlangt.
+     „Als Ganzes lesbar" war also der Anspruch und nicht der Zustand. 0.65
+     ergibt 4.55:1; die aktive Zeile steht weiterhin bei 12.4:1. */
   .s-benefits__num {
     display: grid;
     place-items: center;
@@ -153,8 +187,9 @@ const MOTIFS = [
     font-family: var(--f-mono);
     font-size: var(--fs-label);
     line-height: 1;
-    opacity: 0.55;
-    transition: opacity var(--d-base) var(--e-out),
+    opacity: 0.65;
+    transition:
+      opacity var(--d-base) var(--e-out),
       border-color var(--d-base) var(--e-out);
   }
 
@@ -164,7 +199,7 @@ const MOTIFS = [
     font-size: var(--fs-h4-sm);
     font-weight: 400;
     line-height: 1.2;
-    opacity: 0.55;
+    opacity: 0.65;
     transition: opacity var(--d-base) var(--e-out);
   }
 
@@ -178,8 +213,10 @@ const MOTIFS = [
     font-size: var(--fs-text-main);
     line-height: 1.45;
     opacity: 0;
-    transition: grid-template-rows var(--d-slow) var(--e-out),
-      opacity var(--d-base) var(--e-out), margin-top var(--d-slow) var(--e-out);
+    transition:
+      grid-template-rows var(--d-slow) var(--e-out),
+      opacity var(--d-base) var(--e-out),
+      margin-top var(--d-slow) var(--e-out);
   }
 
   /* Der Inhalt braucht ein eigenes, überlaufverstecktes Element — reiner
