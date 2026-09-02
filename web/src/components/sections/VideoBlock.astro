@@ -28,9 +28,15 @@ interface Props {
   url: string;
   title?: string;
   poster?: ImageSource;
+  /**
+   * Name eines Motivs aus der lokalen Pipeline, solange im Studio kein
+   * Standbild hängt. Ohne Angabe bleibt die Fläche leer — dann steht dort
+   * der Abspielpfeil auf ruhigem Grund und sonst nichts.
+   */
+  fallback?: string;
 }
 
-const { url, title, poster } = Astro.props;
+const { url, title, poster, fallback } = Astro.props;
 
 /**
  * Die Kennung aus jeder der drei Adressformen, die YouTube ausgibt:
@@ -59,53 +65,80 @@ const embedUrl = id
   ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`
   : null;
 
-/* Das Vorschaubild von YouTube. `hqdefault` und nicht `maxresdefault`: Das
-   gibt es nicht zu jedem Video, und ein fehlendes Bild wäre eine graue
-   Fläche mit einem Knopf darin. */
-const fallbackPoster = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+/* **Kein Vorschaubild von YouTube mehr.**
+
+   Hier stand `https://i.ytimg.com/vi/<id>/hqdefault.jpg` als Rückfall, wenn
+   im Studio kein Poster hängt. Damit lud jede Karriereseite ein Bild von
+   einem Google-Server, sobald sie aufgerufen wurde — YouTube sah die
+   IP-Adresse jeder Besucherin, bevor irgendjemand auf Abspielen geklickt
+   hatte. Gemessen war es die einzige Fremdanfrage der ganzen Website.
+
+   Das ist genau das, was dieser Baustein verhindern soll (siehe
+   `modules/embed.js`): Vor dem Klick geht nichts hinaus, deshalb braucht es
+   kein Einwilligungsbanner. Ein Rückfall, der diese Zusage still bricht, ist
+   schlimmer als kein Rückfall.
+
+   An seiner Stelle steht ein gestaltetes Motiv aus der eigenen Pipeline —
+   dasselbe Muster, mit dem der Kopf der Praxisseite arbeitet. Es liegt auf
+   demselben Server wie die Seite, und ein Video ohne jedes Bild wäre eine
+   graue Fläche von 16:9 mit einem Pfeil darin. Wer ein bestimmtes Standbild
+   will, pflegt eines im Studio. */
 ---
 
-{embedUrl && (
-  <section class="s-video container">
-    {title && <h2 class="s-video__title" data-split="lines">{title}</h2>}
+{
+  embedUrl && (
+    <section class="s-video container">
+      {title && (
+        <h2 class="s-video__title" data-split="lines">
+          {title}
+        </h2>
+      )}
 
-    {/*
+      {/*
       Ein <button> und kein <div> mit Klickfänger: Das Ding tut etwas, also
       muss es mit der Tastatur erreichbar sein und sich als Schaltfläche
       ansagen. Das Attribut trägt die Adresse — das Skript baut daraus das
       iframe, damit die Adresse nicht doppelt im Markup steht.
     */}
-    <button
-      class="s-video__frame"
-      type="button"
-      data-embed={embedUrl}
-      aria-label={title ? `Video abspielen: ${title}` : "Video abspielen"}
-      data-reveal="scale"
-    >
-      {isCmsImage(poster) ? (
-        <CmsImage
-          source={poster}
-          alt=""
-          widths={[640, 1024, 1600]}
-          sizes="(max-width: 900px) 92vw, 80vw"
-        />
-      ) : (
-        fallbackPoster && <img src={fallbackPoster} alt="" loading="lazy" width="480" height="360" />
-      )}
+      <button
+        class="s-video__frame"
+        type="button"
+        data-embed={embedUrl}
+        aria-label={title ? `Video abspielen: ${title}` : "Video abspielen"}
+        data-reveal="scale"
+      >
+        {isCmsImage(poster) ? (
+          <CmsImage
+            source={poster}
+            alt=""
+            widths={[640, 1024, 1600]}
+            sizes="(max-width: 900px) 92vw, 80vw"
+          />
+        ) : fallback ? (
+          <CmsImage
+            source={fallback}
+            alt=""
+            widths={[640, 1024, 1600]}
+            sizes="(max-width: 900px) 92vw, 80vw"
+          />
+        ) : null}
 
-      <span class="s-video__play" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="28" height="28">
-          <path d="M8 5v14l11-7z" fill="currentColor" />
-        </svg>
-      </span>
-    </button>
+        <span class="s-video__play" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M8 5v14l11-7z" fill="currentColor" />
+          </svg>
+        </span>
+      </button>
 
-    {/* Wer kein JavaScript hat, bekommt wenigstens den Weg zum Video. */}
-    <noscript>
-      <a class="s-video__external" href={url} rel="noopener">Video bei YouTube ansehen</a>
-    </noscript>
-  </section>
-)}
+      {/* Wer kein JavaScript hat, bekommt wenigstens den Weg zum Video. */}
+      <noscript>
+        <a class="s-video__external" href={url} rel="noopener">
+          Video bei YouTube ansehen
+        </a>
+      </noscript>
+    </section>
+  )
+}
 
 <style>
   .s-video {

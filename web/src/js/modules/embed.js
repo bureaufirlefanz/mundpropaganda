@@ -24,26 +24,44 @@ export function initEmbeds() {
 
         const frame = document.createElement("iframe");
         frame.src = url;
-        frame.title = button.getAttribute("aria-label") || "Eingebetteter Inhalt";
+        frame.title =
+          button.getAttribute("aria-label") || "Eingebetteter Inhalt";
         frame.loading = "lazy";
         frame.allow =
           "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
         frame.allowFullscreen = true;
 
-        /* Der Knopf wird zur Hülle des iframes: Er trägt bereits Rundung,
-           Seitenverhältnis und Überlauf. Ein neues Element daneben müsste
-           dieselben Regeln noch einmal führen.
+        /* Aus dem Knopf wird ein Rahmen.
 
-           `disabled` statt `replaceWith`: Das Element bleibt im
-           Dokumentfluss, die Höhe springt also nicht. Ohne die Abschaltung
-           bliebe eine Schaltfläche mit einem Video darin — mit der Tastatur
-           erreichbar, aber ohne Wirkung. */
-        button.replaceChildren(frame);
-        button.disabled = true;
-        button.style.cursor = "default";
-        button.removeAttribute("data-embed");
+           Vorher blieb der `<button>` stehen, bekam das iframe als Kind und
+           `disabled`. Zwei Dinge stimmten daran nicht: Ein `<button>` darf
+           keinen eigenständig bedienbaren Inhalt enthalten, und in Firefox
+           schluckt ein abgeschalteter Knopf die Zeigerereignisse seiner
+           Kinder — das Video war da und ließ sich nicht bedienen.
+
+           Der Ersatz übernimmt Klasse und Astro-Kennung des Knopfes: Rundung,
+           Seitenverhältnis und Überlauf hängen daran, und die
+           Bereichskennung (`data-astro-cid-…`) entscheidet, ob die
+           komponenteneigenen Regeln überhaupt greifen. Ein von Hand
+           geschriebenes `class="s-video__frame"` bliebe ohne Wirkung.
+
+           `data-reveal` wird bewusst NICHT übernommen: Die Einblendung ist
+           längst gelaufen, und ein neues Element mit diesem Attribut wäre
+           per CSS auf Deckkraft null gesetzt — von einem Modul, das es nicht
+           mehr anfasst. Das Video wäre unsichtbar. */
+        const rahmen = document.createElement("div");
+        for (const attribut of button.attributes) {
+          if (
+            attribut.name === "class" ||
+            attribut.name.startsWith("data-astro-cid-")
+          ) {
+            rahmen.setAttribute(attribut.name, attribut.value);
+          }
+        }
+        rahmen.append(frame);
+        button.replaceWith(rahmen);
       },
-      { once: true }
+      { once: true },
     );
   });
 }

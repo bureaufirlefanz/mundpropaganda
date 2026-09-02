@@ -337,7 +337,7 @@ export const HOMEPAGE_QUERY = defineQuery(`
  */
 export const PRACTICE_QUERY = defineQuery(`
   *[_id == "practice"][0]{
-    topline, title, lead, image${BILD}, imageSecondary${BILD},
+    topline, title, lead, image${BILD},
     storyTopline, storyHeadline, storyColumns, storyImage${BILD},
     figures[]{ value, text },
     valuesTopline, valuesHeadline, valuesText, valuesItems[]{ title, text },

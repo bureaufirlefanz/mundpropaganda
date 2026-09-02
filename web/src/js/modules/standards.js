@@ -30,6 +30,12 @@ function setup(section) {
   let current = -1;
   let cycle = null;
   let running = false;
+  /* Hat jemand selbst gewählt? Dann darf der Selbstlauf beim erstmaligen
+     Sichtbarwerden nicht auf den ersten Eintrag zurückspringen. Gemessen:
+     Wer mit der Tastatur in den Abschnitt hineintabbt, scrollt ihn dabei in
+     den Blick — der ScrollTrigger feuerte danach `start(0)` und stellte den
+     Eintrag wieder um, den man gerade angesteuert hatte. */
+  let selbstGewaehlt = false;
 
   /* --- Zustandswechsel ------------------------------------------------ */
   const show = (index) => {
@@ -38,6 +44,11 @@ function setup(section) {
 
     rows.forEach((row, i) => {
       row.dataset.active = String(i === index);
+      /* Der Schalter sagt an, ob sein Text offen ist. Ohne das meldete er
+         beim Durchtabben fünfmal dasselbe, egal was zu sehen war. */
+      row
+        .querySelector("[data-standards-trigger]")
+        ?.setAttribute("aria-expanded", String(i === index));
     });
 
     if (!images.length) return;
@@ -75,7 +86,7 @@ function setup(section) {
         onComplete: () => {
           if (running) runStep((index + 1) % rows.length);
         },
-      }
+      },
     );
   };
 
@@ -110,13 +121,27 @@ function setup(section) {
       gsap.set(bars, { scaleX: 0 });
     });
 
-    // Tastatur- und Touch-Bedienung: Fokus bzw. Tippen wählt ebenfalls aus.
-    row.addEventListener("focusin", () => {
+    /* Tastatur und Touch — aber nur, wo es etwas zu bedienen gibt.
+
+       Die Benefits klappen ihren Text auf; dort steht im Markup ein echter
+       `<button>`, und der ist von sich aus erreichbar. Die Standards zeigen
+       ihren Text ohnehin, dort gibt es nichts zu öffnen.
+
+       Vorher setzte diese Stelle `tabindex="0"` auf JEDE Zeile beider
+       Abschnitte. Auf der Startseite waren das fünf Fokusstopps auf Divs
+       ohne Rolle und ohne Namen: Ein Vorlesegerät kündigte nichts an, und
+       zu erreichen war damit nur ein Bildwechsel hinter einer Zahnmaske. */
+    const trigger = row.querySelector("[data-standards-trigger]");
+    if (!trigger) return;
+
+    const waehle = () => {
+      selbstGewaehlt = true;
       stop();
       show(i);
       gsap.set(bars, { scaleX: 0 });
-    });
-    row.setAttribute("tabindex", "0");
+    };
+    trigger.addEventListener("focus", waehle);
+    trigger.addEventListener("click", waehle);
   });
 
   list.addEventListener("pointerleave", () => start());
@@ -126,7 +151,7 @@ function setup(section) {
     trigger: section,
     start: "top 75%",
     end: "bottom 25%",
-    onEnter: () => start(0),
+    onEnter: () => start(selbstGewaehlt ? undefined : 0),
     onEnterBack: () => start(),
     onLeave: stop,
     onLeaveBack: stop,

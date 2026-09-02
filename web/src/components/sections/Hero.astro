@@ -18,78 +18,128 @@ interface Props {
 const { lines } = Astro.props;
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            HERO — Wortmarke mit dem Zahn zwischen den Zeilen
-           ================================================================== */}
-      <section class="s-hero" data-hero>
-        <ToothLines />
+           ================================================================== */
+}
+<section class="s-hero" data-hero>
+  <ToothLines />
 
-        <div class="container s-hero__inner">
-          {/* Wortmarke, Meta-Zeilen und Zahn liegen zusammen in einem Block:
+  <div class="container s-hero__inner">
+    {
+      /* Wortmarke, Meta-Zeilen und Zahn liegen zusammen in einem Block:
               Er ist der Bezugschrome, an dem die beiden absolut gesetzten
               Teile hängen.
 
               Vorher steckten sie IN der <h1>. Das war ungültig — eine
               Überschrift darf nur Text und Auszeichnung enthalten, keine
               <div> und <p>. Und es stand dem Mobil-Aufbau im Weg: Was in der
-              Überschrift steckt, lässt sich nicht hinter sie sortieren. */}
-          <div class="s-hero__block">
-            {/* Die Wortmarke ist die Hauptüberschrift der Seite — ohne sie
-                hätte die Startseite gar keine h1. */}
-            <h1 class="s-hero__wordmark">
-              <span class="s-hero__word" data-hero-word>Mund</span>
+              Überschrift steckt, lässt sich nicht hinter sie sortieren. */
+    }
+    <div class="s-hero__block">
+      {
+        /* Die Wortmarke ist die Hauptüberschrift der Seite — ohne sie
+                hätte die Startseite gar keine h1. */
+      }
+      <h1 class="s-hero__wordmark">
+        <span class="s-hero__word" data-hero-word>Mund</span>
 
-              {/* Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
+        {
+          /* Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
                    Beide schreiben sonst dieselbe Transform und überschreiben
-                   sich gegenseitig, sobald man während des Intros scrollt. */}
-              <span class="s-hero__tooth" data-hero-tooth>
-                {/* Dritte Ebene für die Zeigernähe: Auftritt (innen) und
+                   sich gegenseitig, sobald man während des Intros scrollt. */
+        }
+        <span class="s-hero__tooth" data-hero-tooth>
+          {
+            /* Dritte Ebene für die Zeigernähe: Auftritt (innen) und
                      Scroll-Parallax (außen) schreiben beide transform, eine
-                     gemeinsame Ebene würde sich gegenseitig überschreiben. */}
-                <span class="s-hero__tooth-drift" data-hero-tooth-drift>
-                <span class="s-hero__tooth-inner" data-hero-tooth-inner>
-                  {/* Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
+                     gemeinsame Ebene würde sich gegenseitig überschreiben. */
+          }
+          <span class="s-hero__tooth-drift" data-hero-tooth-drift>
+            <span class="s-hero__tooth-inner" data-hero-tooth-inner>
+              {
+                /* Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
                        Alphamaske wie der Zahn, dadurch wird nur das milchglasig,
-                       was tatsächlich hinter dem Objekt liegt. */}
-                  <span class="s-hero__tooth-glass"></span>
-                  <Picture name="tooth-3d" alt="" sizes="(max-width: 900px) 60vw, 29vw" eager />
-                </span>
-                </span>
-              </span>
+                       was tatsächlich hinter dem Objekt liegt. */
+              }
+              <span class="s-hero__tooth-glass"></span>
+              <Picture
+                name="tooth-3d"
+                alt=""
+                sizes="(max-width: 900px) 60vw, 29vw"
+                eager
+              />
+            </span>
+          </span>
+        </span>
 
-              {/* Der Zahn liegt mit z-index 2 vor beiden Zeilen — so steht es
+        {
+          /* Der Zahn liegt mit z-index 2 vor beiden Zeilen — so steht es
                   im Entwurf. Diese Zeile trägt trotzdem z-index 1, damit sie
-                  über der Hintergrundzeichnung der Section liegt. */}
-              <span class="s-hero__word s-hero__word--wide" data-hero-word>Propaganda</span>
-            </h1>
+                  über der Hintergrundzeichnung der Section liegt. */
+        }
+        <span class="s-hero__word s-hero__word--wide" data-hero-word
+          >Propaganda</span
+        >
+      </h1>
 
-            <div class="s-hero__meta">
-              {/* set:html, weil die Umbrüche aus dem Text kommen: Die
-                  Redaktion schreibt drei Zeilen, und drei Zeilen sollen es
-                  bleiben. Nur \n wird zu <br /> — sonst nichts. */}
-              {lines.map((z) => (
-                <p data-hero-meta data-highlight-marker-reveal data-marker-theme="brand" data-marker-stagger="90" data-marker-delay="1.1" set:html={z.split("\n").join("<br />")} />
+      <div class="s-hero__meta">
+        {
+          /* Die Umbrüche kommen aus dem Text: Die Redaktion schreibt
+                  drei Zeilen, und drei Zeilen sollen es bleiben.
+
+                  Vorher stand hier `set:html` mit dem Hinweis „nur \n wird zu
+                  <br /> — sonst nichts". Das stimmte nicht: `set:html` gibt
+                  den ganzen Text ungeprüft aus. Ein `<` oder `&` aus dem
+                  Studio landete roh im HTML, und wer im CMS schreiben darf,
+                  konnte damit Markup einschleusen. Die Zeilen als Kinder
+                  auszugeben kostet nichts und Astro maskiert sie von selbst. */
+        }
+        {
+          lines.map((z) => (
+            <p
+              data-hero-meta
+              data-highlight-marker-reveal
+              data-marker-theme="brand"
+              data-marker-stagger="90"
+              data-marker-delay="1.1"
+            >
+              {z.split("\n").map((teil, i) => (
+                <Fragment>
+                  {i > 0 && <br />}
+                  {teil}
+                </Fragment>
               ))}
-            </div>
+            </p>
+          ))
+        }
+      </div>
+    </div>
 
-          </div>
+    <a
+      class="s-hero__scroll"
+      href="#leistungen"
+      aria-label="Weiter zum Inhalt"
+      data-hero-scroll
+    >
+      <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
+    </a>
 
-          <a class="s-hero__scroll" href="#leistungen" aria-label="Weiter zum Inhalt" data-hero-scroll>
-            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-          </a>
+    <div class="s-hero__foot" data-hero-foot>
+      <Reviews />
+    </div>
 
-          <div class="s-hero__foot" data-hero-foot>
-            <Reviews />
-          </div>
-
-          {/* Nur auf schmalen Fenstern sichtbar. Dort endet der Hero mit
+    {
+      /* Nur auf schmalen Fenstern sichtbar. Dort endet der Hero mit
               einer Handlung statt mit einem Scroll-Pfeil — auf dem Telefon
-              scrollt man ohnehin, ein Pfeil dafür ist verschenkte Fläche. */}
-          <div class="s-hero__cta" data-hero-foot>
-            <Button label="Termin buchen" href="#kontakt" />
-          </div>
-        </div>
-      </section>
+              scrollt man ohnehin, ein Pfeil dafür ist verschenkte Fläche. */
+    }
+    <div class="s-hero__cta" data-hero-foot>
+      <Button label="Termin buchen" href="#kontakt" />
+    </div>
+  </div>
+</section>
 
 <style>
   /* Der Zahn steckt zwischen den beiden Wortzeilen: „MUND" liegt dahinter,
@@ -353,7 +403,8 @@ const { lines } = Astro.props;
     position: absolute;
     inset: 0;
     opacity: var(--glass-sheen);
-    background: linear-gradient(
+    background:
+      linear-gradient(
         148deg,
         rgb(255 255 255 / 0.2) 0%,
         rgb(255 255 255 / 0.05) 32%,
@@ -610,11 +661,11 @@ const { lines } = Astro.props;
      darin stehen — nur so liegt er zwischen den beiden Wortzeilen, und nur
      so bezieht er seine Lage auf die Wortmarke statt auf die Section.
      Blockverhalten holen die drei Ebenen sich hier zurück. */
-  .s-hero__tooth,
-  .s-hero__tooth-drift,
-  .s-hero__tooth-inner {
-    display: block;
-  }
+    .s-hero__tooth,
+    .s-hero__tooth-drift,
+    .s-hero__tooth-inner {
+      display: block;
+    }
 
     /* Nur die Größe: Lage und Staffelung stimmen schon, sie kommen aus der
        Regel weiter oben und beziehen sich auf die Wortmarke. Auf 390px ist

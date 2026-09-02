@@ -42,12 +42,19 @@ const GROUPS = [
   {
     title: "Seitenköpfe",
     hint: "Der erste Bildschirm eines Seitentyps. Sie unterscheiden sich im Bau, nicht nur im Inhalt.",
-    members: ["Hero", "ServiceHero", "PillarHero", "CareersHero", "PracticeHero"],
+    members: ["Hero", "ServiceHero", "PillarHero", "CareersHero"],
   },
   {
     title: "Text und Einstieg",
     hint: "Fließtext und Überleitungen.",
-    members: ["Intro", "Prose", "Statement", "Split", "TextHeading", "SectionHeading"],
+    members: [
+      "Intro",
+      "Prose",
+      "Statement",
+      "Split",
+      "TextHeading",
+      "SectionHeading",
+    ],
   },
   {
     title: "Verzeichnis und Sprungmarken",
@@ -68,8 +75,18 @@ const GROUPS = [
     title: "Karten und Listen",
     hint: "Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.",
     members: [
-      "Services", "Magazine", "PostList", "PostCard", "Jobs", "Team",
-      "Locations", "Perks", "Reasons", "Standards", "Benefits", "Values",
+      "Services",
+      "Magazine",
+      "PostList",
+      "PostCard",
+      "Jobs",
+      "Team",
+      "Locations",
+      "Perks",
+      "Reasons",
+      "Standards",
+      "Benefits",
+      "Values",
     ],
   },
   {
@@ -80,12 +97,27 @@ const GROUPS = [
   {
     title: "Medien",
     hint: "Bilder, Vergleiche, Video.",
-    members: ["Gallery", "BeforeAfter", "VideoBlock", "CmsImage", "Picture", "PostImage", "ImageRing"],
+    members: [
+      "Gallery",
+      "BeforeAfter",
+      "VideoBlock",
+      "CmsImage",
+      "Picture",
+      "PostImage",
+      "ImageRing",
+    ],
   },
   {
     title: "Handlung und Kontakt",
     hint: "Alles, was zu einem Termin führt.",
-    members: ["CtaBand", "Contact", "Application", "Button", "Faq", "Accordion"],
+    members: [
+      "CtaBand",
+      "Contact",
+      "Application",
+      "Button",
+      "Faq",
+      "Accordion",
+    ],
   },
   {
     title: "Hinweise und Belege",
@@ -100,7 +132,14 @@ const GROUPS = [
   {
     title: "Technik und Zierde",
     hint: "Kein eigener Inhalt — Sprites, Übergänge, Motive.",
-    members: ["Icons", "Transition", "VisualEditing", "Thread", "ToothLines", "ToothRings"],
+    members: [
+      "Icons",
+      "Transition",
+      "VisualEditing",
+      "Thread",
+      "ToothLines",
+      "ToothRings",
+    ],
   },
 ];
 
@@ -128,7 +167,6 @@ const EXEMPT = {
   PillarHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
   ServiceHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
   CareersHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
-  PracticeHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
   Hero: "Seitenkopf, nur im Zusammenhang sinnvoll",
 };
 
@@ -201,7 +239,8 @@ function props(text) {
       continue;
     }
     /* Einzeilige Kommentare tragen keinen Hilfetext, nur Randnotizen. */
-    if (line.startsWith("//") || line.startsWith("/*") || line.startsWith("*")) continue;
+    if (line.startsWith("//") || line.startsWith("/*") || line.startsWith("*"))
+      continue;
 
     if (depth === 0) {
       const m = line.match(/^([a-zA-Z_$][\w$]*)(\?)?\s*:\s*(.*)$/);
@@ -239,11 +278,14 @@ const all = callers();
 
 /* Die Komponentenseite ist der lebende Katalog: Wer einen Baustein baut und
    ihn dort nicht zeigt, hat ihn für alle anderen unsichtbar gebaut. */
-const gallery = all.find((f) => f.path === "pages/design/komponenten.astro")?.text ?? "";
+const gallery =
+  all.find((f) => f.path === "pages/design/komponenten.astro")?.text ?? "";
 
 const components = new Map();
 for (const dir of FOLDERS) {
-  for (const file of readdirSync(join(WEB, dir)).filter((f) => f.endsWith(".astro"))) {
+  for (const file of readdirSync(join(WEB, dir)).filter((f) =>
+    f.endsWith(".astro"),
+  )) {
     const name = file.replace(".astro", "");
     const full = join(dir, file);
     const text = readFileSync(join(WEB, full), "utf8");
@@ -254,8 +296,14 @@ for (const dir of FOLDERS) {
       props: props(text),
       inGallery: new RegExp(`<${name}[\\s/>]`).test(gallery),
       used: all
-        .filter((f) => f.path !== full && new RegExp(`<${name}[\\s/>]`).test(f.text))
-        .map((f) => f.path.replace(/\.astro$/, "").replace(/^(pages|templates|components)\//, ""))
+        .filter(
+          (f) => f.path !== full && new RegExp(`<${name}[\\s/>]`).test(f.text),
+        )
+        .map((f) =>
+          f.path
+            .replace(/\.astro$/, "")
+            .replace(/^(pages|templates|components)\//, ""),
+        )
         .sort(),
     });
   }
@@ -317,7 +365,9 @@ if (orphans.length) {
 const notShown = [...components.values()]
   .filter((c) => !c.inGallery && !EXEMPT[c.name])
   .map((c) => c.name);
-const exempt = [...components.values()].filter((c) => !c.inGallery && EXEMPT[c.name]);
+const exempt = [...components.values()].filter(
+  (c) => !c.inGallery && EXEMPT[c.name],
+);
 
 out += `
 ## Deckung der Komponentenseite
@@ -347,7 +397,10 @@ ${[...components.values()]
     (c) =>
       `**\`${c.name}\`**\n\n${c.props
         .filter((a) => a.doc)
-        .map((a) => `- \`${a.name}${a.optional ? "?" : ""}: ${a.type}\` — ${a.doc}`)
+        .map(
+          (a) =>
+            `- \`${a.name}${a.optional ? "?" : ""}: ${a.type}\` — ${a.doc}`,
+        )
         .join("\n")}`,
   )
   .join("\n\n")}
@@ -389,7 +442,9 @@ ${readdirSync(join(WEB, "js/modules"))
 const target = join(ROOT, "web/BAUSTEINE.md");
 writeFileSync(target, out);
 
-console.log(`Geschrieben: ${relative(ROOT, target)}  (${components.size} Bausteine)`);
+console.log(
+  `Geschrieben: ${relative(ROOT, target)}  (${components.size} Bausteine)`,
+);
 
 /* Die Abdeckung wird mitgemeldet, nicht nur erzeugt: Eine Zahl, die man beim
    Lauf sieht, bewegt sich; eine, die man suchen muss, nicht. */
@@ -400,5 +455,6 @@ console.log(
     `(${Math.round((100 * erklaert) / alleAngaben.length)} %)`,
 );
 if (orphans.length) console.log(`Nicht einsortiert: ${orphans.join(", ")}`);
-if (notShown.length) console.log(`Fehlen im Katalog (${notShown.length}): ${notShown.join(", ")}`);
+if (notShown.length)
+  console.log(`Fehlen im Katalog (${notShown.length}): ${notShown.join(", ")}`);
 else console.log("Katalog vollständig.");

@@ -18,7 +18,10 @@ export function initNav() {
      wird er hier ausgelöst. */
   if (!document.querySelector("[data-hero]")) {
     const inner = nav.querySelector(".c-nav__inner");
-    if (inner && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      inner &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       gsap.from(inner, {
         yPercent: -140,
         opacity: 0,
@@ -49,7 +52,7 @@ export function initNav() {
       .from(
         panel.querySelectorAll("[data-megamenu-item]"),
         { y: 20, opacity: 0, duration: 0.5, stagger: 0.03 },
-        "-=0.3"
+        "-=0.3",
       );
 
     menus.set(item, { tl });
@@ -91,12 +94,52 @@ export function initNav() {
     });
 
     item.addEventListener("focusout", (e) => {
-      if (!item.contains(e.relatedTarget) && !panel.contains(e.relatedTarget)) close();
+      if (!item.contains(e.relatedTarget) && !panel.contains(e.relatedTarget))
+        close();
     });
     panel.addEventListener("focusout", (e) => {
-      if (!panel.contains(e.relatedTarget) && !item.contains(e.relatedTarget)) close();
+      if (!panel.contains(e.relatedTarget) && !item.contains(e.relatedTarget))
+        close();
     });
   });
+
+  /* --- Mobile-Burger -------------------------------------------------- */
+  const burger = nav.querySelector("[data-burger]");
+  const mobilePanel = nav.querySelector("[data-mobile-menu]");
+  let mobileTl = null;
+
+  /**
+   * Das mobile Panel auf oder zu — an einer Stelle, weil es drei Auslöser
+   * gibt: der Knopf, die Escape-Taste und ein Klick auf einen Verweis darin.
+   *
+   * Die Aufschrift wechselt mit. Ein Knopf, der im offenen Zustand weiterhin
+   * „Menü öffnen" heißt, ist für ein Vorlesegerät schlicht falsch
+   * beschriftet — `aria-expanded` allein sagt den Zustand, aber nicht, was
+   * der nächste Druck tut.
+   */
+  const setzeMobil = (offen) => {
+    if (!burger || !mobileTl) return;
+    burger.setAttribute("aria-expanded", String(offen));
+    burger.setAttribute("aria-label", offen ? "Menü schließen" : "Menü öffnen");
+    nav.dataset.menuOpen = String(offen);
+    offen ? mobileTl.play() : mobileTl.reverse();
+  };
+
+  const mobilIstOffen = () => burger?.getAttribute("aria-expanded") === "true";
+
+  if (burger && mobilePanel) {
+    mobileTl = gsap.timeline({ paused: true });
+    mobileTl
+      .set(mobilePanel, { visibility: "visible" })
+      .to(mobilePanel, { height: "auto", duration: 0.5, ease: "power3.inOut" })
+      .from(
+        mobilePanel.querySelectorAll("[data-megamenu-item]"),
+        { y: 20, opacity: 0, duration: 0.4, stagger: 0.04 },
+        "-=0.25",
+      );
+
+    burger.addEventListener("click", () => setzeMobil(!mobilIstOffen()));
+  }
 
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
@@ -105,28 +148,17 @@ export function initNav() {
       item.dataset.open = "false";
     });
     nav.dataset.menuOpen = "false";
+
+    /* Escape schloss bis hierher nur die Mega-Menüs. Auf dem Telefon blieb
+       das Panel offen, und wer es mit der Tastatur geöffnet hatte, kam nur
+       durch das ganze Menü hindurch wieder heraus.
+
+       Der Fokus geht zurück auf den Knopf: Er ist die Stelle, an der man war,
+       bevor das Panel aufging. Ohne das steht der Fokus auf einem Element,
+       das gerade unsichtbar geworden ist. */
+    if (mobilIstOffen()) {
+      setzeMobil(false);
+      burger.focus();
+    }
   });
-
-  /* --- Mobile-Burger -------------------------------------------------- */
-  const burger = nav.querySelector("[data-burger]");
-  const mobilePanel = nav.querySelector("[data-mobile-menu]");
-
-  if (burger && mobilePanel) {
-    const mobileTl = gsap.timeline({ paused: true });
-    mobileTl
-      .set(mobilePanel, { visibility: "visible" })
-      .to(mobilePanel, { height: "auto", duration: 0.5, ease: "power3.inOut" })
-      .from(
-        mobilePanel.querySelectorAll("[data-megamenu-item]"),
-        { y: 20, opacity: 0, duration: 0.4, stagger: 0.04 },
-        "-=0.25"
-      );
-
-    burger.addEventListener("click", () => {
-      const open = burger.getAttribute("aria-expanded") === "true";
-      burger.setAttribute("aria-expanded", String(!open));
-      nav.dataset.menuOpen = String(!open);
-      open ? mobileTl.reverse() : mobileTl.play();
-    });
-  }
 }

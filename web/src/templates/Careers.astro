@@ -56,16 +56,27 @@ const action = (await resolved([d?.action ?? null], Astro.url.pathname))[0];
    also steht die Prüfung hier an einer Stelle. */
 const intro =
   d?.introTopline && d.introHeadline && d.introColumns?.length
-    ? { topline: d.introTopline, headline: d.introHeadline, columns: d.introColumns }
+    ? {
+        topline: d.introTopline,
+        headline: d.introHeadline,
+        columns: d.introColumns,
+      }
     : undefined;
 
 const figures =
   d?.figuresTopline && d.figuresHeadline && d.figuresItems?.length
-    ? { topline: d.figuresTopline, headline: d.figuresHeadline, figures: d.figuresItems }
+    ? {
+        topline: d.figuresTopline,
+        headline: d.figuresHeadline,
+        figures: d.figuresItems,
+      }
     : undefined;
 
 const comparison =
-  d?.comparisonTopline && d.comparisonHeadline && d.comparisonColumns?.length && d.comparisonRows?.length
+  d?.comparisonTopline &&
+  d.comparisonHeadline &&
+  d.comparisonColumns?.length &&
+  d.comparisonRows?.length
     ? {
         topline: d.comparisonTopline,
         headline: d.comparisonHeadline,
@@ -77,7 +88,11 @@ const comparison =
 
 const voices =
   d?.voicesTopline && d.voicesHeadline && d.voicesItems?.length
-    ? { topline: d.voicesTopline, headline: d.voicesHeadline, voices: d.voicesItems }
+    ? {
+        topline: d.voicesTopline,
+        headline: d.voicesHeadline,
+        voices: d.voicesItems,
+      }
     : undefined;
 
 const process =
@@ -92,12 +107,20 @@ const week =
 
 const perks =
   d?.benefitsTopline && d.benefitsHeadline && d.benefitsItems?.length
-    ? { topline: d.benefitsTopline, headline: d.benefitsHeadline, items: d.benefitsItems }
+    ? {
+        topline: d.benefitsTopline,
+        headline: d.benefitsHeadline,
+        items: d.benefitsItems,
+      }
     : undefined;
 
 const reasons =
   d?.reasonsTopline && d.reasonsHeadline && d.reasonsItems?.length
-    ? { topline: d.reasonsTopline, headline: d.reasonsHeadline, items: d.reasonsItems }
+    ? {
+        topline: d.reasonsTopline,
+        headline: d.reasonsHeadline,
+        items: d.reasonsItems,
+      }
     : undefined;
 
 /* Die Stellen sind der Zweck der Seite. Ohne ausgeschriebene Stelle entfällt
@@ -117,20 +140,49 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     alt={d?.image?.alt ?? ""}
   />
 
-  {intro && <Intro {...intro} lead={d?.lead} action={action?.text} actionHref={action?.href} />}
+  {
+    intro && (
+      <Intro
+        {...intro}
+        lead={d?.lead}
+        action={action?.text}
+        actionHref={action?.href}
+      />
+    )
+  }
 
-  {/* Das Video steht direkt hinter der Haltung: Es zeigt, was der Absatz
+  {
+    /* Das Video steht direkt hinter der Haltung: Es zeigt, was der Absatz
       darüber behauptet. Weiter unten, zwischen Vergleichstabelle und
-      Stellen, wäre es eine Unterbrechung. */}
-  {d?.videoUrl && (
-    <VideoBlock url={d.videoUrl} title={d.videoTitle ?? undefined} poster={d.videoPoster} />
-  )}
+      Stellen, wäre es eine Unterbrechung. */
+  }
+  {
+    d?.videoUrl && (
+      <VideoBlock
+        url={d.videoUrl}
+        title={d.videoTitle ?? undefined}
+        poster={d.videoPoster}
+        fallback="praxis-02"
+      />
+    )
+  }
 
   {figures && <Facts {...figures} />}
 
-  {/* Die 4-Tage-Woche als eigener Block und nicht als Zeile in der Liste
-      darunter — sie ist das Argument, das die Seite trägt. */}
-  {week && <Panel id="vier-tage" topline={week.topline} title={week.headline} text={week.text} />}
+  {
+    /* Die 4-Tage-Woche als eigener Block und nicht als Zeile in der Liste
+      darunter — sie ist das Argument, das die Seite trägt. */
+  }
+  {
+    week && (
+      <Panel
+        id="vier-tage"
+        topline={week.topline}
+        title={week.headline}
+        text={week.text}
+      />
+    )
+  }
 
   {perks && <Perks {...perks} />}
 
@@ -138,23 +190,27 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
   {reasons && <Reasons {...reasons} />}
 
-  {showJobs && d && (
-    <Jobs
-      id="stellen"
-      topline={d.jobsTopline!}
-      headline={d.jobsHeadline!}
-      jobs={jobs}
-      applicationEmail={d.applicationEmail ?? ""}
-      text={d.jobsText ?? undefined}
-    />
-  )}
+  {
+    showJobs && d && (
+      <Jobs
+        id="stellen"
+        topline={d.jobsTopline!}
+        headline={d.jobsHeadline!}
+        jobs={jobs}
+        applicationEmail={d.applicationEmail ?? ""}
+        text={d.jobsText ?? undefined}
+      />
+    )
+  }
 
   {voices && <Voices {...voices} />}
 
   {process && <Timeline {...process} />}
 
-  {/* Hinter dem Ablauf: Erst weiß man, was einen erwartet, dann bewirbt man
-      sich. Davor wäre das Formular eine Aufforderung ohne Auskunft. */}
+  {
+    /* Hinter dem Ablauf: Erst weiß man, was einen erwartet, dann bewirbt man
+      sich. Davor wäre das Formular eine Aufforderung ohne Auskunft. */
+  }
   <Application
     id="bewerben"
     topline="Bewerbung"
@@ -164,26 +220,40 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     fallbackEmail={d?.applicationEmail ?? undefined}
   />
 
-  {d?.speculativeTopline && d.speculativeTitle && (
-    <Panel
-      id="initiativ"
-      topline={d.speculativeTopline}
-      title={d.speculativeTitle}
-      text={d.speculativeText ?? undefined}
-    >
-      <div class="c-speculative">
-        {d.speculativeParagraph && <p>{d.speculativeParagraph}</p>}
-        {d.applicationEmail && (
-          <div class="c-speculative__action">
-            <Button label="Initiativ bewerben" href={applicationLink(d.applicationEmail)} />
-            <a class="c-speculative__mail" href={`mailto:${d.applicationEmail}`}>{d.applicationEmail}</a>
-          </div>
-        )}
-      </div>
-    </Panel>
-  )}
+  {
+    d?.speculativeTopline && d.speculativeTitle && (
+      <Panel
+        id="initiativ"
+        topline={d.speculativeTopline}
+        title={d.speculativeTitle}
+        text={d.speculativeText ?? undefined}
+      >
+        <div class="c-speculative">
+          {d.speculativeParagraph && <p>{d.speculativeParagraph}</p>}
+          {d.applicationEmail && (
+            <div class="c-speculative__action">
+              <Button
+                label="Initiativ bewerben"
+                href={applicationLink(d.applicationEmail)}
+              />
+              <a
+                class="c-speculative__mail"
+                href={`mailto:${d.applicationEmail}`}
+              >
+                {d.applicationEmail}
+              </a>
+            </div>
+          )}
+        </div>
+      </Panel>
+    )
+  }
 
-  {d?.faqTitle && d.faq?.length ? <Faq title={d.faqTitle} questions={d.faq} /> : null}
+  {
+    d?.faqTitle && d.faq?.length ? (
+      <Faq title={d.faqTitle} questions={d.faq} />
+    ) : null
+  }
 </Base>
 
 <style>

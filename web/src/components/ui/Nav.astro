@@ -16,11 +16,19 @@
 import Button from "./Button.astro";
 import NavPromo from "./NavPromo.astro";
 import { navPromo } from "../../content/nav-promo";
-import { loadServiceList, forGroup, servicePath, GROUPS } from "../../lib/service-list";
+import {
+  loadServiceList,
+  forGroup,
+  servicePath,
+  GROUPS,
+} from "../../lib/service-list";
 import { loadNavigation, resolved } from "../../lib/navigation";
 
 const list = await loadServiceList();
-const serviceColumns = GROUPS.map((g) => ({ title: g.title, items: forGroup(list, g.value) }));
+const serviceColumns = GROUPS.map((g) => ({
+  title: g.title,
+  items: forGroup(list, g.value),
+}));
 
 const nav = await loadNavigation();
 const here = Astro.url.pathname;
@@ -40,17 +48,21 @@ const action = (await resolved([nav?.action ?? null], here))[0];
    hier niemand es liest, verspricht die Oberfläche eine Wirkung, die es nicht
    gibt — genau die Sorte Lüge, die Stufe 2 des Umbaus beseitigt hat. Das
    Schema anzufassen ist aber nicht Teil dieser Aufgabe (Briefing §4). */
-
 ---
 
 <header class="c-nav" data-nav data-hidden="false" data-scrolled="false">
   <div class="c-nav__inner">
-    <a class="c-nav__logo" href="/" aria-label="Mundpropaganda - zur Startseite">
-      <svg aria-hidden="true"><use href="#i-logo" /></svg>
+    <a
+      class="c-nav__logo"
+      href="/"
+      aria-label="Mundpropaganda - zur Startseite"
+    >
+      <svg aria-hidden="true"><use href="#i-logo"></use></svg>
       <span>Mundpropaganda</span>
     </a>
 
-    {/* Der ERSTE Eintrag öffnet das große Menü — daran hängt nav.js über
+    {
+      /* Der ERSTE Eintrag öffnet das große Menü — daran hängt nav.js über
         `data-nav-item="services"`. Das ist eine Eigenschaft des Aufbaus,
         keine des Inhalts: Die Leistungen sind der einzige Punkt mit
         Unterpunkten.
@@ -58,23 +70,39 @@ const action = (await resolved([nav?.action ?? null], here))[0];
         Die übrigen tragen einen LEEREN Wert, nicht `true`: nav.js liest
         `dataset.navItem` und sucht damit ein Panel. Bei "true" suchte es
         nach `[data-megamenu="true"]` — findet nichts, schadet nichts,
-        behauptet aber einen Namen, den es nicht gibt. */}
+        behauptet aber einen Namen, den es nicht gibt. */
+    }
     <nav class="c-nav__menu" aria-label="Hauptnavigation">
-      {mainMenu.map((entry, i) => (
-        <div class="c-nav__item" data-nav-item={i === 0 ? "services" : ""} data-open={i === 0 ? "false" : undefined}>
-          <a class="c-nav__link" href={entry.href}>{entry.text}</a>
-        </div>
-      ))}
+      {
+        mainMenu.map((entry, i) => (
+          <div
+            class="c-nav__item"
+            data-nav-item={i === 0 ? "services" : ""}
+            data-open={i === 0 ? "false" : undefined}
+          >
+            <a class="c-nav__link" href={entry.href}>
+              {entry.text}
+            </a>
+          </div>
+        ))
+      }
     </nav>
 
     <div class="c-nav__actions">
       {action && <Button label={action.text} href={action.href} />}
 
+      {
+        /* `aria-controls` nennt das Panel, das der Knopf öffnet, und die
+          Aufschrift wechselt mit dem Zustand — beides setzt `nav.js`. Ohne
+          das sagte ein Vorlesegerät dauerhaft „Menü öffnen", auch wenn das
+          Menü offen war, und nannte nie, was da eigentlich aufgeht. */
+      }
       <button
         class="c-nav__burger"
         data-burger
         type="button"
         aria-expanded="false"
+        aria-controls="nav-mobile"
         aria-label="Menü öffnen"
       >
         <span></span><span></span><span></span>
@@ -84,14 +112,18 @@ const action = (await resolved([nav?.action ?? null], here))[0];
 
   <div class="c-megamenu" data-megamenu="services">
     <div class="c-megamenu__inner">
-      {serviceColumns.map((column) => (
-        <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{column.title}</p>
-          {column.items.map((l) => (
-            <a class="c-megamenu__link" href={servicePath(l)}>{l.name}</a>
-          ))}
-        </div>
-      ))}
+      {
+        serviceColumns.map((column) => (
+          <div data-megamenu-item>
+            <p class="c-megamenu__col-title">{column.title}</p>
+            {column.items.map((l) => (
+              <a class="c-megamenu__link" href={servicePath(l)}>
+                {l.name}
+              </a>
+            ))}
+          </div>
+        ))
+      }
 
       <div class="c-megamenu__promo" data-megamenu-item>
         <NavPromo {...navPromo} />
@@ -99,20 +131,26 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     </div>
   </div>
 
-  <div class="c-megamenu" data-mobile-menu>
+  <div class="c-megamenu" id="nav-mobile" data-mobile-menu>
     <div class="c-megamenu__inner">
-      {/* Alle Gruppen, nicht nur die erste. Vorher stand hier `columns[0]` —
+      {
+        /* Alle Gruppen, nicht nur die erste. Vorher stand hier `columns[0]` —
           das Menü zeigte damit vier von elf Leistungen, und welche vier war
           reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt
-          dieselbe Auswahl wie am Schreibtisch. */}
-      {serviceColumns.map((column) => (
-        <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{column.title}</p>
-          {column.items.map((l) => (
-            <a class="c-megamenu__link" href={servicePath(l)}>{l.name}</a>
-          ))}
-        </div>
-      ))}
+          dieselbe Auswahl wie am Schreibtisch. */
+      }
+      {
+        serviceColumns.map((column) => (
+          <div data-megamenu-item>
+            <p class="c-megamenu__col-title">{column.title}</p>
+            {column.items.map((l) => (
+              <a class="c-megamenu__link" href={servicePath(l)}>
+                {l.name}
+              </a>
+            ))}
+          </div>
+        ))
+      }
       <div class="c-megamenu__promo" data-megamenu-item>
         <NavPromo {...navPromo} />
       </div>
@@ -356,7 +394,8 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     padding-block: var(--sp-2);
     border-bottom: var(--bw) solid var(--c-line);
     font-size: var(--fs-text-main);
-    transition: padding-left var(--d-base) var(--e-out),
+    transition:
+      padding-left var(--d-base) var(--e-out),
       color var(--d-fast) var(--e-swift);
   }
 
@@ -383,7 +422,8 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     display: block;
     height: 1.5px;
     background: currentColor;
-    transition: transform var(--d-base) var(--e-out),
+    transition:
+      transform var(--d-base) var(--e-out),
       opacity var(--d-fast) var(--e-swift);
   }
 
@@ -426,4 +466,3 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     }
   }
 </style>
-

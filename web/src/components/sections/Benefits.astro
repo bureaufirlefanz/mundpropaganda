@@ -47,8 +47,28 @@ const MOTIFS = [
           >
             <span class="s-benefits__num">{i + 1}</span>
             <div class="s-benefits__body">
-              <h3 class="s-benefits__name">{e.name}</h3>
-              <div class="s-benefits__text">
+              {/* Ein echter Schalter, kein fokussierbares Div.
+
+                  Anders als bei den Standards steht der Text hier nicht da:
+                  Er ist auf Höhe null zusammengezogen und wird erst beim
+                  Aufklappen sichtbar. Damit ist die Zeile eine Bedienung und
+                  kein Absatz — und eine Bedienung braucht eine Rolle, einen
+                  Namen und `aria-expanded`. Vorher trug die Zeile nur ein
+                  `tabindex="0"`, das `standards.js` per JavaScript setzte:
+                  fünf Fokusstopps, die kein Vorlesegerät ankündigen konnte,
+                  und auf dem Telefon tat ein Tippen nichts. */}
+              <h3 class="s-benefits__name">
+                <button
+                  type="button"
+                  class="s-benefits__trigger"
+                  data-standards-trigger
+                  aria-expanded={i === 0 ? "true" : "false"}
+                  aria-controls={`benefit-${i}-text`}
+                >
+                  {e.name}
+                </button>
+              </h3>
+              <div class="s-benefits__text" id={`benefit-${i}-text`}>
                 <p>{e.text}</p>
               </div>
             </div>
@@ -201,6 +221,27 @@ const MOTIFS = [
     line-height: 1.2;
     opacity: 0.65;
     transition: opacity var(--d-base) var(--e-out);
+  }
+
+  /* Der Schalter erbt alles von der Überschrift; sichtbar ist er nur als
+     Text. Ein Knopf, der wie ein Knopf aussieht, wäre hier fünfmal ein Kasten
+     in einer Liste, die aus Linien besteht. */
+  .s-benefits__trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .s-benefits__trigger:focus-visible {
+    outline: 2px solid var(--c-bg);
+    outline-offset: 4px;
+    border-radius: var(--r-sm);
   }
 
   /* Zusammengeklappt über die Rasterzeile, nicht über display: none —

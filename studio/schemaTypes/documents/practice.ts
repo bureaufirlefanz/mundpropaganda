@@ -82,14 +82,17 @@ export const practice = defineType({
       description: "Querformat, über die volle Breite unter der Überschrift.",
       group: "header",
     }),
-    defineField({
-      name: "imageSecondary",
-      title: "Zweites Bild",
-      type: "picture",
-      description:
-        "Hochformat. Liegt versetzt über der rechten Ecke des Kopfbilds. Leer lassen: dann steht das Kopfbild allein, und das ist kein Mangel.",
-      group: "header",
-    }),
+    /* „Zweites Bild" stand hier bis zum 2026-09-02.
+
+       Es gehörte zu `PracticeHero`, dem früheren Kopf dieser Seite: ein
+       Hochformat, versetzt über der rechten Ecke des Kopfbilds. Die Seite
+       benutzt seit dem Umbau denselben Kopf wie die Karriereseite, und der
+       zeigt ein Bild. Das Feld blieb „vorerst" stehen, damit ein gepflegtes
+       Motiv nicht verloren geht — gepflegt war nie eines.
+
+       Ein Feld, dessen Wirkung niemand sehen kann, kostet das Vertrauen in
+       jedes andere (Aufgabe 4 in CMS-UMBAU.md). Deshalb weg statt
+       „vorerst". */
 
     /* --- Die Praxis ------------------------------------------------------
        Zwei Textspalten und daneben ein Bild. Der Abschnitt beantwortet
@@ -124,8 +127,18 @@ export const practice = defineType({
           type: "object",
           name: "figure",
           fields: [
-            defineField({ name: "value", title: "Zahl", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "text", title: "Erläuterung", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "value",
+              title: "Zahl",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Erläuterung",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
           ],
           preview: { select: { title: "value", subtitle: "text" } },
         }),
@@ -155,13 +168,19 @@ export const practice = defineType({
           type: "object",
           name: "value",
           fields: [
-            defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "title",
+              title: "Überschrift",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "text",
               title: "Text",
               type: "text",
               rows: 4,
-              description: "Was das konkret heißt. Ohne dieses Wie bleibt die Überschrift eine Floskel.",
+              description:
+                "Was das konkret heißt. Ohne dieses Wie bleibt die Überschrift eine Floskel.",
               validation: (r) => r.required(),
             }),
           ],
@@ -201,7 +220,12 @@ export const practice = defineType({
       group: "locations",
     }),
 
-    defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" }),
+    defineField({
+      name: "seo",
+      title: "Suchmaschine",
+      type: "seo",
+      group: "seo",
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Praxis", subtitle: "/praxis" }),
