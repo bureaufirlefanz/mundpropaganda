@@ -131,11 +131,12 @@ const GROUPS = [
   },
   {
     title: "Technik und Zierde",
-    hint: "Kein eigener Inhalt — Sprites, Übergänge, Motive.",
+    hint: "Kein eigener Inhalt — Sprites, Übergänge, Motive, Angaben für Suchmaschinen.",
     members: [
       "Icons",
       "Transition",
       "VisualEditing",
+      "StructuredData",
       "Thread",
       "ToothLines",
       "ToothRings",
@@ -156,6 +157,7 @@ const EXEMPT = {
   Icons: "SVG-Sprite, unsichtbar",
   Transition: "Seitenübergang, kein Markup",
   VisualEditing: "nur im Vorschaumodus",
+  StructuredData: "JSON-LD im Kopf der Seite, unsichtbar",
   Backdrop: "Verdunkelung hinter dem Menü",
   Nav: "steht auf jeder Seite, auch auf dieser",
   Footer: "steht auf jeder Seite, auch auf dieser",
@@ -213,9 +215,15 @@ function summary(text) {
  *
  * Die Klammertiefe wird mitgezählt, damit ein Objekttyp über mehrere Zeilen
  * nicht als drei weitere Angaben durchgeht.
+ *
+ * `extends` gehört mit ins Muster. `Picture.astro` schreibt
+ * `interface Props extends HTMLAttributes<"img"> {` — der frühere Ausdruck
+ * verlangte die Klammer direkt hinter `Props` und fand deshalb nichts. Die
+ * Zeile im Katalog trug für diesen Baustein „—" statt seiner sechs Angaben,
+ * und zwar stillschweigend: Ein Baustein ohne Angaben ist ein gültiger Fall.
  */
 function props(text) {
-  const block = text.match(/interface Props \{([\s\S]*?)\n\}/);
+  const block = text.match(/interface Props[^{]*\{([\s\S]*?)\n\}/);
   if (!block) return [];
 
   const out = [];

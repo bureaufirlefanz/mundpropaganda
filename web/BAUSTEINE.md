@@ -26,10 +26,9 @@ Der erste Bildschirm eines Seitentyps. Sie unterscheiden sich im Bau, nicht nur 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Hero` | Abschnitt | — | `lines: string[]` | Home | — |
-| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `topline?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service | — |
+| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service | — |
 | `PillarHero` | Abschnitt | Der Kopf einer Pillar Page (Figma 177:1734). | `title: string` `eyebrow?: string` `image?: ImageSource` `alt?: string` | Pillar | — |
-| `CareersHero` | Abschnitt | Der Kopf der Karriereseite: Wortmarke, darunter das Bild als Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` | Careers | — |
-| `PracticeHero` | Abschnitt | Der Kopf der Praxisseite. | `topline: string` `title: string` `lead?: string` `image?: ImageSource` `imageSecondary?: ImageSource` | Practice | — |
+| `CareersHero` | Abschnitt | Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` `fallback?: string` `zoom?: boolean` | Careers, Practice | — |
 
 ## Text und Einstieg
 
@@ -37,7 +36,7 @@ Fließtext und Überleitungen.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Intro` | Abschnitt | — | `topline?: string` `headline?: string` `columns: string[]` `image?: ImageSource` `alt?: string` `variant?: "default" | "centered"` `lead?: string` `action?: string` `actionHref?: string` | Careers, Pillar, Service, design/komponenten | ✓ |
+| `Intro` | Abschnitt | — | `topline?: string` `headline?: string` `columns: string[]` `image?: ImageSource` `alt?: string` `variant?: "default" | "centered"` `lead?: string` `action?: string` `actionHref?: string` `bleed?: string` | Careers, Pillar, Practice, Service, design/komponenten | ✓ |
 | `Prose` | Abschnitt | Ein Textabschnitt mit Bild daneben (Figma 177:1732 und 177:2276). | `id: string` `body: PortableTextBlock[]` `image?: ImageSource` `alt?: string` `side?: "left" | "right"` `note?: ProseNote | null` | Pillar, design/komponenten | ✓ |
 | `Statement` | Abschnitt | Ein einzelner Absatz über die halbe Seitenbreite, größer gesetzt als Fließtext. Trägt eine Kernaussage, ohne eine Headline zu sein | `topline: string` `text: string` | Service, design/komponenten | ✓ |
 | `Split` | Abschnitt | Text links auf brauner Fläche, Bild rechts. | `topline: string` `title: string` `paragraphs: string[]` `image?: ImageSource` | Home, design/komponenten | ✓ |
@@ -74,7 +73,7 @@ Schritt für Schritt, mit und ohne Zeitachse.
 |---|---|---|---|---|---|
 | `Steps` | Abschnitt | Nummerierte Karten: der Ablauf einer Behandlung in wenigen Schritten. | `title?: string` `steps: Step[]` | Pillar, Service, design/komponenten | ✓ |
 | `Timeline` | Abschnitt | Zeitstrahl — ein Ablauf als waagerechte Bahn, an der sich beim Scrollen eine Linie entlangzieht und die Marken nacheinander anspri | `headline: string` `stages: Stage[]` | Careers, design/komponenten | ✓ |
-| `Features` | Abschnitt | Alternierende Bild/Text-Zeilen. Jede zweite Zeile dreht die Reihenfolge um, dadurch wandert das Bild im Wechsel von links nach rec | `lines: FeatureRow[]` | Service, design/komponenten | ✓ |
+| `Features` | Abschnitt | Alternierende Bild/Text-Zeilen. Jede zweite Zeile dreht die Reihenfolge um, dadurch wandert das Bild im Wechsel von links nach rec | `lines: FeatureRow[]` | Practice, Service, design/komponenten | ✓ |
 
 ## Karten und Listen
 
@@ -87,12 +86,12 @@ Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.
 | `PostList` | Abschnitt | Die Beiträge als Raster — die Übersicht unter /magazin. | `posts: Post[]` | Magazine, design/komponenten | ✓ |
 | `PostCard` | UI | Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. | `post: Post` `sizes: string` `parallax?: string` `withButton?: boolean` `headingLevel?: "h2" | "h3"` | Post, design/komponenten, sections/Magazine | ✓ |
 | `Jobs` | Abschnitt | Offene Stellen — jede Zeile klappt auf und zeigt Aufgaben, Profil und den Weg zur Bewerbung. | `id?: string` `topline: string` `headline: string` `jobs: Job[]` `applicationEmail: string` `text?: string` | Careers, design/komponenten | ✓ |
-| `Team` | Abschnitt | Das Team: Gruppenfoto über die volle Breite, darunter das Raster. | `id?: string` `topline: string` `headline: string` `text?: string` `photo?: ImageSource` `members: Member[]` | Practice, design/komponenten | ✓ |
-| `Locations` | Abschnitt | Die Standorte mit Anschrift, Zeiten und Karte. | `id?: string` `topline: string` `headline: string` `text?: string` `locations: Location[]` | Practice, design/komponenten | ✓ |
+| `Team` | Abschnitt | Das Team: Überschrift, darunter das Raster aller Personen. | `id?: string` `topline: string` `headline: string` `text?: string` `photo?: ImageSource` `members: Member[]` | Practice, design/komponenten | ✓ |
+| `Locations` | Abschnitt | Die Standorte mit Anschrift, Zeiten und Karte. | `id?: string` `topline: string` `headline: string` `text?: string` `locations: Location[]` | design/komponenten | ✓ |
 | `Perks` | Abschnitt | Was die Praxis bietet, als Liste. Auf der Karriereseite. | `topline: string` `headline: string` `items: string[]` | Careers, design/komponenten | ✓ |
 | `Reasons` | Abschnitt | Zwei bis vier Blöcke, die je eine Frage beantworten, die vor einer Bewerbung wirklich gestellt wird: Wie komme ich hin, mit wem ar | `topline: string` `headline: string` `items: Reason[]` | Careers, design/komponenten | ✓ |
 | `Standards` | Abschnitt | Nummerierte Punkte links, ein zahnförmig maskiertes Foto rechts. | `title: string` `items: { name: string; text?: stri…` | Home, design/komponenten | ✓ |
-| `Benefits` | Abschnitt | Dieselbe Section wie im Prototyp — Markup und Klassen unverändert, nur die Inhalte kommen jetzt aus der Datenschicht. Die data-Att | — | Service, design/komponenten | ✓ |
+| `Benefits` | Abschnitt | Dieselbe Section wie im Prototyp — Markup und Klassen unverändert, nur die Inhalte kommen jetzt aus der Datenschicht. Die data-Att | `topline: string` `headline: string` `items: Entry[]` | Service, design/komponenten | ✓ |
 | `Values` | Abschnitt | Die Haltung der Praxis: drei bis fünf Punkte, jeder mit einem Wie. | `topline: string` `headline: string` `text?: string` `items: Value[]` | Practice, design/komponenten | ✓ |
 
 ## Stimmen und Geschichten
@@ -112,11 +111,11 @@ Bilder, Vergleiche, Video.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Gallery` | Abschnitt | Unsere Standorte. Zwei Darstellungen derselben Motive: "reihe" — die Bildreihe läuft beim Scrollen waagerecht durch (Bestand) "rin | `variant?: "reihe" | "ring"` `title: string` `images?: { image: ImageSource; capti…` | Home, design/komponenten | ✓ |
+| `Gallery` | Abschnitt | Unsere Standorte. Zwei Darstellungen derselben Motive: "reihe" — die Bildreihe läuft beim Scrollen waagerecht durch (Bestand) "rin | `variant?: "reihe" | "ring"` `title: string` `images?: { image: ImageSource; capti…` | Home, Practice, design/komponenten | ✓ |
 | `BeforeAfter` | Abschnitt | Vorher/Nachher-Vergleich mit Schieberegler. | `topline: string` `before?: ImageSource` `after?: ImageSource` | Pillar, Service, design/komponenten | ✓ |
-| `VideoBlock` | Abschnitt | Ein YouTube-Video, das erst auf Klick lädt. | `url: string` `title?: string` `poster?: ImageSource` | Careers, design/komponenten | ✓ |
-| `CmsImage` | UI | Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im Studio keines gepflegt ist. Beide Fälle sehen im Markup gl | `source: ImageSource | undefined | n…` `alt?: string` `widths?: number[]` `sizes?: string` `eager?: boolean` `ratio?: number` | Person, Post, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Contents, sections/CtaBand, sections/Experts, sections/Features, sections/Intro, sections/PillarHero, sections/PracticeHero, sections/Prose, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Team, sections/VideoBlock, sections/Voices, ui/AuthorNote, ui/ImageRing, ui/NavPromo, ui/PostCard, ui/PostImage | — |
-| `Picture` | UI | Responsives Bild aus der lokalen Pipeline. | `name: string` `alt?: string` `sizes?: string` `eager?: boolean` `parallax?: string` | Post, design/komponenten, sections/BeforeAfter, sections/CareersHero, sections/Experts, sections/Features, sections/Gallery, sections/Hero, sections/Split, sections/Stories, sections/Voices, ui/ImageRing, ui/PostCard | ✓ |
+| `VideoBlock` | Abschnitt | Ein YouTube-Video, das erst auf Klick lädt. | `url: string` `title?: string` `poster?: ImageSource` `fallback?: string` | Careers, design/komponenten | ✓ |
+| `CmsImage` | UI | Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im Studio keines gepflegt ist. Beide Fälle sehen im Markup gl | `source: ImageSource | undefined | n…` `alt?: string` `widths?: number[]` `sizes?: string` `eager?: boolean` `ratio?: number` | Person, Post, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Contents, sections/CtaBand, sections/Experts, sections/Features, sections/Intro, sections/PillarHero, sections/Prose, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Team, sections/VideoBlock, sections/Voices, ui/AuthorNote, ui/ImageRing, ui/NavPromo, ui/PostCard, ui/PostImage | — |
+| `Picture` | UI | Responsives Bild aus der lokalen Pipeline. | `name: string` `alt?: string` `sizes?: string` `eager?: boolean` `parallax?: string` | Post, design/komponenten, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Experts, sections/Features, sections/Gallery, sections/Hero, sections/Intro, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Voices, ui/ImageRing, ui/PostCard | ✓ |
 | `PostImage` | UI | Ein Bild im Fließtext eines Beitrags. | `node: {` | design/komponenten | ✓ |
 | `ImageRing` | UI | Bild-Ring — die Motive sitzen auf einem Zylinder, der um den Betrachter kreist. Alternative Darstellung zur laufenden Bildreihe. | `images: RingImage[]` `label: string` `minimum?: number` | design/komponenten | ✓ |
 
@@ -127,9 +126,9 @@ Alles, was zu einem Termin führt.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `CtaBand` | Abschnitt | Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314). | `headline: string` `text?: string` `actionLabel?: string` `actionHref?: string` `image?: ImageSource` `alt?: string` | Pillar, design/komponenten | ✓ |
-| `Contact` | Abschnitt | Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des Akkordeons ein Formular. | `service?: string` `extended?: boolean` | Home, Magazine, Pillar, Post, Practice, Service, design/komponenten | ✓ |
+| `Contact` | Abschnitt | Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des Akkordeons ein Formular. | `service?: string` `extended?: boolean` | Pillar, Service, design/komponenten | ✓ |
 | `Application` | Abschnitt | Das Bewerbungsformular: mehrere Schritte, je nach Rolle andere Fragen. | `id?: string` `topline: string` `headline: string` `text?: string` `jobs: Job[]` `fallbackEmail?: string` | Careers, design/komponenten | ✓ |
-| `Button` | UI | Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil. | `label: string` `href?: string` `variant?: "dark" | "block"` `static?: boolean` `type?: "submit" | "button"` `labelAttrs?: Record<string, unknown>` | Careers, Post, design/komponenten, design/styleguide, sections/Application, sections/Contact, sections/CtaBand, sections/Hero, sections/Intro, sections/Jobs, sections/Magazine, sections/ServiceHero, sections/Services, sections/Standards, sections/Stories, ui/Footer, ui/Nav, ui/NavPromo, ui/PostCard | ✓ |
+| `Button` | UI | Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil. | `label: string` `href?: string` `variant?: "dark" | "block"` `static?: boolean` `type?: "submit" | "button"` `labelAttrs?: Record<string, unknown>` | 404, Careers, Post, design/komponenten, design/styleguide, sections/Application, sections/Contact, sections/CtaBand, sections/Hero, sections/Intro, sections/Jobs, sections/Magazine, sections/ServiceHero, sections/Services, sections/Standards, sections/Stories, ui/Footer, ui/Nav, ui/NavPromo, ui/PostCard | ✓ |
 | `Faq` | Abschnitt | FAQ: Panel-Rahmen plus Akkordeon. Startseite und Leistungsseiten benutzen denselben Baustein, nur mit anderen Fragen. | `title?: string` `questions: Question[]` `topline?: string` `text?: string` | Careers, Home, Pillar, Service, design/komponenten | ✓ |
 | `Accordion` | UI | Akkordeon. Immer nur ein Eintrag offen (`data-accordion="single"`), gesteuert von modules/ui.js. | `questions: Question[]` | design/komponenten, design/styleguide, sections/Faq | ✓ |
 
@@ -140,7 +139,7 @@ Abgesetzte Kästen, Autorenangaben.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `SourceNote` | UI | A set-off note for study references, legal wording and warnings. | `variant?: "source" | "info" | "warnin…` `title?: string` `href?: string` `linkLabel?: string` | design/komponenten, sections/Prose | ✓ |
-| `AuthorNote` | UI | Accountability for a medical service page: who wrote the text, who checked it professionally, when that last happened, and what it | `author?: Person | null` `reviewedBy?: (Omit<Person, "image">) | n…` `lastReviewed?: string | null` `sources?: Source[] | null` | design/komponenten | ✓ |
+| `AuthorNote` | UI | Accountability for a medical service page: who wrote the text, who checked it professionally, when that last happened, and what it | `author?: Person | null` `reviewedBy?: Omit<Person, "image"> | null` `lastReviewed?: string | null` `sources?: Source[] | null` | design/komponenten | ✓ |
 | `Reviews` | UI | Bewertungsbalken. Zahlen und Quelle kommen aus den Einstellungen. | — | design/komponenten, sections/Hero, sections/ServiceHero | ✓ |
 
 ## Rahmen
@@ -150,22 +149,23 @@ Auf jeder Seite gleich.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Nav` | UI | Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie Services-Tabelle und Footer. Alles Übrige (Hauptmenü, | — | **nirgends** | — |
-| `Footer` | UI | — | — | **nirgends** | — |
+| `Footer` | UI | — | `id?: string` | **nirgends** | — |
 | `Filter` | UI | Filter für die Magazin-Übersicht: ein Knopf, der die Kategorien ausklappt. | `categories: string[]` `total: number` | design/komponenten, sections/PostList | ✓ |
 | `Panel` | UI | Panel-Rahmen: schmaler Kopf links, der beim Scrollen stehen bleibt, breiter Inhalt rechts. Was rechts steht, gibt der Aufrufer übe | `id?: string` `topline: string` `title?: string` `text?: string` | Careers, design/komponenten, sections/Application, sections/Contact, sections/Faq | ✓ |
 | `Backdrop` | UI | Seitengrund: nur ein feines Korn. Farbige Lichtfelder standen hier schon — sie haben der Fläche nicht gutgetan und sind wieder rau | — | **nirgends** | — |
 
 ## Technik und Zierde
 
-Kein eigener Inhalt — Sprites, Übergänge, Motive.
+Kein eigener Inhalt — Sprites, Übergänge, Motive, Angaben für Suchmaschinen.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Icons` | UI | — | — | **nirgends** | — |
 | `Transition` | UI | Spaltenvorhang für den Seitenwechsel. | — | **nirgends** | — |
 | `VisualEditing` | UI | Klick-zum-Bearbeiten in der Vorschau. | — | preview/[...path] | — |
+| `StructuredData` | UI | Die Praxis als strukturierte Daten (schema.org, JSON-LD). | — | **nirgends** | — |
 | `Thread` | UI | — | — | sections/Standards | — |
-| `ToothLines` | UI | — | — | Person, sections/CareersHero, sections/Hero, sections/PracticeHero, sections/ServiceHero | — |
+| `ToothLines` | UI | — | — | Person, sections/CareersHero, sections/Hero, sections/ServiceHero | — |
 | `ToothRings` | UI | — | — | design/komponenten, sections/Standards | ✓ |
 
 ## Deckung der Komponentenseite
@@ -177,13 +177,13 @@ Bewusst nicht im Katalog:
 - `CareersHero` — Seitenkopf, nur im Zusammenhang sinnvoll
 - `Hero` — Seitenkopf, nur im Zusammenhang sinnvoll
 - `PillarHero` — Seitenkopf, nur im Zusammenhang sinnvoll
-- `PracticeHero` — Seitenkopf, nur im Zusammenhang sinnvoll
 - `ServiceHero` — Seitenkopf, nur im Zusammenhang sinnvoll
 - `Backdrop` — Verdunkelung hinter dem Menü
 - `CmsImage` — Bildhülle ohne eigene Gestalt
 - `Footer` — steht auf jeder Seite, auch auf dieser
 - `Icons` — SVG-Sprite, unsichtbar
 - `Nav` — steht auf jeder Seite, auch auf dieser
+- `StructuredData` — JSON-LD im Kopf der Seite, unsichtbar
 - `Thread` — Verbindungslinie, gehört zu einem Abschnitt
 - `ToothLines` — Zierlinien im Hintergrund
 - `Transition` — Seitenübergang, kein Markup
@@ -199,6 +199,11 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`Application`**
 
 - `fallbackEmail?: string` — Adresse für Stellen, an denen keine eigene hinterlegt ist.
+
+**`CareersHero`**
+
+- `fallback?: string` — Das gestaltete Ersatzmotiv, solange im Studio keines hängt. Wählbar, seit dieser Kopf auch die Praxisseite trägt: Dort wäre ein Behandlungsbild das falsche Versprechen — man will die Räume sehen, nicht den Stuhl. Voreinstellung bleibt die Karriereseite. /
+- `zoom?: boolean` — Ob das Bild beim Scrollen auf Vollbild aufzieht. Wahlfrei und aus: Auf der Karriereseite steht der Kopf für sich, dort wäre das eine Bewegung ohne Anlass. Auf der Praxisseite trägt sie den Übergang vom Kopf in die Seite — man fährt in den Raum hinein, in den man kommt. /
 
 **`Compare`**
 
@@ -238,6 +243,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 - `image?: ImageSource` — Bild über den Spalten. Nur in der Ausprägung `centered` vorgesehen — dort steht es mittig und schmäler als die Seite (Figma 177:1731). /
 - `variant?: "default" | "centered"` — `centered` ist die Fassung der Pillar Pages: Bild mittig, darunter zwei Textspalten als zentrierter Block. Die Überschrift steht dort nicht hier, sondern nummeriert darüber (`ui/SectionHeading.astro`). Ohne Angabe bleibt es beim dreispaltigen Raster der übrigen Seiten — deren Markup ändert sich dadurch nicht. /
 - `lead?: string` — Der Einstiegstext, der vorher im Kopf der Seite stand. Er gehört hierher: Im Kopf war er ein dritter Anfang zwischen Bild und Überschrift, hier trägt er die Aussage, die der Abschnitt ausbuchstabiert. /
+- `bleed?: string` — Ein randloses Bild über dem Abschnitt, als Motivname aus der Bildpipeline (`Picture.astro`), nicht als CMS-Bild. Es bricht über die volle Fensterbreite aus und läuft ohne Rundung bis an beide Kanten — dieselbe Begründung wie bei `PostImage` in der Fassung `full`: Eine Rundung an einer Kante, die am Fensterrand endet, sieht aus wie ein Fehler beim Zuschneiden. `alt` beschreibt das Bild, das tatsächlich gerendert wird. `bleed` und `image` schließen sich in der Praxis aus: das eine ist die randlose Fassung, das andere das mittige Bild der Pillar Pages. /
 
 **`Jobs`**
 
@@ -263,6 +269,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 **`ServiceHero`**
 
+- `slug?: string` — Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`.
 - `action?: string` — Beschriftung des Knopfs.
 
 **`Steps`**
@@ -272,6 +279,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`Stories`**
 
 - `action?: { text: string; href: string }` — Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner.
+
+**`VideoBlock`**
+
+- `fallback?: string` — Name eines Motivs aus der lokalen Pipeline, solange im Studio kein Standbild hängt. Ohne Angabe bleibt die Fläche leer — dann steht dort der Abspielpfeil auf ruhigem Grund und sonst nichts. /
 
 **`AuthorNote`**
 
@@ -291,6 +302,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 - `categories: string[]` — Die Kategoriewerte, die unter den Beiträgen vorkommen.
 - `total: number` — Wie viele Beiträge es insgesamt gibt.
+
+**`Footer`**
+
+- `id?: string` — Sprungziel. Trägt `kontakt`, wenn die Seite keinen eigenen Kontaktabschnitt hat — siehe `contactSection` in `layouts/Base.astro`. /
 
 **`NavPromo`**
 
@@ -350,4 +365,4 @@ gestartet. Ein Modul findet sein Markup über `data-`-Attribute und tut
 nichts, wenn es keines gibt — deshalb schadet es nicht, dass jede Seite alle
 Module lädt.
 
-`application` · `embed` · `facts` · `filter` · `gallery` · `hero` · `marker` · `nav` · `reveal` · `ring` · `rings` · `scroll` · `section-dock` · `services` · `standards` · `stories` · `thread` · `timeline` · `toc` · `ui`
+`application` · `embed` · `facts` · `filter` · `gallery` · `hero-zoom` · `hero` · `marker` · `nav` · `reveal` · `ring` · `rings` · `scroll` · `section-dock` · `services` · `standards` · `stories` · `thread` · `timeline` · `toc` · `ui`
