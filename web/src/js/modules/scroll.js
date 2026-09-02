@@ -7,6 +7,7 @@
  */
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
+import { onTeardown } from "../lib/lifecycle.js";
 
 let lenis = null;
 
@@ -28,8 +29,23 @@ export function initScroll() {
 
   lenis.on("scroll", ScrollTrigger.update);
 
-  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  const raf = (time) => lenis.raf(time * 1000);
+  gsap.ticker.add(raf);
   gsap.ticker.lagSmoothing(0);
+
+  /* Beides muss beim Seitenwechsel wieder weg.
+
+     `initScroll()` läuft nach jedem Wechsel erneut und legte bis hierher
+     jedes Mal eine neue Instanz an — samt Ticker-Rückruf und den fünf
+     Listenern, die Lenis in seinem Konstruktor ans Fenster hängt. Nach fünf
+     Wechseln schrieben fünf Instanzen die Scrollposition, jede pro Bild.
+     Die alte Instanz hielt außerdem das Dokument fest, das gerade
+     ausgetauscht wurde. */
+  onTeardown(() => {
+    gsap.ticker.remove(raf);
+    lenis?.destroy();
+    lenis = null;
+  });
 
   // Lenis überschreibt native Scroll-Positionen in seinem RAF-Loop.
   // Programmatisches Springen (Tests, Devtools, Deep-Links) muss deshalb
@@ -79,9 +95,13 @@ export function initAnchors() {
        * gegen die weiche Bewegung von Lenis arbeitet. */
       if (!target.hasAttribute("tabindex")) {
         target.setAttribute("tabindex", "-1");
-        target.addEventListener("blur", () => target.removeAttribute("tabindex"), {
-          once: true,
-        });
+        target.addEventListener(
+          "blur",
+          () => target.removeAttribute("tabindex"),
+          {
+            once: true,
+          },
+        );
       }
       target.focus({ preventScroll: true });
     });

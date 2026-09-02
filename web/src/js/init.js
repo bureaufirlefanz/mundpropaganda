@@ -7,7 +7,7 @@
  * Stile in den Komponenten mit und ruft `init` über den Router auf. Der
  * Prototyp lädt stattdessen main.js daneben, das beides ergänzt.
  */
-import { ScrollTrigger } from "./lib/gsap.js";
+import { refreshTriggers } from "./lib/gsap.js";
 import { waitForFonts, FONTS } from "./lib/fonts.js";
 import { initScroll, initAnchors } from "./modules/scroll.js";
 import { initReveals, initSplitHeadlines } from "./modules/reveal.js";
@@ -102,7 +102,10 @@ export function init() {
 
     initServicesPreview();
     initStandards();
-    initGallery(); initRing(); initFacts(); initTimeline();
+    initGallery();
+    initRing();
+    initFacts();
+    initTimeline();
     initMediaParallax();
     initStories();
     initToothRings();
@@ -143,7 +146,7 @@ export function init() {
           selbst.disconnect();
           initThread();
         },
-        { rootMargin: "200% 0px" }
+        { rootMargin: "200% 0px" },
       );
       beobachter.observe(faden);
     } else if (faden) {
@@ -154,13 +157,15 @@ export function init() {
 
     whenScrolled(() => {
       // Bilder verändern nach dem Laden die Seitenhöhe — Trigger neu vermessen.
-      ScrollTrigger.refresh();
+      refreshTriggers();
 
       /* Waren die Bilder zu diesem Zeitpunkt noch nicht durch, verschiebt sich
          die Höhe später noch einmal. Dann ein zweites Mal vermessen — dieses
          Mal ohne Eile, die Choreografie ist längst vorbei. */
       if (document.readyState !== "complete") {
-        window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
+        window.addEventListener("load", () => refreshTriggers(), {
+          once: true,
+        });
       }
     });
   });

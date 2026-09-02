@@ -27,6 +27,7 @@
  * kann auch nichts durch die Bildebene brechen.
  */
 import { gsap, prefersReducedMotion } from "../lib/gsap.js";
+import { pageSignal, onTeardown } from "../lib/lifecycle.js";
 
 /** Grad pro Sekunde im Leerlauf. Bewusst langsam — es soll treiben, nicht fahren. */
 const SPEED = 3.4;
@@ -90,7 +91,8 @@ function buildRing(root) {
   function measure() {
     const width = cards[0].offsetWidth;
     // Der Abstand steht im CSS, damit Aussehen und Rechnung nicht auseinanderlaufen.
-    const gap = parseFloat(getComputedStyle(root).getPropertyValue("--ring-gap")) || 0;
+    const gap =
+      parseFloat(getComputedStyle(root).getPropertyValue("--ring-gap")) || 0;
     radius = Math.round((width + gap) / (2 * Math.tan(Math.PI / count)));
     amplitude = width * PARALLAX;
 
@@ -128,8 +130,7 @@ function buildRing(root) {
        Das negative Vorzeichen am Winkel gehört zur Innenwölbung: die Karten
        liegen bei −r, eine positive Drehung schöbe sie entgegen der
        Zugrichtung. So bleibt „nach rechts ziehen" auch „nach rechts". */
-    rotor.style.transform =
-      `translateZ(${Math.round(radius * 0.22)}px) rotateY(${-angle}deg)`;
+    rotor.style.transform = `translateZ(${Math.round(radius * 0.22)}px) rotateY(${-angle}deg)`;
 
     /* Tiefe sichtbar machen. Anders als bei der Wölbung nach außen ist hier
        die MITTE am weitesten weg — die Helligkeit folgt der Entfernung, nicht
@@ -234,7 +235,12 @@ function buildRing(root) {
      flackert, während die Karten unter dem stehenden Zeiger durchwandern. */
 
   const rampSpeed = (target, duration) => {
-    gsap.to(drive, { speed: target, duration: reduced ? 0 : duration, ease: "power2.out", overwrite: true });
+    gsap.to(drive, {
+      speed: target,
+      duration: reduced ? 0 : duration,
+      ease: "power2.out",
+      overwrite: true,
+    });
   };
 
   /* Auslaufen ist kürzer als Anlaufen: Anhalten soll auf den Zeiger
@@ -275,12 +281,22 @@ function buildRing(root) {
     });
   };
 
-  root.querySelector("[data-ring-prev]")?.addEventListener("click", () => turn(1));
-  root.querySelector("[data-ring-next]")?.addEventListener("click", () => turn(-1));
+  root
+    .querySelector("[data-ring-prev]")
+    ?.addEventListener("click", () => turn(1));
+  root
+    .querySelector("[data-ring-next]")
+    ?.addEventListener("click", () => turn(-1));
 
   stage.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") { turn(1); e.preventDefault(); }
-    if (e.key === "ArrowRight") { turn(-1); e.preventDefault(); }
+    if (e.key === "ArrowLeft") {
+      turn(1);
+      e.preventDefault();
+    }
+    if (e.key === "ArrowRight") {
+      turn(-1);
+      e.preventDefault();
+    }
   });
 
   /* --- Start ----------------------------------------------------------- */
@@ -290,11 +306,24 @@ function buildRing(root) {
   gsap.ticker.add(tick);
 
   let measureTimer;
-  window.addEventListener("resize", () => {
+  window.addEventListener(
+    "resize",
+    () => {
+      clearTimeout(measureTimer);
+      measureTimer = setTimeout(() => {
+        measure();
+        draw();
+      }, 150);
+    },
+    { signal: pageSignal() },
+  );
+
+  /* Der Ticker schreibt jedes Bild `transform` und `filter` auf jede Karte.
+     Ohne Abmeldung läuft er nach dem Seitenwechsel weiter — auf Karten, die
+     aus dem Dokument genommen wurden, und zusätzlich zu dem Ticker, den der
+     nächste Aufruf anlegt. */
+  onTeardown(() => {
+    gsap.ticker.remove(tick);
     clearTimeout(measureTimer);
-    measureTimer = setTimeout(() => {
-      measure();
-      draw();
-    }, 150);
   });
 }

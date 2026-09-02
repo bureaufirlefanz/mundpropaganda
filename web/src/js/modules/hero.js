@@ -13,8 +13,15 @@
  * Beim Scrollen laufen Zahn, Linien und Typo unterschiedlich schnell —
  * erst dadurch werden die Ebenen als Ebenen lesbar.
  */
-import { gsap, ScrollTrigger, SplitText, prefersReducedMotion } from "../lib/gsap.js";
+import {
+  gsap,
+  ScrollTrigger,
+  SplitText,
+  prefersReducedMotion,
+  refreshTriggers,
+} from "../lib/gsap.js";
 import { waitForFonts, FONTS } from "../lib/fonts.js";
+import { pageSignal } from "../lib/lifecycle.js";
 
 export function initHero() {
   const hero = document.querySelector("[data-hero]");
@@ -50,7 +57,10 @@ export function initHero() {
        Startzustand setzt in der Astro-App das CSS, und `clearProps` räumt nur
        Inline-Stile weg — die CSS-Regel würde danach wieder greifen. */
     gsap.set([words, tooth, meta, foot, scroll, nav], { clearProps: "all" });
-    gsap.set([words, tooth, meta, foot, scroll, nav], { opacity: 1, visibility: "visible" });
+    gsap.set([words, tooth, meta, foot, scroll, nav], {
+      opacity: 1,
+      visibility: "visible",
+    });
     return;
   }
 
@@ -91,7 +101,12 @@ export function initHero() {
        Animiert werden weiterhin die Zeichen — `s.chars` liefert sie
        unverändert. */
     const splits = [...words].map(
-      (w) => new SplitText(w, { type: "words,chars", mask: "chars", wordsClass: "hero-word" })
+      (w) =>
+        new SplitText(w, {
+          type: "words,chars",
+          mask: "chars",
+          wordsClass: "hero-word",
+        }),
     );
     const chars = splits.flatMap((s) => s.chars);
 
@@ -108,7 +123,7 @@ export function initHero() {
         nav,
         { yPercent: -140, opacity: 0 },
         { yPercent: 0, opacity: 1, duration: 1.1 },
-        0.1
+        0.1,
       );
     }
 
@@ -132,7 +147,7 @@ export function initHero() {
           duration: 1.5,
           stagger: { each: 0.018, from: "start" },
         },
-        0.25
+        0.25,
       )
       // Der Zahn steigt auf und setzt sich in seine Lage. Der leichte
       // Maßstabswechsel genügt für die Tiefe. Die Deckkraft läuft als
@@ -168,7 +183,7 @@ export function initHero() {
             });
           },
         },
-        0.85
+        0.85,
       )
       /* Die Deckkraft läuft auf dem Bild, nicht auf dem Wrapper: ein
          Vorfahre mit opacity < 1 isoliert das Milchglas in eine eigene
@@ -182,7 +197,7 @@ export function initHero() {
         toothImg,
         { opacity: 0 },
         { opacity: TOOTH_OPACITY, duration: 0.2, ease: "power2.out" },
-        0.85
+        0.85,
       )
       /* Das Glas kommt über seine eigene Unschärfe herein — als CSS-Variable,
          weil backdrop-filter als Kurzschreibweise nicht interpolierbar ist.
@@ -206,7 +221,7 @@ export function initHero() {
           duration: 0.6,
           ease: "power2.out",
         },
-        1.05
+        1.05,
       )
       /* Die Meta-Zeilen laufen über den Highlight-Marker (modules/marker.js)
          und bringen ihren eigenen Auslöser mit — hier bleiben sie außen vor. */
@@ -214,7 +229,7 @@ export function initHero() {
         foot,
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.9 },
-        1.2
+        1.2,
       );
 
     /* Der Scroll-Hinweis tippt nach seinem Auftritt ruhig weiter — ein
@@ -247,7 +262,7 @@ export function initHero() {
             });
           },
         },
-        1.35
+        1.35,
       );
     }
   });
@@ -274,7 +289,7 @@ export function initHero() {
       target,
       { y: 0, yPercent: 0, scale: 1 },
       { ...to, ease: "none", immediateRender: false },
-      0
+      0,
     );
 
   /* 44 statt 26 Prozent. Der Zahn muss die Zeile „Propaganda" beim Scrollen
@@ -314,7 +329,7 @@ export function initHero() {
         immediateRender: false,
         invalidateOnRefresh: true,
       },
-      0
+      0,
     );
   }
 
@@ -326,21 +341,35 @@ export function initHero() {
      ------------------------------------------------------------------ */
   const drift3d = tooth?.querySelector("[data-hero-tooth-drift]");
 
-  if (drift3d && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  if (
+    drift3d &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  ) {
     const xTo = gsap.quickTo(drift3d, "x", { duration: 1.4, ease: "power3" });
     const yTo = gsap.quickTo(drift3d, "y", { duration: 1.4, ease: "power3" });
     // Die Drehung läuft etwas träger als der Versatz — dadurch schwingt das
     // Objekt nach, statt starr mitzuwandern.
-    const rTo = gsap.quickTo(drift3d, "rotation", { duration: 1.8, ease: "power3" });
-
-    window.addEventListener("pointermove", (e) => {
-      const cx = e.clientX / window.innerWidth - 0.5;
-      const cy = e.clientY / window.innerHeight - 0.5;
-      xTo(cx * 14);
-      yTo(cy * 9);
-      rTo(cx * 2.2);
+    const rTo = gsap.quickTo(drift3d, "rotation", {
+      duration: 1.8,
+      ease: "power3",
     });
+
+    /* `passive`, weil nichts abgefangen wird — der Browser darf das Scrollen
+       weiterlaufen lassen, ohne auf den Rückruf zu warten. `signal`, weil
+       der Listener am Fenster hängt: Ohne ihn schöbe er nach jedem
+       Seitenwechsel weiter an einem Zahn, den es nicht mehr gibt. */
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        const cx = e.clientX / window.innerWidth - 0.5;
+        const cy = e.clientY / window.innerHeight - 0.5;
+        xTo(cx * 14);
+        yTo(cy * 9);
+        rTo(cx * 2.2);
+      },
+      { passive: true, signal: pageSignal() },
+    );
   }
 
-  ScrollTrigger.refresh();
+  refreshTriggers();
 }

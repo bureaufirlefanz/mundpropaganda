@@ -11,7 +11,13 @@
  * Gestaltungsprinzip: lange Dauer, weiches Auslaufen, kein Überschwingen.
  * Die Bewegung soll auffallen, während sie läuft, und nicht danach.
  */
-import { gsap, ScrollTrigger, SplitText, prefersReducedMotion } from "../lib/gsap.js";
+import {
+  gsap,
+  ScrollTrigger,
+  SplitText,
+  prefersReducedMotion,
+  refreshTriggers,
+} from "../lib/gsap.js";
 import { waitForFonts, FONTS } from "../lib/fonts.js";
 
 /* Gemeinsame Kurve für alle Reveals: sehr langes Auslaufen, kein Bounce.
@@ -52,7 +58,7 @@ export function initReveals() {
        gemeinsam auftreten sollen, aber unterschiedlich weit oben stehen —
        sonst löst jedes für sich aus und die Bewegung zerfällt. */
     const scope = el.dataset.revealTrigger;
-    const trigger = scope ? el.closest(scope) ?? el : el;
+    const trigger = scope ? (el.closest(scope) ?? el) : el;
 
     gsap.fromTo(el, variant, {
       ...REST,
@@ -120,7 +126,11 @@ export function initSplitHeadlines() {
         onSplit(self) {
           gsap.set(el, { visibility: "visible" });
 
-          const items = isChars ? self.chars : isWords ? self.words : self.lines;
+          const items = isChars
+            ? self.chars
+            : isWords
+              ? self.words
+              : self.lines;
 
           return gsap.from(items, {
             /* 130 statt 100: Der Maskenkasten in base.css trägt unten
@@ -140,6 +150,6 @@ export function initSplitHeadlines() {
       });
     });
 
-    ScrollTrigger.refresh();
+    refreshTriggers();
   });
 }

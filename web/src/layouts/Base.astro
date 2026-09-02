@@ -85,7 +85,8 @@ const blockIndexing = noIndex || !website.searchEngines;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#d6d6d6" />
 
-    {/*
+    {
+      /*
       Muss synchron und vor dem ersten Bild laufen. Am Attribut `js` hängen
       alle Regeln, die Elemente bis zu ihrer Animation verbergen
       (`html.js [data-reveal]`, `html.js .s-hero__word` …).
@@ -102,7 +103,8 @@ const blockIndexing = noIndex || !website.searchEngines;
 
       Beim Seitenwechsel über den Router geht die Klasse allerdings verloren —
       sie wird unten in `astro:after-swap` nachgesetzt.
-    */}
+    */
+    }
     <script is:inline>
       document.documentElement.classList.add("js");
     </script>
@@ -110,11 +112,17 @@ const blockIndexing = noIndex || !website.searchEngines;
     <title>{fullTitle}</title>
     {metaDescription && <meta name="description" content={metaDescription} />}
     {blockIndexing && <meta name="robots" content="noindex, nofollow" />}
-    {website.googleVerification && (
-      <meta name="google-site-verification" content={website.googleVerification} />
-    )}
+    {
+      website.googleVerification && (
+        <meta
+          name="google-site-verification"
+          content={website.googleVerification}
+        />
+      )
+    }
 
-    {/*
+    {
+      /*
       Open Graph und Twitter — was Messenger, soziale Netzwerke und Slack
       auslesen, wenn jemand einen Link auf die Praxis teilt. Ohne diese Zeilen
       raten sie, und das Ergebnis ist meist der erste Textbrocken der Seite.
@@ -127,74 +135,130 @@ const blockIndexing = noIndex || !website.searchEngines;
 
       Das Bild kommt aus dem CMS und trägt deshalb schon eine absolute
       URL vom Sanity-CDN. Ein lokales Motiv ginge hier nicht ohne `site`.
-    */}
+    */
+    }
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={website.siteName} />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content={fullTitle} />
-    {metaDescription && <meta property="og:description" content={metaDescription} />}
+    {
+      metaDescription && (
+        <meta property="og:description" content={metaDescription} />
+      )
+    }
     {shareImage && <meta property="og:image" content={shareImage} />}
 
-    <meta name="twitter:card" content={shareImage ? "summary_large_image" : "summary"} />
+    <meta
+      name="twitter:card"
+      content={shareImage ? "summary_large_image" : "summary"}
+    />
     <meta name="twitter:title" content={fullTitle} />
-    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
+    {
+      metaDescription && (
+        <meta name="twitter:description" content={metaDescription} />
+      )
+    }
     {shareImage && <meta name="twitter:image" content={shareImage} />}
 
-    {/* Die beiden Schnitte, die above the fold sichtbar sind — sonst
-         blitzt die Fallback-Schrift im Hero auf. */}
-    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
+    {
+      /* Die beiden Schnitte, die above the fold sichtbar sind — sonst
+         blitzt die Fallback-Schrift im Hero auf. */
+    }
+    <link
+      rel="preload"
+      href="/fonts/PPNeueMontreal-Medium.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/GT-Pressura-Mono-Light.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="preload" href="/svg/tooth-3d-mask.png" as="image" />
-    {/* Gepflegtes Favicon oder die Wortmarke. Kein `type` beim CMS-Motiv:
+    {
+      /* Gepflegtes Favicon oder die Wortmarke. Kein `type` beim CMS-Motiv:
         Das Format hängt daran, was hochgeladen wurde, und eine falsche
-        Angabe ist schlechter als keine. */}
-    {website.faviconUrl ? (
-      <link rel="icon" href={website.faviconUrl} />
-    ) : (
-      <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
-    )}
+        Angabe ist schlechter als keine. */
+    }
+    {
+      website.faviconUrl ? (
+        <link rel="icon" href={website.faviconUrl} />
+      ) : (
+        <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
+      )
+    }
 
-    {/* Plausible misst ohne Cookies und ohne personenbezogene Daten, braucht
+    {
+      /* Plausible misst ohne Cookies und ohne personenbezogene Daten, braucht
         also kein Einwilligungsbanner. Ohne gepflegte Domain wird gar nichts
-        geladen — kein leerer Aufruf, kein fremder Host im Netzwerk. */}
-    {website.plausibleDomain && (
-      <script
-        is:inline
-        defer
-        data-domain={website.plausibleDomain}
-        src="https://plausible.io/js/script.js"
-      />
-    )}
+        geladen — kein leerer Aufruf, kein fremder Host im Netzwerk. */
+    }
+    {
+      website.plausibleDomain && (
+        <script
+          is:inline
+          defer
+          data-domain={website.plausibleDomain}
+          src="https://plausible.io/js/script.js"
+        />
+      )
+    }
 
-    {/* Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
+    {
+      /* Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
          modules/transition.js: er tauscht nur den geänderten Teil des
-         Dokuments aus, statt die Seite neu zu laden. */}
+         Dokuments aus, statt die Seite neu zu laden. */
+    }
     <ClientRouter />
-
   </head>
 
   <body>
-    {/* WCAG 2.2, 2.4.1 Bypass Blocks. Vor dem Inhalt jeder Seite stehen
+    {
+      /* WCAG 2.2, 2.4.1 Bypass Blocks. Vor dem Inhalt jeder Seite stehen
         Navigation und Menü — mit der Tastatur waren das bis hierher rund
         zwanzig Anschläge, auf jeder Seite neu. Der Sprung muss das erste
         fokussierbare Element im Dokument sein, sonst ist er nicht zu
-        erreichen, bevor die Blöcke kommen, die er überspringen soll. */}
+        erreichen, bevor die Blöcke kommen, die er überspringen soll. */
+    }
     <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
 
-    <Icons />
-    <Backdrop transition:persist />
-    <Transition />
-    <Nav transition:persist />
+    {
+      /* Kein `transition:persist` an Backdrop und Nav.
 
-    {/* `tabindex="-1"`: Ohne das nimmt ein <main> den Fokus nicht an, der
+        Es stand hier, hat aber nie etwas getan: Astro setzt die Direktive
+        auf das Element, an dem sie steht — bei einem Komponenten-Tag landet
+        sie nirgends im HTML. Gemessen trug im gebauten Dokument genau ein
+        Element `data-astro-transition-persist`, und das ist der Vorhang aus
+        `Transition.astro`, der sie an einem echten `<div>` führt.
+
+        Sie hier wirksam zu machen hieße, sie in die beiden Komponenten an
+        ihr Wurzelelement zu setzen — und zugleich jeden Listener, den `nav.js`
+        an Knöpfe und Verweise hängt, an das Abbruchsignal zu binden. Sonst
+        sammelten sich die an den überlebenden Elementen an, und aus einem
+        stillen Nichtstun würde ein echtes Leck. Die beiden neu zu rendern
+        kostet nichts; der Fall ist gemessen und nicht vermutet. */
+    }
+    <Icons />
+    <Backdrop />
+    <Transition />
+    <Nav />
+
+    {
+      /* `tabindex="-1"`: Ohne das nimmt ein <main> den Fokus nicht an, der
         Sprung verschöbe nur den Bildausschnitt und der Tabulator liefe
-        danach weiter in der Navigation. */}
+        danach weiter in der Navigation. */
+    }
     <main id="main" tabindex="-1"><slot /></main>
 
     <Footer id={contactSection ? undefined : "kontakt"} />
 
     <script>
       import { init } from "../js/init.js";
+      import { teardown } from "../js/lib/lifecycle.js";
       import { gsap, ScrollTrigger } from "../js/lib/gsap.js";
 
       /* Bei einem Seitenwechsel tauscht der Router nur den Inhalt aus — die
@@ -213,17 +277,26 @@ const blockIndexing = noIndex || !website.searchEngines;
          Endlage sieht. Der Listener hängt am document und wird deshalb nur
          einmal registriert, nicht bei jedem Wechsel neu. */
       document.addEventListener("astro:after-swap", () =>
-        document.documentElement.classList.add("js")
+        document.documentElement.classList.add("js"),
       );
 
       document.addEventListener("astro:page-load", () => init());
 
       /* Vor dem Austausch aufräumen. Ohne das behalten die ScrollTrigger ihre
          Verweise auf Elemente, die es gleich nicht mehr gibt — sie messen dann
-         gegen Leichen und stapeln sich bei jedem Wechsel weiter auf. */
+         gegen Leichen und stapeln sich bei jedem Wechsel weiter auf.
+
+         `teardown()` nimmt alles Übrige mit: die Lenis-Instanz samt
+         Ticker-Rückruf, die Listener an `document` und `window` aus
+         Navigation, Filter, Leistungsvorschau und Hero, den Ticker des
+         Kartendecks und den Medienkontext der Marker-Zeilen. Bis hierher
+         wurden nur die ScrollTrigger abgeräumt — alles andere häufte sich
+         mit jedem Seitenwechsel an. Die Begründung im Einzelnen steht in
+         `js/lib/lifecycle.js`. */
       document.addEventListener("astro:before-swap", () => {
         ScrollTrigger.getAll().forEach((t) => t.kill());
         gsap.globalTimeline.clear();
+        teardown();
       });
     </script>
 

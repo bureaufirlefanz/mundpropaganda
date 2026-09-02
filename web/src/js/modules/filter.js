@@ -11,6 +11,7 @@
  * benutzt hat, weil man etwas Bestimmtes suchte.
  */
 import { gsap, prefersReducedMotion } from "../lib/gsap.js";
+import { pageSignal } from "../lib/lifecycle.js";
 
 export function initFilter() {
   const box = document.querySelector("[data-filter]");
@@ -33,7 +34,9 @@ export function initFilter() {
      `data-category` trägt den Rohwert aus dem Schema („technik"), angesagt
      werden soll aber, was auch auf dem Bildschirm steht. */
   const beschriftung = (wert) =>
-    options.find((o) => (o.dataset.filterValue || "") === wert)?.textContent.trim() || wert;
+    options
+      .find((o) => (o.dataset.filterValue || "") === wert)
+      ?.textContent.trim() || wert;
 
   /* --- Auf- und Zuklappen ------------------------------------------------ */
 
@@ -66,7 +69,7 @@ export function initFilter() {
             ease: "power3.out",
             stagger: { each: 0.045, from: "end" },
             overwrite: true,
-          }
+          },
         );
       }
       tags[0]?.focus();
@@ -97,15 +100,27 @@ export function initFilter() {
 
   /* Klick daneben und Escape schließen. Ohne beides bleibt das Panel offen
      stehen, während man schon wieder liest. */
-  document.addEventListener("click", (e) => {
-    if (!box.contains(e.target)) toggle(false);
-  });
+  /* `signal` an beiden: Die Listener hängen am `document` und überleben den
+     Seitenwechsel — `box` und `button` sind danach Elemente aus einem
+     Dokument, das es nicht mehr gibt. */
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!box.contains(e.target)) toggle(false);
+    },
+    { signal: pageSignal() },
+  );
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape" || button.getAttribute("aria-expanded") !== "true") return;
-    toggle(false);
-    button.focus();
-  });
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key !== "Escape" || button.getAttribute("aria-expanded") !== "true")
+        return;
+      toggle(false);
+      button.focus();
+    },
+    { signal: pageSignal() },
+  );
 
   /* --- Filtern ----------------------------------------------------------- */
 
@@ -126,7 +141,13 @@ export function initFilter() {
         gsap.fromTo(
           card,
           { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", overwrite: true }
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power2.out",
+            overwrite: true,
+          },
         );
       } else {
         gsap.to(card, {
@@ -143,7 +164,10 @@ export function initFilter() {
     }
 
     for (const o of options) {
-      o.setAttribute("aria-pressed", String((o.dataset.filterValue || "") === (value || "")));
+      o.setAttribute(
+        "aria-pressed",
+        String((o.dataset.filterValue || "") === (value || "")),
+      );
     }
 
     if (dot) dot.hidden = !value;
@@ -153,8 +177,12 @@ export function initFilter() {
        Attribut erst in ihrem `onComplete`, die Zählung liefe der Anzeige also
        um eine Vierteldrehung hinterher und nennte die Zahl von vorhin. */
     if (status) {
-      const treffer = cards.filter((c) => !value || c.dataset.category === value).length;
-      const wo = value ? `in der Kategorie ${beschriftung(value)}` : "insgesamt";
+      const treffer = cards.filter(
+        (c) => !value || c.dataset.category === value,
+      ).length;
+      const wo = value
+        ? `in der Kategorie ${beschriftung(value)}`
+        : "insgesamt";
       status.textContent =
         treffer === 1 ? `Ein Beitrag ${wo}.` : `${treffer} Beiträge ${wo}.`;
     }

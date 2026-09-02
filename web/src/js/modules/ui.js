@@ -6,7 +6,12 @@
  * Hover-Reaktionen gehören zum Element (siehe .c-btn und .c-link im CSS),
  * nicht an den Mauszeiger.
  */
-import { gsap } from "../lib/gsap.js";
+import { gsap, prefersReducedMotion } from "../lib/gsap.js";
+
+/* Ohne Bewegung sofort statt gar nicht: Aufklappen und Fehlerhinweis sind
+   Bedienung, kein Schmuck. Null Sekunden setzt den Endzustand, nur ohne den
+   Weg dorthin. */
+const dauer = (wert) => (prefersReducedMotion ? 0 : wert);
 
 /* --- Accordion ---------------------------------------------------------
    Höhe wird animiert statt auf `auto` gesetzt, damit der Übergang weich
@@ -58,7 +63,7 @@ export function initAccordion() {
             if (anderes) anderes.inert = true;
             gsap.to(anderes, {
               height: 0,
-              duration: 0.45,
+              duration: dauer(0.45),
               ease: "power3.inOut",
             });
           });
@@ -73,7 +78,7 @@ export function initAccordion() {
         panel.inert = isOpen;
         gsap.to(panel, {
           height: isOpen ? 0 : "auto",
-          duration: 0.5,
+          duration: dauer(0.5),
           ease: "power3.inOut",
         });
       });
@@ -305,7 +310,10 @@ export function initForm() {
         gsap.fromTo(
           firstInvalid,
           { x: -6 },
-          { x: 0, duration: 0.5, ease: "elastic.out(1, 0.35)" },
+          /* Das Rütteln am ersten ungültigen Feld ist der Hinweis „hier".
+             Ohne Bewegung übernimmt das der Fokussprung, den die Zeile
+             darunter ohnehin macht — plus die Meldung am Feld. */
+          { x: 0, duration: dauer(0.5), ease: "elastic.out(1, 0.35)" },
         );
         firstInvalid.querySelector("input, textarea, select")?.focus();
         return;

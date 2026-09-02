@@ -19,6 +19,7 @@
  *   data-marker-delay                 Vorlauf in Sekunden (Ergänzung)
  */
 import { gsap, ScrollTrigger, SplitText } from "../lib/gsap.js";
+import { onTeardown } from "../lib/lifecycle.js";
 
 export function initHighlightMarkerTextReveal() {
   const defaults = {
@@ -47,7 +48,9 @@ export function initHighlightMarkerTextReveal() {
   function resolveColor(value) {
     if (colorMap[value]) return colorMap[value];
     if (value.startsWith("--")) {
-      return getComputedStyle(document.body).getPropertyValue(value).trim() || value;
+      return (
+        getComputedStyle(document.body).getPropertyValue(value).trim() || value
+      );
     }
     return value;
   }
@@ -73,31 +76,45 @@ export function initHighlightMarkerTextReveal() {
 
   let reduceMotion = false;
 
-  gsap.matchMedia().add({ reduce: "(prefers-reduced-motion: reduce)" }, (context) => {
+  /* Jeder Aufruf legt einen eigenen Kontext an, der auf die Medienabfrage
+     hört. Ohne `revert()` beim Seitenwechsel stapeln sie sich, und jeder
+     ältere hält die Elemente seiner Seite fest. */
+  const mm = gsap.matchMedia();
+  onTeardown(() => mm.revert());
+
+  mm.add({ reduce: "(prefers-reduced-motion: reduce)" }, (context) => {
     reduceMotion = context.conditions.reduce;
   });
 
   // Reduced motion: no animation at all
   if (reduceMotion) {
-    document.querySelectorAll("[data-highlight-marker-reveal]").forEach((el) => {
-      gsap.set(el, { autoAlpha: 1 });
-    });
+    document
+      .querySelectorAll("[data-highlight-marker-reveal]")
+      .forEach((el) => {
+        gsap.set(el, { autoAlpha: 1 });
+      });
     return;
   }
 
   // Cleanup previous instances
-  document.querySelectorAll("[data-highlight-marker-reveal]").forEach(cleanupElement);
+  document
+    .querySelectorAll("[data-highlight-marker-reveal]")
+    .forEach(cleanupElement);
 
   const elements = document.querySelectorAll("[data-highlight-marker-reveal]");
   if (!elements.length) return;
 
   elements.forEach((el) => {
-    const direction = el.getAttribute("data-marker-direction") || defaults.direction;
+    const direction =
+      el.getAttribute("data-marker-direction") || defaults.direction;
     const theme = el.getAttribute("data-marker-theme") || defaults.theme;
-    const scrollStart = el.getAttribute("data-marker-scroll-start") || defaults.scrollStart;
-    const staggerStart = el.getAttribute("data-marker-stagger-start") || defaults.staggerStart;
+    const scrollStart =
+      el.getAttribute("data-marker-scroll-start") || defaults.scrollStart;
+    const staggerStart =
+      el.getAttribute("data-marker-stagger-start") || defaults.staggerStart;
     const staggerOffset =
-      (parseFloat(el.getAttribute("data-marker-stagger")) || defaults.stagger) / 1000;
+      (parseFloat(el.getAttribute("data-marker-stagger")) || defaults.stagger) /
+      1000;
     // Ergänzung: Vorlauf in Sekunden. Im Hero laufen die Balken sonst
     // gleichzeitig mit der Wortmarke los und nehmen ihr die Aufmerksamkeit.
     const startDelay = parseFloat(el.getAttribute("data-marker-delay")) || 0;
@@ -117,7 +134,9 @@ export function initHighlightMarkerTextReveal() {
         // Teardown previous build
         instance.timeline?.kill();
         instance.scrollTrigger?.kill();
-        el.querySelectorAll(".highlight-marker-bar").forEach((bar) => bar.remove());
+        el.querySelectorAll(".highlight-marker-bar").forEach((bar) =>
+          bar.remove(),
+        );
 
         // Build bars and timeline
         const lines = self.lines;
@@ -129,7 +148,8 @@ export function initHighlightMarkerTextReveal() {
           const bar = createBar(color, dirConfig.origin);
           line.appendChild(bar);
 
-          const staggerIndex = staggerStart === "end" ? lines.length - 1 - i : i;
+          const staggerIndex =
+            staggerStart === "end" ? lines.length - 1 - i : i;
 
           tl.to(
             bar,
@@ -138,7 +158,7 @@ export function initHighlightMarkerTextReveal() {
               duration: defaults.barDuration,
               ease: defaults.barEase,
             },
-            staggerIndex * staggerOffset
+            staggerIndex * staggerOffset,
           );
         });
 

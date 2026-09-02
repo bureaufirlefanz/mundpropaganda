@@ -13,7 +13,12 @@
  * Bahn — nicht ein zweiter Medienabfrage-Wert im Skript, der mit dem CSS
  * auseinanderlaufen könnte.
  */
-import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
+import {
+  gsap,
+  ScrollTrigger,
+  prefersReducedMotion,
+  refreshTriggers,
+} from "../lib/gsap.js";
 
 export function initTimeline() {
   document.querySelectorAll("[data-timeline]").forEach((root) => {
@@ -70,12 +75,12 @@ export function initTimeline() {
             });
           },
         },
-      }
+      },
     );
 
     /* Nach dem Umbruch stimmen die Anteile nicht mehr — waagerecht und
        senkrecht liegen die Punkte woanders. ScrollTrigger misst bei
        `refresh` neu, das oben angehängte `onRefresh` zieht die Marken mit. */
-    ScrollTrigger.refresh();
+    refreshTriggers();
   });
 }

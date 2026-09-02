@@ -5,6 +5,7 @@
  * bewegt (quickTo) — kein Layout, kein Repaint pro Frame.
  */
 import { gsap } from "../lib/gsap.js";
+import { pageSignal } from "../lib/lifecycle.js";
 
 export function initServicesPreview() {
   const table = document.querySelector("[data-services]");
@@ -25,12 +26,19 @@ export function initServicesPreview() {
 
   const xTo = gsap.quickTo(preview, "x", { duration: 0.55, ease: "power3" });
   const yTo = gsap.quickTo(preview, "y", { duration: 0.55, ease: "power3" });
-  const rTo = gsap.quickTo(preview, "rotation", { duration: 0.8, ease: "power3" });
+  const rTo = gsap.quickTo(preview, "rotation", {
+    duration: 0.8,
+    ease: "power3",
+  });
 
   let lastX = null;
   let visible = false;
 
-  gsap.set(preview, { scale: 0.85, opacity: 0, transformOrigin: "center center" });
+  gsap.set(preview, {
+    scale: 0.85,
+    opacity: 0,
+    transformOrigin: "center center",
+  });
 
   const centerOn = (e) => ({
     x: e.clientX - preview.offsetWidth / 2,
@@ -96,10 +104,19 @@ export function initServicesPreview() {
   list.addEventListener("pointerleave", hide);
   table.addEventListener("pointermove", move);
 
-  // Sicherheitsnetze: Fenster verlassen, Tab wechseln, Kontextmenü öffnen.
-  document.addEventListener("pointerleave", hide);
-  window.addEventListener("blur", hide);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) hide();
-  });
+  /* Sicherheitsnetze: Fenster verlassen, Tab wechseln, Kontextmenü öffnen.
+
+     Alle drei hängen an `document` bzw. `window` und überleben den
+     Seitenwechsel — `hide` griffe danach auf die Tabelle der alten Seite zu.
+     Das Signal nimmt sie mit. */
+  const signal = pageSignal();
+  document.addEventListener("pointerleave", hide, { signal });
+  window.addEventListener("blur", hide, { signal });
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) hide();
+    },
+    { signal },
+  );
 }

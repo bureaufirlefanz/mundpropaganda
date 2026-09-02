@@ -4,7 +4,13 @@
  * Die Leiste selbst ist rein statisch — sie schwebt konstant über der
  * Seite und verändert beim Scrollen weder Position, Größe noch Farbe.
  */
-import { gsap } from "../lib/gsap.js";
+import { gsap, prefersReducedMotion } from "../lib/gsap.js";
+import { pageSignal } from "../lib/lifecycle.js";
+
+/* Ohne Bewegung soll das Menü sofort dastehen und nicht gar nicht: Es ist
+   kein Schmuck, sondern der Weg durch die Seite. Null Sekunden statt kein
+   Tween — der Endzustand wird gesetzt, nur ohne Weg dorthin. */
+const dauer = (wert) => (prefersReducedMotion ? 0 : wert);
 
 export function initNav() {
   const nav = document.querySelector("[data-nav]");
@@ -18,10 +24,9 @@ export function initNav() {
      wird er hier ausgelöst. */
   if (!document.querySelector("[data-hero]")) {
     const inner = nav.querySelector(".c-nav__inner");
-    if (
-      inner &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
+    /* Derselbe Wert wie überall sonst, statt einer zweiten Abfrage: Die in
+       `lib/gsap.js` hört auf Änderungen, diese hier tat es nicht. */
+    if (inner && !prefersReducedMotion) {
       gsap.from(inner, {
         yPercent: -140,
         opacity: 0,
@@ -48,10 +53,10 @@ export function initNav() {
 
     const tl = gsap.timeline({ paused: true });
     tl.set(panel, { visibility: "visible" })
-      .to(panel, { height: "auto", duration: 0.5, ease: "power3.inOut" })
+      .to(panel, { height: "auto", duration: dauer(0.5), ease: "power3.inOut" })
       .from(
         panel.querySelectorAll("[data-megamenu-item]"),
-        { y: 20, opacity: 0, duration: 0.5, stagger: 0.03 },
+        { y: 20, opacity: 0, duration: dauer(0.5), stagger: dauer(0.03) },
         "-=0.3",
       );
 
@@ -131,34 +136,42 @@ export function initNav() {
     mobileTl = gsap.timeline({ paused: true });
     mobileTl
       .set(mobilePanel, { visibility: "visible" })
-      .to(mobilePanel, { height: "auto", duration: 0.5, ease: "power3.inOut" })
+      .to(mobilePanel, {
+        height: "auto",
+        duration: dauer(0.5),
+        ease: "power3.inOut",
+      })
       .from(
         mobilePanel.querySelectorAll("[data-megamenu-item]"),
-        { y: 20, opacity: 0, duration: 0.4, stagger: 0.04 },
+        { y: 20, opacity: 0, duration: dauer(0.4), stagger: dauer(0.04) },
         "-=0.25",
       );
 
     burger.addEventListener("click", () => setzeMobil(!mobilIstOffen()));
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    menus.forEach(({ tl }, item) => {
-      tl.reverse();
-      item.dataset.open = "false";
-    });
-    nav.dataset.menuOpen = "false";
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key !== "Escape") return;
+      menus.forEach(({ tl }, item) => {
+        tl.reverse();
+        item.dataset.open = "false";
+      });
+      nav.dataset.menuOpen = "false";
 
-    /* Escape schloss bis hierher nur die Mega-Menüs. Auf dem Telefon blieb
+      /* Escape schloss bis hierher nur die Mega-Menüs. Auf dem Telefon blieb
        das Panel offen, und wer es mit der Tastatur geöffnet hatte, kam nur
        durch das ganze Menü hindurch wieder heraus.
 
        Der Fokus geht zurück auf den Knopf: Er ist die Stelle, an der man war,
        bevor das Panel aufging. Ohne das steht der Fokus auf einem Element,
        das gerade unsichtbar geworden ist. */
-    if (mobilIstOffen()) {
-      setzeMobil(false);
-      burger.focus();
-    }
-  });
+      if (mobilIstOffen()) {
+        setzeMobil(false);
+        burger.focus();
+      }
+    },
+    { signal: pageSignal() },
+  );
 }

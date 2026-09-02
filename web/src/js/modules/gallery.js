@@ -6,6 +6,7 @@
  * bleibt scrollbar wie gewohnt und fühlt sich nicht „geklaut" an.
  */
 import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.js";
+import { onTeardown } from "../lib/lifecycle.js";
 
 export function initGallery() {
   initCarousel({
@@ -63,7 +64,9 @@ function initCarousel(cfg) {
     if (!cfg.paged) return 1;
     const visibleWidth = track.parentElement.clientWidth;
     const step =
-      items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : items[0].offsetWidth;
+      items.length > 1
+        ? items[1].offsetLeft - items[0].offsetLeft
+        : items[0].offsetWidth;
     return Math.max(1, Math.floor(visibleWidth / step));
   }
 
@@ -127,7 +130,9 @@ function initCarousel(cfg) {
     });
 
     const active = cfg.paged ? Math.floor(index / perPage()) : index;
-    dots.forEach((d, i) => d.setAttribute("aria-selected", String(i === active)));
+    dots.forEach((d, i) =>
+      d.setAttribute("aria-selected", String(i === active)),
+    );
   }
 
   /* Ein Klick blättert eine SEITE weiter, nicht einen Beitrag. Bei vier
@@ -135,8 +140,12 @@ function initCarousel(cfg) {
      das las sich wie ein Ruckeln und nicht wie Blättern. */
   const stepSize = () => (cfg.paged ? perPage() : 1);
 
-  section.querySelector(cfg.next)?.addEventListener("click", () => go(index + stepSize()));
-  section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - stepSize()));
+  section
+    .querySelector(cfg.next)
+    ?.addEventListener("click", () => go(index + stepSize()));
+  section
+    .querySelector(cfg.prev)
+    ?.addEventListener("click", () => go(index - stepSize()));
 
   /* Die Spur nachführen, wenn der Fokus in eine Karte springt.
 
@@ -170,10 +179,18 @@ function initCarousel(cfg) {
   /* Nach einem Resize voices die Offsets nicht mehr — und bei seitenweisem
      Blättern auch die Anzahl der Punkte nicht, weil dann andere viele Karten
      nebeneinander passen. */
-  ScrollTrigger.addEventListener("refreshInit", () => {
+  /* `refreshInit` ist global, nicht an diese Galerie gebunden. Ohne
+     Abmeldung baute jeder spätere `ScrollTrigger.refresh()` die Punkte einer
+     Galerie neu, die längst aus dem Dokument genommen wurde — und zwar für
+     jede Galerie jeder bisher besuchten Seite. */
+  const beiRefresh = () => {
     if (cfg.paged) buildDots();
     go(index);
-  });
+  };
+  ScrollTrigger.addEventListener("refreshInit", beiRefresh);
+  onTeardown(() =>
+    ScrollTrigger.removeEventListener("refreshInit", beiRefresh),
+  );
 }
 
 /**
@@ -214,7 +231,7 @@ export function initMediaParallax() {
           end: "bottom top",
           scrub: true,
         },
-      }
+      },
     );
   });
 }
