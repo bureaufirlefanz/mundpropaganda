@@ -41,7 +41,7 @@ import { EnvelopeIcon } from "@sanity/icons/Envelope";
 const sectionPreview = (
   kind: string,
   field = "headline",
-  extra: { media?: string; icon?: ComponentType } = {}
+  extra: { media?: string; icon?: ComponentType } = {},
 ) => ({
   /* Nur die drei Schlüssel, die Sanity kennt: `title`, `subtitle`, `media`.
      Eigene Namen sind zwar erlaubt, sobald ein `prepare` sie verarbeitet —
@@ -69,8 +69,16 @@ const sectionPreview = (
   }),
 });
 
-const topline = defineField({ name: "topline", title: "Topline", type: "string" });
-const headline = defineField({ name: "headline", title: "Überschrift", type: "string" });
+const topline = defineField({
+  name: "topline",
+  title: "Topline",
+  type: "string",
+});
+const headline = defineField({
+  name: "headline",
+  title: "Überschrift",
+  type: "string",
+});
 
 /* --- Einleitung -------------------------------------------------------- */
 
@@ -112,22 +120,37 @@ export const sectionFacts = defineType({
           type: "object",
           name: "figure",
           fields: [
-            defineField({ name: "value", title: "Zahl", type: "number", validation: (r) => r.required() }),
+            defineField({
+              name: "value",
+              title: "Zahl",
+              type: "number",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "unit",
               title: "Einheit",
               type: "string",
-              description: "Steht direkt hinter der Zahl, z. B. „ h“ oder „ %“. Leer lassen, wenn keine.",
+              description:
+                "Steht direkt hinter der Zahl, z. B. „ h“ oder „ %“. Leer lassen, wenn keine.",
             }),
-            defineField({ name: "text", title: "Erklärung", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "text",
+              title: "Erklärung",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
           ],
           preview: {
             select: { title: "value", subtitle: "text" },
-            prepare: ({ title, subtitle }) => ({ title: String(title ?? ""), subtitle }),
+            prepare: ({ title, subtitle }) => ({
+              title: String(title ?? ""),
+              subtitle,
+            }),
           },
         }),
       ],
-      description: "Vier passen in eine Reihe. Nur Angaben, die sich nachrechnen lassen.",
+      description:
+        "Vier passen in eine Reihe. Nur Angaben, die sich nachrechnen lassen.",
       validation: (r) => r.max(4),
     }),
   ],
@@ -153,13 +176,24 @@ export const sectionCompare = defineType({
           type: "object",
           name: "column",
           fields: [
-            defineField({ name: "name", title: "Überschrift", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "meta", title: "Zusatz", type: "string", description: "Kleine Zeile darunter." }),
+            defineField({
+              name: "name",
+              title: "Überschrift",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "meta",
+              title: "Zusatz",
+              type: "string",
+              description: "Kleine Zeile darunter.",
+            }),
             defineField({
               name: "emphasised",
               title: "Hervorheben",
               type: "boolean",
-              description: "Legt die Spalte farbig hinterlegt über alle Zeilen. Höchstens eine.",
+              description:
+                "Legt die Spalte farbig hinterlegt über alle Zeilen. Höchstens eine.",
               initialValue: false,
             }),
           ],
@@ -177,7 +211,12 @@ export const sectionCompare = defineType({
           type: "object",
           name: "zeile",
           fields: [
-            defineField({ name: "name", title: "Merkmal", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Merkmal",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "values",
               title: "Werte",
@@ -209,13 +248,19 @@ export const sectionCompare = defineType({
                       name: "text",
                       title: "Text",
                       type: "string",
-                      hidden: ({ parent }) => parent?.kind === "ja" || parent?.kind === "nein",
+                      hidden: ({ parent }) =>
+                        parent?.kind === "ja" || parent?.kind === "nein",
                     }),
                   ],
                   preview: {
                     select: { kind: "kind", text: "text" },
                     prepare: ({ kind, text }) => ({
-                      title: kind === "ja" ? "Ja" : kind === "nein" ? "Nein" : text || "(leer)",
+                      title:
+                        kind === "ja"
+                          ? "Ja"
+                          : kind === "nein"
+                            ? "Nein"
+                            : text || "(leer)",
                     }),
                   },
                 }),
@@ -236,7 +281,9 @@ export const sectionCompare = defineType({
     }),
   ],
   icon: SplitVerticalIcon,
-  preview: sectionPreview("Vergleichstabelle", "headline", { icon: SplitVerticalIcon }),
+  preview: sectionPreview("Vergleichstabelle", "headline", {
+    icon: SplitVerticalIcon,
+  }),
 });
 
 /* --- Ablauf als Zeitstrahl --------------------------------------------- */
@@ -257,8 +304,18 @@ export const sectionTimeline = defineType({
           type: "object",
           name: "stage",
           fields: [
-            defineField({ name: "marker", title: "Zeitangabe", type: "string", description: "Z. B. „Tag 0“ oder „Woche 2“." }),
-            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "marker",
+              title: "Zeitangabe",
+              type: "string",
+              description: "Z. B. „Tag 0“ oder „Woche 2“.",
+            }),
+            defineField({
+              name: "title",
+              title: "Titel",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
           ],
           preview: { select: { title: "title", subtitle: "marker" } },
@@ -289,27 +346,54 @@ export const sectionVoices = defineType({
           type: "object",
           name: "voice",
           fields: [
-            defineField({ name: "quote", title: "Zitat", type: "text", rows: 4, validation: (r) => r.required() }),
-            defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "quote",
+              title: "Zitat",
+              type: "text",
+              rows: 4,
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "name",
+              title: "Name",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({ name: "role", title: "Rolle", type: "string" }),
-            defineField({ name: "since", title: "Zusatz", type: "string", description: "Z. B. „seit 2019“." }),
+            defineField({
+              name: "since",
+              title: "Zusatz",
+              type: "string",
+              description: "Z. B. „seit 2019“.",
+            }),
             defineField({ name: "image", title: "Bild", type: "picture" }),
             defineField({
               name: "offset",
               title: "Höhenversatz",
               type: "number",
-              description: "0 = oben bündig, 1 = ganz abgesenkt. Dazwischen ist erlaubt.",
+              description:
+                "0 = oben bündig, 1 = ganz abgesenkt. Dazwischen ist erlaubt.",
               initialValue: 0,
               validation: (r) => r.min(0).max(1),
             }),
           ],
-          preview: { select: { title: "name", subtitle: "role", media: "image" } },
+          preview: {
+            select: { title: "name", subtitle: "role", media: "image" },
+          },
         }),
       ],
     }),
   ],
   icon: UsersIcon,
-  preview: sectionPreview("Stimmen", "headline", { media: "stimmen.0.picture", icon: UsersIcon }),
+  /* `voices.0.image` und nicht `stimmen.0.picture`: Der alte Pfad stammt aus
+     der Zeit vor der Sprachmigration und zeigte auf ein Array und ein Feld,
+     die es beide nicht mehr gibt. Er warf keinen Fehler — Sanity zeigt bei
+     einem toten Pfad einfach das Symbol —, und deshalb sah die Blockvorschau
+     so aus, als sei für diesen Abschnitt kein Bild vorgesehen. */
+  preview: sectionPreview("Stimmen", "headline", {
+    media: "voices.0.image",
+    icon: UsersIcon,
+  }),
 });
 
 /* --- Aussage ----------------------------------------------------------- */
@@ -320,7 +404,13 @@ export const sectionStatement = defineType({
   type: "object",
   fields: [
     topline,
-    defineField({ name: "text", title: "Satz", type: "text", rows: 3, validation: (r) => r.required() }),
+    defineField({
+      name: "text",
+      title: "Satz",
+      type: "text",
+      rows: 3,
+      validation: (r) => r.required(),
+    }),
   ],
   icon: BlockquoteIcon,
   preview: sectionPreview("Aussage", "text", { icon: BlockquoteIcon }),
@@ -343,7 +433,12 @@ export const sectionSteps = defineType({
           type: "object",
           name: "schritt",
           fields: [
-            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "title",
+              title: "Titel",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({ name: "text", title: "Text", type: "text", rows: 4 }),
           ],
           preview: { select: { title: "title" } },
@@ -362,7 +457,12 @@ export const sectionPricing = defineType({
   title: "Preise",
   type: "object",
   fields: [
-    defineField({ name: "title", title: "Überschrift", type: "string", initialValue: "Kosten" }),
+    defineField({
+      name: "title",
+      title: "Überschrift",
+      type: "string",
+      initialValue: "Kosten",
+    }),
     defineField({
       name: "pricing",
       title: "Preise",
@@ -372,8 +472,17 @@ export const sectionPricing = defineType({
           type: "object",
           name: "price",
           fields: [
-            defineField({ name: "name", title: "Bezeichnung", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "price", title: "Preisangabe", type: "string" }),
+            defineField({
+              name: "name",
+              title: "Bezeichnung",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "price",
+              title: "Preisangabe",
+              type: "string",
+            }),
           ],
           preview: { select: { title: "name", subtitle: "price" } },
         }),
@@ -391,7 +500,12 @@ export const sectionFaq = defineType({
   title: "Häufige Fragen",
   type: "object",
   fields: [
-    defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+    defineField({
+      name: "title",
+      title: "Überschrift",
+      type: "string",
+      validation: (r) => r.required(),
+    }),
     defineField({ name: "text", title: "Zusatzzeile", type: "text", rows: 2 }),
     defineField({
       name: "questions",
@@ -402,8 +516,18 @@ export const sectionFaq = defineType({
           type: "object",
           name: "questionAnswer",
           fields: [
-            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
+            defineField({
+              name: "question",
+              title: "Frage",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "answer",
+              title: "Antwort",
+              type: "text",
+              rows: 4,
+            }),
           ],
           preview: { select: { title: "question" } },
         }),
@@ -427,7 +551,8 @@ export const sectionContact = defineType({
       name: "service",
       title: "Vorausgewählte Leistung",
       type: "string",
-      description: "Steht im Auswahlfeld voreingestellt. Leer lassen für keine Vorauswahl.",
+      description:
+        "Steht im Auswahlfeld voreingestellt. Leer lassen für keine Vorauswahl.",
     }),
   ],
   icon: EnvelopeIcon,

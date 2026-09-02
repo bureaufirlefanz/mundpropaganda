@@ -100,14 +100,16 @@ function holeBauer() {
   const { projectId, dataset } = sanityClient.config();
   if (!projectId || !dataset) {
     throw new Error(
-      "Für Bilder aus dem CMS fehlen PUBLIC_SANITY_PROJECT_ID oder PUBLIC_SANITY_DATASET (siehe web/.env.example)."
+      "Für Bilder aus dem CMS fehlen PUBLIC_SANITY_PROJECT_ID oder PUBLIC_SANITY_DATASET (siehe web/.env.example).",
     );
   }
   builder = imageUrlBuilder({ projectId, dataset });
   return builder;
 }
 
-export const isCmsImage = (source: ImageSource | undefined | null): source is CmsImageValue =>
+export const isCmsImage = (
+  source: ImageSource | undefined | null,
+): source is CmsImageValue =>
   typeof source === "object" && source !== null && Boolean(source.asset);
 
 /**
@@ -119,13 +121,81 @@ export const isCmsImage = (source: ImageSource | undefined | null): source is Cm
  * Bildmittelpunkt aus dem Studio: ohne Zielformat gibt es nichts, worauf ein
  * Hotspot angewandt werden könnte.
  */
-export function imageUrl(source: CmsImageValue, width: number, ratio?: number): string {
+export function imageUrl(
+  source: CmsImageValue,
+  width: number,
+  ratio?: number,
+): string {
   let image = holeBauer().image(source).width(width).auto("format").quality(78);
   if (ratio) image = image.height(Math.round(width / ratio)).fit("crop");
   return image.url();
 }
 
 /** srcset über mehrere Breiten — dasselbe Prinzip wie im lokalen Partial. */
-export function imageSrcset(source: CmsImageValue, widths: number[], ratio?: number): string {
+export function imageSrcset(
+  source: CmsImageValue,
+  widths: number[],
+  ratio?: number,
+): string {
   return widths.map((b) => `${imageUrl(source, b, ratio)} ${b}w`).join(", ");
+}
+
+/**
+ * Die Maße, die ins `<img>` gehören.
+ *
+ * `width` und `height` am Bild sind keine Größenangabe — CSS überschreibt
+ * beides —, sondern die Angabe des Seitenverhältnisses, bevor die Datei da
+ * ist. Der Browser reserviert damit den Platz und muss nichts nachrücken.
+ *
+ * Gemessen ist der Gewinn heute klein: Fast jede Bildfläche der Seite hat in
+ * ihrem CSS ein `aspect-ratio`, und der Wert für die Layoutverschiebung liegt
+ * auf allen Seiten unter 0,003. Die Angabe kostet aber nichts und trägt genau
+ * dort, wo das CSS sie nicht hat — und das ist der Fall, den man nicht sieht,
+ * weil er erst mit einem neuen Abschnitt entsteht.
+ *
+ * Der Beschnitt zählt mit. `crop` gibt an, wieviel von jeder Seite wegfällt;
+ * die Metadaten nennen die ganze Datei. Ohne diese Rechnung stünde am Bild
+ * das Verhältnis des Originals, während die CDN-Adresse den Ausschnitt
+ * liefert — und der reservierte Platz wäre falsch.
+ */
+export function imageSize(
+  source: CmsImageValue,
+  width: number,
+  ratio?: number,
+): { width: number; height: number } | undefined {
+  if (ratio) return { width, height: Math.round(width / ratio) };
+
+  const dimensions = source.asset?.metadata?.dimensions;
+  if (!dimensions?.width || !dimensions?.height) return undefined;
+
+  const crop = source.crop as
+    | { top?: number; bottom?: number; left?: number; right?: number }
+    | undefined;
+  const waagerecht = 1 - (crop?.left ?? 0) - (crop?.right ?? 0);
+  const senkrecht = 1 - (crop?.top ?? 0) - (crop?.bottom ?? 0);
+  if (waagerecht <= 0 || senkrecht <= 0) return undefined;
+
+  const eigen =
+    (dimensions.width * waagerecht) / (dimensions.height * senkrecht);
+  return { width, height: Math.round(width / eigen) };
+}
+
+/**
+ * Der Bildmittelpunkt als `object-position`.
+ *
+ * Bis hierher wirkte der Hotspot aus dem Studio nur, wenn die Aufrufstelle ein
+ * `ratio` mitgab — dann beschneidet das CDN und wendet ihn an. Das taten 27
+ * von 28 Stellen nicht: Die Redaktion konnte den Punkt setzen, CSS schnitt
+ * trotzdem um die Mitte, und der Punkt war reine Zierde.
+ *
+ * Ohne serverseitigen Beschnitt lässt sich derselbe Wunsch im Browser
+ * erfüllen — `object-fit: cover` schneidet dann um den gesetzten Punkt statt
+ * um die Mitte. `undefined`, wenn kein Hotspot gesetzt ist: Dann soll die
+ * Regel aus dem Stylesheet gelten und nicht eine hier erfundene Mitte.
+ */
+export function hotspotPosition(source: CmsImageValue): string | undefined {
+  const hotspot = source.hotspot as { x?: number; y?: number } | undefined;
+  if (typeof hotspot?.x !== "number" || typeof hotspot?.y !== "number")
+    return undefined;
+  return `${(hotspot.x * 100).toFixed(2)}% ${(hotspot.y * 100).toFixed(2)}%`;
 }

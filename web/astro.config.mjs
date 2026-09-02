@@ -8,8 +8,11 @@ import netlify from "@astrojs/netlify";
 // astro.config.mjs läuft vor Astros Env-Ladung — import.meta.env.PUBLIC_* ist
 // hier noch nicht verfügbar. loadEnv liest dieselben Variablen, die die Seiten
 // später über import.meta.env bekommen.
-const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET, PUBLIC_SANITY_STUDIO_URL } =
-  loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
+const {
+  PUBLIC_SANITY_PROJECT_ID,
+  PUBLIC_SANITY_DATASET,
+  PUBLIC_SANITY_STUDIO_URL,
+} = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 /* Wo das Studio läuft. Braucht Stega, um aus einem angeklickten Text den
    richtigen Feldpfad im Studio zu öffnen. Voreinstellung ist der lokale
@@ -55,7 +58,9 @@ function suchmaschinenSperre({ projectId, dataset, apiVersion }) {
     name: "mundpropaganda:suchmaschinen-sperre",
     hooks: {
       "astro:build:done": async ({ dir, logger }) => {
-        const abfrage = encodeURIComponent('*[_id == "settings"][0].searchEngines');
+        const abfrage = encodeURIComponent(
+          '*[_id == "settings"][0].searchEngines',
+        );
         const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${abfrage}`;
 
         let freigegeben = false;
@@ -65,12 +70,14 @@ function suchmaschinenSperre({ projectId, dataset, apiVersion }) {
           freigegeben = (await antwort.json()).result === true;
         } catch (fehler) {
           logger.warn(
-            `Einstellungen nicht erreichbar (${fehler.message}) — die Seite wird gesperrt ausgeliefert.`
+            `Einstellungen nicht erreichbar (${fehler.message}) — die Seite wird gesperrt ausgeliefert.`,
           );
         }
 
         if (freigegeben) {
-          logger.info("Suchmaschinen sind freigegeben, keine Sperre in _headers.");
+          logger.info(
+            "Suchmaschinen sind freigegeben, keine Sperre in _headers.",
+          );
           return;
         }
 
@@ -78,7 +85,9 @@ function suchmaschinenSperre({ projectId, dataset, apiVersion }) {
         const bestand = await readFile(pfad, "utf8").catch(() => "");
         const sperre = "/*\n  X-Robots-Tag: noindex, nofollow\n\n";
         await writeFile(pfad, sperre + bestand, "utf8");
-        logger.info("Suchmaschinen gesperrt: X-Robots-Tag in _headers gesetzt.");
+        logger.info(
+          "Suchmaschinen gesperrt: X-Robots-Tag in _headers gesetzt.",
+        );
       },
     },
   };
@@ -110,6 +119,15 @@ export default defineConfig({
       apiVersion: "2026-07-28",
       // Statischer Build: direkt gegen die API, nicht über den CDN-Cache.
       useCdn: false,
+
+      /* Ausgeschrieben, obwohl es die Voreinstellung ist.
+         Seit `apiVersion` 2025-02-19 liefert die API ohne Angabe den
+         veröffentlichten Stand — davor waren es Entwürfe UND Veröffentlichtes.
+         Ein Sprung der apiVersion nach oben ändert daran nichts mehr, ein
+         Sprung nach unten schon: Dann bekäme der statische Build unfertige
+         Entwürfe und veröffentlichte sie. Das ist zu leise für einen
+         Unfall. */
+      perspective: "published",
       // Das Studio bleibt eigenständig in studio/ — hier bewusst kein
       // studioBasePath, sonst würde es in die Auslieferung eingebettet.
 
@@ -145,7 +163,13 @@ export default defineConfig({
        Reveals und 11 Headlines standen unverändert da. Nur im
        Entwicklungsmodus, der Build bündelt ohnehin alles. */
     optimizeDeps: {
-      include: ["gsap", "gsap/ScrollTrigger", "gsap/SplitText", "gsap/CustomEase", "lenis"],
+      include: [
+        "gsap",
+        "gsap/ScrollTrigger",
+        "gsap/SplitText",
+        "gsap/CustomEase",
+        "lenis",
+      ],
     },
   },
 });

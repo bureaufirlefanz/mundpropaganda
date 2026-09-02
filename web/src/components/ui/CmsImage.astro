@@ -7,8 +7,16 @@
  * Gegenstück zu Picture.astro: das bedient die feste Bildpipeline des
  * Prototyps, dieses hier das CDN.
  */
-import { isCmsImage, imageUrl, imageSrcset, type ImageSource } from "../../lib/images";
+import {
+  isCmsImage,
+  imageUrl,
+  imageSrcset,
+  imageSize,
+  hotspotPosition,
+  type ImageSource,
+} from "../../lib/images";
 import WIDTHS from "../../lib/image-widths.json";
+import type { CmsImageValue } from "../../lib/images";
 
 interface Props {
   source: ImageSource | undefined | null;
@@ -46,7 +54,7 @@ const cms = isCmsImage(source);
 
 /* Der Alternativtext steht am Bild im Studio. Ein ausgeschriebenes alt am
    Aufrufort gewinnt trotzdem — dekorative Bilder brauchen ein leeres. */
-const description = alt || (cms ? (source as any).alt ?? "" : "");
+const description = alt || (cms ? ((source as any).alt ?? "") : "");
 
 /* Platzhalter, bis das Bild da ist. Anders als die lokalen Motive liegen
    CMS-Bilder auf einem fremden Host — ohne das bleibt der Rahmen bis dahin
@@ -63,19 +71,44 @@ const lqip = cms ? (source as any).asset?.metadata?.lqip : undefined;
    Lauter Abbruch bei unbekanntem Namen, dieselbe Begründung wie in
    `Picture.astro`: Ein Tippfehler soll den Build anhalten und nicht erst auf
    der fertigen Seite auffallen. */
-const motif = !cms && typeof source === "string" && !source.includes("/") ? source : null;
-const motifWidths = motif ? (WIDTHS as Record<string, number[]>)[motif] : undefined;
+const motif =
+  !cms && typeof source === "string" && !source.includes("/") ? source : null;
+const motifWidths = motif
+  ? (WIDTHS as Record<string, number[]>)[motif]
+  : undefined;
 
 if (motif && !motifWidths?.length) {
   throw new Error(
     `CmsImage: Motiv „${motif}" steht nicht in image-widths.json. ` +
       `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
-      `\`npm run images\`.`
+      `\`npm run images\`.`,
   );
 }
 
 const motifSrcset = (ext: string) =>
   motifWidths!.map((w) => `/img/${motif}-${w}.${ext} ${w}w`).join(", ");
+
+/* Maße und Bildmittelpunkt gelten nur für Bilder aus dem CMS: Die lokale
+   Pipeline schreibt ihre Höhen nicht auf, und einen Hotspot hat sie nicht. */
+const largest = widths[widths.length - 1];
+const size = cms
+  ? imageSize(source as CmsImageValue, largest, ratio)
+  : undefined;
+
+/* Ohne `ratio` schneidet CSS, und dann muss der Punkt hier hin. Mit `ratio`
+   hat das CDN bereits um ihn herum beschnitten — ein zweites Mal wäre
+   doppelt. */
+const position =
+  cms && !ratio ? hotspotPosition(source as CmsImageValue) : undefined;
+
+const style =
+  [
+    lqip &&
+      `background-image:url(${lqip});background-size:cover;background-position:center`,
+    position && `object-position:${position}`,
+  ]
+    .filter(Boolean)
+    .join(";") || undefined;
 ---
 
 {
@@ -86,12 +119,12 @@ const motifSrcset = (ext: string) =>
       srcset={imageSrcset(source as any, widths, ratio)}
       sizes={sizes}
       alt={description}
+      width={size?.width}
+      height={size?.height}
       loading={eager ? "eager" : "lazy"}
       fetchpriority={eager ? "high" : undefined}
       decoding={eager ? undefined : "async"}
-      style={lqip
-        ? `background-image:url(${lqip});background-size:cover;background-position:center`
-        : undefined}
+      style={style}
     />
   ) : motif ? (
     /* AVIF zuerst, WebP als Rückfall — dieselbe Reihenfolge wie in

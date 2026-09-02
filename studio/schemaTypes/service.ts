@@ -1,6 +1,10 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
 import { TagIcon } from "@sanity/icons/Tag";
+import { seoField } from "./objects/seo-field";
 
 /**
  * Eine Leistung (Veneers, Implantate, ...).
@@ -55,7 +59,8 @@ export const service = defineType({
       name: "topline",
       title: "Topline",
       type: "string",
-      description: "Kurze Zeile über der Überschrift, z. B. „Veneers in Berlin“.",
+      description:
+        "Kurze Zeile über der Überschrift, z. B. „Veneers in Berlin“.",
       group: "content",
     }),
 
@@ -94,7 +99,8 @@ export const service = defineType({
       name: "group",
       title: "Spalte im Menü",
       type: "string",
-      description: "Bestimmt, unter welcher Überschrift sie im Navigationsmenü steht.",
+      description:
+        "Bestimmt, unter welcher Überschrift sie im Navigationsmenü steht.",
       group: "list",
       options: {
         list: [
@@ -110,7 +116,8 @@ export const service = defineType({
       name: "tag",
       title: "Kürzel",
       type: "string",
-      description: "Steht rechts in der Tabellenzeile, z. B. das Standortkürzel „P25“.",
+      description:
+        "Steht rechts in der Tabellenzeile, z. B. das Standortkürzel „P25“.",
       group: "list",
       initialValue: "P25",
     }),
@@ -131,7 +138,12 @@ export const service = defineType({
       group: "content",
       options: { collapsible: true, collapsed: false },
       fields: [
-        defineField({ name: "text", title: "Einleitung", type: "text", rows: 4 }),
+        defineField({
+          name: "text",
+          title: "Einleitung",
+          type: "text",
+          rows: 4,
+        }),
         defineField({ name: "image", title: "Bild", type: "picture" }),
       ],
     }),
@@ -146,8 +158,18 @@ export const service = defineType({
          anlegt, füllt ihn auch. Eine Überschrift ohne Text wäre die halbe
          Wahrheit statt keiner. Dasselbe gilt für Benefits darunter. */
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-        defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+        defineField({
+          name: "topline",
+          title: "Topline",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "headline",
+          title: "Überschrift",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
         defineField({
           name: "columns",
           title: "Textspalten",
@@ -166,19 +188,35 @@ export const service = defineType({
       group: "content",
       options: { collapsible: true, collapsed: true },
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-        defineField({ name: "headline", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+        defineField({
+          name: "topline",
+          title: "Topline",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "headline",
+          title: "Überschrift",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
         defineField({
           name: "items",
           title: "Einträge",
-          description: "Werden nacheinander aufgeklappt, dazu wechselt das Bild.",
+          description:
+            "Werden nacheinander aufgeklappt, dazu wechselt das Bild.",
           type: "array",
           of: [
             defineArrayMember({
               type: "object",
               name: "item",
               fields: [
-                defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
+                defineField({
+                  name: "name",
+                  title: "Name",
+                  type: "string",
+                  validation: (r) => r.required(),
+                }),
                 defineField({
                   name: "text",
                   title: "Text",
@@ -210,7 +248,12 @@ export const service = defineType({
           type: "object",
           name: "price",
           fields: [
-            defineField({ name: "name", title: "Bezeichnung", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Bezeichnung",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "price",
               title: "Preisangabe",
@@ -235,8 +278,18 @@ export const service = defineType({
           type: "object",
           name: "questionAnswer",
           fields: [
-            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
+            defineField({
+              name: "question",
+              title: "Frage",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "answer",
+              title: "Antwort",
+              type: "text",
+              rows: 4,
+            }),
           ],
           preview: { select: { title: "question" } },
         }),
@@ -267,9 +320,22 @@ export const service = defineType({
       description:
         "Zwei Aufnahmen mit Schieberegler. Ohne eigene Bilder stehen hier die gestalteten Motive - laden Sie für diese Behandlung eigene hoch, sonst zeigt der Vergleich fremde Zähne.",
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-        defineField({ name: "before", title: "Aufnahme vorher", type: "picture" }),
-        defineField({ name: "after", title: "Aufnahme nachher", type: "picture" }),
+        defineField({
+          name: "topline",
+          title: "Topline",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "before",
+          title: "Aufnahme vorher",
+          type: "picture",
+        }),
+        defineField({
+          name: "after",
+          title: "Aufnahme nachher",
+          type: "picture",
+        }),
       ],
     }),
 
@@ -279,10 +345,22 @@ export const service = defineType({
       type: "object",
       group: "content",
       options: { collapsible: true, collapsed: true },
-      description: "Ein einzelner Absatz, größer gesetzt. Trägt eine Aussage, ohne Überschrift zu sein.",
+      description:
+        "Ein einzelner Absatz, größer gesetzt. Trägt eine Aussage, ohne Überschrift zu sein.",
       fields: [
-        defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-        defineField({ name: "text", title: "Text", type: "text", rows: 5, validation: (r) => r.required() }),
+        defineField({
+          name: "topline",
+          title: "Topline",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "text",
+          title: "Text",
+          type: "text",
+          rows: 5,
+          validation: (r) => r.required(),
+        }),
       ],
     }),
 
@@ -310,8 +388,19 @@ export const service = defineType({
               type: "object",
               name: "schritt",
               fields: [
-                defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
-                defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
+                defineField({
+                  name: "title",
+                  title: "Titel",
+                  type: "string",
+                  validation: (r) => r.required(),
+                }),
+                defineField({
+                  name: "text",
+                  title: "Text",
+                  type: "text",
+                  rows: 4,
+                  validation: (r) => r.required(),
+                }),
               ],
               preview: { select: { title: "title", subtitle: "text" } },
             }),
@@ -321,35 +410,199 @@ export const service = defineType({
       ],
     }),
 
+    /* --- Zwei Abschnitte für lange Seiten -------------------------------
+
+       Eine Leistungsseite trägt zwischen Intro, Merkmalen und Ablauf nur
+       kurze Blöcke. Für ein Thema wie Veneers ist das zu wenig: Wer sich
+       für einen Eingriff entscheidet, liest, und was hier nicht steht, sucht
+       er woanders.
+
+       „Textabschnitte" sind deshalb längere Strecken im Magazinsatz —
+       Überschrift, ein Vorspann, darunter zwei bis drei Spalten Fließtext.
+       Sie stehen nicht an einer festen Stelle, sondern tragen ihre Position
+       selbst: `placement` sagt, hinter welchem Abschnitt der Block landet.
+       Der Grund ist die Dramaturgie einer Seite — der Text „Für wen kommen
+       Veneers infrage" gehört vor die drei Arten, der über die Kosten hinter
+       die Preise. Ein einziger fester Platz träfe immer nur einen davon.
+
+       Das „Handlungsband" ist die Einladung dazwischen: eine Karte auf einem
+       randabfallenden Bild, mit genau einem Knopf. Es steht hinter dem
+       Ablauf, weil dort die Frage entsteht, die es beantwortet. */
+
     defineField({
-      name: "features",
-      title: "Bild-Text-Zeilen",
+      name: "textSections",
+      title: "Textabschnitte",
       type: "array",
       group: "content",
-      description: "Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt von selbst.",
+      description:
+        "Längere Textstrecken im Magazinsatz. Jede trägt selbst, an welcher Stelle der Seite sie steht.",
       of: [
         defineArrayMember({
           type: "object",
-          name: "featureZeile",
+          name: "textSection",
           fields: [
-            defineField({ name: "topline", title: "Topline", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
-            defineField({ name: "image", title: "Bild", type: "picture" }),
+            defineField({
+              name: "placement",
+              title: "Wo steht der Abschnitt?",
+              type: "string",
+              description:
+                "Bestimmt die Stelle auf der Seite, nicht die Reihenfolge in dieser Liste.",
+              initialValue: "intro",
+              options: {
+                list: [
+                  { title: "Nach dem Intro", value: "intro" },
+                  { title: "Nach der Kernaussage", value: "statement" },
+                  { title: "Nach dem Ablauf", value: "steps" },
+                  { title: "Nach den Kosten", value: "pricing" },
+                ],
+                layout: "radio",
+              },
+              validation: (r) => r.required(),
+            }),
+            defineField({ name: "topline", title: "Topline", type: "string" }),
+            defineField({
+              name: "headline",
+              title: "Überschrift",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "lead",
+              title: "Vorspann",
+              type: "text",
+              rows: 3,
+              description:
+                "Ein bis zwei Sätze, größer gesetzt. Leer lassen, wenn der Text ohne auskommt.",
+            }),
+            defineField({
+              name: "columns",
+              title: "Textspalten",
+              description:
+                "Zwei oder drei - mehr wird auf dem Schirm zur Spalte aus Einzelwörtern.",
+              type: "array",
+              of: [defineArrayMember({ type: "text", rows: 8 })],
+              validation: (r) => r.required().min(2).max(3),
+            }),
+            defineField({
+              name: "items",
+              title: "Aufzählung",
+              type: "array",
+              of: [defineArrayMember({ type: "string" })],
+              description:
+                "Steht abgesetzt unter den Spalten, zweispaltig. Wahlfrei - ohne Einträge erscheint sie nicht.",
+              validation: (r) => r.max(10),
+            }),
           ],
-          preview: { select: { title: "title", subtitle: "topline", media: "image" } },
+          preview: {
+            select: {
+              title: "headline",
+              placement: "placement",
+              topline: "topline",
+            },
+            prepare: ({ title, placement, topline }) => {
+              const wo = {
+                intro: "nach dem Intro",
+                statement: "nach der Kernaussage",
+                steps: "nach dem Ablauf",
+                pricing: "nach den Kosten",
+              };
+              return {
+                title: title ?? "Ohne Überschrift",
+                subtitle: [topline, wo[placement as keyof typeof wo]]
+                  .filter(Boolean)
+                  .join(" · "),
+              };
+            },
+          },
         }),
       ],
     }),
 
     defineField({
-      name: "seoDescription",
-      title: "Meta-Beschreibung",
-      type: "text",
-      rows: 2,
-      group: "seo",
-      validation: (rule) => rule.max(160).warning("Über 160 Zeichen kürzt Google ab."),
+      name: "ctaBand",
+      title: "Handlungsband",
+      type: "object",
+      group: "content",
+      options: { collapsible: true, collapsed: true },
+      description:
+        "Die Einladung mitten auf der Seite, hinter dem Ablauf. Ohne Überschrift erscheint sie nicht.",
+      fields: [
+        defineField({
+          name: "headline",
+          title: "Überschrift",
+          type: "string",
+          description:
+            "Kurz, zwei Zeilen - z. B. „Erst reden, dann entscheiden.“",
+          validation: (r) => r.required(),
+        }),
+        defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
+        defineField({
+          name: "actionLabel",
+          title: "Beschriftung des Knopfes",
+          type: "string",
+          description:
+            "Der Knopf springt zum Kontaktabschnitt dieser Seite. Leer lassen, wenn die Karte ohne Knopf stehen soll.",
+        }),
+        defineField({
+          name: "image",
+          title: "Bild",
+          type: "picture",
+          description:
+            "Läuft hinter der Karte über die volle Breite. Ohne eigenes Bild steht hier das gestaltete Motiv.",
+        }),
+      ],
     }),
+
+    defineField({
+      name: "features",
+      title: "Bild-Text-Zeilen",
+      type: "array",
+      group: "content",
+      description:
+        "Abwechselnd Bild links und rechts. Jede zweite Zeile spiegelt von selbst.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "featureZeile",
+          fields: [
+            defineField({
+              name: "topline",
+              title: "Topline",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "title",
+              title: "Überschrift",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Text",
+              type: "text",
+              rows: 4,
+              validation: (r) => r.required(),
+            }),
+            defineField({ name: "image", title: "Bild", type: "picture" }),
+          ],
+          preview: {
+            select: { title: "title", subtitle: "topline", media: "image" },
+          },
+        }),
+      ],
+    }),
+
+    /* Dasselbe SEO-Objekt wie bei allen anderen Seiten mit eigener Adresse.
+       Vorher stand hier ein nacktes `seoDescription` — eine einzelne
+       Zeichenkette. Eine Leistungsseite konnte damit keinen eigenen
+       Seitentitel, kein Teilen-Bild und keinen Ausschluss aus dem Suchindex
+       haben, obwohl `/leistungen/veneers` die am häufigsten aufgerufene Seite
+       nach der Startseite ist.
+
+       Der alte Wert wandert mit `scripts/service-seo.mjs` nach
+       `seo.description`. */
+    seoField,
   ],
 
   /* Das Vorschaubild der Liste zeigt, was die Redaktion in der Tabelle sieht.
@@ -364,10 +617,17 @@ export const service = defineType({
       hero: "hero.image",
     },
     prepare: ({ title, shortName, placement, preview, hero }) => {
-      const wo = { tabelle: "Tabelle", liste: "nur Link", versteckt: "nur Menü" };
+      const wo = {
+        tabelle: "Tabelle",
+        liste: "nur Link",
+        versteckt: "nur Menü",
+      };
       return {
         title: title ?? "Ohne Titel",
-        subtitle: [shortName && shortName !== title ? shortName : null, wo[placement as keyof typeof wo]]
+        subtitle: [
+          shortName && shortName !== title ? shortName : null,
+          wo[placement as keyof typeof wo],
+        ]
           .filter(Boolean)
           .join(" · "),
         media: preview ?? hero,

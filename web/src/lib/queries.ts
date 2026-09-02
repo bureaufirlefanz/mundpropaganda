@@ -86,12 +86,16 @@ export const SERVICE_LIST_QUERY = defineQuery(`
  * gebaut, standen aber nicht im Schema — die Seite nahm sie aus
  * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
  * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
+ *
+ * `textSections` und `ctaBand` kamen später dazu, für Seiten, die mehr
+ * tragen müssen als kurze Blöcke. Beide sind wahlfrei. Die Textstrecke
+ * bringt ihre Position selbst mit — `placement` sagt, hinter welchem
+ * Abschnitt sie landet, und `templates/Service.astro` verteilt danach.
  */
 export const SERVICE_QUERY =
   defineQuery(`*[_type == "service" && slug.current == $slug][0]{
   title,
   topline,
-  seoDescription,
   hero{ text, image${BILD} },
   intro{ topline, headline, columns },
   benefits{ topline, headline, items[]{ name, text, image${BILD} } },
@@ -100,7 +104,10 @@ export const SERVICE_QUERY =
   beforeAfter{ topline, before${BILD}, after${BILD} },
   statement{ topline, text },
   steps{ title, items[]{ title, text } },
-  features[]{ topline, title, text, image${BILD} }
+  features[]{ topline, title, text, image${BILD} },
+  textSections[]{ placement, topline, headline, lead, columns, items },
+  ctaBand{ headline, text, actionLabel, image${BILD} },
+  seo{ title, description, noIndex, image${BILD} }
 }`);
 
 /**
@@ -310,12 +317,12 @@ export const MAGAZINE_INDEX_QUERY = defineQuery(`
 export const HOMEPAGE_QUERY = defineQuery(`
   *[_id == "homepage"][0]{
     heroLines,
-    splitTopline, splitTitle, splitParagraphs, splitImage,
+    splitTopline, splitTitle, splitParagraphs, splitImage${BILD},
     servicesTitle,
     standardsTitle, standardsItems[]{ name, text, image${BILD} },
     locationsTitle, locationsImages[]{ image${BILD}, caption },
-    expertsTitle, expertsParagraphs, expertsNames, expertsImage,
-    storiesItems[]{ name, image, quote },
+    expertsTitle, expertsParagraphs, expertsNames, expertsImage${BILD},
+    storiesItems[]{ name, image${BILD}, quote },
     storiesAction${LINK},
     magazineTopline, magazineTitle, magazineText,
     faqTitle, faqText, faq[]{ question, answer },

@@ -5,6 +5,7 @@ import { CaseIcon } from "@sanity/icons/Case";
 import { EnvelopeIcon } from "@sanity/icons/Envelope";
 import { WarningOutlineIcon } from "@sanity/icons/WarningOutline";
 import { TagsIcon } from "@sanity/icons/Tags";
+import { seoField } from "../objects/seo-field";
 
 /**
  * Die Seiten, die es genau einmal gibt.
@@ -28,8 +29,6 @@ const gruppen = [
   { name: "content", title: "Inhalt", default: true },
   { name: "seo", title: "SEO" },
 ];
-
-const seoFeld = defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" });
 
 /** Kopf einer Unterseite: Topline, Titel, Einleitung, Bild. */
 const kopfFelder = [
@@ -55,29 +54,43 @@ const kopfFelder = [
     description: "Zwei bis drei Sätze unter der Überschrift.",
     group: "content",
   }),
-  defineField({ name: "image", title: "Kopfbild", type: "picture", group: "content" }),
+  defineField({
+    name: "image",
+    title: "Kopfbild",
+    type: "picture",
+    group: "content",
+  }),
 ];
 
 const baukasten = defineField({
   name: "sections",
   title: "Abschnitte",
   type: "sections",
-  description: "Der Aufbau der Seite. Abschnitte lassen sich ziehen und umstellen.",
+  description:
+    "Der Aufbau der Seite. Abschnitte lassen sich ziehen und umstellen.",
   group: "content",
 });
 
 /** Erzeugt eine Einzelseite mit Kopf, Baukasten und SEO. */
-function einzelseite(name: string, title: string, icon: any, untertitel: string) {
+function einzelseite(
+  name: string,
+  title: string,
+  icon: any,
+  untertitel: string,
+) {
   return defineType({
     name,
     title,
     type: "document",
     icon,
     groups: gruppen,
-    fields: [...kopfFelder, baukasten, seoFeld],
+    fields: [...kopfFelder, baukasten, seoField],
     preview: {
       select: { title: "title" },
-      prepare: ({ title }) => ({ title: title || untertitel, subtitle: untertitel }),
+      prepare: ({ title }) => ({
+        title: title || untertitel,
+        subtitle: untertitel,
+      }),
     },
   });
 }
@@ -88,14 +101,29 @@ export const servicesIndex = einzelseite(
   "servicesIndex",
   "Leistungen (Übersicht)",
   TagsIcon,
-  "/leistungen"
+  "/leistungen",
 );
 
 /* `practice` steht nicht mehr hier: Die Praxisseite hat eine feste,
    gestaltete Abfolge und keinen Baukasten. Ihr Typ liegt in
    `documents/practice.ts` — wie die Karriereseite. */
-export const magazineIndex = einzelseite("magazineIndex", "Magazin (Übersicht)", DocumentsIcon, "/magazin");
+export const magazineIndex = einzelseite(
+  "magazineIndex",
+  "Magazin (Übersicht)",
+  DocumentsIcon,
+  "/magazin",
+);
 /* `careers` steht nicht mehr hier: Die Seite hat eine feste, gestaltete
    Abfolge und keinen Baukasten. Ihr Typ liegt in `documents/karriere.ts`. */
-export const contactPage = einzelseite("contactPage", "Kontakt", EnvelopeIcon, "/kontakt");
-export const emergency = einzelseite("emergency", "Notdienst", WarningOutlineIcon, "/notdienst");
+export const contactPage = einzelseite(
+  "contactPage",
+  "Kontakt",
+  EnvelopeIcon,
+  "/kontakt",
+);
+export const emergency = einzelseite(
+  "emergency",
+  "Notdienst",
+  WarningOutlineIcon,
+  "/notdienst",
+);

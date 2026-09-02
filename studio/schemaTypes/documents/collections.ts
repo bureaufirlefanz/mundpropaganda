@@ -1,11 +1,15 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
-import { slugAvailable, RESERVED_SLUGS } from "../../lib/paths";
+import { slugAvailable, slugIsFree, RESERVED_SLUGS } from "../../lib/paths";
 import { blockContentMember, inlineImageMember } from "../objects/rich-text";
+import { seoField } from "../objects/seo-field";
 
 /**
  * Die Sammlungen: Typen, von denen es beliebig viele gibt.
@@ -20,8 +24,6 @@ const gruppen = [
   { name: "seo", title: "SEO" },
 ];
 
-const seoFeld = defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" });
-
 /* --- Magazinbeitrag ----------------------------------------------------- */
 
 export const post = defineType({
@@ -31,12 +33,19 @@ export const post = defineType({
   icon: DocumentTextIcon,
   groups: gruppen,
   fields: [
-    defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required(), group: "content" }),
+    defineField({
+      name: "title",
+      title: "Titel",
+      type: "string",
+      validation: (r) => r.required(),
+      group: "content",
+    }),
     defineField({
       name: "slug",
       title: "URL-Teil",
       type: "slug",
-      description: "Ergibt /magazin/<slug>. Kleinschreibung, Bindestriche, keine Umlaute.",
+      description:
+        "Ergibt /magazin/<slug>. Kleinschreibung, Bindestriche, keine Umlaute.",
       options: { source: "title", maxLength: 72 },
       validation: (r) => r.required(),
       group: "content",
@@ -82,7 +91,12 @@ export const post = defineType({
         "Verknüpft den Beitrag mit einer Leistung. Dadurch kann die Leistungsseite passende Beiträge zeigen, ohne dass jemand sie dort einzeln einträgt.",
       group: "content",
     }),
-    defineField({ name: "previewImage", title: "Vorschaubild", type: "picture", group: "content" }),
+    defineField({
+      name: "previewImage",
+      title: "Vorschaubild",
+      type: "picture",
+      group: "content",
+    }),
     defineField({
       name: "lead",
       title: "Anrisstext",
@@ -98,16 +112,22 @@ export const post = defineType({
       of: [blockContentMember, inlineImageMember],
       group: "content",
     }),
-    seoFeld,
+    seoField,
   ],
   orderings: [
-    { title: "Neueste zuerst", name: "dateDesc", by: [{ field: "date", direction: "desc" }] },
+    {
+      title: "Neueste zuerst",
+      name: "dateDesc",
+      by: [{ field: "date", direction: "desc" }],
+    },
   ],
   preview: {
     select: { title: "title", date: "date", media: "previewImage" },
     prepare: ({ title, date, media }) => ({
       title,
-      subtitle: date ? new Date(date).toLocaleDateString("de-DE") : "ohne Datum",
+      subtitle: date
+        ? new Date(date).toLocaleDateString("de-DE")
+        : "ohne Datum",
       media,
     }),
   },
@@ -135,30 +155,56 @@ export const pillar = defineType({
       type: "slug",
       description:
         "Liegt auf der obersten Ebene: /<slug>. Das ist Absicht - eine Pillar Page ist auf ein Suchwort gebaut, jedes Verzeichnis davor verwässert es.",
-      options: { source: "title", maxLength: 72 },
+      /* `isUnique` gegen BEIDE Typen der obersten Ebene, nicht nur gegen den
+         eigenen: Ein Rechtstext mit demselben Slug beanspruchte dieselbe
+         Adresse, und Sanitys eingebaute Prüfung sähe ihn nicht. */
+      options: { source: "title", maxLength: 72, isUnique: slugIsFree },
       validation: (r) =>
-        r.required().custom((wert) =>
-          slugAvailable(wert?.current)
-            ? true
-            : `„${wert?.current}“ ist ein fester Pfad der Website. Reserviert: ${RESERVED_SLUGS.join(", ")}.`
-        ),
+        r
+          .required()
+          .custom((wert) =>
+            slugAvailable(wert?.current)
+              ? true
+              : `„${wert?.current}“ ist ein fester Pfad der Website. Reserviert: ${RESERVED_SLUGS.join(", ")}.`,
+          ),
       group: "content",
     }),
-    defineField({ name: "topline", title: "Topline", type: "string", group: "content" }),
-    defineField({ name: "lead", title: "Einleitung", type: "text", rows: 4, group: "content" }),
-    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "content" }),
+    defineField({
+      name: "topline",
+      title: "Topline",
+      type: "string",
+      group: "content",
+    }),
+    defineField({
+      name: "lead",
+      title: "Einleitung",
+      type: "text",
+      rows: 4,
+      group: "content",
+    }),
+    defineField({
+      name: "image",
+      title: "Kopfbild",
+      type: "picture",
+      group: "content",
+    }),
     defineField({
       name: "sections",
       title: "Abschnitte",
       type: "sections",
-      description: "Der Aufbau der Seite. Abschnitte lassen sich ziehen und umstellen.",
+      description:
+        "Der Aufbau der Seite. Abschnitte lassen sich ziehen und umstellen.",
       group: "content",
     }),
-    seoFeld,
+    seoField,
   ],
   preview: {
     select: { title: "title", slug: "slug.current", media: "image" },
-    prepare: ({ title, slug, media }) => ({ title, subtitle: slug ? `/${slug}` : "ohne URL", media }),
+    prepare: ({ title, slug, media }) => ({
+      title,
+      subtitle: slug ? `/${slug}` : "ohne URL",
+      media,
+    }),
   },
 });
 
@@ -171,17 +217,28 @@ export const legalPage = defineType({
   icon: DocumentTextIcon,
   groups: gruppen,
   fields: [
-    defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required(), group: "content" }),
+    defineField({
+      name: "title",
+      title: "Titel",
+      type: "string",
+      validation: (r) => r.required(),
+      group: "content",
+    }),
     defineField({
       name: "slug",
       title: "URL-Teil",
       type: "slug",
-      description: "Liegt auf der obersten Ebene: /impressum, /datenschutz, /agb.",
-      options: { source: "title", maxLength: 40 },
+      description:
+        "Liegt auf der obersten Ebene: /impressum, /datenschutz, /agb.",
+      options: { source: "title", maxLength: 40, isUnique: slugIsFree },
       validation: (r) =>
-        r.required().custom((wert) =>
-          slugAvailable(wert?.current) ? true : `„${wert?.current}“ ist ein fester Pfad der Website.`
-        ),
+        r
+          .required()
+          .custom((wert) =>
+            slugAvailable(wert?.current)
+              ? true
+              : `„${wert?.current}“ ist ein fester Pfad der Website.`,
+          ),
       group: "content",
     }),
     defineField({
@@ -194,12 +251,15 @@ export const legalPage = defineType({
     /* Rechtstexte gehören nicht in den Suchindex — sie ziehen Suchanfragen
        auf sich, die niemandem nützen, und verdünnen die Relevanz der Seite.
        Voreingestellt auf „ausschließen“, änderbar bleibt es trotzdem. */
-    seoFeld,
+    seoField,
   ],
   initialValue: { seo: { noIndex: true } },
   preview: {
     select: { title: "title", slug: "slug.current" },
-    prepare: ({ title, slug }) => ({ title, subtitle: slug ? `/${slug}` : "ohne URL" }),
+    prepare: ({ title, slug }) => ({
+      title,
+      subtitle: slug ? `/${slug}` : "ohne URL",
+    }),
   },
 });
 
@@ -248,7 +308,8 @@ export const person = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      description: "Die Adresse der eigenen Seite, z. B. /praxis/kerrin-gratecap.",
+      description:
+        "Die Adresse der eigenen Seite, z. B. /praxis/kerrin-gratecap.",
       options: { source: "name", maxLength: 60 },
       group: "card",
       validation: (r) => r.required(),
@@ -257,7 +318,8 @@ export const person = defineType({
       name: "role",
       title: "Rolle",
       type: "string",
-      description: "Kurz. Steht unter dem Namen, z. B. „Zahnärztin, Ästhetik und Prophylaxe“.",
+      description:
+        "Kurz. Steht unter dem Namen, z. B. „Zahnärztin, Ästhetik und Prophylaxe“.",
       group: "card",
       validation: (r) => r.required(),
     }),
@@ -274,7 +336,8 @@ export const person = defineType({
       name: "focusAreas",
       title: "Schwerpunkte",
       type: "array",
-      description: "Verweist auf Leistungen. Die Seite verlinkt sie - wer den Namen sucht, findet so die Behandlung.",
+      description:
+        "Verweist auf Leistungen. Die Seite verlinkt sie - wer den Namen sucht, findet so die Behandlung.",
       of: [{ type: "reference", to: [{ type: "service" }] }],
       group: "card",
     }),
@@ -293,7 +356,8 @@ export const person = defineType({
       title: "Zitat",
       type: "text",
       rows: 3,
-      description: "Ein Satz in eigenen Worten. Steht groß neben dem Porträt. Leer lassen, wenn es keinen gibt - ein erfundenes Zitat merkt man.",
+      description:
+        "Ein Satz in eigenen Worten. Steht groß neben dem Porträt. Leer lassen, wenn es keinen gibt - ein erfundenes Zitat merkt man.",
       group: "detail",
     }),
     defineField({
@@ -347,12 +411,18 @@ export const person = defineType({
       name: "email",
       title: "E-Mail",
       type: "string",
-      description: "Nur wenn die Person direkt erreichbar sein soll. Sonst leer lassen - dann steht die allgemeine Adresse da.",
+      description:
+        "Nur wenn die Person direkt erreichbar sein soll. Sonst leer lassen - dann steht die allgemeine Adresse da.",
       group: "detail",
       validation: (r) => r.email(),
     }),
 
-    defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" }),
+    defineField({
+      name: "seo",
+      title: "Suchmaschine",
+      type: "seo",
+      group: "seo",
+    }),
   ],
   preview: { select: { title: "name", subtitle: "role", media: "image" } },
 });
@@ -379,42 +449,79 @@ export const job = defineType({
   ],
   fields: [
     orderRankField({ type: "job" }),
-    defineField({ name: "title", title: "Stellenbezeichnung", type: "string", validation: (r) => r.required(), group: "posting" }),
+    defineField({
+      name: "title",
+      title: "Stellenbezeichnung",
+      type: "string",
+      validation: (r) => r.required(),
+      group: "posting",
+    }),
     defineField({
       name: "handle",
       title: "Kennung",
       type: "slug",
-      description: "Wird zur Sprungmarke auf der Karriereseite und zum Betreff der Bewerbungsmail.",
+      description:
+        "Wird zur Sprungmarke auf der Karriereseite und zum Betreff der Bewerbungsmail.",
       options: { source: "title", maxLength: 40 },
       validation: (r) => r.required(),
-      group: "facts"
+      group: "facts",
     }),
     defineField({
       name: "kind",
       title: "Art",
       type: "string",
-      description: "Steht als Marke neben dem Titel, z. B. „Vollzeit oder Teilzeit“.",
-      group: "facts"
+      description:
+        "Steht als Marke neben dem Titel, z. B. „Vollzeit oder Teilzeit“.",
+      group: "facts",
     }),
-    defineField({ name: "location", title: "Standort", type: "string", group: "facts" }),
-    defineField({ name: "hours", title: "Beginn oder Umfang", type: "string", group: "facts" }),
-    defineField({ name: "lead", title: "Einleitung", type: "text", rows: 4, group: "posting" }),
-    defineField({ name: "duties", title: "Deine Aufgaben", type: "array", of: [{ type: "string" }], group: "posting" }),
-    defineField({ name: "profile", title: "Das bringst du mit", type: "array", of: [{ type: "string" }], group: "posting" }),
+    defineField({
+      name: "location",
+      title: "Standort",
+      type: "string",
+      group: "facts",
+    }),
+    defineField({
+      name: "hours",
+      title: "Beginn oder Umfang",
+      type: "string",
+      group: "facts",
+    }),
+    defineField({
+      name: "lead",
+      title: "Einleitung",
+      type: "text",
+      rows: 4,
+      group: "posting",
+    }),
+    defineField({
+      name: "duties",
+      title: "Deine Aufgaben",
+      type: "array",
+      of: [{ type: "string" }],
+      group: "posting",
+    }),
+    defineField({
+      name: "profile",
+      title: "Das bringst du mit",
+      type: "array",
+      of: [{ type: "string" }],
+      group: "posting",
+    }),
     defineField({
       name: "highlight",
       title: "Besonderheit",
       type: "string",
       description: "Ein Satz, der hervorgehoben unter den Aufzählungen steht.",
-      group: "posting"
+      group: "posting",
     }),
     defineField({
       name: "active",
       title: "Ausgeschrieben",
       type: "boolean",
-      description: "Abwählen, statt zu löschen - dann verschwindet die Stelle von der Seite, bleibt aber erhalten.",
+      description:
+        "Abwählen, statt zu löschen - dann verschwindet die Stelle von der Seite, bleibt aber erhalten.",
       initialValue: true,
-      group: "facts"
+      group: "facts",
     }),
 
     /* --- Bewerbung -------------------------------------------------------
@@ -497,7 +604,10 @@ export const job = defineType({
               };
               return {
                 title,
-                subtitle: [(kind && arten[kind]) ?? kind, required ? "Pflicht" : null]
+                subtitle: [
+                  (kind && arten[kind]) ?? kind,
+                  required ? "Pflicht" : null,
+                ]
                   .filter(Boolean)
                   .join(" · "),
               };
@@ -511,7 +621,9 @@ export const job = defineType({
     select: { title: "title", kind: "kind", active: "active" },
     prepare: ({ title, kind, active }) => ({
       title,
-      subtitle: [active === false ? "nicht ausgeschrieben" : null, kind].filter(Boolean).join(" · "),
+      subtitle: [active === false ? "nicht ausgeschrieben" : null, kind]
+        .filter(Boolean)
+        .join(" · "),
     }),
   },
 });

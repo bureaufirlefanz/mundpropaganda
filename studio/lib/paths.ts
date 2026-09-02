@@ -1,3 +1,5 @@
+import type { SlugOptions } from "sanity";
+
 /**
  * Das URL-Modell der Website — eine Quelle für Studio, Vorschau und Frontend.
  *
@@ -104,3 +106,34 @@ export function pathFor(typ?: string, slug?: string): string | null {
 /** Ob ein Slug auf oberster Ebene erlaubt ist. */
 export const slugAvailable = (slug?: string) =>
   !slug || !RESERVED_SLUGS.includes(slug as (typeof RESERVED_SLUGS)[number]);
+
+/**
+ * Ist dieser Slug auf der obersten Ebene noch frei?
+ *
+ * Sanitys eingebaute Prüfung sieht nur den eigenen Typ. Auf der obersten
+ * Ebene liegen aber ZWEI Typen nebeneinander: Rechtstexte und Pillar Pages.
+ * Ein Rechtstext „veneers-berlin" wäre für Sanity einmalig und beanspruchte
+ * trotzdem dieselbe Adresse wie die Pillar Page — welche gewinnt, entschiede
+ * die Reihenfolge im Build.
+ *
+ * `slugAvailable()` deckt den anderen Fall ab: Kollision mit einem festen
+ * Pfad. Beides zusammen ist die vollständige Antwort.
+ *
+ * Der Entwurf zählt nicht gegen sich selbst: Ein Dokument hat im Studio zwei
+ * Fassungen (`drafts.abc` und `abc`), und ohne den Ausschluss meldete jeder
+ * gespeicherte Entwurf sich selbst als Dublette.
+ */
+export const slugIsFree: NonNullable<SlugOptions["isUnique"]> = async (
+  slug,
+  context,
+) => {
+  const { document, getClient } = context;
+  if (!document) return true;
+
+  const id = document._id.replace(/^drafts\./, "");
+  const found = await getClient({ apiVersion: "2026-07-28" }).fetch<number>(
+    `count(*[_type in $types && slug.current == $slug && !(_id in [$id, "drafts." + $id])])`,
+    { types: TOP_LEVEL, slug, id },
+  );
+  return found === 0;
+};
