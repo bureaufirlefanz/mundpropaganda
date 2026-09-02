@@ -41,17 +41,21 @@ const SIZES = {
 } as const;
 ---
 
-{isCmsImage(node.image) && (
-  <figure class="c-postimage" data-width={width}>
-    <CmsImage
-      source={node.image}
-      alt=""
-      widths={[640, 1024, 1600, 2200]}
-      sizes={SIZES[width]}
-    />
-    {node.caption && <figcaption class="c-postimage__caption">{node.caption}</figcaption>}
-  </figure>
-)}
+{
+  isCmsImage(node.image) && (
+    <figure class="c-postimage" data-width={width}>
+      <CmsImage
+        source={node.image}
+        alt=""
+        widths={[640, 1024, 1600, 2200]}
+        sizes={SIZES[width]}
+      />
+      {node.caption && (
+        <figcaption class="c-postimage__caption">{node.caption}</figcaption>
+      )}
+    </figure>
+  )
+}
 
 <style>
   .c-postimage {
@@ -88,7 +92,7 @@ const SIZES = {
     font-weight: 300;
     font-size: var(--fs-label);
     line-height: 1.4;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-mono);
     color: var(--c-text-muted);
   }
 

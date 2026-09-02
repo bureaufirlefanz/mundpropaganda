@@ -263,7 +263,7 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     gap: var(--sp-6);
     max-width: 52ch;
     font-size: var(--fs-text-large);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   .c-speculative__action {
@@ -278,7 +278,7 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
   .c-speculative__mail {
     font-family: var(--f-mono);
     font-size: var(--fs-text-small);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-mono);
     text-decoration: underline;
     text-underline-offset: 4px;
   }

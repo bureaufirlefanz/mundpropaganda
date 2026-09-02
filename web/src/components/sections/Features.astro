@@ -34,27 +34,59 @@ const { lines } = Astro.props;
 /* Klasse 3: die gestalteten Motive, in der Reihenfolge des Entwurfs. Über den
    Index und modulo, damit eine vierte Zeile nicht ohne Bild dasteht — und
    damit nicht alle Zeilen dasselbe Motiv tragen. */
-const MOTIFS = ["wurzelbehandlung-mikroskop", "veneers-modell", "labor-hand-implantat"];
+/* `veneers-modell` stand hier bis hierher an zweiter Stelle — dasselbe Motiv,
+   das die Navigationsempfehlung auf JEDER Seite zeigt. Damit lief es einem
+   auf 28 von 29 Seiten zweimal über den Weg. `beratung-modell` ist neu und
+   war nirgends verwendet. */
+const MOTIFS = [
+  "wurzelbehandlung-mikroskop",
+  "beratung-modell",
+  "labor-hand-implantat",
+];
 ---
 
 <section class="section section--flush">
   <div class="container">
-    {lines.map((row, i) => (
-      <div class:list={["s-feature", i % 2 === 1 && "s-feature--reverse"]}>
-        <div class="s-feature__media" data-reveal="scale">
-          {isCmsImage(row.image) ? (
-            <CmsImage source={row.image} alt="" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 50vw" data-parallax="8" />
-          ) : (
-            <Picture name={row.motif ?? MOTIFS[i % MOTIFS.length]} alt="" sizes="(max-width: 900px) 100vw, 50vw" parallax="8" />
-          )}
+    {
+      lines.map((row, i) => (
+        <div class:list={["s-feature", i % 2 === 1 && "s-feature--reverse"]}>
+          <div class="s-feature__media" data-reveal="scale">
+            {isCmsImage(row.image) ? (
+              <CmsImage
+                source={row.image}
+                alt=""
+                widths={[640, 1024, 1600, 2200]}
+                sizes="(max-width: 900px) 100vw, 50vw"
+                data-parallax="8"
+              />
+            ) : (
+              <Picture
+                name={row.motif ?? MOTIFS[i % MOTIFS.length]}
+                alt=""
+                sizes="(max-width: 900px) 100vw, 50vw"
+                parallax="8"
+              />
+            )}
+          </div>
+          <div class="s-feature__body" data-reveal="up">
+            <span class="c-topline">{row.topline}</span>
+            <h3 class="s-feature__title" data-split="lines">
+              {row.title}
+            </h3>
+            {/* Leerzeile trennt Absätze.
+              Das Studio-Feld ist mehrzeilig (`type: "text"`), gerendert wurde
+              aber ein einziges `<p>` — zwei Absätze liefen darin zu einem
+              Block zusammen, weil HTML Zeilenumbrüche schluckt. Der Baustein
+              war darauf schon eingerichtet: `.s-feature__body` ist eine
+              Flex-Spalte mit `gap`, und die Regel darunter greift auf `p`,
+              nicht auf ein einzelnes Element. */}
+            {row.text.split(/\n{2,}/).map((absatz) => (
+              <p>{absatz.trim()}</p>
+            ))}
+          </div>
         </div>
-        <div class="s-feature__body" data-reveal="up">
-          <span class="c-topline">{row.topline}</span>
-          <h3 class="s-feature__title" data-split="lines">{row.title}</h3>
-          <p>{row.text}</p>
-        </div>
-      </div>
-    ))}
+      ))
+    }
   </div>
 </section>
 
@@ -101,13 +133,13 @@ const MOTIFS = ["wurzelbehandlung-mikroskop", "veneers-modell", "labor-hand-impl
     font-size: var(--fs-h2-lg);
     font-weight: 500;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-feature__body p {
     font-size: var(--fs-text-main);
     color: var(--c-text-muted);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   .s-feature--reverse .s-feature__media {

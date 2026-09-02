@@ -33,25 +33,31 @@ const { headline, stages } = Astro.props;
   </div>
 
   <ol class="s-timeline__track" data-reveal-stagger="0.1">
-    {/* Die Bahn selbst: eine blasse Linie über die volle Breite, darüber die
+    {
+      /* Die Bahn selbst: eine blasse Linie über die volle Breite, darüber die
         farbige, die mitwächst. Zwei Elemente statt eines Verlaufs — ein
-        Verlauf ließe sich nicht sauber auf einen Fortschritt abbilden. */}
+        Verlauf ließe sich nicht sauber auf einen Fortschritt abbilden. */
+    }
     <div class="s-timeline__rail" aria-hidden="true">
       <span class="s-timeline__progress" data-timeline-fill></span>
     </div>
 
-    {stages.map((e, i) => (
-      <li class="s-timeline__stage" data-reveal-child>
-        <span class="s-timeline__dot" aria-hidden="true"></span>
-        <h3 class="s-timeline__stage-title">
-          {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
+    {
+      stages.map((e, i) => (
+        <li class="s-timeline__stage" data-reveal-child>
+          <span class="s-timeline__dot" aria-hidden="true" />
+          <h3 class="s-timeline__stage-title">
+            {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
               Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
-          <span class="c-number s-timeline__number" aria-hidden="true">{i + 1}</span>
-          {e.title}
-        </h3>
-        <p class="s-timeline__text">{e.text}</p>
-      </li>
-    ))}
+            <span class="c-number s-timeline__number" aria-hidden="true">
+              {i + 1}
+            </span>
+            {e.title}
+          </h3>
+          <p class="s-timeline__text">{e.text}</p>
+        </li>
+      ))
+    }
   </ol>
 </section>
 
@@ -68,8 +74,8 @@ const { headline, stages } = Astro.props;
   .s-timeline__title {
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-timeline__track {
@@ -124,7 +130,8 @@ const { headline, stages } = Astro.props;
     border-radius: var(--r-round);
     background: var(--c-bg);
     border: 2px solid var(--c-line);
-    transition: background var(--d-base) var(--e-out),
+    transition:
+      background var(--d-base) var(--e-out),
       border-color var(--d-base) var(--e-out);
   }
 
@@ -144,8 +151,8 @@ const { headline, stages } = Astro.props;
     gap: 0.5em;
     font-size: var(--fs-h4-sm);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
@@ -177,7 +184,7 @@ const { headline, stages } = Astro.props;
     max-width: 34ch;
     margin-top: var(--sp-3);
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

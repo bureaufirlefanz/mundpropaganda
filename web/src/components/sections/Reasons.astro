@@ -30,13 +30,17 @@ const { topline, headline, items } = Astro.props;
   </div>
 
   <ol class="s-reasons__list" data-reveal-stagger="0.08">
-    {items.map((g, i) => (
-      <li class="s-reasons__block" data-reveal-child>
-        <span class="s-reasons__number" aria-hidden="true">{i + 1}</span>
-        <h3 class="s-reasons__block-title">{g.title}</h3>
-        <p class="s-reasons__text">{g.text}</p>
-      </li>
-    ))}
+    {
+      items.map((g, i) => (
+        <li class="s-reasons__block" data-reveal-child>
+          <span class="s-reasons__number" aria-hidden="true">
+            {i + 1}
+          </span>
+          <h3 class="s-reasons__block-title">{g.title}</h3>
+          <p class="s-reasons__text">{g.text}</p>
+        </li>
+      ))
+    }
   </ol>
 </section>
 
@@ -54,8 +58,8 @@ const { topline, headline, items } = Astro.props;
     margin-top: var(--sp-4);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   /* `auto-fit` mit einer Mindestbreite statt einer festen Spaltenzahl: Der
@@ -90,22 +94,22 @@ const { topline, headline, items } = Astro.props;
     background: var(--c-dark);
     color: var(--c-grey);
     font-size: var(--fs-text-small);
-    line-height: 1;
+    line-height: var(--lh-tight);
   }
 
   .s-reasons__block-title {
     margin-bottom: var(--sp-3);
     font-size: var(--fs-h5);
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
   .s-reasons__text {
     max-width: 40ch;
     font-size: var(--fs-text-main);
-    line-height: 1.5;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 </style>

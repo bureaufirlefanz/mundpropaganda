@@ -15,20 +15,27 @@ const { reviews } = await loadSettings();
 const stars = reviews ? Math.round(reviews.average) : 0;
 ---
 
-{reviews && (
-<div class="c-reviews">
-  <div class="c-reviews__meta">
-    <span>{reviews.provider}</span>
-    <span>{reviews.count} Bewertungen</span>
-    <span>{averageText(reviews.average)}</span>
-  </div>
-  <div class="c-reviews__stars" aria-label={`${averageText(reviews.average)} Sternen`}>
-    {Array.from({ length: stars }).map(() => (
-      <svg aria-hidden="true"><use href="#i-star" /></svg>
-    ))}
-  </div>
-</div>
-)}
+{
+  reviews && (
+    <div class="c-reviews">
+      <div class="c-reviews__meta">
+        <span>{reviews.provider}</span>
+        <span>{reviews.count} Bewertungen</span>
+        <span>{averageText(reviews.average)}</span>
+      </div>
+      <div
+        class="c-reviews__stars"
+        aria-label={`${averageText(reviews.average)} Sternen`}
+      >
+        {Array.from({ length: stars }).map(() => (
+          <svg aria-hidden="true">
+            <use href="#i-star" />
+          </svg>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 <style>
   .c-reviews {
@@ -42,7 +49,7 @@ const stars = reviews ? Math.round(reviews.average) : 0;
     -webkit-backdrop-filter: blur(12px);
     font-family: var(--f-sans);
     font-size: var(--fs-label-md);
-    line-height: 1;
+    line-height: var(--lh-tight);
     color: var(--c-dark);
   }
 
@@ -54,7 +61,8 @@ const stars = reviews ? Math.round(reviews.average) : 0;
 
   .c-reviews__meta span + span {
     padding-left: var(--sp-2);
-    border-left: var(--bw) solid color-mix(in srgb, var(--c-dark) 25%, transparent);
+    border-left: var(--bw) solid
+      color-mix(in srgb, var(--c-dark) 25%, transparent);
   }
 
   .c-reviews__stars {

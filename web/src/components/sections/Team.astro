@@ -44,36 +44,55 @@ const { id, topline, headline, text, photo, members } = Astro.props;
 ---
 
 <section class="s-team" id={id}>
-  {/* Das Gruppenbild ist etwas anderes als ein Porträtraster: ein Bild, nicht
+  {
+    /* Das Gruppenbild ist etwas anderes als ein Porträtraster: ein Bild, nicht
       vierzehn, und es zeigt die Praxis mit Menschen darin. Wenn im Studio
-      keines hängt, beginnt der Abschnitt mit der Überschrift. */}
-  {isCmsImage(photo) && (
-    <div class="s-team__photo" data-reveal="scale">
-      <CmsImage source={photo} alt="" widths={[640, 1024, 1600, 2200]} sizes="100vw" />
-    </div>
-  )}
+      keines hängt, beginnt der Abschnitt mit der Überschrift. */
+  }
+  {
+    isCmsImage(photo) && (
+      <div class="s-team__photo" data-reveal="scale">
+        <CmsImage
+          source={photo}
+          alt=""
+          widths={[640, 1024, 1600, 2200]}
+          sizes="100vw"
+        />
+      </div>
+    )
+  }
 
   <div class="container">
     <div class="s-team__head">
       <span class="c-topline" data-reveal="fade">{topline}</span>
       <h2 class="s-team__title" data-split="lines">{headline}</h2>
-      {text && <p class="s-team__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+      {
+        text && (
+          <p class="s-team__text" data-reveal="up" data-reveal-delay="0.1">
+            {text}
+          </p>
+        )
+      }
     </div>
 
     <ul class="s-team__list" data-reveal-stagger="0.06">
-      {members.map((m) => (
-        <li class="s-team__item" data-reveal-child>
-          <a class="c-member" href={`/praxis/${m.slug}`}>
-            <h3 class="c-member__name">{m.name}</h3>
-            <p class="c-member__role">{m.role}</p>
-            {m.text && <p class="c-member__text">{m.text}</p>}
-            <span class="c-member__more">
-              Zur Person
-              <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-            </span>
-          </a>
-        </li>
-      ))}
+      {
+        members.map((m) => (
+          <li class="s-team__item" data-reveal-child>
+            <a class="c-member" href={`/praxis/${m.slug}`}>
+              <h3 class="c-member__name">{m.name}</h3>
+              <p class="c-member__role">{m.role}</p>
+              {m.text && <p class="c-member__text">{m.text}</p>}
+              <span class="c-member__more">
+                Zur Person
+                <svg aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </div>
 </section>
@@ -113,8 +132,8 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     margin-top: var(--sp-4);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-team__text {
@@ -168,7 +187,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     font-size: var(--fs-text-large);
     font-weight: 400;
     line-height: 1.25;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
   }
 
   .c-member__role {
@@ -181,7 +200,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   .c-member__text {
     margin-top: var(--sp-3);
     font-size: var(--fs-text-small);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -196,7 +215,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     padding-top: var(--sp-4);
     font-family: var(--f-mono);
     font-size: var(--fs-label);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
   }
 

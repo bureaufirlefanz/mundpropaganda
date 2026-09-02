@@ -70,18 +70,29 @@ const { locations } = await loadSettings();
  * Das Röntgengerät stand hier und ist wieder raus: Es war der einzige
  * Apparat zwischen lauter Räumen und Details, und genau das fiel auf. */
 const MOTIFS: RingImage[] = [
-  { name: "empfang-p25", alt: "Empfang mit dem geschwungenen Bogen", caption: "Prenzlauer Allee" },
+  {
+    name: "empfang-p25",
+    alt: "Empfang mit dem geschwungenen Bogen",
+    caption: "Prenzlauer Allee",
+  },
   { name: "zahnleuchte", alt: "Leuchte in Form eines Zahns über dem Empfang" },
   { name: "wartebereich", alt: "Wartebereich mit Holzbank am Fenster" },
   { name: "blumen", alt: "Blumenstrauß auf der Ablage" },
   { name: "behandlungszimmer-rot", alt: "Behandlungszimmer mit Tageslicht" },
   { name: "waschbecken", alt: "Waschbecken mit Armatur in Messing" },
   { name: "flur-rot", alt: "Flur mit roter Wand" },
-  { name: "empfang-c37", alt: "Empfang der zweiten Praxis", caption: "Christburger Straße" },
+  {
+    name: "empfang-c37",
+    alt: "Empfang der zweiten Praxis",
+    caption: "Christburger Straße",
+  },
   { name: "spiegel-detail", alt: "Handspiegel auf der Ablage" },
   { name: "flur-bilder", alt: "Flur mit gerahmten Bildern und Sitzbank" },
   { name: "tee-kueche", alt: "Teeküche mit Messingarmatur" },
-  { name: "behandlungszimmer-holz", alt: "Behandlungszimmer mit Blick ins Grüne" },
+  {
+    name: "behandlungszimmer-holz",
+    alt: "Behandlungszimmer mit Blick ins Grüne",
+  },
   { name: "logo-glas", alt: "Der gezeichnete Zahn auf der Glastür" },
   { name: "holzbank", alt: "Die geschwungene Holzbank im Wartebereich" },
   { name: "waschbecken-blau", alt: "Waschbecken vor blauen Fliesen" },
@@ -96,72 +107,144 @@ const MOTIFS: RingImage[] = [
    ist eine Komposition, und drei eigene Fotos zwischen zwei geliehenen
    Abstraktionen sähen aus wie ein Fehler. */
 const ringImages: RingImage[] = images?.length
-  ? images.map((b) => ({ image: b.image, alt: b.caption ?? "", caption: b.caption }))
+  ? images.map((b) => ({
+      image: b.image,
+      alt: b.caption ?? "",
+      caption: b.caption,
+    }))
   : MOTIFS;
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            UNSERE STANDORTE — horizontal laufende Bildreihe
-           ================================================================== */}
-      <section class="s-gallery" id="standorte" data-gallery>
-        <h2 class="s-gallery__title" data-split="lines">{title}</h2>
+           ================================================================== */
+}
+<section class="s-gallery" id="standorte" data-gallery>
+  <h2 class="s-gallery__title" data-split="lines">{title}</h2>
 
-        {variant === "ring" ? (
-          <BildRing images={ringImages} label="Unsere Standorte" />
-        ) : (
-          <Fragment>
-          <div class="s-gallery__track" data-gallery-track>
-            <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="zahnleuchte" alt="" sizes="10vw" parallax="9" />
-            </figure>
-            <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="empfang-p25" alt="Empfang mit dem geschwungenen Bogen" sizes="20vw" parallax="9" />
-            </figure>
-            <figure class="s-gallery__item s-gallery__item--lg">
-              <Picture name="behandlungszimmer-rot" alt="Behandlungszimmer mit Tageslicht" sizes="45vw" parallax="9" />
-              <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
-            </figure>
-            <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="wartebereich" alt="Wartebereich mit Holzbank am Fenster" sizes="20vw" parallax="9" />
-              <figcaption class="s-gallery__caption">Christburger Straße</figcaption>
-            </figure>
-            <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="waschbecken" alt="" sizes="10vw" parallax="9" />
-            </figure>
-          </div>
-
-          {/* Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. */}
-          <div class="container s-gallery__nav" data-reveal="fade">
-            <div class="s-gallery__arrows">
-              <button class="s-gallery__arrow" data-gallery-prev type="button" aria-label="Vorheriger Standort">
-                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-              </button>
-              <button class="s-gallery__arrow" data-gallery-next type="button" aria-label="Nächster Standort">
-                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-              </button>
-            </div>
-            <div class="s-gallery__dots" data-gallery-dots role="tablist" aria-label="Standorte"></div>
-          </div>
-          </Fragment>
-        )}
-
-        <div class="container s-cols">
-          {locations.map((o, i) => (
-            <div class="s-cols__item">
-              {/* Konturzahl: rein grafisch, deshalb für Vorlesegeräte
-                  ausgeblendet — die Anschrift steht darunter im Klartext. */}
-              <p class="s-cols__display" data-reveal="up" data-reveal-delay={i * 0.08} aria-hidden="true">{o.shortCode}</p>
-              <h3 data-reveal="up" data-reveal-delay={0.06 + i * 0.08} data-reveal-trigger=".s-experts">{o.name}</h3>
-              {/* <address> statt <p>: das ist die Anschrift der Praxis, und
-                  Vorlesegeräte kündigen sie als solche an. */}
-              <address class="s-cols__address" data-reveal="up" data-reveal-delay={0.1 + i * 0.08} data-reveal-trigger=".s-experts">
-                {o.street}<br />{o.city}
-              </address>
-              <p data-reveal="up" data-reveal-delay={0.14 + i * 0.08} data-reveal-trigger=".s-experts">{o.description}</p>
-            </div>
-          ))}
+  {
+    variant === "ring" ? (
+      <BildRing images={ringImages} label="Unsere Standorte" />
+    ) : (
+      <Fragment>
+        <div class="s-gallery__track" data-gallery-track>
+          <figure class="s-gallery__item s-gallery__item--sm">
+            <Picture name="zahnleuchte" alt="" sizes="10vw" parallax="9" />
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--md">
+            <Picture
+              name="empfang-p25"
+              alt="Empfang mit dem geschwungenen Bogen"
+              sizes="20vw"
+              parallax="9"
+            />
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--lg">
+            <Picture
+              name="behandlungszimmer-rot"
+              alt="Behandlungszimmer mit Tageslicht"
+              sizes="45vw"
+              parallax="9"
+            />
+            <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--md">
+            <Picture
+              name="wartebereich"
+              alt="Wartebereich mit Holzbank am Fenster"
+              sizes="20vw"
+              parallax="9"
+            />
+            <figcaption class="s-gallery__caption">
+              Christburger Straße
+            </figcaption>
+          </figure>
+          <figure class="s-gallery__item s-gallery__item--sm">
+            <Picture name="waschbecken" alt="" sizes="10vw" parallax="9" />
+          </figure>
         </div>
-      </section>
+
+        {/* Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. */}
+        <div class="container s-gallery__nav" data-reveal="fade">
+          <div class="s-gallery__arrows">
+            <button
+              class="s-gallery__arrow"
+              data-gallery-prev
+              type="button"
+              aria-label="Vorheriger Standort"
+            >
+              <svg aria-hidden="true">
+                <use href="#i-arrow" />
+              </svg>
+            </button>
+            <button
+              class="s-gallery__arrow"
+              data-gallery-next
+              type="button"
+              aria-label="Nächster Standort"
+            >
+              <svg aria-hidden="true">
+                <use href="#i-arrow" />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="s-gallery__dots"
+            data-gallery-dots
+            role="tablist"
+            aria-label="Standorte"
+          />
+        </div>
+      </Fragment>
+    )
+  }
+
+  <div class="container s-cols">
+    {
+      locations.map((o, i) => (
+        <div class="s-cols__item">
+          {/* Konturzahl: rein grafisch, deshalb für Vorlesegeräte
+                  ausgeblendet — die Anschrift steht darunter im Klartext. */}
+          <p
+            class="s-cols__display"
+            data-reveal="up"
+            data-reveal-delay={i * 0.08}
+            aria-hidden="true"
+          >
+            {o.shortCode}
+          </p>
+          <h3
+            data-reveal="up"
+            data-reveal-delay={0.06 + i * 0.08}
+            data-reveal-trigger=".s-experts"
+          >
+            {o.name}
+          </h3>
+          {/* <address> statt <p>: das ist die Anschrift der Praxis, und
+                  Vorlesegeräte kündigen sie als solche an. */}
+          <address
+            class="s-cols__address"
+            data-reveal="up"
+            data-reveal-delay={0.1 + i * 0.08}
+            data-reveal-trigger=".s-experts"
+          >
+            {o.street}
+            <br />
+            {o.city}
+          </address>
+          <p
+            data-reveal="up"
+            data-reveal-delay={0.14 + i * 0.08}
+            data-reveal-trigger=".s-experts"
+          >
+            {o.description}
+          </p>
+        </div>
+      ))
+    }
+  </div>
+</section>
 
 <style>
   /* Horizontale Bildreihe, die beim Scrollen seitwärts läuft. Das mittlere
@@ -178,7 +261,7 @@ const ringImages: RingImage[] = images?.length
     margin-bottom: var(--sp-6);
     font-size: var(--fs-h1-xs);
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-gallery__track {
@@ -226,7 +309,7 @@ const ringImages: RingImage[] = images?.length
     -webkit-backdrop-filter: blur(10px);
     font-family: var(--f-mono);
     font-size: var(--fs-label);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--c-dark);
   }
@@ -275,8 +358,8 @@ const ringImages: RingImage[] = images?.length
     font-family: var(--f-mono);
     font-style: normal;
     font-size: var(--fs-text-small);
-    line-height: 1.5;
-    letter-spacing: 0.04em;
+    line-height: var(--lh-body);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
   }
 
@@ -286,7 +369,7 @@ const ringImages: RingImage[] = images?.length
     font-family: var(--f-sans);
     font-weight: 500;
     font-size: var(--fs-display-xl);
-    line-height: 1;
+    line-height: var(--lh-tight);
     letter-spacing: -0.019em;
     color: transparent;
     -webkit-text-stroke: 0.6px var(--c-dark);
@@ -297,15 +380,15 @@ const ringImages: RingImage[] = images?.length
     margin-bottom: var(--sp-3);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-cols__item p {
     max-width: 44ch;
     font-size: var(--fs-text-main);
     color: var(--c-text-muted);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   /* Auf breiten Fenstern laufen die beiden Spalten zum jeweils äußeren

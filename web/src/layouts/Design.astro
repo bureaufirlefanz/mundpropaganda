@@ -27,8 +27,16 @@ interface Props {
 const { title, active } = Astro.props;
 
 const PAGES = [
-  { path: "/design/styleguide", name: "Styleguide", note: "Farben, Typografie, Abstände, Bausteine" },
-  { path: "/design/komponenten", name: "Komponenten", note: "Jeder Baustein mit Beschreibung" },
+  {
+    path: "/design/styleguide",
+    name: "Styleguide",
+    note: "Farben, Typografie, Abstände, Bausteine",
+  },
+  {
+    path: "/design/komponenten",
+    name: "Komponenten",
+    note: "Jeder Baustein mit Beschreibung",
+  },
 ] as const;
 ---
 
@@ -42,15 +50,31 @@ const PAGES = [
     {/* Interne Seite: gehört nicht in den Index einer Suchmaschine. */}
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
-    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
-    <script is:inline>document.documentElement.classList.add("js");</script>
+    <link
+      rel="preload"
+      href="/fonts/PPNeueMontreal-Medium.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/GT-Pressura-Mono-Light.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <script is:inline>
+      document.documentElement.classList.add("js");
+    </script>
   </head>
 
   <body class="d-body">
-    {/* WCAG 2.2, 2.4.1 — wie in Base.astro. Muss das erste
+    {
+      /* WCAG 2.2, 2.4.1 — wie in Base.astro. Muss das erste
         fokussierbare Element sein, sonst ist der Sprung nicht zu
-        erreichen, bevor die Navigation kommt. */}
+        erreichen, bevor die Navigation kommt. */
+    }
     <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
 
     <Icons />
@@ -58,11 +82,20 @@ const PAGES = [
     <header class="d-header">
       <a class="d-header__brand" href="/">Mundpropaganda</a>
       <nav class="d-header__nav" aria-label="Design">
-        {PAGES.map((s) => (
-          <a href={s.path} aria-current={s.name.toLowerCase().startsWith(active.slice(0, 4)) ? "page" : undefined}>
-            {s.name}
-          </a>
-        ))}
+        {
+          PAGES.map((s) => (
+            <a
+              href={s.path}
+              aria-current={
+                s.name.toLowerCase().startsWith(active.slice(0, 4))
+                  ? "page"
+                  : undefined
+              }
+            >
+              {s.name}
+            </a>
+          ))
+        }
       </nav>
     </header>
 
@@ -99,7 +132,7 @@ const PAGES = [
         color: var(--c-grey);
         font-family: var(--f-mono);
         font-size: var(--fs-text-small);
-        letter-spacing: 0.06em;
+        letter-spacing: var(--tracking-wide);
         text-transform: uppercase;
       }
 
@@ -149,20 +182,20 @@ const PAGES = [
         margin-bottom: var(--sp-2);
         font-family: var(--f-mono);
         font-size: var(--fs-text-small);
-        letter-spacing: 0.08em;
+        letter-spacing: var(--tracking-wider);
         color: var(--c-text-muted);
       }
 
       .d-section__title {
         font-size: var(--fs-h2);
         font-weight: 400;
-        line-height: 1.15;
+        line-height: var(--lh-title);
       }
 
       .d-section__text {
         margin-top: var(--sp-3);
         font-size: var(--fs-text-main);
-        line-height: 1.5;
+        line-height: var(--lh-body);
         color: var(--c-text-muted);
       }
 
@@ -185,7 +218,7 @@ const PAGES = [
       .d-sample__name {
         font-family: var(--f-mono);
         font-size: var(--fs-text-small);
-        letter-spacing: 0.06em;
+        letter-spacing: var(--tracking-wide);
         text-transform: uppercase;
       }
 
@@ -194,7 +227,7 @@ const PAGES = [
       .d-sample__path {
         font-family: var(--f-mono);
         font-size: var(--fs-label);
-        letter-spacing: 0.04em;
+        letter-spacing: var(--tracking-mono);
         color: var(--c-text-muted);
       }
 
@@ -202,7 +235,7 @@ const PAGES = [
         max-width: 68ch;
         margin-bottom: var(--sp-4);
         font-size: var(--fs-text-main);
-        line-height: 1.5;
+        line-height: var(--lh-body);
         color: var(--c-text-muted);
       }
 
@@ -258,7 +291,7 @@ const PAGES = [
         border: var(--bw) dashed var(--c-line);
         border-radius: var(--r-md);
         font-size: var(--fs-text-main);
-        line-height: 1.5;
+        line-height: var(--lh-body);
         color: var(--c-text-muted);
       }
 

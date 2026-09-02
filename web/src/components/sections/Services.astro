@@ -14,7 +14,12 @@ interface Props {
 /* Keine Vorgabe: Pflichtfeld im Schema, die Seite reicht es durch. */
 const { title } = Astro.props;
 import Button from "../ui/Button.astro";
-import { loadServiceList, forTable, forList, servicePath } from "../../lib/service-list";
+import {
+  loadServiceList,
+  forTable,
+  forList,
+  servicePath,
+} from "../../lib/service-list";
 import { isCmsImage, imageUrl, motifPath } from "../../lib/images";
 import { serviceMotif } from "../../lib/service-images";
 
@@ -51,73 +56,93 @@ const previewPath = (l: (typeof lines)[number]) => {
    richtig, ohne dass hier etwas gerechnet werden muss. */
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            UNSERE SERVICES — Tabelle mit Cursor-Preview
-           ================================================================== */}
-      <section class="s-services" id="leistungen" data-services>
-        <div class="container">
-          <h2 class="s-services__title" data-split="lines">{title}</h2>
+           ================================================================== */
+}
+<section class="s-services" id="leistungen" data-services>
+  <div class="container">
+    <h2 class="s-services__title" data-split="lines">{title}</h2>
 
-          <div class="s-services__head" data-reveal="fade">
-            <span>Leistung</span>
-            <span class="s-services__head-practice">Praxis</span>
-            {/* Leere Zelle für die Pfeilspalte — sie trägt dieselbe Klasse wie
+    <div class="s-services__head" data-reveal="fade">
+      <span>Leistung</span>
+      <span class="s-services__head-practice">Praxis</span>
+      {
+        /* Leere Zelle für die Pfeilspalte — sie trägt dieselbe Klasse wie
                 der Pfeil in den Zeilen und erscheint und verschwindet
                 deshalb mit ihm. Ohne diese Kopplung stünde der Kopf dort, wo
                 auf Touch der Pfeil sitzt, und läge eine Pfeilbreite neben
-                seiner eigenen Spalte. */}
-            <span class="s-services__arrow" aria-hidden="true"></span>
-          </div>
+                seiner eigenen Spalte. */
+      }
+      <span class="s-services__arrow" aria-hidden="true"></span>
+    </div>
 
-          <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
-            {lines.map((l, i) => (
-              <a
-                class="s-services__row"
-                href={servicePath(l)}
-                data-service-row
-                data-reveal-child
-                data-preview={previewPath(l)}
-                data-preview-label="Mehr Info"
-              >
-                <span class="s-services__name">{l.name}</span>
-                <span class="s-services__tag">{l.tag}</span>
-                {/* Zeigt, dass die Zeile irgendwohin führt. Auf Zeigergeräten
+    <div class="s-services__list" data-services-list data-reveal-stagger="0.06">
+      {
+        lines.map((l, i) => (
+          <a
+            class="s-services__row"
+            href={servicePath(l)}
+            data-service-row
+            data-reveal-child
+            data-preview={previewPath(l)}
+            data-preview-label="Mehr Info"
+          >
+            <span class="s-services__name">{l.name}</span>
+            <span class="s-services__tag">{l.tag}</span>
+            {/* Zeigt, dass die Zeile irgendwohin führt. Auf Zeigergeräten
                     verrät das der Hover, auf dem Telefon gäbe es sonst kein
                     Anzeichen — der Pfeil steht dort dauerhaft. */}
-                <span class="s-services__arrow" aria-hidden="true">
-                  <svg><use href="#i-arrow" /></svg>
-                </span>
-              </a>
-            ))}
-          </div>
+            <span class="s-services__arrow" aria-hidden="true">
+              <svg>
+                <use href="#i-arrow" />
+              </svg>
+            </span>
+          </a>
+        ))
+      }
+    </div>
 
-          <div class="s-services__more" data-reveal-stagger="0.06">
-            {more.map((l) => (
-              <a href={servicePath(l)} data-reveal-child>
-                <span>{l.name}</span>
-                {/* Der Pfeil steckt in einem überlaufversteckten Fenster —
+    <div class="s-services__more" data-reveal-stagger="0.06">
+      {
+        more.map((l) => (
+          <a href={servicePath(l)} data-reveal-child>
+            <span>{l.name}</span>
+            {/* Der Pfeil steckt in einem überlaufversteckten Fenster —
                     das ist die Maske, aus der er beim Überfahren
                     hochfährt. */}
-                <span class="s-services__more-icon" aria-hidden="true">
-                  <span><svg><use href="#i-arrow" /></svg></span>
-                </span>
-              </a>
-            ))}
-          </div>
+            <span class="s-services__more-icon" aria-hidden="true">
+              <span>
+                <svg>
+                  <use href="#i-arrow" />
+                </svg>
+              </span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
 
-          <div class="s-services__foot" data-reveal="up">
-            <Button label="Termin buchen" href="#kontakt" />
-          </div>
-        </div>
+    <div class="s-services__foot" data-reveal="up">
+      <Button label="Termin buchen" href="#kontakt" />
+    </div>
+  </div>
 
-        <div class="s-services__preview" data-services-preview aria-hidden="true">
-          <img src="/img/teeth-macro-640.webp" alt="" />
-          {/* Der Button des Hauses statt eines eigenen Schildchens. Das Label
+  <div class="s-services__preview" data-services-preview aria-hidden="true">
+    <img src="/img/teeth-macro-640.webp" alt="" />
+    {
+      /* Der Button des Hauses statt eines eigenen Schildchens. Das Label
               trägt `data-preview-label`, weil services.js seinen Text je Zeile
-              austauscht. */}
-          <Button label="Mehr Info" static labelAttrs={{ "data-preview-label": true }} />
-        </div>
-      </section>
+              austauscht. */
+    }
+    <Button
+      label="Mehr Info"
+      static
+      labelAttrs={{ "data-preview-label": true }}
+    />
+  </div>
+</section>
 
 <style>
   /* Zeilen mit Hover-Highlight in Brand-Pink; ein Bild folgt dem Cursor. */
@@ -135,7 +160,7 @@ const previewPath = (l: (typeof lines)[number]) => {
     font-size: var(--fs-h1);
     font-weight: 500;
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   /* Kopf und Zeilen teilen sich EIN Raster, nicht zwei ähnliche Aufteilungen.
@@ -160,7 +185,7 @@ const previewPath = (l: (typeof lines)[number]) => {
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-text-small);
-    letter-spacing: 0.1em;
+    letter-spacing: var(--tracking-widest);
     text-transform: uppercase;
     /* Diese Section liegt auf Taupe, nicht auf Grau — dort ist der Grund
        dunkler und es braucht mehr Deckung: 82 % ergeben 4.55:1, die
@@ -183,7 +208,8 @@ const previewPath = (l: (typeof lines)[number]) => {
     border-bottom: var(--bw) solid var(--c-line);
     /* Wie oben: Grund ist Taupe, 82 % statt der urspruenglichen 62 % (3.03:1). */
     color: color-mix(in srgb, var(--c-dark) 82%, transparent);
-    transition: color var(--d-fast) var(--e-swift),
+    transition:
+      color var(--d-fast) var(--e-swift),
       padding-left var(--d-base) var(--e-out),
       border-color var(--d-base) var(--e-swift);
   }
@@ -209,16 +235,16 @@ const previewPath = (l: (typeof lines)[number]) => {
   .s-services__name {
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-services__tag {
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-text-small);
-    line-height: 1.5;
-    letter-spacing: 0.06em;
+    line-height: var(--lh-body);
+    letter-spacing: var(--tracking-wide);
   }
 
   @media (hover: hover) {
@@ -339,8 +365,9 @@ const previewPath = (l: (typeof lines)[number]) => {
     padding-right: calc(var(--arrow) + var(--sp-3));
     border-bottom: var(--bw) solid var(--c-line);
     font-size: var(--fs-h5);
-    line-height: 1.2;
-    transition: padding-left var(--d-base) var(--e-out),
+    line-height: var(--lh-snug);
+    transition:
+      padding-left var(--d-base) var(--e-out),
       color var(--d-fast) var(--e-swift);
   }
 

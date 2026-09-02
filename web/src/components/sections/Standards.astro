@@ -199,8 +199,8 @@ const AUSSCHNITT: Record<string, string> = {
     margin-bottom: var(--flow-2xl);
     font-size: var(--fs-display-2);
     font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tighter);
   }
 
   /* Zeilenraster 150px: Inhalt max. 124px plus 26px Innenabstand.
@@ -267,8 +267,8 @@ const AUSSCHNITT: Record<string, string> = {
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-h5);
-    line-height: 1.2;
-    letter-spacing: 0.04em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-mono);
   }
 
   /* Die Umbrüche stehen im Markup als <br>: kein Wert für max-width teilt
@@ -279,7 +279,7 @@ const AUSSCHNITT: Record<string, string> = {
     font-size: var(--fs-h2);
     font-weight: 400;
     line-height: 1.05;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
     max-width: 18ch;
     text-wrap: balance;
   }
@@ -288,7 +288,7 @@ const AUSSCHNITT: Record<string, string> = {
      bleibt. */
   .s-standards__text {
     font-size: var(--fs-text-small);
-    line-height: 1.5;
+    line-height: var(--lh-body);
     max-width: 34ch;
   }
 

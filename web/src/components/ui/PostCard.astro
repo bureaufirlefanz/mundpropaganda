@@ -19,7 +19,12 @@ import Button from "./Button.astro";
 import Picture from "./Picture.astro";
 import CmsImage from "./CmsImage.astro";
 import { isCmsImage } from "../../lib/images";
-import { categoryLabel, postPath, motifFor, type Post } from "../../lib/magazine";
+import {
+  categoryLabel,
+  postPath,
+  motifFor,
+  type Post,
+} from "../../lib/magazine";
 
 interface Props {
   post: Post;
@@ -61,17 +66,32 @@ const {
 const motif = motifFor(p.slug);
 ---
 
-{/* `data-category` trägt den Rohwert, nicht den Klartext: Der Filter
+{
+  /* `data-category` trägt den Rohwert, nicht den Klartext: Der Filter
      vergleicht ihn mit dem Wert aus dem Schema, und „Material & Technik"
      gegen „technik" zu prüfen hieße, die Zuordnung ein zweites Mal zu
-     pflegen. */}
-<a class="c-post" href={postPath(p.slug)} data-category={p.category ?? ""} {...rest}>
+     pflegen. */
+}
+<a
+  class="c-post"
+  href={postPath(p.slug)}
+  data-category={p.category ?? ""}
+  {...rest}
+>
   <div class="c-post__media">
-    {isCmsImage(p.previewImage) ? (
-      <CmsImage source={p.previewImage} alt="" widths={[640, 1024]} sizes={sizes} data-parallax={parallax} />
-    ) : (
-      <Picture name={motif} alt="" sizes={sizes} parallax={parallax} />
-    )}
+    {
+      isCmsImage(p.previewImage) ? (
+        <CmsImage
+          source={p.previewImage}
+          alt=""
+          widths={[640, 1024]}
+          sizes={sizes}
+          data-parallax={parallax}
+        />
+      ) : (
+        <Picture name={motif} alt="" sizes={sizes} parallax={parallax} />
+      )
+    }
   </div>
 
   <div class="c-post__surface">
@@ -185,8 +205,8 @@ const motif = motifFor(p.slug);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    line-height: 1.2;
-    letter-spacing: 0.1em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-widest);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -196,14 +216,14 @@ const motif = motifFor(p.slug);
     font-size: var(--fs-h4);
     font-weight: 400;
     line-height: 1.12;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
   }
 
   .c-post__text {
     margin-top: auto;
     padding-top: var(--sp-6);
     font-size: var(--fs-text-small);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
   }
 

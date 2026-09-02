@@ -56,40 +56,50 @@ const { id, body, image, alt = "", side = "right", note } = Astro.props;
 const hasNote = Boolean(note?.text);
 ---
 
-<section class:list={["container", "s-prose", `s-prose--${side}`]} id={id} data-toc-target={id}>
+<section
+  class:list={["container", "s-prose", `s-prose--${side}`]}
+  id={id}
+  data-toc-target={id}
+>
   <div class="s-prose__inner">
-    {image && (
-      <figure class="s-prose__media" data-reveal="scale">
-        <CmsImage
-          source={image}
-          alt={alt}
-          widths={[640, 1024, 1600, 2200]}
-          sizes="(max-width: 1000px) 100vw, 46vw"
-        />
-      </figure>
-    )}
+    {
+      image && (
+        <figure class="s-prose__media" data-reveal="scale">
+          <CmsImage
+            source={image}
+            alt={alt}
+            widths={[640, 1024, 1600, 2200]}
+            sizes="(max-width: 1000px) 100vw, 46vw"
+          />
+        </figure>
+      )
+    }
 
     <div class="s-prose__body" data-reveal="up">
-      {/* Eigene Hülle um den Fließtext: Die `:global()`-Regeln unten gälten
+      {
+        /* Eigene Hülle um den Fließtext: Die `:global()`-Regeln unten gälten
           sonst auch für den Hinweiskasten darunter, der einen eigenen `<p>`
           mitbringt. Der erbte dadurch Fließtextgröße und gedämpfte Farbe und
-          fiel unter den Kontrastwert — gemeldet von `npm run web:check`. */}
+          fiel unter den Kontrastwert — gemeldet von `npm run web:check`. */
+      }
       <div class="s-prose__text">
         <PortableText value={body} />
       </div>
 
-      {hasNote && (
-        <div class="s-prose__note">
-          <SourceNote
-            variant={note!.variant ?? "info"}
-            title={note!.title ?? undefined}
-            href={note!.href ?? undefined}
-            linkLabel={note!.linkLabel ?? undefined}
-          >
-            {note!.text}
-          </SourceNote>
-        </div>
-      )}
+      {
+        hasNote && (
+          <div class="s-prose__note">
+            <SourceNote
+              variant={note!.variant ?? "info"}
+              title={note!.title ?? undefined}
+              href={note!.href ?? undefined}
+              linkLabel={note!.linkLabel ?? undefined}
+            >
+              {note!.text}
+            </SourceNote>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>
@@ -176,7 +186,7 @@ const hasNote = Boolean(note?.text);
      Textspalte in `Post.astro`, damit ein Absatz überall gleich liest. */
   .s-prose__text :global(p) {
     font-size: var(--fs-text-main);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
     color: var(--c-text-muted);
   }
 
@@ -193,7 +203,7 @@ const hasNote = Boolean(note?.text);
     padding-left: 0;
     list-style-position: inside;
     font-size: var(--fs-text-main);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
     color: var(--c-text-muted);
   }
 

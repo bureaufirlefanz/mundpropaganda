@@ -33,11 +33,13 @@ const { data: d, title } = Astro.props;
       <h1 class="s-legal__title" data-split="lines">{title}</h1>
     </header>
 
-    {d?.text && (
-      <div class="container s-legal__text" data-reveal="up">
-        <PortableText value={d.text} />
-      </div>
-    )}
+    {
+      d?.text && (
+        <div class="container s-legal__text" data-reveal="up">
+          <PortableText value={d.text} />
+        </div>
+      )
+    }
   </article>
 </Base>
 
@@ -58,7 +60,7 @@ const { data: d, title } = Astro.props;
     font-size: var(--fs-h1);
     font-weight: 500;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-legal__text {
@@ -72,7 +74,7 @@ const { data: d, title } = Astro.props;
     margin-bottom: var(--sp-4);
     font-size: var(--fs-h3);
     font-weight: 500;
-    line-height: 1.2;
+    line-height: var(--lh-snug);
   }
 
   .s-legal__text :global(h3) {

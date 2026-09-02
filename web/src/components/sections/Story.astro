@@ -39,43 +39,59 @@ const { topline, headline, columns, image, figures } = Astro.props;
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-story__title" data-split="lines">{headline}</h2>
 
-    {columns.map((paragraph, i) => (
-      <p class="s-story__paragraph" data-reveal="up" data-reveal-delay={0.08 * (i + 1)}>
-        {paragraph}
-      </p>
-    ))}
+    {
+      columns.map((paragraph, i) => (
+        <p
+          class="s-story__paragraph"
+          data-reveal="up"
+          data-reveal-delay={0.08 * (i + 1)}
+        >
+          {paragraph}
+        </p>
+      ))
+    }
 
-    {figures && figures.length > 0 && (
-      <dl class="s-story__figures" data-reveal-stagger="0.08">
-        {figures.map((z) => (
-          <div class="s-story__figure" data-reveal-child>
-            {/* <dd> vor <dt> im Markup wäre falsch herum — die Zahl ist der
+    {
+      figures && figures.length > 0 && (
+        <dl class="s-story__figures" data-reveal-stagger="0.08">
+          {figures.map((z) => (
+            <div class="s-story__figure" data-reveal-child>
+              {/* <dd> vor <dt> im Markup wäre falsch herum — die Zahl ist der
                 Wert, die Erläuterung der Begriff. `flex-direction: column-
                 reverse` dreht nur die Darstellung. */}
-            <dt class="s-story__figure-label">{z.text}</dt>
-            <dd class="s-story__figure-value">{z.value}</dd>
-          </div>
-        ))}
-      </dl>
-    )}
+              <dt class="s-story__figure-label">{z.text}</dt>
+              <dd class="s-story__figure-value">{z.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
   </div>
 
-  {/* Klasse 3 wie überall auf der Seite: Ohne gepflegtes Motiv steht das
+  {
+    /* Klasse 3 wie überall auf der Seite: Ohne gepflegtes Motiv steht das
       gestaltete Ersatzbild. Ohne diesen Rückfall bricht das zweispaltige
       Raster in sich zusammen — der Text nähme dann die volle Breite und
-      liefe auf 58 Zeichen Lesemaß mitten in einer leeren Spalte. */}
+      liefe auf 58 Zeichen Lesemaß mitten in einer leeren Spalte. */
+  }
   <div class="s-story__media">
     <div class="s-story__image" data-reveal="right">
-      {isCmsImage(image) ? (
-        <CmsImage
-          source={image}
-          alt=""
-          widths={[640, 1024, 1600]}
-          sizes="(max-width: 900px) 92vw, 42vw"
-        />
-      ) : (
-        <Picture name="experten-gespraech-tisch" alt="" sizes="(max-width: 900px) 92vw, 42vw" />
-      )}
+      {
+        isCmsImage(image) ? (
+          <CmsImage
+            source={image}
+            alt=""
+            widths={[640, 1024, 1600]}
+            sizes="(max-width: 900px) 92vw, 42vw"
+          />
+        ) : (
+          <Picture
+            name="experten-gespraech-tisch"
+            alt=""
+            sizes="(max-width: 900px) 92vw, 42vw"
+          />
+        )
+      }
     </div>
   </div>
 </section>
@@ -95,8 +111,8 @@ const { topline, headline, columns, image, figures } = Astro.props;
     margin-bottom: var(--sp-6);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   /* 60 Zeichen ist die Grenze, ab der das Auge die nächste Zeile nicht mehr
@@ -105,7 +121,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
   .s-story__paragraph {
     max-width: 58ch;
     font-size: var(--fs-text-main);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
   }
 
   .s-story__paragraph + .s-story__paragraph {
@@ -133,8 +149,8 @@ const { topline, headline, columns, image, figures } = Astro.props;
     margin: 0;
     font-size: var(--fs-h1-xs);
     font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tighter);
   }
 
   .s-story__figure-label {
@@ -157,7 +173,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
   .s-story__image {
     overflow: hidden;
     aspect-ratio: 4 / 5;
-/* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
+    /* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
        gerundet. Jedes andere Bild nimmt `--r-md`. */
     border-radius: var(--r-md);
     background: var(--c-tint);

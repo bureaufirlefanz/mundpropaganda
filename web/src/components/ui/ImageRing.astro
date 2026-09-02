@@ -64,9 +64,11 @@ const cards = Array.from({ length: count }, (_, i) => ({
 ---
 
 <div class="c-ring" data-ring>
-  {/* tabindex, damit der Ring den Fokus annehmen und auf die Pfeiltasten
+  {
+    /* tabindex, damit der Ring den Fokus annehmen und auf die Pfeiltasten
       hören kann. Die beiden Knöpfe darunter tun dasselbe für alle, die
-      lieber klicken. */}
+      lieber klicken. */
+  }
   <div
     class="c-ring__stage"
     data-ring-stage
@@ -76,37 +78,53 @@ const cards = Array.from({ length: count }, (_, i) => ({
     tabindex="0"
   >
     <div class="c-ring__rotor" data-ring-rotor>
-      {cards.map(({ image, repeated }) => (
-        <figure class="c-ring__card" data-ring-card aria-hidden={repeated ? "true" : undefined}>
-          {isCmsImage(image.image) ? (
-            <CmsImage
-              source={image.image}
-              alt={repeated ? "" : (image.alt ?? "")}
-              widths={[640, 1024]}
-              sizes="(max-width: 700px) 80vw, 38vw"
-            />
-          ) : (
-            <Picture
-              name={image.name ?? "empfang-p25"}
-              alt={repeated ? "" : (image.alt ?? "")}
-              sizes="(max-width: 700px) 80vw, 38vw"
-            />
-          )}
-          {image.caption && !repeated && (
-            <figcaption class="c-ring__caption">{image.caption}</figcaption>
-          )}
-        </figure>
-      ))}
+      {
+        cards.map(({ image, repeated }) => (
+          <figure
+            class="c-ring__card"
+            data-ring-card
+            aria-hidden={repeated ? "true" : undefined}
+          >
+            {isCmsImage(image.image) ? (
+              <CmsImage
+                source={image.image}
+                alt={repeated ? "" : (image.alt ?? "")}
+                widths={[640, 1024]}
+                sizes="(max-width: 700px) 80vw, 38vw"
+              />
+            ) : (
+              <Picture
+                name={image.name ?? "empfang-p25"}
+                alt={repeated ? "" : (image.alt ?? "")}
+                sizes="(max-width: 700px) 80vw, 38vw"
+              />
+            )}
+            {image.caption && !repeated && (
+              <figcaption class="c-ring__caption">{image.caption}</figcaption>
+            )}
+          </figure>
+        ))
+      }
     </div>
   </div>
 
   <div class="container c-ring__nav" data-reveal="fade">
     <div class="c-ring__arrows">
-      <button class="s-gallery__arrow" data-ring-prev type="button" aria-label={`${label}: zurück`}>
-        <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+      <button
+        class="s-gallery__arrow"
+        data-ring-prev
+        type="button"
+        aria-label={`${label}: zurück`}
+      >
+        <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
       </button>
-      <button class="s-gallery__arrow" data-ring-next type="button" aria-label={`${label}: weiter`}>
-        <svg aria-hidden="true"><use href="#i-arrow" /></svg>
+      <button
+        class="s-gallery__arrow"
+        data-ring-next
+        type="button"
+        aria-label={`${label}: weiter`}
+      >
+        <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
       </button>
     </div>
   </div>
@@ -160,7 +178,9 @@ const cards = Array.from({ length: count }, (_, i) => ({
      Überschrift und zu den Pfeilen wirkte. */
   .c-ring__stage {
     position: relative;
-    height: calc(var(--card-height) * var(--card-visible) + 2 * var(--stage-air));
+    height: calc(
+      var(--card-height) * var(--card-visible) + 2 * var(--stage-air)
+    );
     overflow: hidden;
     cursor: grab;
     touch-action: pan-y;
@@ -273,7 +293,7 @@ const cards = Array.from({ length: count }, (_, i) => ({
     color: var(--c-dark);
     font-family: var(--f-mono);
     font-size: var(--fs-text-small);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     text-align: center;
   }

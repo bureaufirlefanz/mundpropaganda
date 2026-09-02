@@ -308,7 +308,7 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
   .c-apply__status:not(:empty) {
     margin-top: var(--sp-4);
     font-size: var(--fs-text-small);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -357,7 +357,7 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
        Kreis skalieren zusammen mit dem Kontext. Ein fester Grad würde die
        Geometrie von der Schrift entkoppeln. */
     font-size: 0.9em;
-    line-height: 1;
+    line-height: var(--lh-tight);
   }
 
   .c-apply__marker[data-active] .c-apply__marker-number {
@@ -451,7 +451,7 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
 
   .c-apply__note {
     font-size: var(--fs-text-small);
-    line-height: 1.5;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 

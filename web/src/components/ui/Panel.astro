@@ -23,7 +23,13 @@ const { id, topline, title, text } = Astro.props;
 <section class="container s-panel" id={id}>
   <div class="s-panel__head">
     <span class="c-topline">{topline}</span>
-    {title && <h2 class="s-panel__title" data-split="lines">{title}</h2>}
+    {
+      title && (
+        <h2 class="s-panel__title" data-split="lines">
+          {title}
+        </h2>
+      )
+    }
     {text && <p class="s-panel__text t-body t-muted">{text}</p>}
   </div>
 
@@ -70,7 +76,7 @@ const { id, topline, title, text } = Astro.props;
     font-size: var(--fs-h2-lg);
     font-weight: 500;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   @media (max-width: 900px) {

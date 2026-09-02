@@ -28,11 +28,12 @@ interface Props {
 const { categories, total } = Astro.props;
 ---
 
-{categories.length > 1 && (
-  /* Fragment, weil der Ausdruck nur eine Wurzel zurückgeben darf und hier
+{
+  categories.length > 1 && (
+    /* Fragment, weil der Ausdruck nur eine Wurzel zurückgeben darf und hier
      jetzt zwei Elemente nebeneinander stehen: die Ansage und der Filter. */
-  <>
-  {/* WCAG 2.2, 4.1.3 Statusmeldungen. Das Filtern blendet Karten mit `hidden`
+    <>
+      {/* WCAG 2.2, 4.1.3 Statusmeldungen. Das Filtern blendet Karten mit `hidden`
       ein und aus — für das Auge offensichtlich, für ein Vorlesegerät nicht:
       Verschwundene Elemente werden nicht angesagt, und ohne diese Zeile bliebe
       nach einem Klick auf eine Kategorie unklar, ob überhaupt etwas passiert
@@ -40,45 +41,64 @@ const { categories, total } = Astro.props;
 
       Die Region steht vor der Liste und von Anfang an im Dokument; ein erst
       nachträglich eingefügter Bereich wird nicht zuverlässig beobachtet. */}
-  <p class="sr-only" data-filter-status role="status" aria-live="polite"></p>
+      <p class="sr-only" data-filter-status role="status" aria-live="polite" />
 
-  <div class="c-filter" data-filter>
-    {/* Nur das Zeichen. Ein Wort daneben erklärte nichts, was das Zeichen
+      <div class="c-filter" data-filter>
+        {/* Nur das Zeichen. Ein Wort daneben erklärte nichts, was das Zeichen
         nicht schon sagt, und stünde bei jeder Kategorie in anderer Länge da —
         der Knopf änderte seine Breite bei jeder Auswahl. Was gewählt ist,
         steht im Panel und am Zustand des Knopfes.
         `aria-label`, weil es keine sichtbare Beschriftung gibt: Ohne das
         liest ein Vorlesegerät nur „Schaltfläche". */}
-    <button
-      class="c-filter__button"
-      type="button"
-      aria-expanded="false"
-      aria-controls="filter-optionen"
-      aria-label="Nach Kategorie filtern"
-      data-filter-button
-    >
-      <svg class="c-filter__icon" aria-hidden="true"><use href="#i-filter" /></svg>
-      {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Knopf
+        <button
+          class="c-filter__button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="filter-optionen"
+          aria-label="Nach Kategorie filtern"
+          data-filter-button
+        >
+          <svg class="c-filter__icon" aria-hidden="true">
+            <use href="#i-filter" />
+          </svg>
+          {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Knopf
           zugeklappt genauso aus wie ohne Auswahl. */}
-      <span class="c-filter__dot" data-filter-dot hidden></span>
-    </button>
+          <span class="c-filter__dot" data-filter-dot hidden />
+        </button>
 
-    {/* `hidden` im Markup, nicht nur per CSS: Ohne das wären die Optionen für
+        {/* `hidden` im Markup, nicht nur per CSS: Ohne das wären die Optionen für
         Vorlesegeräte von Anfang an in der Vorlesereihenfolge, obwohl niemand
         sie sieht. Das Modul nimmt es beim Aufklappen weg. */}
-    <div class="c-filter__panel" id="filter-optionen" role="group" aria-label="Nach Kategorie filtern" hidden>
-      <button class="c-filter__tag" type="button" data-filter-value="" aria-pressed="true">
-        Alle
-      </button>
-      {categories.map((k) => (
-        <button class="c-filter__tag" type="button" data-filter-value={k} aria-pressed="false">
-          {categoryLabel(k)}
-        </button>
-      ))}
-    </div>
-  </div>
-  </>
-)}
+        <div
+          class="c-filter__panel"
+          id="filter-optionen"
+          role="group"
+          aria-label="Nach Kategorie filtern"
+          hidden
+        >
+          <button
+            class="c-filter__tag"
+            type="button"
+            data-filter-value=""
+            aria-pressed="true"
+          >
+            Alle
+          </button>
+          {categories.map((k) => (
+            <button
+              class="c-filter__tag"
+              type="button"
+              data-filter-value={k}
+              aria-pressed="false"
+            >
+              {categoryLabel(k)}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
 
 <style>
   /* Ohne JavaScript gibt es nichts zu bedienen — dann steht hier auch nichts.
@@ -191,8 +211,8 @@ const { categories, total } = Astro.props;
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    line-height: 1.2;
-    letter-spacing: 0.08em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;

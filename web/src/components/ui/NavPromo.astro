@@ -35,14 +35,16 @@ const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
 
 <a class="c-navpromo" href={href}>
   <div class="c-navpromo__media">
-    {image && (
-      <CmsImage
-        source={image}
-        alt={alt}
-        widths={[400, 800]}
-        sizes="(max-width: 900px) 90vw, 22vw"
-      />
-    )}
+    {
+      image && (
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[400, 800]}
+          sizes="(max-width: 900px) 90vw, 22vw"
+        />
+      )
+    }
   </div>
 
   <div class="c-navpromo__body">
@@ -116,7 +118,7 @@ const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
     font-size: var(--fs-h3);
     font-weight: 400;
     line-height: var(--lh-heading);
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 

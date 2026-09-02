@@ -26,14 +26,16 @@ const { headings, title = "Inhalt" } = Astro.props;
   <p class="c-toc__heading" id="toc-title">{title}</p>
 
   <ol class="c-toc__list">
-    {headings.map((m) => (
-      <li class:list={["c-toc__item", m.level === 3 && "c-toc__item--deep"]}>
-        <a class="c-toc__link" href={`#${m.id}`} data-toc-link={m.id}>
-          <span class="c-toc__rule" aria-hidden="true"></span>
-          <span class="c-toc__label">{m.text}</span>
-        </a>
-      </li>
-    ))}
+    {
+      headings.map((m) => (
+        <li class:list={["c-toc__item", m.level === 3 && "c-toc__item--deep"]}>
+          <a class="c-toc__link" href={`#${m.id}`} data-toc-link={m.id}>
+            <span class="c-toc__rule" aria-hidden="true" />
+            <span class="c-toc__label">{m.text}</span>
+          </a>
+        </li>
+      ))
+    }
   </ol>
 </nav>
 
@@ -76,7 +78,7 @@ const { headings, title = "Inhalt" } = Astro.props;
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    letter-spacing: 0.1em;
+    letter-spacing: var(--tracking-widest);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }

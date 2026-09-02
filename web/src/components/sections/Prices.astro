@@ -38,7 +38,13 @@ interface Props {
   disclaimer?: string;
 }
 
-const { title = "Kosten", pricing, id = "kosten", note, disclaimer } = Astro.props;
+const {
+  title = "Kosten",
+  pricing,
+  id = "kosten",
+  note,
+  disclaimer,
+} = Astro.props;
 
 /* Ein gemeinsamer Schalter: Trägt irgendeine Zeile eine Zusatzangabe,
    halten alle Karten den Platz frei. Sonst endeten Karten derselben Reihe
@@ -47,48 +53,68 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
 ---
 
 <section class="s-prices container" id={id} data-toc-target={id}>
-  {title && <h2 class="s-prices__title" data-split="lines">{title}</h2>}
+  {
+    title && (
+      <h2 class="s-prices__title" data-split="lines">
+        {title}
+      </h2>
+    )
+  }
   <div class="s-prices__grid" data-reveal-stagger="0.08">
-    {pricing.map((p) => (
-      <article class="c-price" data-reveal-child>
-        <h3 class="c-price__name">{p.name}</h3>
+    {
+      pricing.map((p) => (
+        <article class="c-price" data-reveal-child>
+          <h3 class="c-price__name">{p.name}</h3>
 
-        {hasFacts && (
-          <dl class="c-price__facts">
-            {p.reduction && (
-              <div class="c-price__fact">
-                <dt>Zahnabtrag</dt>
-                <dd>{p.reduction}</dd>
-              </div>
-            )}
-            {p.durability && (
-              <div class="c-price__fact">
-                <dt>Haltbarkeit</dt>
-                <dd>{p.durability}</dd>
-              </div>
-            )}
-          </dl>
-        )}
+          {hasFacts && (
+            <dl class="c-price__facts">
+              {p.reduction && (
+                <div class="c-price__fact">
+                  <dt>Zahnabtrag</dt>
+                  <dd>{p.reduction}</dd>
+                </div>
+              )}
+              {p.durability && (
+                <div class="c-price__fact">
+                  <dt>Haltbarkeit</dt>
+                  <dd>{p.durability}</dd>
+                </div>
+              )}
+            </dl>
+          )}
 
-        {p.from || p.unit ? (
-          /* Dreiteilig wie im Entwurf (Figma 177:2029): „AB" klein links, der
+          {p.from || p.unit ? (
+            /* Dreiteilig wie im Entwurf (Figma 177:2029): „AB" klein links, der
              Betrag groß in der Mitte, die Einheit klein rechts. Die beiden
              kleinen Teile stehen in eigenen Spans, damit sie im Lesefluss
              bleiben, während der Betrag Tabellenziffern bekommt. */
-          <span class="c-price__tag c-price__tag--split">
-            <span class="c-price__from">{p.from ? "ab" : ""}</span>
-            <span class="c-price__amount">{p.price}</span>
-            <span class="c-price__unit">{p.unit ?? ""}</span>
-          </span>
-        ) : (
-          <span class="c-price__tag">{p.price}</span>
-        )}
-      </article>
-    ))}
+            <span class="c-price__tag c-price__tag--split">
+              <span class="c-price__from">{p.from ? "ab" : ""}</span>
+              <span class="c-price__amount">{p.price}</span>
+              <span class="c-price__unit">{p.unit ?? ""}</span>
+            </span>
+          ) : (
+            <span class="c-price__tag">{p.price}</span>
+          )}
+        </article>
+      ))
+    }
   </div>
 
-  {note && <p class="s-prices__note" data-reveal="up">{note}</p>}
-  {disclaimer && <p class="s-prices__disclaimer" data-reveal="up">{disclaimer}</p>}
+  {
+    note && (
+      <p class="s-prices__note" data-reveal="up">
+        {note}
+      </p>
+    )
+  }
+  {
+    disclaimer && (
+      <p class="s-prices__disclaimer" data-reveal="up">
+        {disclaimer}
+      </p>
+    )
+  }
 </section>
 
 <style>
@@ -101,7 +127,7 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
     margin-bottom: var(--sp-10);
     font-size: var(--fs-h1-sm);
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-prices__grid {
@@ -143,8 +169,8 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
   .c-price__name {
     font-size: var(--fs-h4);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
@@ -162,7 +188,7 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-text-main);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     text-align: center;
   }
@@ -239,9 +265,9 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
     font-family: var(--f-sans);
     font-size: var(--fs-h4);
     font-weight: 400;
-    line-height: 1;
+    line-height: var(--lh-tight);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
     text-transform: none;
   }
 
@@ -264,7 +290,7 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
     padding-top: var(--sp-6);
     border-top: var(--bw) solid var(--c-line);
     font-size: var(--fs-text-small);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
     color: var(--c-text-muted);
   }
 </style>

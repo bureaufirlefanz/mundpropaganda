@@ -80,11 +80,25 @@ const MOTIF = serviceMotif(slug);
   <ToothLines />
 
   <div class="s-shero__body">
-    {/* Topline und Fließtext tragen `data-hero-meta`, die Überschrift
+    {
+      /* Topline und Fließtext tragen `data-hero-meta`, die Überschrift
         `data-hero-word` — damit greift die Hero-Choreografie: der
-        Leistungsname steigt zeichenweise hinter seiner Maske auf. */}
-    {topline && <p class="s-shero__topline" data-hero-meta>{topline}</p>}
-    <h1 class="s-shero__title" style={`--shero-cap: ${sizeCap}cqw`} data-hero-word>{title}</h1>
+        Leistungsname steigt zeichenweise hinter seiner Maske auf. */
+    }
+    {
+      topline && (
+        <p class="s-shero__topline" data-hero-meta>
+          {topline}
+        </p>
+      )
+    }
+    <h1
+      class="s-shero__title"
+      style={`--shero-cap: ${sizeCap}cqw`}
+      data-hero-word
+    >
+      {title}
+    </h1>
     {text && <p data-hero-meta>{text}</p>}
 
     <div class="s-shero__actions" data-hero-foot>
@@ -97,28 +111,32 @@ const MOTIF = serviceMotif(slug);
   </div>
 
   <div class="s-shero__media">
-    {/* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
-        unter 900px die ganze. */}
-    {isCmsImage(image) ? (
-      <CmsImage
-        source={image}
-        alt={alt}
-        widths={[640, 1024, 1600, 2200]}
-        sizes="(max-width: 900px) 100vw, 50vw"
-        eager
-      />
-    ) : (
-      /* `Picture` und nicht `CmsImage` mit einem Pfad: `serviceMotif` gibt
+    {
+      /* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
+        unter 900px die ganze. */
+    }
+    {
+      isCmsImage(image) ? (
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[640, 1024, 1600, 2200]}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          eager
+        />
+      ) : (
+        /* `Picture` und nicht `CmsImage` mit einem Pfad: `serviceMotif` gibt
          einen Motivnamen zurück, keinen fertigen Pfad — und nur `Picture`
          liefert dafür AVIF und WebP samt srcset. Vorher stand hier eine
          einzelne 1600er WebP für alle elf Leistungsseiten. */
-      <Picture
-        name={MOTIF}
-        alt={alt}
-        sizes="(max-width: 900px) 100vw, 50vw"
-        eager
-      />
-    )}
+        <Picture
+          name={MOTIF}
+          alt={alt}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          eager
+        />
+      )
+    }
   </div>
 </section>
 
@@ -157,7 +175,7 @@ const MOTIF = serviceMotif(slug);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-h5);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
   }
 
@@ -187,8 +205,8 @@ const MOTIF = serviceMotif(slug);
   .s-shero__title {
     font-size: min(var(--fs-display-2), 13vw, var(--shero-cap, 100cqw));
     font-weight: 500;
-    line-height: 0.92;
-    letter-spacing: -0.03em;
+    line-height: var(--lh-display);
+    letter-spacing: var(--tracking-tighter);
     text-transform: uppercase;
     text-wrap: balance;
   }
@@ -196,7 +214,7 @@ const MOTIF = serviceMotif(slug);
   .s-shero__body p {
     max-width: 42ch;
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   /* Läuft nach rechts aus der Section heraus, steht senkrecht aber mittig —

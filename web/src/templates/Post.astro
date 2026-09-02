@@ -72,121 +72,178 @@ const minutes = readingTime(d?.text);
   <article class="s-post">
     {/* --- Kopf: Bild über die volle Breite, Titel darauf ---------------- */}
     <header class="s-post__header">
-      {/* Ohne Bild im CMS dasselbe Ersatzmotiv wie auf der Karte im Raster
+      {
+        /* Ohne Bild im CMS dasselbe Ersatzmotiv wie auf der Karte im Raster
           und im Karussell — sonst zeigte ein Beitrag in der Übersicht ein
-          Bild und auf seiner eigenen Seite ein anderes. */}
+          Bild und auf seiner eigenen Seite ein anderes. */
+      }
       <div class="s-post__headerimage">
-        {isCmsImage(d?.previewImage) ? (
-          <CmsImage source={d.previewImage} alt="" widths={[640, 1024, 1600, 2200]} sizes="100vw" eager />
-        ) : (
-          <Picture name={motifFor(d?.slug)} alt="" sizes="100vw" eager />
-        )}
+        {
+          isCmsImage(d?.previewImage) ? (
+            <CmsImage
+              source={d.previewImage}
+              alt=""
+              widths={[640, 1024, 1600, 2200]}
+              sizes="100vw"
+              eager
+            />
+          ) : (
+            <Picture name={motifFor(d?.slug)} alt="" sizes="100vw" eager />
+          )
+        }
       </div>
 
       <div class="container s-post__headline">
         <div class="s-post__titlecard">
-          {d?.category && <span class="s-post__tag">{categoryLabel(d.category)}</span>}
+          {
+            d?.category && (
+              <span class="s-post__tag">{categoryLabel(d.category)}</span>
+            )
+          }
           <h1 class="s-post__title" data-split="lines">{title}</h1>
-          {d?.lead && <p class="s-post__lead" data-reveal="up">{d.lead}</p>}
+          {
+            d?.lead && (
+              <p class="s-post__lead" data-reveal="up">
+                {d.lead}
+              </p>
+            )
+          }
         </div>
 
-        {/* Die Nebenangaben stehen NEBEN der Titelkarte, nicht im Rand des
+        {
+          /* Die Nebenangaben stehen NEBEN der Titelkarte, nicht im Rand des
             Fließtextes. Damit sind sie dort, wo man sie sucht — beim Titel —
             und trotzdem vom Titel getrennt: eigene Spalte, eigene Ebene,
             eigener Schnitt. Tag, Datum und Autor sind drei verschiedene
-            Dinge und sehen jetzt auch so aus. */}
+            Dinge und sehen jetzt auch so aus. */
+        }
         <div class="s-post__facts">
           <dl class="s-post__factlist">
-            {d?.date && (
-              <div class="s-post__fact">
-                <dt>Erschienen</dt>
-                <dd><time datetime={d.date}>{dateLabel(d.date)}</time></dd>
-              </div>
-            )}
+            {
+              d?.date && (
+                <div class="s-post__fact">
+                  <dt>Erschienen</dt>
+                  <dd>
+                    <time datetime={d.date}>{dateLabel(d.date)}</time>
+                  </dd>
+                </div>
+              )
+            }
             <div class="s-post__fact">
               <dt>Lesezeit</dt>
               <dd>{minutes} {minutes === 1 ? "Minute" : "Minuten"}</dd>
             </div>
           </dl>
 
-          {/* Ohne Autor steht hier nichts. Kein „Redaktion" als Notbehelf:
-              Das ist eine Behauptung über eine Urheberschaft. */}
-          {d?.author?.name && (
-            <div class="s-post__author">
-              {isCmsImage(d.author.image) && (
-                <div class="s-post__authorimage">
-                  <CmsImage source={d.author.image} alt="" widths={[96, 192]} sizes="48px" />
+          {
+            /* Ohne Autor steht hier nichts. Kein „Redaktion" als Notbehelf:
+              Das ist eine Behauptung über eine Urheberschaft. */
+          }
+          {
+            d?.author?.name && (
+              <div class="s-post__author">
+                {isCmsImage(d.author.image) && (
+                  <div class="s-post__authorimage">
+                    <CmsImage
+                      source={d.author.image}
+                      alt=""
+                      widths={[96, 192]}
+                      sizes="48px"
+                    />
+                  </div>
+                )}
+                <div>
+                  <p class="s-post__authorname">{d.author.name}</p>
+                  {d.author.role && (
+                    <p class="s-post__authorrole">{d.author.role}</p>
+                  )}
                 </div>
-              )}
-              <div>
-                <p class="s-post__authorname">{d.author.name}</p>
-                {d.author.role && <p class="s-post__authorrole">{d.author.role}</p>}
               </div>
-            </div>
-          )}
+            )
+          }
         </div>
       </div>
     </header>
 
     {/* --- Satz: Verzeichnis, Text, Randspalte --------------------------- */}
-    {d?.text && (
-      <div class:list={["container", "s-post__body", showToc && "s-post__body--toc"]}>
-        {showToc && (
-          <aside class="s-post__aside">
-            <TableOfContents headings={headings} />
-          </aside>
-        )}
+    {
+      d?.text && (
+        <div
+          class:list={[
+            "container",
+            "s-post__body",
+            showToc && "s-post__body--toc",
+          ]}
+        >
+          {showToc && (
+            <aside class="s-post__aside">
+              <TableOfContents headings={headings} />
+            </aside>
+          )}
 
-        <div class="s-post__column">
-          <div class="s-post__text" data-toc-bereich>
-            <PortableText
-              value={blocks}
-              components={{
-                block: { h2: TextHeading, h3: TextHeading },
-                type: { inlineImage: PostImage },
-              }}
-            />
+          <div class="s-post__column">
+            <div class="s-post__text" data-toc-bereich>
+              <PortableText
+                value={blocks}
+                components={{
+                  block: { h2: TextHeading, h3: TextHeading },
+                  type: { inlineImage: PostImage },
+                }}
+              />
 
-            {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist.
+              {/* Der Rückweg zur Leistung, wenn der Beitrag auf eine verweist.
                 Das ist der Gewinn der Referenz im Schema: Sie trägt in beide
                 Richtungen. */}
-            {d?.service?.slug && (
-              <div class="s-post__back">
-                <Button
-                  label={`Zur Leistung: ${d.service.title}`}
-                  href={`/leistungen/${d.service.slug}`}
-                  variant="dark"
-                />
-              </div>
-            )}
+              {d?.service?.slug && (
+                <div class="s-post__back">
+                  <Button
+                    label={`Zur Leistung: ${d.service.title}`}
+                    href={`/leistungen/${d.service.slug}`}
+                    variant="dark"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )
+    }
   </article>
 
-  {/* --- Weiterlesen ------------------------------------------------------
+  {
+    /* --- Weiterlesen ------------------------------------------------------
       Nur echte Treffer aus derselben Kategorie. Kein Auffüllen mit den
       neuesten Beiträgen: „Ähnliche Beiträge", unter denen etwas Unähnliches
-      steht, ist dieselbe stille Behauptung, die Aufgabe 4 abgeräumt hat. */}
-  {related.length > 0 && (
-    <section class="container s-more">
-      <div class="s-more__head">
-        <span class="c-topline" data-reveal="fade">Weiterlesen</span>
-        <h2 class="s-more__title" data-split="lines">
-          Mehr aus {categoryLabel(d?.category)}
-        </h2>
-      </div>
+      steht, ist dieselbe stille Behauptung, die Aufgabe 4 abgeräumt hat. */
+  }
+  {
+    related.length > 0 && (
+      <section class="container s-more">
+        <div class="s-more__head">
+          <span class="c-topline" data-reveal="fade">
+            Weiterlesen
+          </span>
+          <h2 class="s-more__title" data-split="lines">
+            Mehr aus {categoryLabel(d?.category)}
+          </h2>
+        </div>
 
-      <div class="s-more__grid" data-reveal-stagger="0.06">
-        {related.map((p) => (
-          <PostCard post={p} sizes="(max-width: 700px) 100vw, 30vw" withButton data-reveal-child />
-        ))}
-      </div>
-    </section>
-  )}
+        <div class="s-more__grid" data-reveal-stagger="0.06">
+          {related.map((p) => (
+            <PostCard
+              post={p}
+              sizes="(max-width: 700px) 100vw, 30vw"
+              withButton
+              data-reveal-child
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
-  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+  {
+    /* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
       Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
       sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
       Keramikinlays, Pillar Page).
@@ -194,7 +251,8 @@ const minutes = readingTime(d?.text);
       Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
       am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
       sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
-      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */
+  }
 </Base>
 
 <style>
@@ -260,8 +318,8 @@ const minutes = readingTime(d?.text);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    line-height: 1;
-    letter-spacing: 0.08em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
   }
 
@@ -269,7 +327,7 @@ const minutes = readingTime(d?.text);
     font-size: var(--fs-h1);
     font-weight: 500;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   /* Eigene Abstufung statt `--c-text-muted`: Das rechnet gegen den
@@ -277,7 +335,7 @@ const minutes = readingTime(d?.text);
   .s-post__lead {
     margin-top: var(--sp-5);
     font-size: var(--fs-text-large);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
   }
 
@@ -354,7 +412,7 @@ const minutes = readingTime(d?.text);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    letter-spacing: 0.1em;
+    letter-spacing: var(--tracking-widest);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -410,7 +468,7 @@ const minutes = readingTime(d?.text);
   .s-post__text :global(p) {
     margin-bottom: var(--sp-5);
     font-size: var(--fs-text-main);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
   }
 
   /* Zwischentitel bekommen eine Nummer im linken Rand. Der Zähler läuft über
@@ -427,8 +485,8 @@ const minutes = readingTime(d?.text);
     margin-bottom: var(--sp-4);
     font-size: var(--fs-h3);
     font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
     scroll-margin-top: calc(var(--nav-height) + var(--sp-4));
   }
 
@@ -440,7 +498,7 @@ const minutes = readingTime(d?.text);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    letter-spacing: 0.1em;
+    letter-spacing: var(--tracking-widest);
     color: var(--c-text-muted);
   }
 
@@ -449,7 +507,7 @@ const minutes = readingTime(d?.text);
     margin-bottom: var(--sp-3);
     font-size: var(--fs-h5);
     font-weight: 500;
-    line-height: 1.2;
+    line-height: var(--lh-snug);
     scroll-margin-top: calc(var(--nav-height) + var(--sp-4));
   }
 
@@ -462,7 +520,7 @@ const minutes = readingTime(d?.text);
   .s-post__text :global(li) {
     margin-bottom: var(--sp-2);
     font-size: var(--fs-text-main);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
   }
 
   .s-post__text :global(a) {
@@ -496,8 +554,8 @@ const minutes = readingTime(d?.text);
     margin-top: var(--sp-3);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   /* Dieselben drei Spalten wie unter /magazin. Die Karte merkt selbst, dass

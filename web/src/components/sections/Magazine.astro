@@ -25,50 +25,78 @@ interface Props {
 const { topline, title, text, posts } = Astro.props;
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
            darunter ein Karussell aus Bild + überlappender weißer Karte
-           ================================================================== */}
-      <section class="s-magazine" id="magazin" data-magazine>
-        <div class="container">
-          <span class="c-topline" data-reveal="fade">{topline}</span>
+           ================================================================== */
+}
+<section class="s-magazine" id="magazin" data-magazine>
+  <div class="container">
+    <span class="c-topline" data-reveal="fade">{topline}</span>
 
-          <div class="s-magazine__head">
-            {/* Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
+    <div class="s-magazine__head">
+      {
+        /* Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
                  Leicht gegeneinander gedreht, das „ZU" liegt als weiße
-                 Plakette dazwischen. */}
-            <div class="s-magazine__type" data-reveal="up">
-              <span class="s-magazine__bar">Mund</span>
-              <span class="s-magazine__chip">zu</span>
-              <span class="s-magazine__bar s-magazine__bar--lower">Mund</span>
-            </div>
+                 Plakette dazwischen. */
+      }
+      <div class="s-magazine__type" data-reveal="up">
+        <span class="s-magazine__bar">Mund</span>
+        <span class="s-magazine__chip">zu</span>
+        <span class="s-magazine__bar s-magazine__bar--lower">Mund</span>
+      </div>
 
-            <div class="s-magazine__intro">
-              <h2 class="s-magazine__title" data-split="lines">{title}</h2>
-              <p data-reveal="up" data-reveal-delay="0.08">{text}</p>
-            </div>
-          </div>
+      <div class="s-magazine__intro">
+        <h2 class="s-magazine__title" data-split="lines">{title}</h2>
+        <p data-reveal="up" data-reveal-delay="0.08">{text}</p>
+      </div>
+    </div>
 
-          <div class="s-magazine__track" data-magazine-track>
-            {posts.map((p, i) => (
-              <PostCard post={p} sizes="24vw" parallax="9" withButton data-magazine-item />
-            ))}
-          </div>
+    <div class="s-magazine__track" data-magazine-track>
+      {
+        posts.map((p, i) => (
+          <PostCard
+            post={p}
+            sizes="24vw"
+            parallax="9"
+            withButton
+            data-magazine-item
+          />
+        ))
+      }
+    </div>
 
-          <div class="s-magazine__nav">
-            <div class="s-magazine__arrows">
-              <button class="s-gallery__arrow" data-magazine-prev type="button" aria-label="Vorheriger Beitrag">
-                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-              </button>
-              <button class="s-gallery__arrow" data-magazine-next type="button" aria-label="Nächster Beitrag">
-                <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-              </button>
-            </div>
-            <div class="s-gallery__dots" data-magazine-dots role="tablist" aria-label="Beiträge"></div>
-            <Button label="Alle Beiträge" href="/magazin" variant="dark" />
-          </div>
-        </div>
-      </section>
+    <div class="s-magazine__nav">
+      <div class="s-magazine__arrows">
+        <button
+          class="s-gallery__arrow"
+          data-magazine-prev
+          type="button"
+          aria-label="Vorheriger Beitrag"
+        >
+          <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
+        </button>
+        <button
+          class="s-gallery__arrow"
+          data-magazine-next
+          type="button"
+          aria-label="Nächster Beitrag"
+        >
+          <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
+        </button>
+      </div>
+      <div
+        class="s-gallery__dots"
+        data-magazine-dots
+        role="tablist"
+        aria-label="Beiträge"
+      >
+      </div>
+      <Button label="Alle Beiträge" href="/magazin" variant="dark" />
+    </div>
+  </div>
+</section>
 
 <style>
   /* Wortmarke auf zwei Markerbalken, daneben der Einstiegstext, darunter ein
@@ -123,7 +151,7 @@ const { topline, title, text, posts } = Astro.props;
     font-weight: 500;
     font-size: var(--fs-display-lg);
     line-height: 0.86;
-    letter-spacing: -0.03em;
+    letter-spacing: var(--tracking-tighter);
     text-transform: uppercase;
     white-space: nowrap;
     rotate: 1.8deg;
@@ -152,8 +180,8 @@ const { topline, title, text, posts } = Astro.props;
     font-family: var(--f-sans);
     font-weight: 500;
     font-size: var(--fs-display-sm);
-    line-height: 1;
-    letter-spacing: -0.02em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
     rotate: -3deg;
   }
@@ -166,14 +194,14 @@ const { topline, title, text, posts } = Astro.props;
     margin-bottom: var(--sp-4);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
     text-transform: uppercase;
   }
 
   .s-magazine__intro p {
     font-size: var(--fs-text-small);
-    line-height: 1.5;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 

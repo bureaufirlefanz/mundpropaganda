@@ -15,16 +15,24 @@ const { title, steps } = Astro.props;
 
 <section class="s-steps">
   <div class="container">
-    {title && <h2 class="s-steps__title" data-split="lines">{title}</h2>}
+    {
+      title && (
+        <h2 class="s-steps__title" data-split="lines">
+          {title}
+        </h2>
+      )
+    }
 
     <div class="s-steps__grid" data-reveal-stagger="0.08">
-      {steps.map((s, i) => (
-        <article class="c-step" data-reveal-child>
-          <span class="c-number c-step__num">{i + 1}</span>
-          <h3 class="c-step__title">{s.title}</h3>
-          <p class="c-step__text">{s.text}</p>
-        </article>
-      ))}
+      {
+        steps.map((s, i) => (
+          <article class="c-step" data-reveal-child>
+            <span class="c-number c-step__num">{i + 1}</span>
+            <h3 class="c-step__title">{s.title}</h3>
+            <p class="c-step__text">{s.text}</p>
+          </article>
+        ))
+      }
     </div>
   </div>
 </section>
@@ -41,7 +49,7 @@ const { title, steps } = Astro.props;
     font-size: var(--fs-h1-sm);
     font-weight: 500;
     line-height: 1.02;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-steps__grid {
@@ -86,8 +94,8 @@ const { title, steps } = Astro.props;
   .c-step__title {
     font-size: var(--fs-h4);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   /* `margin-top: auto` schiebt den Text an die Unterkante — dadurch setzen
@@ -95,7 +103,7 @@ const { title, steps } = Astro.props;
   .c-step__text {
     margin-top: auto;
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: color-mix(in srgb, var(--c-neutral-800) 80%, transparent);
   }
 </style>

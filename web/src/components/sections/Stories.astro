@@ -39,95 +39,151 @@ const { items, action } = Astro.props;
 /* Zwei echte Porträts vorn, danach die abstrakten Motive. `smile-portrait`
    ist entfallen: Es lag nur in 563px vor, und die Karte zeigt das Motiv bis
    1024px breit — es wurde also hochskaliert ausgeliefert. */
-const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-02", "motion-03"];
+const MOTIFS = [
+  "story-portrait-01",
+  "story-portrait-02",
+  "motion-01",
+  "motion-02",
+  "motion-03",
+];
 ---
 
-{/* ==================================================================
+{
+  /* ==================================================================
            TRANSFORMATION STORIES
-           ================================================================== */}
-      <section class="s-stories" data-stories>
-        {/* Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
+           ================================================================== */
+}
+<section class="s-stories" data-stories>
+  {
+    /* Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
              Scroll — dadurch läuft der Schriftzug am oberen Rand entlang,
-             ohne dass er als Marquee gebaut werden muss. */}
-        <div class="s-stories__ring" data-stories-ring aria-hidden="true">
-          <svg viewBox="0 0 1000 1000">
-            <defs>
-              <path
-                id="storiesCircle"
-                d="M 500,500 m -430,0 a 430,430 0 1,1 860,0 a 430,430 0 1,1 -860,0"
-                fill="none"
+             ohne dass er als Marquee gebaut werden muss. */
+  }
+  <div class="s-stories__ring" data-stories-ring aria-hidden="true">
+    <svg viewBox="0 0 1000 1000">
+      <defs>
+        <path
+          id="storiesCircle"
+          d="M 500,500 m -430,0 a 430,430 0 1,1 860,0 a 430,430 0 1,1 -860,0"
+          fill="none"></path>
+      </defs>
+      <text>
+        <textPath href="#storiesCircle" startOffset="0%">
+          Transformation Stories - Transformation Stories - Transformation
+          Stories - Transformation Stories -
+        </textPath>
+      </text>
+    </svg>
+  </div>
+  <p class="sr-only">Transformation Stories</p>
+
+  <div class="s-stories__deck" data-deck>
+    <div class="s-stories__stack" data-deck-stack>
+      {
+        /* Vollflächige Motive: freigestellte PNGs würden die Karten
+                 dahinter durchscheinen lassen. */
+      }
+      {
+        items.map((e, i) => (
+          <figure class="s-stories__card" data-deck-card>
+            {isCmsImage(e.image) ? (
+              <CmsImage
+                source={e.image}
+                alt={e.name}
+                widths={[563, 1024]}
+                sizes="(max-width: 700px) 70vw, 30vw"
+                data-parallax="9"
               />
-            </defs>
-            <text>
-              <textPath href="#storiesCircle" startOffset="0%">
-                Transformation Stories - Transformation Stories - Transformation
-                Stories - Transformation Stories -
-              </textPath>
-            </text>
-          </svg>
-        </div>
-        <p class="sr-only">Transformation Stories</p>
+            ) : (
+              <Picture
+                name={MOTIFS[i % MOTIFS.length]}
+                alt={e.name}
+                sizes="(max-width: 700px) 70vw, 30vw"
+                parallax="9"
+              />
+            )}
+            <figcaption class="s-stories__name">{e.name}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
 
-        <div class="s-stories__deck" data-deck>
-          <div class="s-stories__stack" data-deck-stack>
-            {/* Vollflächige Motive: freigestellte PNGs würden die Karten
-                 dahinter durchscheinen lassen. */}
-            {items.map((e, i) => (
-              <figure class="s-stories__card" data-deck-card>
-                {isCmsImage(e.image) ? (
-                  <CmsImage source={e.image} alt={e.name} widths={[563, 1024]} sizes="(max-width: 700px) 70vw, 30vw" data-parallax="9" />
-                ) : (
-                  <Picture name={MOTIFS[i % MOTIFS.length]} alt={e.name} sizes="(max-width: 700px) 70vw, 30vw" parallax="9" />
-                )}
-                <figcaption class="s-stories__name">{e.name}</figcaption>
-              </figure>
-            ))}
-          </div>
-
-          {/* Pfeile flankieren den Fächer, der Zähler sitzt darunter. Keine
+    {
+      /* Pfeile flankieren den Fächer, der Zähler sitzt darunter. Keine
               gemeinsame Hülle mehr: nur als direkte Kinder liegen sie im
               selben Raster wie der Stapel und lassen sich daneben setzen.
-              Der gemeinsame Auslöser hält sie trotzdem im Gleichschritt. */}
-          <button class="s-stories__nav" data-deck-prev type="button" aria-label="Vorherige Geschichte"
-                  data-reveal="fade" data-reveal-trigger=".s-stories__deck">
-            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-          </button>
+              Der gemeinsame Auslöser hält sie trotzdem im Gleichschritt. */
+    }
+    <button
+      class="s-stories__nav"
+      data-deck-prev
+      type="button"
+      aria-label="Vorherige Geschichte"
+      data-reveal="fade"
+      data-reveal-trigger=".s-stories__deck"
+    >
+      <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
+    </button>
 
-          <button class="s-stories__nav" data-deck-next type="button" aria-label="Nächste Geschichte"
-                  data-reveal="fade" data-reveal-trigger=".s-stories__deck">
-            <svg aria-hidden="true"><use href="#i-arrow" /></svg>
-          </button>
+    <button
+      class="s-stories__nav"
+      data-deck-next
+      type="button"
+      aria-label="Nächste Geschichte"
+      data-reveal="fade"
+      data-reveal-trigger=".s-stories__deck"
+    >
+      <svg aria-hidden="true"><use href="#i-arrow"></use></svg>
+    </button>
 
-          <span class="s-stories__count" data-deck-count
-                data-reveal="fade" data-reveal-trigger=".s-stories__deck">1 / 5</span>
-        </div>
-      </section>
+    <span
+      class="s-stories__count"
+      data-deck-count
+      data-reveal="fade"
+      data-reveal-trigger=".s-stories__deck">1 / 5</span
+    >
+  </div>
+</section>
 
-      <section class="s-quote">
-        <div class="s-quote__inner">
-          <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
+<section class="s-quote">
+  <div class="s-quote__inner">
+    <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
 
-          {/* Wechselt mit der vordersten Karte oben. Alle Zitate liegen
-               übereinander, sichtbar ist immer genau eines. */}
-          <div class="s-quote__stage" data-deck-quotes>
-            {items.map((e, i) => (
-              <blockquote class="s-quote__text" data-deck-quote data-active={i === 0 ? "true" : undefined}>{e.quote}</blockquote>
-            ))}
-          </div>
+    {
+      /* Wechselt mit der vordersten Karte oben. Alle Zitate liegen
+               übereinander, sichtbar ist immer genau eines. */
+    }
+    <div class="s-quote__stage" data-deck-quotes>
+      {
+        items.map((e, i) => (
+          <blockquote
+            class="s-quote__text"
+            data-deck-quote
+            data-active={i === 0 ? "true" : undefined}
+          >
+            {e.quote}
+          </blockquote>
+        ))
+      }
+    </div>
 
-          <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
-        </div>
+    <span class="s-quote__mark" aria-hidden="true">&rdquo;</span>
+  </div>
 
-        {/* Vorher stand hier fest „Ganze Story lesen" mit href="#" — ein
+  {
+    /* Vorher stand hier fest „Ganze Story lesen" mit href="#" — ein
             Knopf, der den Browser nach oben springen ließ. Es gibt keine
             ganze Story: Die Stimmen sind Zitate, keine Beiträge. Wohin er
-            führt, entscheidet die Redaktion. */}
-        {action && (
-          <div class="s-quote__foot">
-            <Button label={action.text} href={action.href} />
-          </div>
-        )}
-      </section>
+            führt, entscheidet die Redaktion. */
+  }
+  {
+    action && (
+      <div class="s-quote__foot">
+        <Button label={action.text} href={action.href} />
+      </div>
+    )
+  }
+</section>
 
 <style>
   /* Gebogener Lauftext auf einem Kreisbogen + gestapelte Karten, die beim
@@ -294,7 +350,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     color: var(--c-dark);
     font-family: var(--f-mono);
     font-size: var(--fs-label-md);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -312,7 +368,8 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     background: var(--c-dark);
     border: 0;
     color: var(--c-grey);
-    transition: background var(--d-fast) var(--e-swift),
+    transition:
+      background var(--d-fast) var(--e-swift),
       color var(--d-fast) var(--e-swift);
   }
 
@@ -337,7 +394,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-text-small);
-    letter-spacing: 0.08em;
+    letter-spacing: var(--tracking-wider);
     color: var(--c-text-muted);
     font-variant-numeric: tabular-nums;
   }
@@ -357,7 +414,8 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     margin-top: calc(-1 * var(--quote-lift));
     /* Nur ein knapper Abstand über den Hub hinaus: das Zitat soll dicht
        unter der Steuerung stehen und mit ihr als ein Block lesen. */
-    padding: calc(var(--quote-lift) + var(--sp-2)) var(--site-margin) var(--sp-12);
+    padding: calc(var(--quote-lift) + var(--sp-2)) var(--site-margin)
+      var(--sp-12);
     background: var(--c-taupe);
     color: var(--c-dark);
   }

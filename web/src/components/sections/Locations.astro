@@ -62,55 +62,82 @@ const route = (o: Location) =>
   <div class="s-locations__head">
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-locations__title" data-split="lines">{headline}</h2>
-    {text && <p class="s-locations__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+    {
+      text && (
+        <p class="s-locations__text" data-reveal="up" data-reveal-delay="0.1">
+          {text}
+        </p>
+      )
+    }
   </div>
 
   <div class="s-locations__grid" data-reveal-stagger="0.1">
-    {locations.map((o) => (
-      <article class="c-location" data-reveal-child>
-        {o.latitude != null && o.longitude != null ? (
-          <button
-            class="c-location__map"
-            type="button"
-            data-embed={mapUrl(o.latitude, o.longitude)}
-            aria-label={`Karte laden für ${o.name}`}
-          >
-            <span class="c-location__placeholder" aria-hidden="true">
-              <span class="c-location__code">{o.shortCode}</span>
-              <span class="c-location__load">Karte laden</span>
-            </span>
-          </button>
-        ) : null}
+    {
+      locations.map((o) => (
+        <article class="c-location" data-reveal-child>
+          {o.latitude != null && o.longitude != null ? (
+            <button
+              class="c-location__map"
+              type="button"
+              data-embed={mapUrl(o.latitude, o.longitude)}
+              aria-label={`Karte laden für ${o.name}`}
+            >
+              <span class="c-location__placeholder" aria-hidden="true">
+                <span class="c-location__code">{o.shortCode}</span>
+                <span class="c-location__load">Karte laden</span>
+              </span>
+            </button>
+          ) : null}
 
-        <div class="c-location__body">
-          <h3 class="c-location__name">{o.name}</h3>
-          {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
+          <div class="c-location__body">
+            <h3 class="c-location__name">{o.name}</h3>
+            {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
               solche an. Der Browser setzt das Element kursiv, das wird unten
               zurückgenommen. */}
-          <address class="c-location__address">{o.street}<br />{o.city}</address>
+            <address class="c-location__address">
+              {o.street}
+              <br />
+              {o.city}
+            </address>
 
-          {o.description && <p class="c-location__text">{o.description}</p>}
+            {o.description && <p class="c-location__text">{o.description}</p>}
 
-          {o.hours && o.hours.length > 0 && (
-            <dl class="c-location__hours">
-              {o.hours.map((z) => (
-                <>
-                  <dt>{z.days}</dt>
-                  <dd>{z.time}</dd>
-                </>
-              ))}
-            </dl>
-          )}
+            {o.hours && o.hours.length > 0 && (
+              <dl class="c-location__hours">
+                {o.hours.map((z) => (
+                  <>
+                    <dt>{z.days}</dt>
+                    <dd>{z.time}</dd>
+                  </>
+                ))}
+              </dl>
+            )}
 
-          <a class="c-location__route" href={route(o)} target="_blank" rel="noopener">
-            Route planen
-            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-              <path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" />
-            </svg>
-          </a>
-        </div>
-      </article>
-    ))}
+            <a
+              class="c-location__route"
+              href={route(o)}
+              target="_blank"
+              rel="noopener"
+            >
+              Route planen
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12h13M12 5l7 7-7 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              </svg>
+            </a>
+          </div>
+        </article>
+      ))
+    }
   </div>
 </section>
 
@@ -129,8 +156,8 @@ const route = (o: Location) =>
     margin-top: var(--sp-4);
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-locations__text {
@@ -166,7 +193,7 @@ const route = (o: Location) =>
     border: 0;
     overflow: hidden;
     aspect-ratio: 3 / 2;
-/* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
+    /* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
        gerundet. Jedes andere Bild nimmt `--r-md`. */
     border-radius: var(--r-md);
     background: var(--c-dark);
@@ -195,8 +222,8 @@ const route = (o: Location) =>
   .c-location__code {
     font-size: var(--fs-h1);
     font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tighter);
     color: var(--c-brand);
   }
 
@@ -209,7 +236,7 @@ const route = (o: Location) =>
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
   }
 
@@ -238,20 +265,20 @@ const route = (o: Location) =>
     font-size: var(--fs-text-large);
     font-weight: 400;
     line-height: 1.25;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
   }
 
   .c-location__address {
     font-style: normal;
     font-size: var(--fs-text-main);
-    line-height: 1.5;
+    line-height: var(--lh-body);
   }
 
   .c-location__text {
     max-width: 44ch;
     margin-top: var(--sp-4);
     font-size: var(--fs-text-small);
-    line-height: 1.5;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 
@@ -266,7 +293,7 @@ const route = (o: Location) =>
     padding-top: var(--sp-4);
     border-top: var(--bw) solid var(--c-line);
     font-size: var(--fs-text-small);
-    line-height: 1.6;
+    line-height: var(--lh-loose);
     color: var(--c-text-muted);
   }
 
@@ -283,7 +310,7 @@ const route = (o: Location) =>
     margin-top: auto;
     padding-top: var(--sp-6);
     font-size: var(--fs-label);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     text-decoration: none;
   }

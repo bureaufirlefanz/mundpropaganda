@@ -15,7 +15,6 @@
 import Button from "../ui/Button.astro";
 import { applicationLink, type Job } from "../../lib/careers";
 
-
 interface Props {
   id?: string;
   topline: string;
@@ -33,67 +32,91 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   <div class="s-jobs__head">
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <h2 class="s-jobs__title" data-split="lines">{headline}</h2>
-    {text && <p class="s-jobs__text" data-reveal="up" data-reveal-delay="0.08">{text}</p>}
+    {
+      text && (
+        <p class="s-jobs__text" data-reveal="up" data-reveal-delay="0.08">
+          {text}
+        </p>
+      )
+    }
   </div>
 
   <div class="s-jobs__list" data-accordion="single" data-reveal-stagger="0.06">
-    {jobs.map((s, i) => (
-      <article class="s-jobs__item" data-accordion-item data-reveal-child id={`stelle-${s.handle}`}>
-        {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
+    {
+      jobs.map((s, i) => (
+        <article
+          class="s-jobs__item"
+          data-accordion-item
+          data-reveal-child
+          id={`stelle-${s.handle}`}
+        >
+          {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
             geben dann beim Ansteuern der Zeile den Stellentitel aus und
             nicht nur „Schaltfläche". */}
-        <h3 class="s-jobs__row-title">
-          <button class="s-jobs__row" data-accordion-trigger type="button">
-            {/* Reine Ordnungszahl. `aria-hidden`, weil sie sonst der
+          <h3 class="s-jobs__row-title">
+            <button class="s-jobs__row" data-accordion-trigger type="button">
+              {/* Reine Ordnungszahl. `aria-hidden`, weil sie sonst der
                 Überschrift vorangestellt vorgelesen würde — „null eins
                 Zahnmedizinische Fachangestellte". Die Reihenfolge ergibt
                 sich für Vorlesegeräte ohnehin aus der Liste. */}
-            <span class="c-number s-jobs__number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <span class="c-number s-jobs__number" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
 
-            <span class="s-jobs__name">{s.title}</span>
+              <span class="s-jobs__name">{s.title}</span>
 
-            <span class="s-jobs__meta">
-              <span class="s-jobs__badge">{s.kind}</span>
-              <span class="s-jobs__location">{s.location}</span>
-              <span class="s-jobs__hours">{s.hours}</span>
-            </span>
+              <span class="s-jobs__meta">
+                <span class="s-jobs__badge">{s.kind}</span>
+                <span class="s-jobs__location">{s.location}</span>
+                <span class="s-jobs__hours">{s.hours}</span>
+              </span>
 
-            <span class="s-jobs__icon" aria-hidden="true">
-              <svg><use href="#i-chevron" /></svg>
-            </span>
-          </button>
-        </h3>
+              <span class="s-jobs__icon" aria-hidden="true">
+                <svg>
+                  <use href="#i-chevron" />
+                </svg>
+              </span>
+            </button>
+          </h3>
 
-        <div class="s-jobs__panel" data-accordion-panel>
-          <div class="s-jobs__content">
-            <p class="s-jobs__lead">{s.lead}</p>
+          <div class="s-jobs__panel" data-accordion-panel>
+            <div class="s-jobs__content">
+              <p class="s-jobs__lead">{s.lead}</p>
 
-            <div class="s-jobs__columns">
-              <div>
-                <h4 class="s-jobs__subtitle">Deine Aufgaben</h4>
-                <ul class="s-jobs__bullets">
-                  {(s.duties ?? []).map((a) => <li>{a}</li>)}
-                </ul>
+              <div class="s-jobs__columns">
+                <div>
+                  <h4 class="s-jobs__subtitle">Deine Aufgaben</h4>
+                  <ul class="s-jobs__bullets">
+                    {(s.duties ?? []).map((a) => (
+                      <li>{a}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="s-jobs__subtitle">Das bringst du mit</h4>
+                  <ul class="s-jobs__bullets">
+                    {(s.profile ?? []).map((a) => (
+                      <li>{a}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div>
-                <h4 class="s-jobs__subtitle">Das bringst du mit</h4>
-                <ul class="s-jobs__bullets">
-                  {(s.profile ?? []).map((a) => <li>{a}</li>)}
-                </ul>
-              </div>
-            </div>
 
-            {s.highlight && <p class="s-jobs__note">{s.highlight}</p>}
+              {s.highlight && <p class="s-jobs__note">{s.highlight}</p>}
 
-            <div class="s-jobs__action">
-              {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
+              <div class="s-jobs__action">
+                {/* Der Betreff ist vorbereitet — sonst landen vier Stellen in
                   einem Postfach unter „Bewerbung". */}
-              <Button label="Auf diese Stelle bewerben" href={applicationLink(applicationEmail, s)} />
+                <Button
+                  label="Auf diese Stelle bewerben"
+                  href={applicationLink(applicationEmail, s)}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </article>
-    ))}
+        </article>
+      ))
+    }
   </div>
 </section>
 
@@ -114,8 +137,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   .s-jobs__title {
     font-size: var(--fs-h2);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   /* Schmaler als die Liste darunter: Der Absatz wird gelesen, die Liste
@@ -169,8 +192,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   .s-jobs__name {
     font-size: var(--fs-h4);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
@@ -203,7 +226,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     height: 40px;
     border-radius: var(--r-round);
     border: var(--bw) solid var(--c-line);
-    transition: transform var(--d-base) var(--e-out),
+    transition:
+      transform var(--d-base) var(--e-out),
       background var(--d-fast) var(--e-swift),
       border-color var(--d-fast) var(--e-swift),
       color var(--d-fast) var(--e-swift);
@@ -247,7 +271,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   .s-jobs__lead {
     max-width: 62ch;
     font-size: var(--fs-text-large);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   .s-jobs__columns {
@@ -261,7 +285,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     margin-bottom: var(--sp-3);
     font-weight: 300;
     font-size: var(--fs-text-small);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -274,7 +298,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     padding: 0;
     list-style: none;
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   /* Eigener Punkt statt des Listenzeichens: dasselbe Zeichen wie in der
@@ -302,7 +326,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     padding: var(--sp-3) var(--sp-4);
     border-left: 2px solid var(--c-brand);
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

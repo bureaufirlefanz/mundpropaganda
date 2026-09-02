@@ -46,7 +46,8 @@ const { title, eyebrow, image, alt = "" } = Astro.props;
    Sonderzeichen zu verlangen: Zwei Wörter bleiben zusammen, ab dem dritten
    bricht es nach dem ersten um. */
 const words = title.trim().split(/\s+/);
-const lines = words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title];
+const lines =
+  words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title];
 ---
 
 <section class="s-pillarhero">
@@ -63,12 +64,14 @@ const lines = words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title]
   <div class="s-pillarhero__panel">
     {eyebrow && <span class="s-pillarhero__eyebrow">{eyebrow}</span>}
     <h1 class="s-pillarhero__title" data-split="lines">
-      {lines.map((line, i) => (
-        <>
-          {i > 0 && <br />}
-          {line}
-        </>
-      ))}
+      {
+        lines.map((line, i) => (
+          <>
+            {i > 0 && <br />}
+            {line}
+          </>
+        ))
+      }
     </h1>
   </div>
 </section>
@@ -153,7 +156,7 @@ const lines = words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title]
     align-items: center;
     gap: var(--sp-3);
     font-size: var(--fs-text-main);
-    line-height: 1.2;
+    line-height: var(--lh-snug);
   }
 
   .s-pillarhero__eyebrow::before {
@@ -169,7 +172,7 @@ const lines = words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title]
     font-family: var(--f-sans);
     font-size: var(--fs-display-2);
     font-weight: 500;
-    line-height: 1;
+    line-height: var(--lh-tight);
     letter-spacing: 0;
     text-transform: uppercase;
     text-wrap: balance;

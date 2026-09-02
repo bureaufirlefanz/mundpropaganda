@@ -13,17 +13,23 @@ const { questions } = Astro.props;
 ---
 
 <div class="c-accordion" data-accordion="single" data-reveal-stagger="0.07">
-  {questions.map((f) => (
-    <div class="c-accordion__item" data-accordion-item data-reveal-child>
-      <button class="c-accordion__trigger" data-accordion-trigger>
-        <span>{f.question}</span>
-        <span class="c-accordion__icon"><svg><use href="#i-chevron" /></svg></span>
-      </button>
-      <div class="c-accordion__panel" data-accordion-panel>
-        <div class="c-accordion__panel-inner">{f.answer}</div>
+  {
+    questions.map((f) => (
+      <div class="c-accordion__item" data-accordion-item data-reveal-child>
+        <button class="c-accordion__trigger" data-accordion-trigger>
+          <span>{f.question}</span>
+          <span class="c-accordion__icon">
+            <svg>
+              <use href="#i-chevron" />
+            </svg>
+          </span>
+        </button>
+        <div class="c-accordion__panel" data-accordion-panel>
+          <div class="c-accordion__panel-inner">{f.answer}</div>
+        </div>
       </div>
-    </div>
-  ))}
+    ))
+  }
 </div>
 
 <style>
@@ -40,7 +46,6 @@ const { questions } = Astro.props;
   }
 
   .c-accordion__trigger {
-
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -83,6 +88,6 @@ const { questions } = Astro.props;
     padding: 0 var(--sp-5) var(--sp-5);
     max-width: 68ch;
     color: color-mix(in srgb, var(--c-neutral-800) 78%, transparent);
-    line-height: 1.5;
+    line-height: var(--lh-body);
   }
 </style>

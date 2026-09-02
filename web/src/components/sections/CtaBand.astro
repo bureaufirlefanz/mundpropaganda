@@ -35,25 +35,43 @@ interface Props {
   alt?: string;
 }
 
-const { headline, text, actionLabel, actionHref, image, alt = "" } = Astro.props;
+const {
+  headline,
+  text,
+  actionLabel,
+  actionHref,
+  image,
+  alt = "",
+} = Astro.props;
 ---
 
 <section class="s-ctaband">
-  {image && (
-    <div class="s-ctaband__media">
-      <CmsImage source={image} alt={alt} widths={[1024, 1600, 2200]} sizes="100vw" />
-    </div>
-  )}
+  {
+    image && (
+      <div class="s-ctaband__media">
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[1024, 1600, 2200]}
+          sizes="100vw"
+        />
+      </div>
+    )
+  }
 
   <div class="s-ctaband__card" data-reveal="up">
     <h2 class="s-ctaband__headline" data-split="lines">{headline}</h2>
 
-    {(text || (actionLabel && actionHref)) && (
-      <div class="s-ctaband__foot">
-        {text && <p class="s-ctaband__text">{text}</p>}
-        {actionLabel && actionHref && <Button label={actionLabel} href={actionHref} />}
-      </div>
-    )}
+    {
+      (text || (actionLabel && actionHref)) && (
+        <div class="s-ctaband__foot">
+          {text && <p class="s-ctaband__text">{text}</p>}
+          {actionLabel && actionHref && (
+            <Button label={actionLabel} href={actionHref} />
+          )}
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -110,7 +128,7 @@ const { headline, text, actionLabel, actionHref, image, alt = "" } = Astro.props
     font-size: var(--fs-h3);
     font-weight: 400;
     line-height: var(--lh-heading);
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
@@ -127,7 +145,7 @@ const { headline, text, actionLabel, actionHref, image, alt = "" } = Astro.props
   .s-ctaband__text {
     max-width: 32ch;
     font-size: var(--fs-text-small);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

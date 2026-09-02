@@ -34,21 +34,31 @@ const { topline, headline, text, items } = Astro.props;
 <section class="s-values">
   <div class="container s-values__inner">
     <div class="s-values__head">
-      <span class="c-topline s-values__topline" data-reveal="fade">{topline}</span>
+      <span class="c-topline s-values__topline" data-reveal="fade"
+        >{topline}</span
+      >
       <h2 class="s-values__title" data-split="lines">{headline}</h2>
-      {text && <p class="s-values__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
+      {
+        text && (
+          <p class="s-values__text" data-reveal="up" data-reveal-delay="0.1">
+            {text}
+          </p>
+        )
+      }
     </div>
 
     <ol class="s-values__list" data-reveal-stagger="0.08">
-      {items.map((w, i) => (
-        <li class="s-values__item" data-reveal-child>
-          <span class="c-number s-values__number" aria-hidden="true">
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <h3 class="s-values__item-title">{w.title}</h3>
-          <p class="s-values__item-text">{w.text}</p>
-        </li>
-      ))}
+      {
+        items.map((w, i) => (
+          <li class="s-values__item" data-reveal-child>
+            <span class="c-number s-values__number" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="s-values__item-title">{w.title}</h3>
+            <p class="s-values__item-text">{w.text}</p>
+          </li>
+        ))
+      }
     </ol>
   </div>
 </section>
@@ -82,8 +92,8 @@ const { topline, headline, text, items } = Astro.props;
     margin-top: var(--sp-4);
     font-size: var(--fs-h2);
     font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-values__text {
@@ -133,8 +143,8 @@ const { topline, headline, text, items } = Astro.props;
     margin-bottom: var(--sp-3);
     font-size: var(--fs-h4-sm);
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 

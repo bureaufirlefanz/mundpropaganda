@@ -22,20 +22,34 @@ const { intro, posts } = Astro.props;
 /* Wie auf der Startseite: Suchmaschinenangaben sind kein sichtbarer
    Seiteninhalt, deshalb darf der Seitentitel auf die Überschrift der Seite
    zurückfallen. Das sagt das Schema dem Kunden auch zu. */
-const title = intro?.seo?.title || `${intro?.title || "Magazin"} - Mundpropaganda`;
+const title =
+  intro?.seo?.title || `${intro?.title || "Magazin"} - Mundpropaganda`;
 const description = intro?.seo?.description || intro?.lead || "";
 ---
 
 <Base title={title} description={description} noIndex={intro?.seo?.noIndex}>
   <section class="container s-magazine-intro">
-    {intro?.topline && <span class="c-topline" data-reveal="fade">{intro.topline}</span>}
+    {
+      intro?.topline && (
+        <span class="c-topline" data-reveal="fade">
+          {intro.topline}
+        </span>
+      )
+    }
     <h1 class="s-magazine-intro__title" data-split="lines">{intro?.title}</h1>
-    {intro?.lead && <p class="s-magazine-intro__text" data-reveal="up">{intro.lead}</p>}
+    {
+      intro?.lead && (
+        <p class="s-magazine-intro__text" data-reveal="up">
+          {intro.lead}
+        </p>
+      )
+    }
   </section>
 
   {posts.length > 0 && <PostList posts={posts} />}
 
-  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+  {
+    /* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
       Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
       sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
       Keramikinlays, Pillar Page).
@@ -43,7 +57,8 @@ const description = intro?.seo?.description || intro?.lead || "";
       Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
       am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
       sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
-      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */
+  }
 </Base>
 
 <style>
@@ -68,15 +83,15 @@ const description = intro?.seo?.description || intro?.lead || "";
     max-width: 16ch;
     font-size: var(--fs-display-2);
     font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tighter);
   }
 
   .s-magazine-intro__text {
     max-width: 52ch;
     margin-top: var(--sp-6);
     font-size: var(--fs-text-large);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 </style>

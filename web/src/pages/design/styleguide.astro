@@ -34,10 +34,10 @@ const HEX = {
   "neutral-800": "#201d1d",
   "neutral-200": "#f4f4f4",
   white: "#ffffff",
-  black: "#000000",
 } as const;
 
-const channels = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const channels = (h: string) =>
+  [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 
 function luminance(hex: string) {
   const k = channels(hex).map((v) => {
@@ -54,12 +54,48 @@ function contrast(a: string, b: string) {
 
 /* Jede Farbe gegen den Grund, auf dem sie tatsächlich vorkommt. */
 const COLORS = [
-  { name: "--c-brand", hex: HEX.brand, role: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise", against: HEX.dark, againstName: "--c-dark" },
-  { name: "--c-dark", hex: HEX.dark, role: "Schrift, dunkle Bänder, Knopffüllung", against: HEX.grey, againstName: "--c-grey" },
-  { name: "--c-taupe", hex: HEX.taupe, role: "Grund der Leistungs- und Geschichten-Section", against: HEX.dark, againstName: "--c-dark" },
-  { name: "--c-grey", hex: HEX.grey, role: "Seitengrund", against: HEX.dark, againstName: "--c-dark" },
-  { name: "--c-neutral-800", hex: HEX["neutral-800"], role: "Schrift auf hellen Flächen (Formular, Magazin)", against: HEX["neutral-200"], againstName: "--c-neutral-200" },
-  { name: "--c-neutral-200", hex: HEX["neutral-200"], role: "Flächen: Karten, Eingabefelder", against: HEX["neutral-800"], againstName: "--c-neutral-800" },
+  {
+    name: "--c-brand",
+    hex: HEX.brand,
+    role: "Akzent: Marker, Fortschritt, gefüllte Symbolkreise",
+    against: HEX.dark,
+    againstName: "--c-dark",
+  },
+  {
+    name: "--c-dark",
+    hex: HEX.dark,
+    role: "Schrift, dunkle Bänder, Knopffüllung",
+    against: HEX.grey,
+    againstName: "--c-grey",
+  },
+  {
+    name: "--c-taupe",
+    hex: HEX.taupe,
+    role: "Grund der Leistungs- und Geschichten-Section",
+    against: HEX.dark,
+    againstName: "--c-dark",
+  },
+  {
+    name: "--c-grey",
+    hex: HEX.grey,
+    role: "Seitengrund",
+    against: HEX.dark,
+    againstName: "--c-dark",
+  },
+  {
+    name: "--c-neutral-800",
+    hex: HEX["neutral-800"],
+    role: "Schrift auf hellen Flächen (Formular, Magazin)",
+    against: HEX["neutral-200"],
+    againstName: "--c-neutral-200",
+  },
+  {
+    name: "--c-neutral-200",
+    hex: HEX["neutral-200"],
+    role: "Flächen: Karten, Eingabefelder",
+    against: HEX["neutral-800"],
+    againstName: "--c-neutral-800",
+  },
 ];
 
 /* Abgeleitete Töne.
@@ -71,14 +107,52 @@ const COLORS = [
    wie oben, und die Deckung steht nur noch an einer Stelle. */
 const mix = (fg: string, bg: string, p: number) => {
   const [F, B] = [channels(fg), channels(bg)];
-  return "#" + [0, 1, 2].map((i) => Math.round(F[i] * p + B[i] * (1 - p)).toString(16).padStart(2, "0")).join("");
+  return (
+    "#" +
+    [0, 1, 2]
+      .map((i) =>
+        Math.round(F[i] * p + B[i] * (1 - p))
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
 };
 
 const DERIVED = [
-  { name: "--c-text-muted", cover: 0.75, on: HEX.grey, onName: "--c-grey", ink: HEX.dark, purpose: "Nebentext auf Grau" },
-  { name: "--c-text-muted (Taupe)", cover: 0.82, on: HEX.taupe, onName: "--c-taupe", ink: HEX.dark, purpose: "Nebentext auf Taupe" },
-  { name: "--c-text-muted (dunkel)", cover: 0.65, on: HEX.dark, onName: "--c-dark", ink: HEX.grey, purpose: "Nebentext auf Braun" },
-  { name: "--c-line", cover: 0.28, on: HEX.grey, onName: "--c-grey", ink: HEX.dark, purpose: "Trennlinien - Schmuck, kein Bedienelement", decoration: true },
+  {
+    name: "--c-text-muted",
+    cover: 0.75,
+    on: HEX.grey,
+    onName: "--c-grey",
+    ink: HEX.dark,
+    purpose: "Nebentext auf Grau",
+  },
+  {
+    name: "--c-text-muted (Taupe)",
+    cover: 0.82,
+    on: HEX.taupe,
+    onName: "--c-taupe",
+    ink: HEX.dark,
+    purpose: "Nebentext auf Taupe",
+  },
+  {
+    name: "--c-text-muted (dunkel)",
+    cover: 0.65,
+    on: HEX.dark,
+    onName: "--c-dark",
+    ink: HEX.grey,
+    purpose: "Nebentext auf Braun",
+  },
+  {
+    name: "--c-line",
+    cover: 0.28,
+    on: HEX.grey,
+    onName: "--c-grey",
+    ink: HEX.dark,
+    purpose: "Trennlinien - Schmuck, kein Bedienelement",
+    decoration: true,
+  },
 ].map((a) => ({ ...a, value: contrast(mix(a.ink, a.on, a.cover), a.on) }));
 
 /* Die vollständige Leiter, lückenlos von 283 px bis 11 px. Bis zum 02.09.2026
@@ -87,61 +161,255 @@ const DERIVED = [
    font-size-Regeln. Die Zwischenstufen sind nicht neu erfunden: Jede
    übernimmt den Wert, den die Homepage an dieser Stelle schon hatte. */
 const SIZES = [
-  { token: "--fs-display-xl", figma: "283 px", purpose: "Konturschrift im Standort-Ring", text: "Berlin" },
-  { token: "--fs-display", figma: "250 px", purpose: "Wortmarke im Hero", text: "Mund" },
-  { token: "--fs-display-lg", figma: "200 px", purpose: "Wortmarke des Magazins", text: "Magazin" },
-  { token: "--fs-display-md", figma: "144 px", purpose: "Geschichten, Personenseite", text: "Anna" },
-  { token: "--fs-display-2", figma: "125 px", purpose: "Konturzahlen der Standorte", text: "P25" },
-  { token: "--fs-display-sm", figma: "90 px", purpose: "Magazinkopf, Team, Praxis, Kennzahlen", text: "24" },
-  { token: "--fs-h1", figma: "70 px", purpose: "Seitentitel der Leistungsseiten", text: "Veneers" },
-  { token: "--fs-h1-sm", figma: "64 px", purpose: "Experten, Preise, Ablauf", text: "Unsere Experten" },
-  { token: "--fs-h1-xs", figma: "55 px", purpose: "Galeriekopf, Geschichte", text: "Unsere Standorte" },
-  { token: "--fs-h2-lg", figma: "48 px", purpose: "Panel, Merkmale", text: "Vier Tage Woche" },
-  { token: "--fs-h2", figma: "40 px", purpose: "Überschrift einer Section", text: "Unsere Standorte" },
-  { token: "--fs-h2-sm", figma: "36 px", purpose: "Einleitung, Statement", text: "Eine volle Stunde" },
-  { token: "--fs-h4", figma: "32 px", purpose: "Inhaltsverzeichnis, Stellen, Preise", text: "Zahnreinigung" },
-  { token: "--fs-h4-sm", figma: "28 px", purpose: "Vorteile, Zeitleiste, Werte", text: "Eigenes Meisterlabor" },
-  { token: "--fs-h5", figma: "24 px", purpose: "Meta-Zeilen im Hero", text: "Zahnarzt Prenzlauer Berg" },
-  { token: "--fs-text-large", figma: "20 px", purpose: "Einleitungstexte", text: "Wir nehmen uns eine volle Stunde." },
-  { token: "--fs-text-main", figma: "18 px", purpose: "Fließtext", text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus." },
-  { token: "--fs-text-small", figma: "16 px", purpose: "Toplines, Beschriftungen", text: "Prenzlauer Berg" },
-  { token: "--fs-label-lg", figma: "14 px", purpose: "Knopfbeschriftung", text: "Termin buchen" },
-  { token: "--fs-label-md", figma: "13 px", purpose: "Navigation, Meta-Zeilen", text: "Leistungen" },
-  { token: "--fs-label", figma: "12 px", purpose: "Kleinstbeschriftungen", text: "Ab 690 € je Zahn" },
-  { token: "--fs-micro", figma: "11 px", purpose: "Fehlerzeichen, Badge auf Schmalgerät", text: "4,9 von 5" },
+  {
+    token: "--fs-display-xl",
+    figma: "283 px",
+    purpose: "Konturschrift im Standort-Ring",
+    text: "Berlin",
+  },
+  {
+    token: "--fs-display",
+    figma: "250 px",
+    purpose: "Wortmarke im Hero",
+    text: "Mund",
+  },
+  {
+    token: "--fs-display-lg",
+    figma: "200 px",
+    purpose: "Wortmarke des Magazins",
+    text: "Magazin",
+  },
+  {
+    token: "--fs-display-md",
+    figma: "144 px",
+    purpose: "Geschichten, Personenseite",
+    text: "Anna",
+  },
+  {
+    token: "--fs-display-2",
+    figma: "125 px",
+    purpose: "Konturzahlen der Standorte",
+    text: "P25",
+  },
+  {
+    token: "--fs-display-sm",
+    figma: "90 px",
+    purpose: "Magazinkopf, Team, Praxis, Kennzahlen",
+    text: "24",
+  },
+  {
+    token: "--fs-h1",
+    figma: "70 px",
+    purpose: "Seitentitel der Leistungsseiten",
+    text: "Veneers",
+  },
+  {
+    token: "--fs-h1-sm",
+    figma: "64 px",
+    purpose: "Experten, Preise, Ablauf",
+    text: "Unsere Experten",
+  },
+  {
+    token: "--fs-h1-xs",
+    figma: "55 px",
+    purpose: "Galeriekopf, Geschichte",
+    text: "Unsere Standorte",
+  },
+  {
+    token: "--fs-h2-lg",
+    figma: "48 px",
+    purpose: "Panel, Merkmale",
+    text: "Vier Tage Woche",
+  },
+  {
+    token: "--fs-h2",
+    figma: "40 px",
+    purpose: "Überschrift einer Section",
+    text: "Unsere Standorte",
+  },
+  {
+    token: "--fs-h2-sm",
+    figma: "36 px",
+    purpose: "Einleitung, Statement",
+    text: "Eine volle Stunde",
+  },
+  {
+    token: "--fs-h4",
+    figma: "32 px",
+    purpose: "Inhaltsverzeichnis, Stellen, Preise",
+    text: "Zahnreinigung",
+  },
+  {
+    token: "--fs-h4-sm",
+    figma: "28 px",
+    purpose: "Vorteile, Zeitleiste, Werte",
+    text: "Eigenes Meisterlabor",
+  },
+  {
+    token: "--fs-h5",
+    figma: "24 px",
+    purpose: "Meta-Zeilen im Hero",
+    text: "Zahnarzt Prenzlauer Berg",
+  },
+  {
+    token: "--fs-text-large",
+    figma: "20 px",
+    purpose: "Einleitungstexte",
+    text: "Wir nehmen uns eine volle Stunde.",
+  },
+  {
+    token: "--fs-text-main",
+    figma: "18 px",
+    purpose: "Fließtext",
+    text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus.",
+  },
+  {
+    token: "--fs-text-small",
+    figma: "16 px",
+    purpose: "Toplines, Beschriftungen",
+    text: "Prenzlauer Berg",
+  },
+  {
+    token: "--fs-label-lg",
+    figma: "14 px",
+    purpose: "Knopfbeschriftung",
+    text: "Termin buchen",
+  },
+  {
+    token: "--fs-label-md",
+    figma: "13 px",
+    purpose: "Navigation, Meta-Zeilen",
+    text: "Leistungen",
+  },
+  {
+    token: "--fs-label",
+    figma: "12 px",
+    purpose: "Kleinstbeschriftungen",
+    text: "Ab 690 € je Zahn",
+  },
+  {
+    token: "--fs-micro",
+    figma: "11 px",
+    purpose: "Fehlerzeichen, Badge auf Schmalgerät",
+    text: "4,9 von 5",
+  },
 ];
 
 /* `--fs-h3` ist ein Alias auf `--fs-h2` und steht deshalb nicht als eigene
    Stufe in der Leiter. */
 
 const LINE_HEIGHTS = [
-  { token: "--lh-display", value: "0.92", purpose: "Wortmarken - die Zeilen sollen sich berühren" },
+  {
+    token: "--lh-display",
+    value: "0.92",
+    purpose: "Wortmarken - die Zeilen sollen sich berühren",
+  },
   { token: "--lh-tight", value: "1", purpose: "Einzeilige Konturzahlen" },
-  { token: "--lh-heading", value: "1.1", purpose: "Überschriften" },
-  { token: "--lh-body", value: "1.5", purpose: "Fließtext" },
+  { token: "--lh-heading", value: "1.1", purpose: "Grundregel für h1 bis h6" },
+  {
+    token: "--lh-title",
+    value: "1.15",
+    purpose: "Abschnittsüberschriften in den Bausteinen",
+  },
+  {
+    token: "--lh-snug",
+    value: "1.2",
+    purpose: "Kurze Zeilen: Kachelnamen, Spaltenköpfe",
+  },
+  { token: "--lh-text", value: "1.45", purpose: "Fließtext in Bausteinen" },
+  { token: "--lh-body", value: "1.5", purpose: "Fließtext in langen Strecken" },
+  { token: "--lh-loose", value: "1.6", purpose: "Rechtstexte, Magazinsatz" },
 ];
 
 const TRACKING = [
-  { token: "--tracking-display", value: "-0.02em", purpose: "Große Grade laufen enger, sonst zerfallen sie" },
-  { token: "--tracking-mono", value: "0.04em", purpose: "Gesperrte Mono-Beschriftungen" },
+  { token: "--tracking-tighter", value: "-0.03em", purpose: "Display" },
+  {
+    token: "--tracking-tight",
+    value: "-0.02em",
+    purpose: "Große Grade laufen enger, sonst zerfallen sie",
+  },
+  {
+    token: "--tracking-snug",
+    value: "-0.01em",
+    purpose: "Überschriften, Auszeichnung im Fließtext",
+  },
+  { token: "--tracking-wide", value: "0.06em", purpose: "Mono-Labels" },
+  {
+    token: "--tracking-wider",
+    value: "0.08em",
+    purpose: "Micro-Labels in Versalien",
+  },
+  {
+    token: "--tracking-widest",
+    value: "0.1em",
+    purpose: "die weitesten Versalien",
+  },
+  {
+    token: "--tracking-mono",
+    value: "0.04em",
+    purpose: "Gesperrte Mono-Beschriftungen",
+  },
 ];
 
-const SPACING = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-8", "--sp-10", "--sp-12", "--sp-16"];
+const SPACING = [
+  "--sp-1",
+  "--sp-2",
+  "--sp-3",
+  "--sp-4",
+  "--sp-5",
+  "--sp-6",
+  "--sp-8",
+  "--sp-10",
+  "--sp-12",
+  "--sp-16",
+];
 const FLOW = [
-  { token: "--flow-sm", value: "24 - 56 px", purpose: "Enge Reihen, Fußzeilen" },
+  {
+    token: "--flow-sm",
+    value: "24 - 56 px",
+    purpose: "Enge Reihen, Fußzeilen",
+  },
   { token: "--flow-md", value: "32 - 72 px", purpose: "Spalten nebeneinander" },
   { token: "--flow-lg", value: "40 - 96 px", purpose: "Kartenraster" },
-  { token: "--flow-xl", value: "56 - 120 px", purpose: "Kopf einer Section zum Inhalt" },
-  { token: "--flow-2xl", value: "64 - 150 px", purpose: "Der große Absatz innerhalb einer Section" },
+  {
+    token: "--flow-xl",
+    value: "56 - 120 px",
+    purpose: "Kopf einer Section zum Inhalt",
+  },
+  {
+    token: "--flow-2xl",
+    value: "64 - 150 px",
+    purpose: "Der große Absatz innerhalb einer Section",
+  },
 ];
 
 const LAYOUT = [
-  { token: "--site-margin", value: "16 - 48 px", purpose: "Seitenrand links und rechts" },
-  { token: "--site-gutter", value: "16 - 32 px", purpose: "Spaltenabstand im Raster" },
-  { token: "--site-max", value: "1728 px", purpose: "Größte Satzbreite, danach wächst nichts mehr" },
+  {
+    token: "--site-margin",
+    value: "16 - 48 px",
+    purpose: "Seitenrand links und rechts",
+  },
+  {
+    token: "--site-gutter",
+    value: "16 - 32 px",
+    purpose: "Spaltenabstand im Raster",
+  },
+  {
+    token: "--site-max",
+    value: "1728 px",
+    purpose: "Größte Satzbreite, danach wächst nichts mehr",
+  },
   { token: "--grid-cols", value: "12", purpose: "Spalten des Rasters" },
-  { token: "--mw-wide", value: "1100 px", purpose: "Breite Medienblöcke: Vorher/Nachher, Bühne" },
-  { token: "--mw-panel", value: "353 px", purpose: "Textmaß in der dunklen Panel-Spalte" },
+  {
+    token: "--mw-wide",
+    value: "1100 px",
+    purpose: "Breite Medienblöcke: Vorher/Nachher, Bühne",
+  },
+  {
+    token: "--mw-panel",
+    value: "353 px",
+    purpose: "Textmaß in der dunklen Panel-Spalte",
+  },
 ];
 
 const SHADOWS = [
@@ -158,29 +426,63 @@ const LAYERS = [
   { token: "--z-nav", value: "100", purpose: "Navigation" },
   { token: "--z-overlay", value: "200", purpose: "Menü, Overlays" },
   { token: "--z-cursor", value: "300", purpose: "Zeiger" },
-  { token: "--z-skiplink", value: "400", purpose: "Sprung zum Inhalt - muss über allem liegen" },
+  {
+    token: "--z-skiplink",
+    value: "400",
+    purpose: "Sprung zum Inhalt - muss über allem liegen",
+  },
 ];
 
 const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-dock", "--r-round"];
 const CURVES = [
   { token: "--e-out", purpose: "Standard. Schnell los, lange auslaufend." },
   { token: "--e-swift", purpose: "Kurze Zustandswechsel: Farbe, Deckkraft." },
-  { token: "--e-ambient", purpose: "Endlose Dauerschleife - Faden, Zahnlinien." },
+  {
+    token: "--e-ambient",
+    purpose: "Endlose Dauerschleife - Faden, Zahnlinien.",
+  },
 ];
 const DURATIONS = [
-  { token: "--d-fast", value: "0.25 s", purpose: "Farbwechsel beim Überfahren" },
+  {
+    token: "--d-fast",
+    value: "0.25 s",
+    purpose: "Farbwechsel beim Überfahren",
+  },
   { token: "--d-base", value: "0.45 s", purpose: "Standard für Bewegung" },
   { token: "--d-slow", value: "0.8 s", purpose: "Aufklappen, Umblenden" },
 ];
 
-const SYMBOLS = ["i-arrow", "i-chevron", "i-filter", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
-
-const SAMPLE_QUESTIONS = [
-  { question: "Wie bekomme ich einen Termin?", answer: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
-  { question: "Behandeln Sie gesetzlich Versicherte?", answer: "Ja. Die Regelleistungen rechnen wir über die Kasse ab." },
+const SYMBOLS = [
+  "i-arrow",
+  "i-chevron",
+  "i-filter",
+  "i-star",
+  "i-upload",
+  "i-instagram",
+  "i-facebook",
+  "i-linkedin",
+  "i-youtube",
+  "i-x",
+  "i-logo",
 ];
 
-const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const SAMPLE_QUESTIONS = [
+  {
+    question: "Wie bekomme ich einen Termin?",
+    answer:
+      "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein.",
+  },
+  {
+    question: "Behandeln Sie gesetzlich Versicherte?",
+    answer: "Ja. Die Regelleistungen rechnen wir über die Kasse ab.",
+  },
+];
+
+const formatNumber = (n: number) =>
+  n.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 ---
 
 <Design title="Styleguide" active="styleguide">
@@ -191,9 +493,13 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <p class="d-section__text">
         Die Grundlagen der Seite: Farben, Typografie, Abstände, Radien und
         Bewegung - dazu die kleinen Bausteine, aus denen alles Übrige
-        zusammengesetzt ist. Jeder Wert kommt aus <code>src/styles/tokens.css</code>
-        und wird hier gezogen, nicht abgeschrieben. Die zusammengesetzten
-        Bausteine stehen auf der <a class="c-link" href="/design/komponenten">Komponenten-Seite</a>.
+        zusammengesetzt ist. Jeder Wert kommt aus <code
+          >src/styles/tokens.css</code
+        >
+        und wird hier gezogen, nicht abgeschrieben. Die zusammengesetzten Bausteine
+        stehen auf der <a class="c-link" href="/design/komponenten"
+          >Komponenten-Seite</a
+        >.
       </p>
     </div>
   </section>
@@ -214,24 +520,37 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
 
     <div class="d-sample">
       <div class="d-grid">
-        {COLORS.map((f) => {
-          const v = contrast(f.hex, f.against);
-          return (
-            <div class="d-color">
-              <div class="d-color__swatch" style={`background: ${f.hex}`}></div>
-              <p class="d-color__name">{f.name}</p>
-              <p class="d-color__hex">{f.hex}</p>
-              <p class="d-color__role">{f.role}</p>
-              <p class="d-color__value">
-                {formatNumber(v)}:1 auf <code>{f.againstName}</code>
-                {" "}
-                <span class={v >= 4.5 ? "d-marker d-marker--good" : v >= 3 ? "d-marker d-marker--partial" : "d-marker d-marker--weak"}>
-                  {v >= 4.5 ? "Fließtext" : v >= 3 ? "nur groß" : "nur Fläche"}
-                </span>
-              </p>
-            </div>
-          );
-        })}
+        {
+          COLORS.map((f) => {
+            const v = contrast(f.hex, f.against);
+            return (
+              <div class="d-color">
+                <div class="d-color__swatch" style={`background: ${f.hex}`} />
+                <p class="d-color__name">{f.name}</p>
+                <p class="d-color__hex">{f.hex}</p>
+                <p class="d-color__role">{f.role}</p>
+                <p class="d-color__value">
+                  {formatNumber(v)}:1 auf <code>{f.againstName}</code>{" "}
+                  <span
+                    class={
+                      v >= 4.5
+                        ? "d-marker d-marker--good"
+                        : v >= 3
+                          ? "d-marker d-marker--partial"
+                          : "d-marker d-marker--weak"
+                    }
+                  >
+                    {v >= 4.5
+                      ? "Fließtext"
+                      : v >= 3
+                        ? "nur groß"
+                        : "nur Fläche"}
+                  </span>
+                </p>
+              </div>
+            );
+          })
+        }
       </div>
     </div>
 
@@ -250,23 +569,38 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
           <tr><th>Token</th><th>Regel</th><th>Zweck</th><th>Kontrast</th></tr>
         </thead>
         <tbody>
-          {DERIVED.map((a) => (
-            <tr>
-              <td><code>{a.name}</code></td>
-              <td>
-                <code>{a.ink === HEX.grey ? "--c-grey" : "--c-dark"}</code>
-                {` auf ${Math.round(a.cover * 100)} %`}
-              </td>
-              <td>{a.purpose}</td>
-              <td>
-                {formatNumber(a.value)}:1
-                {" "}
-                <span class={a.decoration ? "d-marker d-marker--weak" : a.value >= 4.5 ? "d-marker d-marker--good" : "d-marker d-marker--partial"}>
-                  {a.decoration ? "Schmuck" : a.value >= 4.5 ? "Fließtext" : "nur groß"}
-                </span>
-              </td>
-            </tr>
-          ))}
+          {
+            DERIVED.map((a) => (
+              <tr>
+                <td>
+                  <code>{a.name}</code>
+                </td>
+                <td>
+                  <code>{a.ink === HEX.grey ? "--c-grey" : "--c-dark"}</code>
+                  {` auf ${Math.round(a.cover * 100)} %`}
+                </td>
+                <td>{a.purpose}</td>
+                <td>
+                  {formatNumber(a.value)}:1{" "}
+                  <span
+                    class={
+                      a.decoration
+                        ? "d-marker d-marker--weak"
+                        : a.value >= 4.5
+                          ? "d-marker d-marker--good"
+                          : "d-marker d-marker--partial"
+                    }
+                  >
+                    {a.decoration
+                      ? "Schmuck"
+                      : a.value >= 4.5
+                        ? "Fließtext"
+                        : "nur groß"}
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
@@ -286,23 +620,44 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Schriften</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Schriften</span>
+      </div>
       <div class="d-grid">
         <div class="d-stage">
           <p class="d-font-name">--f-sans · PP Neue Montreal</p>
-          <p class="d-font-sample" style="font-family: var(--f-sans)">AaBbCc 0123</p>
-          <p class="d-font-sample" style="font-family: var(--f-sans); font-weight: 500">Medium 500</p>
+          <p class="d-font-sample" style="font-family: var(--f-sans)">
+            AaBbCc 0123
+          </p>
+          <p
+            class="d-font-sample"
+            style="font-family: var(--f-sans); font-weight: 500"
+          >
+            Medium 500
+          </p>
         </div>
         <div class="d-stage">
           <p class="d-font-name">--f-mono · GT Pressura Mono</p>
-          <p class="d-font-sample" style="font-family: var(--f-mono); font-weight: 300">AaBbCc 0123</p>
-          <p class="d-font-sample" style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em">Light 300 gesperrt</p>
+          <p
+            class="d-font-sample"
+            style="font-family: var(--f-mono); font-weight: 300"
+          >
+            AaBbCc 0123
+          </p>
+          <p
+            class="d-font-sample"
+            style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em"
+          >
+            Light 300 gesperrt
+          </p>
         </div>
       </div>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Zeilenhöhe und Laufweite</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Zeilenhöhe und Laufweite</span>
+      </div>
       <p class="d-sample__text">
         Beide gehören zur Skala und standen bis zum 02.09.2026 nicht auf dieser
         Seite. Bei der Laufweite ist das nicht folgenlos geblieben: Neben den
@@ -312,25 +667,41 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {[...LINE_HEIGHTS, ...TRACKING].map((a) => (
-            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
-          ))}
+          {
+            [...LINE_HEIGHTS, ...TRACKING].map((a) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{a.token}</code>
+                  </td>
+                  <td>{a.value}</td>
+                  <td>{a.purpose}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Skala</span></div>
-      {SIZES.map((g) => (
-        <div class="d-size">
-          <div class="d-size__meta">
-            <code>{g.token}</code>
-            <span>{g.figma}</span>
-            <span class="d-size__purpose">{g.purpose}</span>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Skala</span>
+      </div>
+      {
+        SIZES.map((g) => (
+          <div class="d-size">
+            <div class="d-size__meta">
+              <code>{g.token}</code>
+              <span>{g.figma}</span>
+              <span class="d-size__purpose">{g.purpose}</span>
+            </div>
+            <p class="d-size__sample" style={`font-size: var(${g.token})`}>
+              {g.text}
+            </p>
           </div>
-          <p class="d-size__sample" style={`font-size: var(${g.token})`}>{g.text}</p>
-        </div>
-      ))}
+        ))
+      }
     </div>
   </section>
 
@@ -341,30 +712,36 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <h2 class="d-section__title">Abstände, Radien, Rahmen</h2>
       <p class="d-section__text">
         Die Abstandsskala wächst nicht linear - unten in Achterschritten, oben
-        in Sprüngen. Abstände zwischen Sections haben eigene Token, weil sie
-        mit der Fensterbreite mitwachsen müssen.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Abstände</span></div>
-      {SPACING.map((t) => (
-        <div class="d-space">
-          <code class="d-space__name">{t}</code>
-          <div class="d-space__bar" style={`width: var(${t})`}></div>
-        </div>
-      ))}
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Dazu drei fluide Werte für den Abstand zwischen Sections:
-        <code>--section-space</code> als Regelfall,
-        <code>--section-space-sm</code> wenn direkt darunter eine Farbfläche
-        anschließt, und <code>--section-space-lg</code> für den großen Absatz.
+        in Sprüngen. Abstände zwischen Sections haben eigene Token, weil sie mit
+        der Fensterbreite mitwachsen müssen.
       </p>
     </div>
 
     <div class="d-sample">
       <div class="d-sample__header">
-        <span class="d-sample__name">Fluide Abstände innerhalb einer Section</span>
+        <span class="d-sample__name">Abstände</span>
+      </div>
+      {
+        SPACING.map((t) => (
+          <div class="d-space">
+            <code class="d-space__name">{t}</code>
+            <div class="d-space__bar" style={`width: var(${t})`} />
+          </div>
+        ))
+      }
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
+        Dazu drei fluide Werte für den Abstand zwischen Sections:
+        <code>--section-space</code> als Regelfall,
+        <code>--section-space-sm</code> wenn direkt darunter eine Farbfläche anschließt,
+        und <code>--section-space-lg</code> für den großen Absatz.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name"
+          >Fluide Abstände innerhalb einer Section</span
+        >
         <span class="d-sample__path">--flow-*</span>
       </div>
       <p class="d-sample__text">
@@ -378,49 +755,75 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {FLOW.map((a) => (
-            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
-          ))}
+          {
+            FLOW.map((a) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{a.token}</code>
+                  </td>
+                  <td>{a.value}</td>
+                  <td>{a.purpose}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Layout</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Layout</span>
+      </div>
       <p class="d-sample__text">
         Die Maße der Seite selbst. <code>--site-margin</code> und
-        <code>--site-gutter</code> sind die meistbenutzten Token des Projekts
-        und standen bis zum 02.09.2026 auf keiner Tafel.
+        <code>--site-gutter</code> sind die meistbenutzten Token des Projekts und
+        standen bis zum 02.09.2026 auf keiner Tafel.
       </p>
       <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {LAYOUT.map((a) => (
-            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
-          ))}
+          {
+            LAYOUT.map((a) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{a.token}</code>
+                  </td>
+                  <td>{a.value}</td>
+                  <td>{a.purpose}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Radien</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Radien</span>
+      </div>
       <div class="d-stage d-stage--row">
-        {RADII.map((r) => (
-          <div class="d-radius">
-            <div class="d-radius__field" style={`border-radius: var(${r})`}></div>
-            <code>{r}</code>
-          </div>
-        ))}
+        {
+          RADII.map((r) => (
+            <div class="d-radius">
+              <div class="d-radius__field" style={`border-radius: var(${r})`} />
+              <code>{r}</code>
+            </div>
+          ))
+        }
       </div>
       <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Rahmenstärke ist <code>--bw</code> (1&nbsp;px), überall bis auf fünf
-        Stellen. Die sind Gestaltung und kein Versehen: 10&nbsp;px um die
-        Promokachel der Navigation, 2&nbsp;px als Markierung an Zeitleiste,
-        Stellenliste und Personenzitat, 1,5&nbsp;px an der Auswahl im Formular.
-        Bis zum 02.09.2026 stand hier, es gebe „keine zweite" - dabei waren es
-        schon damals vier verschiedene, und acht weitere Stellen schrieben
-        <code>1px</code> aus, statt das Token zu nehmen. Wer eine sechste
-        einführt, sollte sie hier eintragen können. Sonst ist es keine.
+        Rahmenstärke ist <code>--bw</code> (1&nbsp;px), überall bis auf fünf Stellen.
+        Die sind Gestaltung und kein Versehen: 10&nbsp;px um die Promokachel der Navigation,
+        2&nbsp;px als Markierung an Zeitleiste, Stellenliste und Personenzitat, 1,5&nbsp;px
+        an der Auswahl im Formular. Bis zum 02.09.2026 stand hier, es gebe „keine
+        zweite" - dabei waren es schon damals vier verschiedene, und acht weitere
+        Stellen schrieben
+        <code>1px</code> aus, statt das Token zu nehmen. Wer eine sechste einführt,
+        sollte sie hier eintragen können. Sonst ist es keine.
       </p>
     </div>
   </section>
@@ -431,34 +834,53 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <span class="d-section__number">04</span>
       <h2 class="d-section__title">Bewegung</h2>
       <p class="d-section__text">
-        Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus
-        und federn nie zurück. Zum Ausprobieren die Felder überfahren.
+        Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus und
+        federn nie zurück. Zum Ausprobieren die Felder überfahren.
       </p>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Kurven</span></div>
-      {CURVES.map((k) => (
-        <div class="d-curve">
-          <div class="d-curve__meta">
-            <code>{k.token}</code>
-            <span class="d-size__purpose">{k.purpose}</span>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Kurven</span>
+      </div>
+      {
+        CURVES.map((k) => (
+          <div class="d-curve">
+            <div class="d-curve__meta">
+              <code>{k.token}</code>
+              <span class="d-size__purpose">{k.purpose}</span>
+            </div>
+            <div class="d-curve__track">
+              <span
+                class="d-curve__ball"
+                style={`transition-timing-function: var(${k.token})`}
+              />
+            </div>
           </div>
-          <div class="d-curve__track">
-            <span class="d-curve__ball" style={`transition-timing-function: var(${k.token})`}></span>
-          </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Dauern</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Dauern</span>
+      </div>
       <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {DURATIONS.map((d) => (
-            <tr><td><code>{d.token}</code></td><td>{d.value}</td><td>{d.purpose}</td></tr>
-          ))}
+          {
+            DURATIONS.map((d) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{d.token}</code>
+                  </td>
+                  <td>{d.value}</td>
+                  <td>{d.purpose}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
@@ -495,7 +917,10 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
         <Button label="Absenden" type="submit" />
       </div>
       <div class="d-stage d-stage--dark" style="margin-top: var(--sp-4)">
-        <div class="d-stage--row" style="display:flex; flex-wrap:wrap; gap: var(--sp-4)">
+        <div
+          class="d-stage--row"
+          style="display:flex; flex-wrap:wrap; gap: var(--sp-4)"
+        >
           <Button label="Auf dunklem Grund" href="#" />
           <Button label="Block" href="#" variant="block" />
         </div>
@@ -503,9 +928,13 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Textlink und Topline</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Textlink und Topline</span>
+      </div>
       <div class="d-stage">
-        <p style="margin-bottom: var(--sp-4)"><a class="c-link" href="#">Ein Textlink</a> im Fließtext.</p>
+        <p style="margin-bottom: var(--sp-4)">
+          <a class="c-link" href="#">Ein Textlink</a> im Fließtext.
+        </p>
         <span class="c-topline">Vorher &amp; Nachher</span>
       </div>
       <p class="d-sample__text" style="margin-top: var(--sp-4)">
@@ -536,31 +965,47 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Eingabefelder</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Eingabefelder</span>
+      </div>
       <div class="d-stage d-form">
         <div class="c-field">
-          <label class="c-field__label" for="sg-name">Name <span>*</span></label>
+          <label class="c-field__label" for="sg-name">Name <span>*</span></label
+          >
           <div class="c-field__control">
-            <input id="sg-name" type="text" placeholder="Ihr Name" autocomplete="name" />
+            <input
+              id="sg-name"
+              type="text"
+              placeholder="Ihr Name"
+              autocomplete="name"
+            />
           </div>
         </div>
         <div class="c-field">
-          <label class="c-field__label" for="sg-mail">E-Mail-Adresse <span>*</span></label>
+          <label class="c-field__label" for="sg-mail"
+            >E-Mail-Adresse <span>*</span></label
+          >
           <div class="c-field__control">
-            <input id="sg-mail" type="email" placeholder="name@beispiel.de" autocomplete="email" />
+            <input
+              id="sg-mail"
+              type="email"
+              placeholder="name@beispiel.de"
+              autocomplete="email"
+            />
           </div>
         </div>
         <div class="c-field c-field--tall">
           <label class="c-field__label" for="sg-msg">Nachricht</label>
           <div class="c-field__control">
-            <textarea id="sg-msg" rows="4" placeholder="Worum geht es?"></textarea>
+            <textarea id="sg-msg" rows="4" placeholder="Worum geht es?"
+            ></textarea>
           </div>
         </div>
       </div>
       <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Die Beschriftung steht über dem Feld und ist über <code>for</code> mit
-        ihm verbunden - ein Platzhalter allein ist keine Beschriftung, er
-        verschwindet beim Tippen.
+        Die Beschriftung steht über dem Feld und ist über <code>for</code> mit ihm
+        verbunden - ein Platzhalter allein ist keine Beschriftung, er verschwindet
+        beim Tippen.
       </p>
     </div>
   </section>
@@ -583,12 +1028,16 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
         <span class="d-sample__path">components/ui/Icons.astro</span>
       </div>
       <div class="d-grid">
-        {SYMBOLS.map((s) => (
-          <div class="d-symbol">
-            <svg aria-hidden="true"><use href={`#${s}`} /></svg>
-            <code>{s}</code>
-          </div>
-        ))}
+        {
+          SYMBOLS.map((s) => (
+            <div class="d-symbol">
+              <svg aria-hidden="true">
+                <use href={`#${s}`} />
+              </svg>
+              <code>{s}</code>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -607,31 +1056,45 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Schatten</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Schatten</span>
+      </div>
       <p class="d-sample__text">
         Die einzigen Stellen, an denen etwas eine Fläche über einer anderen
         wirft. Die Farbe ist immer <code>--c-dark</code>, nie reines Schwarz.
       </p>
-      <div class="d-stage d-stage--row" style="flex-wrap: wrap; gap: var(--sp-6)">
-        {SHADOWS.map((s) => (
-          <div class="d-radius">
-            <div class="d-shadow-probe" style={`box-shadow: var(${s.token})`}></div>
-            <code>{s.token}</code>
-            <p class="d-size__purpose" style="margin-top: var(--sp-1)">{s.purpose}</p>
-          </div>
-        ))}
+      <div
+        class="d-stage d-stage--row"
+        style="flex-wrap: wrap; gap: var(--sp-6)"
+      >
+        {
+          SHADOWS.map((s) => (
+            <div class="d-radius">
+              <div
+                class="d-shadow-probe"
+                style={`box-shadow: var(${s.token})`}
+              />
+              <code>{s.token}</code>
+              <p class="d-size__purpose" style="margin-top: var(--sp-1)">
+                {s.purpose}
+              </p>
+            </div>
+          ))
+        }
       </div>
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Körnung</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Körnung</span>
+      </div>
       <p class="d-sample__text">
-        Die Papierstruktur, die <code>ui/Backdrop.astro</code> über die Seite
-        legt. Zwei Deckkraftwerte, weil eine Fläche mit eigenem deckenden Grund
-        die Körnung anders trifft als der Seitengrund:
+        Die Papierstruktur, die <code>ui/Backdrop.astro</code> über die Seite legt.
+        Zwei Deckkraftwerte, weil eine Fläche mit eigenem deckenden Grund die Körnung
+        anders trifft als der Seitengrund:
         <code>--grain-opacity</code> (0,34) für die Auflage,
-        <code>--grain-opacity-surface</code> (0,17) für Flächen, die sie selbst
-        mitbringen müssen. Das Bild steht als <code>--grain-image</code> bereit.
+        <code>--grain-opacity-surface</code> (0,17) für Flächen, die sie selbst mitbringen
+        müssen. Das Bild steht als <code>--grain-image</code> bereit.
       </p>
       <div class="d-stage d-stage--row">
         <div class="d-grain d-grain--page"><span>Seitengrund</span></div>
@@ -640,13 +1103,25 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
-      <div class="d-sample__header"><span class="d-sample__name">Ebenen</span></div>
+      <div class="d-sample__header">
+        <span class="d-sample__name">Ebenen</span>
+      </div>
       <table class="d-table">
         <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
         <tbody>
-          {LAYERS.map((a) => (
-            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
-          ))}
+          {
+            LAYERS.map((a) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{a.token}</code>
+                  </td>
+                  <td>{a.value}</td>
+                  <td>{a.purpose}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
       <p class="d-sample__text" style="margin-top: var(--sp-4)">
@@ -675,7 +1150,7 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     .d-color__role,
     .d-color__value {
       font-size: var(--fs-text-small);
-      line-height: 1.45;
+      line-height: var(--lh-text);
       color: var(--c-text-muted);
     }
 
@@ -691,13 +1166,23 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       border-radius: var(--r-sm);
       font-family: var(--f-mono);
       font-size: var(--fs-label);
-      letter-spacing: 0.04em;
+      letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
     }
 
-    .d-marker--good { background: var(--c-dark); color: var(--c-grey); }
-    .d-marker--partial { background: var(--c-brand); color: var(--c-dark); }
-    .d-marker--weak { background: transparent; border: var(--bw) solid var(--c-line); color: var(--c-text); }
+    .d-marker--good {
+      background: var(--c-dark);
+      color: var(--c-grey);
+    }
+    .d-marker--partial {
+      background: var(--c-brand);
+      color: var(--c-dark);
+    }
+    .d-marker--weak {
+      background: transparent;
+      border: var(--bw) solid var(--c-line);
+      color: var(--c-text);
+    }
 
     /* --- Tabellen --- */
     .d-table {
@@ -717,7 +1202,7 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     .d-table th {
       font-family: var(--f-mono);
       font-weight: 300;
-      letter-spacing: 0.06em;
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
     }
 
@@ -730,14 +1215,14 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       margin-bottom: var(--sp-3);
       font-family: var(--f-mono);
       font-size: var(--fs-label);
-      letter-spacing: 0.06em;
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
       color: var(--c-text-muted);
     }
 
     .d-font-sample {
       font-size: var(--fs-h2);
-      line-height: 1.2;
+      line-height: var(--lh-snug);
     }
 
     .d-size {
@@ -752,7 +1237,7 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       margin-bottom: var(--sp-2);
       font-family: var(--f-mono);
       font-size: var(--fs-label);
-      letter-spacing: 0.04em;
+      letter-spacing: var(--tracking-mono);
       color: var(--c-text-muted);
     }
 
@@ -875,7 +1360,7 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       font-family: var(--f-mono);
       font-weight: 300;
       font-size: var(--fs-text-small);
-      letter-spacing: 0.06em;
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
       color: var(--c-neutral-800);
     }
@@ -934,10 +1419,17 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       pointer-events: none;
     }
 
-    .d-grain--page::after { opacity: var(--grain-opacity); }
-    .d-grain--surface::after { opacity: var(--grain-opacity-surface); }
+    .d-grain--page::after {
+      opacity: var(--grain-opacity);
+    }
+    .d-grain--surface::after {
+      opacity: var(--grain-opacity-surface);
+    }
 
-    .d-grain span { position: relative; z-index: 1; }
+    .d-grain span {
+      position: relative;
+      z-index: 1;
+    }
 
     /* --- Symbole --- */
     .d-symbol {

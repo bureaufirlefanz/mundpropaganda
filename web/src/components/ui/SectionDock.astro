@@ -47,44 +47,50 @@ const enough = headings.length >= 2;
 const number = (i: number) => String(i + 1);
 ---
 
-{enough && (
-  <nav data-section-dock-init aria-label={label} class="c-section-dock">
-    <div data-section-dock-pill class="c-section-dock__pill">
-      <button
-        data-section-dock-toggle
-        aria-expanded="false"
-        aria-controls="section-dock-list"
-        class="c-section-dock__toggle"
-        type="button"
-      >
-        <span data-section-dock-label-wrap class="c-section-dock__label-wrap">
-          <span class="c-section-dock__label">
-            <span class="c-section-dock__link-num">{number(0)}</span>
-            <span>{headings[0].text}</span>
+{
+  enough && (
+    <nav data-section-dock-init aria-label={label} class="c-section-dock">
+      <div data-section-dock-pill class="c-section-dock__pill">
+        <button
+          data-section-dock-toggle
+          aria-expanded="false"
+          aria-controls="section-dock-list"
+          class="c-section-dock__toggle"
+          type="button"
+        >
+          <span data-section-dock-label-wrap class="c-section-dock__label-wrap">
+            <span class="c-section-dock__label">
+              <span class="c-section-dock__link-num">{number(0)}</span>
+              <span>{headings[0].text}</span>
+            </span>
           </span>
-        </span>
-      </button>
-      <div data-section-dock-list id="section-dock-list" class="c-section-dock__list">
-        <div data-section-dock-indicator class="c-section-dock__indicator"></div>
-        <ul class="c-section-dock__items">
-          {headings.map((h, i) => (
-            <li>
-              <a
-                data-active={i === 0 ? "" : undefined}
-                data-section-dock-link
-                href={`#${h.id}`}
-                class="c-section-dock__link"
-              >
-                <span class="c-section-dock__link-num">{number(i)}</span>
-                <span>{h.text}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+        </button>
+        <div
+          data-section-dock-list
+          id="section-dock-list"
+          class="c-section-dock__list"
+        >
+          <div data-section-dock-indicator class="c-section-dock__indicator" />
+          <ul class="c-section-dock__items">
+            {headings.map((h, i) => (
+              <li>
+                <a
+                  data-active={i === 0 ? "" : undefined}
+                  data-section-dock-link
+                  href={`#${h.id}`}
+                  class="c-section-dock__link"
+                >
+                  <span class="c-section-dock__link-num">{number(i)}</span>
+                  <span>{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-)}
+    </nav>
+  )
+}
 
 <style>
   .c-section-dock {
@@ -158,7 +164,7 @@ const number = (i: number) => String(i + 1);
   /* Bewusst em statt Token: Die Ziffer soll dem Grad ihres Eintrags folgen. */
   .c-section-dock :global(.c-section-dock__link-num) {
     font-size: 0.75em;
-    line-height: 1;
+    line-height: var(--lh-tight);
     color: var(--c-text-muted);
   }
 
@@ -177,7 +183,8 @@ const number = (i: number) => String(i + 1);
 
   /* Auf dem aktiven Eintrag liegt der rosa Marker; die Ziffer nimmt dort nur
      die Schriftfarbe an. */
-  .c-section-dock :global([data-section-dock-link][data-active] .c-section-dock__link-num) {
+  .c-section-dock
+    :global([data-section-dock-link][data-active] .c-section-dock__link-num) {
     color: color-mix(in srgb, var(--c-dark) 70%, transparent);
   }
 
@@ -185,7 +192,7 @@ const number = (i: number) => String(i + 1);
      Als `block` saß der Kreis auf der Schriftlinie und ragte unten aus dem
      Button heraus — 9px Luft oben, 7px unten. */
   .c-section-dock :global(.c-section-dock__label) {
-    line-height: 1.5;
+    line-height: var(--lh-body);
     display: inline-flex;
     align-items: center;
     gap: 0.7em;

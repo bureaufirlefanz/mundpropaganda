@@ -32,25 +32,47 @@ const {
   labelAttrs = {},
 } = Astro.props;
 
-const classes = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join(" ");
+const classes = ["c-btn", variant && `c-btn--${variant}`]
+  .filter(Boolean)
+  .join(" ");
 ---
 
-{isStatic ? (
-  <span class={classes} aria-hidden="true">
-    <span class="c-btn__label" {...labelAttrs}>{label}</span>
-    <span class="c-btn__icon"><svg><use href="#i-arrow" /></svg></span>
-  </span>
-) : type ? (
-  <button class={classes} type={type}>
-    <span class="c-btn__label" {...labelAttrs}>{label}</span>
-    <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
-  </button>
-) : (
-  <a class={classes} href={href ?? "#"}>
-    <span class="c-btn__label" {...labelAttrs}>{label}</span>
-    <span class="c-btn__icon" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
-  </a>
-)}
+{
+  isStatic ? (
+    <span class={classes} aria-hidden="true">
+      <span class="c-btn__label" {...labelAttrs}>
+        {label}
+      </span>
+      <span class="c-btn__icon">
+        <svg>
+          <use href="#i-arrow" />
+        </svg>
+      </span>
+    </span>
+  ) : type ? (
+    <button class={classes} type={type}>
+      <span class="c-btn__label" {...labelAttrs}>
+        {label}
+      </span>
+      <span class="c-btn__icon" aria-hidden="true">
+        <svg>
+          <use href="#i-arrow" />
+        </svg>
+      </span>
+    </button>
+  ) : (
+    <a class={classes} href={href ?? "#"}>
+      <span class="c-btn__label" {...labelAttrs}>
+        {label}
+      </span>
+      <span class="c-btn__icon" aria-hidden="true">
+        <svg>
+          <use href="#i-arrow" />
+        </svg>
+      </span>
+    </a>
+  )
+}
 
 <style>
   /* Figma: zweiteilig — Pille mit Label plus separater runder Pfeil-Knopf,
@@ -74,11 +96,12 @@ const classes = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join("
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label-lg);
-    line-height: 1;
-    letter-spacing: 0.06em;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     white-space: nowrap;
-    transition: background var(--d-fast) var(--e-swift),
+    transition:
+      background var(--d-fast) var(--e-swift),
       color var(--d-fast) var(--e-swift);
   }
 
@@ -91,7 +114,8 @@ const classes = ["c-btn", variant && `c-btn--${variant}`].filter(Boolean).join("
     border-radius: var(--r-round);
     background: var(--c-brand);
     color: var(--c-dark);
-    transition: background var(--d-fast) var(--e-swift),
+    transition:
+      background var(--d-fast) var(--e-swift),
       color var(--d-fast) var(--e-swift),
       transform var(--d-base) var(--e-out);
   }
