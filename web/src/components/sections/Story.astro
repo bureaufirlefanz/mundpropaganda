@@ -160,7 +160,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
 /* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
        gerundet. Jedes andere Bild nimmt `--r-md`. */
     border-radius: var(--r-md);
-    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+    background: var(--c-tint);
   }
 
   /* :global(img), weil das Bild aus CmsImage.astro kommt. */

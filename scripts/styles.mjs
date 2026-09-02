@@ -30,7 +30,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { starteBrowser, erwarteServer } from "./lib/chrome.mjs";
 import { VIEWPORTS } from "./lib/smoke.mjs";
 
-const BASE = "http://localhost:4322";
+/* Umstellbar wie in `check-web.mjs` und `takt.mjs`:
+ *
+ *     MP_BASE=http://localhost:4399 npm run web:styles -- sichern
+ *
+ * Der feste Port stand einem parallel laufenden Vorschau-Server im Weg. */
+const BASE = process.env.MP_BASE ?? "http://localhost:4322";
 const ORDNER = ".shots/styles";
 const PAGES = ["/", "/leistungen/veneers"];
 

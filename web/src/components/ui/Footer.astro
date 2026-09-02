@@ -34,7 +34,7 @@ const PROFILES = [
   { key: "youtube", title: "YouTube", symbol: "#i-youtube" },
 ] as const;
 const profiles = PROFILES.map((p) => ({ ...p, url: e.social[p.key] })).filter(
-  (p) => p.url && p.url !== "#"
+  (p) => p.url && p.url !== "#",
 );
 
 // Jahreszahl zur Bauzeit — die Seite ist statisch, ein Skript dafür wäre
@@ -57,102 +57,149 @@ const columns = (
     (f?.columns ?? []).map(async (col) => ({
       title: col?.title ?? "",
       links: await resolved(col?.links, here),
-    }))
+    })),
   )
 ).filter((col) => col.title && col.links.length > 0);
 ---
 
 <footer class="c-footer" id={id}>
   <div class="c-footer__inner">
-    {/* Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
-         der Seite. */}
+    {
+      /* Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
+         der Seite. */
+    }
     <a class="c-footer__wordmark" href="/" data-reveal="up">Mundpropaganda</a>
 
     <div class="c-footer__top">
       <div class="c-footer__contact">
         <div class="c-footer__social">
-          {profiles.map((p) => (
-            <a href={p.url} aria-label={p.title}><svg><use href={p.symbol} /></svg></a>
-          ))}
+          {
+            profiles.map((p) => (
+              <a href={p.url} aria-label={p.title}>
+                <svg>
+                  <use href={p.symbol} />
+                </svg>
+              </a>
+            ))
+          }
         </div>
 
-        {/* Je Zeile geprüft: Ein `tel:`-Link ohne Nummer ist kein leerer Text,
+        {
+          /* Je Zeile geprüft: Ein `tel:`-Link ohne Nummer ist kein leerer Text,
             sondern ein Link, der beim Antippen die Wählmaske mit nichts darin
-            öffnet. Was fehlt, steht deshalb gar nicht erst da. */}
+            öffnet. Was fehlt, steht deshalb gar nicht erst da. */
+        }
         <div class="c-footer__lines">
-          {e.phone && <a class="c-link" href={telLink(e.phone)}>{e.phone}</a>}
-          {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
+          {
+            e.phone && (
+              <a class="c-link" href={telLink(e.phone)}>
+                {e.phone}
+              </a>
+            )
+          }
+          {
+            e.email && (
+              <a class="c-link" href={`mailto:${e.email}`}>
+                {e.email}
+              </a>
+            )
+          }
         </div>
 
         {action && <Button label={action.text} href={action.href} />}
 
-        {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
+        {
+          /* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
             Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
             breit genug für zwei nebeneinander. Quelle sind dieselben
-            Einstellungen wie in der Standorte-Section. */}
+            Einstellungen wie in der Standorte-Section. */
+        }
         <div class="c-footer__locations">
-          {e.locations.map((o) => (
-            <div>
-              {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
+          {
+            e.locations.map((o) => (
+              <div>
+                {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
                   ohnehin die Straße, und „Praxis Prenzlauer Allee /
                   Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
                   Halbgeviertstrich wie sonst auch auf der Seite. */}
-              <p class="c-footer__location-name">Praxis – {o.shortCode}</p>
-              {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
+                <p class="c-footer__location-name">Praxis – {o.shortCode}</p>
+                {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
                   solche an. Der Browser setzt das Element kursiv, das wird
                   unten zurückgenommen. */}
-              <address>{o.street}<br />{o.city}</address>
+                <address>
+                  {o.street}
+                  <br />
+                  {o.city}
+                </address>
 
-              {/* Nur wenn Zeiten gepflegt sind. Ein Block mit der Überschrift
+                {/* Nur wenn Zeiten gepflegt sind. Ein Block mit der Überschrift
                   „Öffnungszeiten" und nichts darunter wäre schlimmer als
                   keiner: Wer davorsteht, hält es für einen Fehler und ruft an.
 
                   <dl> und nicht <p>: Tage und Zeit sind Begriff und Erklärung,
                   und Vorlesegeräte lesen das Paar dann zusammen vor. */}
-              {o.hours && o.hours.length > 0 && (
-                <dl class="c-footer__hours">
-                  {o.hours.map((z) => (
-                    <>
-                      <dt>{z.days}</dt>
-                      <dd>{z.time}</dd>
-                    </>
-                  ))}
-                </dl>
-              )}
-            </div>
-          ))}
+                {o.hours && o.hours.length > 0 && (
+                  <dl class="c-footer__hours">
+                    {o.hours.map((z) => (
+                      <>
+                        <dt>{z.days}</dt>
+                        <dd>{z.time}</dd>
+                      </>
+                    ))}
+                  </dl>
+                )}
+              </div>
+            ))
+          }
         </div>
       </div>
 
-      <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
+      <nav
+        class="c-footer__nav"
+        aria-label={f?.servicesHeading ?? "Leistungen"}
+      >
         <p class="c-footer__nav-title">{f?.servicesHeading}</p>
-        {services.map((l) => (
-          <a class="c-link" href={servicePath(l)}>{l.name}</a>
-        ))}
+        {
+          services.map((l) => (
+            <a class="c-link" href={servicePath(l)}>
+              {l.name}
+            </a>
+          ))
+        }
       </nav>
 
-      {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
+      {
+        /* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
           Zeile höher als die anderen — drei Spalten, von denen eine ohne
-          Anlass aus der Reihe fällt. */}
-      {columns.map((column) => (
-        <nav class="c-footer__nav" aria-label={column.title}>
-          <p class="c-footer__nav-title">{column.title}</p>
-          {column.links.map((l) => (
-            <a class="c-link" href={l.href}>{l.text}</a>
-          ))}
-        </nav>
-      ))}
+          Anlass aus der Reihe fällt. */
+      }
+      {
+        columns.map((column) => (
+          <nav class="c-footer__nav" aria-label={column.title}>
+            <p class="c-footer__nav-title">{column.title}</p>
+            {column.links.map((l) => (
+              <a class="c-link" href={l.href}>
+                {l.text}
+              </a>
+            ))}
+          </nav>
+        ))
+      }
     </div>
 
     <div class="c-footer__bottom">
       <p>© {year}{f?.copyright ? ` ${f.copyright}` : ""}</p>
-      {legalLinks.length > 0 && (
-        <div class="c-footer__legal">
-          {legalLinks.map((l) => (
-            <a class="c-link" href={l.href}>{l.text}</a>
-          ))}
-        </div>
-      )}
+      {
+        legalLinks.length > 0 && (
+          <div class="c-footer__legal">
+            {legalLinks.map((l) => (
+              <a class="c-link" href={l.href}>
+                {l.text}
+              </a>
+            ))}
+          </div>
+        )
+      }
     </div>
   </div>
 </footer>
@@ -278,7 +325,8 @@ const columns = (
     place-items: center;
     width: 24px;
     height: 24px;
-    transition: color var(--d-fast) var(--e-swift),
+    transition:
+      color var(--d-fast) var(--e-swift),
       transform var(--d-base) var(--e-out);
   }
 
@@ -347,7 +395,15 @@ const columns = (
     margin-top: var(--sp-3);
     font-size: var(--fs-text-small);
     line-height: 1.5;
-    color: var(--c-text-muted);
+    /* NICHT `--c-text-muted`: Das ist Braun auf Durchsichtig und für den
+       hellen Grund der Seite gedacht. Der Fuß ist dunkel, die Zeile wäre
+       Braun auf Braun gewesen. Aufgefallen ist es nie, weil im Datensatz
+       noch keine Öffnungszeiten stehen und dieses Element deshalb gar nicht
+       gerendert wird — der Fehler hätte auf sein Stichwort gewartet.
+
+       65 % ergeben auf dem dunklen Grund 4.5:1, derselbe Wert, den die
+       entfallene Theme-Schicht für `dark` vorgesehen hatte. */
+    color: color-mix(in srgb, var(--c-grey) 65%, transparent);
   }
 
   .c-footer__hours dd {
@@ -380,7 +436,8 @@ const columns = (
     justify-content: space-between;
     gap: var(--sp-5);
     padding: var(--sp-5) 0;
-    border-top: var(--bw) solid color-mix(in srgb, var(--c-grey) 22%, transparent);
+    border-top: var(--bw) solid
+      color-mix(in srgb, var(--c-grey) 22%, transparent);
     font-family: var(--f-mono);
     font-weight: 300;
     font-size: var(--fs-label);
@@ -450,4 +507,3 @@ const columns = (
     }
   }
 </style>
-

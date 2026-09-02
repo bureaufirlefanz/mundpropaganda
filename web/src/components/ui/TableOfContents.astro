@@ -43,8 +43,8 @@ const { headings, title = "Inhalt" } = Astro.props;
      Verzeichnis sonst unten aus dem Bild. */
   .c-toc {
     position: sticky;
-    top: calc(var(--nav-height, 96px) + var(--sp-6));
-    max-height: calc(100vh - var(--nav-height, 96px) - var(--sp-10));
+    top: calc(var(--nav-height) + var(--sp-6));
+    max-height: calc(100vh - var(--nav-height) - var(--sp-10));
     overflow-y: auto;
     /* Die Bildlaufleiste des Verzeichnisses gehört nicht ins Bild. */
     scrollbar-width: none;

@@ -6,14 +6,13 @@
 
 :root {
   /* --- Farben --------------------------------------------------------- */
-  --c-brand: #ff84c8;          /* brand */
-  --c-dark: #403229;           /* dark / Brown */
-  --c-taupe: #d0bec3;          /* taupe */
-  --c-grey: #d6d6d6;           /* grey — Standard-Seitenhintergrund */
+  --c-brand: #ff84c8; /* brand */
+  --c-dark: #403229; /* dark / Brown */
+  --c-taupe: #d0bec3; /* taupe */
+  --c-grey: #d6d6d6; /* grey — Standard-Seitenhintergrund */
   --c-neutral-800: #201d1d;
   --c-neutral-200: #f4f4f4;
   --c-white: #ffffff;
-  --c-black: #000000;
 
   /* Semantisch */
   --c-bg: var(--c-grey);
@@ -25,29 +24,31 @@
   --c-text-muted: color-mix(in srgb, var(--c-dark) 75%, transparent);
   --c-line: color-mix(in srgb, var(--c-dark) 28%, transparent);
   --c-surface: var(--c-neutral-200);
+  /* Die ruhige Fläche unter einem Bild, bis es da ist — und der Grund, auf
+     dem ein fehlendes Bild sitzt. Stand achtmal wörtlich in den Bausteinen. */
+  --c-tint: color-mix(in srgb, var(--c-dark) 8%, transparent);
 
   /* --- Schriften ------------------------------------------------------ */
   --f-sans: "PP Neue Montreal", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "GT Pressura Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --f-mono-alt: "PP Neue Montreal Mono", var(--f-mono);
 
   /* --- Typo-Skala -----------------------------------------------------
      Figma-Referenz bei 1728px Viewport. Fluid via clamp(), damit sich das
      Design bis 1920+ weiterträgt statt zu zerreißen.
      -------------------------------------------------------------------- */
-  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem);   /* 250px @1728 */
-  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem);    /* 125px */
-  --fs-h1: clamp(2.5rem, 4.05vw, 4.375rem);          /* 70px  */
-  --fs-h2: clamp(1.75rem, 2.31vw, 2.5rem);           /* 40px  */
+  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem); /* 250px @1728 */
+  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem); /* 125px */
+  --fs-h1: clamp(2.5rem, 4.05vw, 4.375rem); /* 70px  */
+  --fs-h2: clamp(1.75rem, 2.31vw, 2.5rem); /* 40px  */
   --fs-h3: var(--fs-h2);
   /* 32px — die Stufe zwischen Überschrift und Fließtext. Trägt die Einträge
      im Inhaltsverzeichnis der Pillar Pages (Figma 177:2116). */
-  --fs-h4: clamp(1.375rem, 1.85vw, 2rem);            /* 32px  */
-  --fs-h5: clamp(1.125rem, 1.39vw, 1.5rem);          /* 24px  */
-  --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem);/* 20px  */
-  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem);     /* 18px  */
-  --fs-text-small: 1rem;                             /* 16px  */
-  --fs-label: 0.75rem;                               /* 12px — Micro-Labels */
+  --fs-h4: clamp(1.375rem, 1.85vw, 2rem); /* 32px  */
+  --fs-h5: clamp(1.125rem, 1.39vw, 1.5rem); /* 24px  */
+  --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem); /* 20px  */
+  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem); /* 18px  */
+  --fs-text-small: 1rem; /* 16px  */
+  --fs-label: 0.75rem; /* 12px — Micro-Labels */
 
   /* Die Zwischenstufen. Sie standen bis zum 02.09.2026 nicht hier, sondern
      als eigene clamp()-Rampe in fast jedem Baustein: 48 font-size-Regeln,
@@ -63,18 +64,34 @@
      Die Leiter läuft lückenlos von oben nach unten:
      283 · 250 · 200 · 144 · 125 · 90 · 70 · 64 · 55 · 48 · 40 · 36 · 32 ·
      28 · 24 · 20 · 18 · 16 · 14 · 13 · 12 · 11 */
-  --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem);  /* 283px — Standort-Ring */
-  --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem);     /* 200px — Magazin-Wortmarke */
-  --fs-display-md: clamp(4rem, 9vw, 9rem);           /* 144px — Geschichten, Personenseite */
-  --fs-display-sm: clamp(1.5rem, 5.2vw, 5.625rem);   /* 90px  — Magazin-Kopf, Team, Praxis, Zahlen */
-  --fs-h1-sm: clamp(2rem, 3.7vw, 4rem);              /* 64px  — Experten, Preise, Ablauf */
-  --fs-h1-xs: clamp(2rem, 3.2vw, 3.5rem);            /* 55px  — Galerie-Kopf, Geschichte */
-  --fs-h2-lg: clamp(1.75rem, 2.8vw, 3rem);           /* 48px  — Panel, Merkmale */
-  --fs-h2-sm: clamp(1.5rem, 2.08vw, 2.25rem);        /* 36px  — Einleitung, Statement */
-  --fs-h4-sm: clamp(1.25rem, 1.7vw, 1.75rem);        /* 28px  — Vorteile, Zeitleiste, Werte */
-  --fs-label-lg: 0.875rem;                           /* 14px  — Knopfbeschriftung */
-  --fs-label-md: 0.8125rem;                          /* 13px  — Navigation, Meta-Zeilen */
-  --fs-micro: 0.6875rem;                             /* 11px  — Fehlerzeichen, Badge auf Schmalgerät */
+  --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem); /* 283px — Standort-Ring */
+  --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem); /* 200px — Magazin-Wortmarke */
+  --fs-display-md: clamp(
+    4rem,
+    9vw,
+    9rem
+  ); /* 144px — Geschichten, Personenseite */
+  --fs-display-sm: clamp(
+    1.5rem,
+    5.2vw,
+    5.625rem
+  ); /* 90px  — Magazin-Kopf, Team, Praxis, Zahlen */
+  --fs-h1-sm: clamp(2rem, 3.7vw, 4rem); /* 64px  — Experten, Preise, Ablauf */
+  --fs-h1-xs: clamp(2rem, 3.2vw, 3.5rem); /* 55px  — Galerie-Kopf, Geschichte */
+  --fs-h2-lg: clamp(1.75rem, 2.8vw, 3rem); /* 48px  — Panel, Merkmale */
+  --fs-h2-sm: clamp(
+    1.5rem,
+    2.08vw,
+    2.25rem
+  ); /* 36px  — Einleitung, Statement */
+  --fs-h4-sm: clamp(
+    1.25rem,
+    1.7vw,
+    1.75rem
+  ); /* 28px  — Vorteile, Zeitleiste, Werte */
+  --fs-label-lg: 0.875rem; /* 14px  — Knopfbeschriftung */
+  --fs-label-md: 0.8125rem; /* 13px  — Navigation, Meta-Zeilen */
+  --fs-micro: 0.6875rem; /* 11px  — Fehlerzeichen, Badge auf Schmalgerät */
 
   --lh-display: 0.92;
   --lh-tight: 1;
@@ -93,7 +110,7 @@
   --sp-6: 40px;
   --sp-8: 64px;
   --sp-10: 80px;
-  --sp-12: 112px;   /* section-space/main */
+  --sp-12: 112px; /* section-space/main */
   --sp-16: 160px;
 
   /* Der Entwurf setzt 112px an. Etwas großzügiger, weil die Seite mit
@@ -203,6 +220,19 @@
   --shadow-handle: 0 4px 20px rgb(0 0 0 / 0.15);
   --shadow-handle-active: 0 6px 26px rgb(0 0 0 / 0.22);
 
+  /* --- Maße der Seitenleiste ------------------------------------------
+     Wie weit die Navigationsleiste von oben in die Seite reicht. Gebraucht
+     für Sprungmarken (`scroll-margin-top`) und das mitlaufende
+     Inhaltsverzeichnis.
+
+     Sie wurde an fünf Stellen als `var(--nav-height, 96px)` gelesen und
+     nirgends gesetzt — es galt also immer der Ersatzwert, und der stand
+     fünfmal da. Gemessen endet die Leiste bei 76 bis 78px, der äußere
+     Rahmen ist 102 bis 104px hoch; 96px liegt dazwischen und ist genau der
+     Wert, der bisher wirkte. Am Aussehen ändert sich damit nichts, nur der
+     Ort, an dem er steht. */
+  --nav-height: 96px;
+
   /* --- Border --------------------------------------------------------- */
   --bw: 1px;
 
@@ -226,11 +256,9 @@
   --d-slow: 0.8s;
 
   /* --- Z-Index -------------------------------------------------------- */
-  --z-base: 1;
   --z-sticky: 50;
   --z-nav: 100;
   --z-overlay: 200;
-  --z-cursor: 300;
   /* Über allem. Der Sprung zum Inhalt ist wertlos, sobald ihn irgendetwas
      verdeckt — und genau das passierte: Er stand auf 100, die Navigation
      steht auf --z-nav (ebenfalls 100), und bei Gleichstand gewinnt das später
@@ -239,24 +267,21 @@
   --z-skiplink: 400;
 }
 
-/* Sektionen können ihr Farbschema lokal umschalten. */
-[data-theme="dark"] {
-  --c-bg: var(--c-dark);
-  --c-text: var(--c-grey);
-  /* Auf Braun braucht es 65 % für 4.5:1 — bei 60 % waren es 4.13:1. */
-  --c-text-muted: color-mix(in srgb, var(--c-grey) 65%, transparent);
-  --c-line: color-mix(in srgb, var(--c-grey) 30%, transparent);
-}
-
-[data-theme="taupe"] {
-  --c-bg: var(--c-taupe);
-  --c-text: var(--c-dark);
-  /* Taupe ist dunkler als Grau, deshalb ein eigener Wert: 81 % für 4.5:1. */
-  --c-text-muted: color-mix(in srgb, var(--c-dark) 82%, transparent);
-  --c-line: color-mix(in srgb, var(--c-dark) 30%, transparent);
-}
-
-[data-theme="light"] {
-  --c-bg: var(--c-neutral-200);
-  --c-text: var(--c-neutral-800);
-}
+/* Die Theme-Schicht ist am 2026-09-02 entfallen.
+ *
+ * Hier standen `[data-theme="dark"|"taupe"|"light"]` und schalteten `--c-bg`,
+ * `--c-text`, `--c-text-muted` und `--c-line` um. Gut gedacht — nur setzte
+ * kein einziges Element im Projekt jemals `data-theme`. Die dunklen
+ * Abschnitte schreiben ihre Farben selbst aus (`background: var(--c-dark);
+ * color: var(--c-bg)`), und zwar alle.
+ *
+ * Weg musste sie nicht wegen der zwanzig Zeilen, sondern weil eine halb
+ * verdrahtete Mechanik gefährlicher ist als gar keine: Sie hat genau einen
+ * Fehler erzeugt. Im Seitenfuß steht `color: var(--c-text-muted)` an den
+ * Öffnungszeiten — jemand ging davon aus, dass die Schicht dort greift. Sie
+ * greift nicht, `--c-text-muted` ist Braun auf Braun, und die Zeile wäre
+ * unlesbar gewesen. Aufgefallen ist es nie, weil im Datensatz noch keine
+ * Öffnungszeiten stehen und das Element deshalb gar nicht gerendert wird.
+ *
+ * Wer Themes will, führt sie bewusst wieder ein — und stellt dann die
+ * Abschnitte mit um, statt beides nebeneinander stehen zu lassen. */

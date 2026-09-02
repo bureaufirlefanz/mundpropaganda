@@ -210,7 +210,7 @@ const minutes = readingTime(d?.text);
   .s-post__headerimage {
     height: clamp(300px, 52vh, 620px);
     overflow: hidden;
-    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
+    background: var(--c-tint);
   }
 
   /* :global(img), weil das Bild aus CmsImage.astro bzw. Picture.astro kommt. */
@@ -429,7 +429,7 @@ const minutes = readingTime(d?.text);
     font-weight: 500;
     line-height: 1.15;
     letter-spacing: -0.01em;
-    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
+    scroll-margin-top: calc(var(--nav-height) + var(--sp-4));
   }
 
   .s-post__text :global(h2)::before {
@@ -450,7 +450,7 @@ const minutes = readingTime(d?.text);
     font-size: var(--fs-h5);
     font-weight: 500;
     line-height: 1.2;
-    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
+    scroll-margin-top: calc(var(--nav-height) + var(--sp-4));
   }
 
   .s-post__text :global(ul) {

@@ -18,13 +18,10 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "PP Neue Montreal Mono";
-  src: url("/fonts/PPNeueMontrealMono-Book.woff2") format("woff2");
-  font-weight: 350;
-  font-style: normal;
-  font-display: swap;
-}
+/* „PP Neue Montreal Mono" ist am 2026-09-02 entfallen — Schnitt und Datei.
+   Er war über `--f-mono-alt` erreichbar, und diese Property wurde an keiner
+   Stelle gelesen. 81 KB, die größte der vier Schriftdateien, für nichts.
+   Die Mono-Auszeichnung der Seite trägt „GT Pressura Mono". */
 
 @font-face {
   font-family: "GT Pressura Mono";
@@ -174,11 +171,9 @@ p {
    Grund (1:1), der helle steht mit 12.28:1. */
 .c-footer :focus-visible,
 .c-navpromo:focus-visible,
-.s-cta :focus-visible,
-[data-theme="dark"] :focus-visible {
-  outline-color: var(--c-white);
-}
-
+/* `.s-cta` stand hier und trifft nichts: Der Baustein heißt `.s-ctaband`.
+   Der Fokusring auf seinem Knopf war damit der dunkle auf dunklem Grund. */
+.s-ctaband :focus-visible,
 /* Nach innen, wo außen kein Platz ist.
 
    Diese Elemente sitzen bündig in einem Vorfahren mit `overflow: hidden` —
@@ -198,55 +193,17 @@ p {
 
 /* --- Typo-Utilities -------------------------------------------------- */
 
-.t-display {
-  font-family: var(--f-sans);
-  font-weight: 500;
-  font-size: var(--fs-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tracking-display);
-  text-transform: uppercase;
-}
+/* Von den elf Typo-Utilities standen neun an keiner einzigen Stelle im
+   Markup: `.t-display`, `.t-display-2`, `.t-h1`, `.t-h2`, `.t-h3`, `.t-h5`,
+   `.t-large`, `.t-label` und `.t-mono`. Sie sind am 2026-09-02 entfallen.
 
-.t-display-2 {
-  font-family: var(--f-sans);
-  font-weight: 500;
-  font-size: var(--fs-display-2);
-  line-height: var(--lh-tight);
-  letter-spacing: var(--tracking-display);
-  text-transform: uppercase;
-}
+   Der Grund für ihr Verschwinden ist die Hausregel selbst: Ein Baustein
+   bringt seine Regeln mit, und eine Überschrift, die ihre Größe aus einer
+   globalen Klasse zieht, hat sie woanders. Was jede Seite mitlieferte und
+   niemand benutzte, ist Ballast — und es liest sich wie ein Angebot, dem
+   man folgen sollte.
 
-.t-h1 {
-  font-size: var(--fs-h1);
-  font-weight: 500;
-  line-height: var(--lh-heading);
-}
-
-.t-h2 {
-  font-size: var(--fs-h2);
-  font-weight: 500;
-  line-height: 1.15;
-}
-
-.t-h3 {
-  font-size: var(--fs-h2);
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.t-h5 {
-  font-family: var(--f-mono);
-  font-weight: 300;
-  font-size: var(--fs-h5);
-  line-height: 1.22;
-  letter-spacing: var(--tracking-mono);
-}
-
-.t-large {
-  font-size: var(--fs-text-large);
-  line-height: 1.35;
-}
+   Die beiden übrigen bleiben, weil `Panel.astro` sie benutzt. */
 
 .t-body {
   font-size: var(--fs-text-main);
@@ -292,19 +249,14 @@ p {
   padding-block: 0;
 }
 
-.section--lg {
-  padding-block: var(--section-space-lg);
-}
+/* `.section--lg` und `.container--wide` sind am 2026-09-02 entfallen — beide
+   ohne eine einzige Verwendung im Markup. */
 
 .container {
   width: 100%;
   max-width: var(--site-max);
   margin-inline: auto;
   padding-inline: var(--site-margin);
-}
-
-.container--wide {
-  max-width: none;
 }
 
 .grid {
@@ -396,13 +348,10 @@ main:focus {
   outline: none;
 }
 
-/* Bild-Wrapper mit Ratio + Cover — überall wiederverwendet. */
-.media {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--c-dark) 8%, transparent);
-}
+/* `.media` hieß „überall wiederverwendet" und stand in keinem einzigen
+   `class`-Attribut. Die Bausteine bringen ihre Bildflächen selbst mit — die
+   Liste in der Regel darunter nennt sie beim Namen. Entfallen am 2026-09-02;
+   der Grundton daraus ist jetzt `--c-tint`. */
 
 /* Ein per transform bewegtes Bild in einem gerundeten, überlaufversteckten
    Rahmen wird vom Compositor auf eine eigene Ebene gelegt. Die Rundung
@@ -414,7 +363,6 @@ main:focus {
    Achtung: Rahmen mit [data-reveal] bekommen von GSAP ein inline
    `transform` gesetzt, das dieses translateZ(0) ersetzt. Die Ebene hängt
    dort an `will-change` aus der Reveal-Regel. */
-.media,
 .s-split__media,
 .s-shero__media,
 .s-experts__media,
@@ -429,13 +377,6 @@ main:focus {
 /* Nachfahren-Selektor, nicht `>`: das <img> steckt in einem <picture>,
    und display:contents ändert nur die Box-Erzeugung, nicht den DOM-Baum
    gegen den Selektoren matchen. */
-.media img,
-.media video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* --- Motion-Basis -----------------------------------------------------
    Elemente mit [data-reveal] starten unsichtbar. Falls JS nicht lädt,
    macht die no-js-Regel sie wieder sichtbar — kein leeres Layout.

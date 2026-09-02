@@ -75,7 +75,8 @@ html.js [data-hero-scroll] {
   width: 24px;
   height: 24px;
   color: var(--c-text);
-  transition: color var(--d-fast) var(--e-swift),
+  transition:
+    color var(--d-fast) var(--e-swift),
     transform var(--d-base) var(--e-out);
 }
 
@@ -147,7 +148,8 @@ html.js [data-hero-scroll] {
   height: 7px;
   border-radius: var(--r-round);
   background: color-mix(in srgb, var(--c-dark) 28%, transparent);
-  transition: background var(--d-fast) var(--e-swift),
+  transition:
+    background var(--d-fast) var(--e-swift),
     transform var(--d-base) var(--e-out);
 }
 
@@ -203,7 +205,8 @@ html.js [data-hero-scroll] {
   background: var(--c-neutral-200);
   color: var(--c-neutral-800);
   font-size: var(--fs-text-main);
-  transition: border-color var(--d-fast) var(--e-swift),
+  transition:
+    border-color var(--d-fast) var(--e-swift),
     background var(--d-fast) var(--e-swift);
 }
 
@@ -358,14 +361,6 @@ html.js [data-hero-scroll] {
   letter-spacing: 0;
 }
 
-/* Auf pinker Fläche. `data-surface="brand"` gehört an den Abschnitt, der die
-   Fläche setzt — dann gilt die Umkehrung für jeden Kreis darin, ohne dass
-   ein Baustein davon wissen muss.
-
-   Heute setzt keine Section eine pinke Fläche. Die Regel steht trotzdem hier
-   und nicht erst, wenn es soweit ist: Wer die erste baut, soll sie vorfinden
-   und nicht neu erfinden. */
-[data-surface="brand"] .c-number {
-  background: var(--c-dark);
-  color: var(--c-brand);
-}
+/* Hier stand eine Regel für `[data-surface="brand"]` — eine Ziffer auf pinker
+   Fläche. Das Attribut hat nie ein Element getragen; entfallen am
+   2026-09-02, zusammen mit der Theme-Schicht in `tokens.css`. */
