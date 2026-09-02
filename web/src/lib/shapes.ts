@@ -28,10 +28,24 @@ export interface Step {
   text: string;
 }
 
-/** Eine Preiskarte. */
+/**
+ * Eine Preiskarte.
+ *
+ * Die drei wahlfreien Angaben tragen die Preistabelle einer Pillar Page.
+ * Auf den Leistungsseiten sind sie nicht gesetzt, und dann rendert
+ * `Prices.astro` genau das Markup von vorher — siehe den Kopf dort.
+ */
 export interface Price {
   name: string;
   price: string;
+  /** Setzt „ab“ vor den Betrag. Nach GOZ ist ein Festpreis nicht zulässig. */
+  from?: boolean;
+  /** Vergleichszeile, z. B. „0,3–1,0 mm“. */
+  reduction?: string;
+  /** Vergleichszeile, z. B. „10–15 Jahre“. */
+  durability?: string;
+  /** Steht rechts in der Pille, z. B. „/ Zahn“ (Figma 177:2029). */
+  unit?: string;
 }
 
 /** Ein aufklappbarer Punkt mit Bild — Standards und Benefits teilen die Form. */

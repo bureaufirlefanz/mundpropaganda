@@ -1,0 +1,199 @@
+---
+/**
+ * Der Kopf einer Pillar Page (Figma 177:1734).
+ *
+ * Ein anderer Bau als `ServiceHero`, deshalb ein eigener Baustein: Dort steht
+ * der Text links und das Bild rechts. Hier läuft das Bild randabfallend über
+ * die volle Breite, und eine helle Fläche schiebt sich von unten darüber —
+ * oben gerundet, unten bündig mit dem folgenden Abschnitt. Die Überschrift
+ * sitzt in dieser Fläche und ragt in das Bild hinein.
+ *
+ * Aus dem Entwurf übernommen, gegen Tokens gelegt:
+ *
+ *   - Fläche `#d6d6d6` → `--c-grey` (ist ohnehin der Seitenhintergrund)
+ *   - Schrift `#403229` → `--c-dark`
+ *   - 125px, PP Neue Montreal Medium, Zeilenhöhe 1 → `--fs-display-2`,
+ *     `--f-sans`. Der Token skaliert bereits mit der Breite.
+ *   - Panel-Rundung 46px → `--r-xl` (neu in `tokens.css`)
+ *
+ * ── Die Rubrik über der Überschrift ──────────────────────────────────────
+ *
+ * „• Guides" ist kein `c-topline`: Die Topline der Leistungsseiten steht in
+ * Versalien und Monospace. Hier ist es eine gesetzte Zeile mit Punkt davor,
+ * die den Bereich benennt. Der Punkt ist dekorativ und liegt deshalb im CSS,
+ * nicht als Zeichen im Text — sonst läse ihn ein Vorleseprogramm mit.
+ *
+ * ── Bild ──────────────────────────────────────────────────────────────────
+ *
+ * `eager`, weil es das LCP-Element der Seite ist. `CmsImage` bedient sowohl
+ * ein Bild aus dem CMS als auch den Namen eines gestalteten Motivs.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import type { ImageSource } from "../../lib/images";
+
+interface Props {
+  title: string;
+  /** Die Rubrik über der Überschrift, z. B. „Guides". */
+  eyebrow?: string;
+  image?: ImageSource;
+  alt?: string;
+}
+
+const { title, eyebrow, image, alt = "" } = Astro.props;
+
+/* Der Zeilenumbruch der Überschrift kommt aus dem Entwurf („VENEERS" /
+   „IN BERLIN"). Er entsteht hier aus dem Titel selbst, statt im Text ein
+   Sonderzeichen zu verlangen: Zwei Wörter bleiben zusammen, ab dem dritten
+   bricht es nach dem ersten um. */
+const words = title.trim().split(/\s+/);
+const lines = words.length > 2 ? [words[0]!, words.slice(1).join(" ")] : [title];
+---
+
+<section class="s-pillarhero">
+  <div class="s-pillarhero__media">
+    <CmsImage
+      source={image}
+      alt={alt}
+      eager
+      widths={[1024, 1600, 2200]}
+      sizes="100vw"
+    />
+  </div>
+
+  <div class="s-pillarhero__panel">
+    {eyebrow && <span class="s-pillarhero__eyebrow">{eyebrow}</span>}
+    <h1 class="s-pillarhero__title" data-split="lines">
+      {lines.map((line, i) => (
+        <>
+          {i > 0 && <br />}
+          {line}
+        </>
+      ))}
+    </h1>
+  </div>
+</section>
+
+<style>
+  /* Volle Fensterbreite, unabhängig vom Container der Seite. Dieselbe
+     Technik wie `.s-benefits`: 100vw plus negativer Innenabstand, damit das
+     Bild randabfallend läuft, ohne dass die Seite waagerecht scrollt. */
+  .s-pillarhero {
+    position: relative;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    /* Die Fläche unten schließt bündig an — kein Abstand nach unten. */
+    margin-bottom: 0;
+  }
+
+  .s-pillarhero__media {
+    /* Bildhöhe aus dem Entwurf: 855 von 1728 Breite. Als Verhältnis notiert,
+       damit es auf jeder Breite hält, mit einer Untergrenze fürs Handy. */
+    aspect-ratio: 1728 / 855;
+    min-height: 420px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--c-dark) 12%, transparent);
+  }
+
+  /* :global(img) — das Bild kommt aus CmsImage.astro und trägt das
+     Scope-Attribut dieser Datei nicht. */
+  .s-pillarhero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* Die helle Fläche überlappt das Bild. `margin-top` negativ statt absolut
+     positioniert: Dadurch bestimmt der Inhalt die Höhe, und die Fläche
+     wächst mit, wenn die Überschrift dreizeilig wird. */
+  /* Schmaler als die Seite: Im Entwurf ist die Fläche 1431 von 1728 breit
+     und lässt links und rechts das Bild stehen. Genau das macht den Kopf aus
+     — eine Fläche über die volle Breite wäre nur ein Balken. */
+  .s-pillarhero__panel {
+    position: relative;
+    width: min(1440px, calc(100% - 2 * clamp(var(--sp-3), 6.9vw, 120px)));
+    margin-inline: auto;
+    margin-top: clamp(-220px, -17.6vw, -80px);
+    padding: clamp(var(--sp-6), 3.5vw, 60px) var(--site-gutter) 0;
+    border-start-start-radius: var(--r-xl);
+    border-start-end-radius: var(--r-xl);
+    background: var(--c-grey);
+    color: var(--c-dark);
+    text-align: center;
+  }
+
+  /* Die Fläche malt einen deckenden Grund und verdeckt damit die Körnung,
+     die `ui/Backdrop.astro` über die Seite legt. Ohne diese Auflage bricht
+     genau an ihrer Unterkante eine sichtbare Kante auf: oben glatt, unten
+     gekörnt — gemessen als rgb(214,214,214) gegen rgb(206,208,213).
+
+     `pointer-events: none` fehlt hier bewusst nicht: Ein Pseudoelement nimmt
+     ohnehin keine Zeigerereignisse an. */
+  .s-pillarhero__panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+    opacity: var(--grain-opacity-surface);
+    mix-blend-mode: multiply;
+    background-image: var(--grain-image);
+  }
+
+  /* Der Inhalt gehört über die Körnung. */
+  .s-pillarhero__eyebrow,
+  .s-pillarhero__title {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Der Punkt vor der Rubrik ist Zierde und steht deshalb im CSS. */
+  .s-pillarhero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-text-main);
+    line-height: 1.2;
+  }
+
+  .s-pillarhero__eyebrow::before {
+    content: "";
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: var(--r-round);
+    background: currentColor;
+  }
+
+  .s-pillarhero__title {
+    margin-top: clamp(var(--sp-4), 2vw, var(--sp-8));
+    font-family: var(--f-sans);
+    font-size: var(--fs-display-2);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  /* Die Rubrik steht im Entwurf links neben der Überschrift, die Überschrift
+     mittig. Ab hier wird beides linksbündig — sonst steht die Rubrik allein
+     auf weiter Fläche. */
+  @media (min-width: 1000px) {
+    .s-pillarhero__panel {
+      text-align: center;
+      padding-inline: clamp(var(--sp-6), 7vw, 120px);
+    }
+
+    .s-pillarhero__eyebrow {
+      position: absolute;
+      left: clamp(var(--sp-6), 7vw, 120px);
+      top: clamp(var(--sp-6), 3.5vw, 60px);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .s-pillarhero__media {
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>

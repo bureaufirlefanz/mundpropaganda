@@ -74,7 +74,7 @@ const categories = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
-    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+    gap: var(--flow-lg) var(--site-gutter);
   }
 
   @media (max-width: 1000px) {

@@ -37,12 +37,59 @@ const { locations } = await loadSettings();
    `locationsImages` gab es im Schema schon einmal und es erreichte nie ein
    Markup. Statt es zu entfernen, liest der Ring jetzt daraus: Wer eigene
    Standortfotos hochlädt, sieht sie hier. */
+/* Zehn Karten, gemischt: Räume, Details und Stimmungen im Wechsel.
+ *
+ * Vorher waren es fünf, und vier davon zeigten einen Raum mit einem Stuhl
+ * darin. Auf dem Zylinder sieht man drei bis vier Karten gleichzeitig — bei
+ * lauter Räumen las sich das als dieselbe Aufnahme in Varianten, und der Ring
+ * drehte sich, ohne dass sich etwas änderte.
+ *
+ * **Bewusst keine Behandlung.** Der Abschnitt heißt „Standorte" und
+ * beantwortet die Frage, wo man landet, nicht was dort mit einem geschieht.
+ * Ein Mundspiegel zwischen Empfang und Blumenvase wäre eine andere Frage.
+ * Einzige Ausnahme ist das Röntgengerät: Es ist Teil des Hauses und zeigt
+ * einen Raum, keinen Eingriff.
+ *
+ * Die Reihenfolge wechselt Nähe und Weite ab — Raum, Detail, Raum, Stimmung.
+ * Zwei Detailaufnahmen nebeneinander verlieren ihren Maßstab.
+ *
+ * ZWANZIG Karten, und die Zahl ist gerechnet, nicht gegriffen. Der Ring füllt
+ * auf ein VIELFACHES der Motivzahl auf, mindestens auf 20 (siehe
+ * `ImageRing`):
+ *
+ *     5 Motive  → ceil(20/5)  × 5  = 20 Karten
+ *    18 Motive  → ceil(20/18) × 18 = 36 Karten
+ *    20 Motive  → ceil(20/20) × 20 = 20 Karten
+ *
+ * Bei 18 hätte der Ring also 36 Bilder gleichzeitig im Dokument gehabt, fast
+ * doppelt so viele wie vorher — gemessen an einem Prüflauf, der dreimal
+ * hintereinander mit „Execution context was destroyed" abbrach, weil dem
+ * Renderer der Speicher ausging. Bei genau 20 gibt es keine Wiederholung und
+ * keine Karte zu viel.
+ *
+ * Das Röntgengerät stand hier und ist wieder raus: Es war der einzige
+ * Apparat zwischen lauter Räumen und Details, und genau das fiel auf. */
 const MOTIFS: RingImage[] = [
-  { name: "praxis-03", alt: "Behandlungsräume mit Tageslicht", caption: "Prenzlauer Allee" },
-  { name: "praxis-01", alt: "Empfangsbereich Prenzlauer Allee" },
-  { name: "praxis-02", alt: "Wartebereich Christburger Straße", caption: "Christburger Straße" },
-  { name: "abstract-01" },
-  { name: "abstract-02" },
+  { name: "empfang-p25", alt: "Empfang mit dem geschwungenen Bogen", caption: "Prenzlauer Allee" },
+  { name: "zahnleuchte", alt: "Leuchte in Form eines Zahns über dem Empfang" },
+  { name: "wartebereich", alt: "Wartebereich mit Holzbank am Fenster" },
+  { name: "blumen", alt: "Blumenstrauß auf der Ablage" },
+  { name: "behandlungszimmer-rot", alt: "Behandlungszimmer mit Tageslicht" },
+  { name: "waschbecken", alt: "Waschbecken mit Armatur in Messing" },
+  { name: "flur-rot", alt: "Flur mit roter Wand" },
+  { name: "empfang-c37", alt: "Empfang der zweiten Praxis", caption: "Christburger Straße" },
+  { name: "spiegel-detail", alt: "Handspiegel auf der Ablage" },
+  { name: "flur-bilder", alt: "Flur mit gerahmten Bildern und Sitzbank" },
+  { name: "tee-kueche", alt: "Teeküche mit Messingarmatur" },
+  { name: "behandlungszimmer-holz", alt: "Behandlungszimmer mit Blick ins Grüne" },
+  { name: "logo-glas", alt: "Der gezeichnete Zahn auf der Glastür" },
+  { name: "holzbank", alt: "Die geschwungene Holzbank im Wartebereich" },
+  { name: "waschbecken-blau", alt: "Waschbecken vor blauen Fliesen" },
+  { name: "flur-tueren", alt: "Flur mit den Türen zu den Behandlungszimmern" },
+  { name: "stern-detail", alt: "Das Zeichen der Praxis an der Wand" },
+  { name: "lichtfleck", alt: "Sonnenlicht auf der roten Wand" },
+  { name: "schild-kottbussertor", alt: "Das Schild im Eingang" },
+  { name: "fassade-p25", alt: "Die Fassade von der Straße aus" },
 ];
 
 /* Gepflegte Bilder gewinnen als GANZE Liste, nicht Karte für Karte: Der Ring
@@ -53,9 +100,9 @@ const ringImages: RingImage[] = images?.length
   : MOTIFS;
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            UNSERE STANDORTE — horizontal laufende Bildreihe
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-gallery" id="standorte" data-gallery>
         <h2 class="s-gallery__title" data-split="lines">{title}</h2>
 
@@ -65,25 +112,25 @@ const ringImages: RingImage[] = images?.length
           <Fragment>
           <div class="s-gallery__track" data-gallery-track>
             <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="abstract-02" alt="" sizes="10vw" parallax="9" />
+              <Picture name="zahnleuchte" alt="" sizes="10vw" parallax="9" />
             </figure>
             <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="praxis-01" alt="Empfangsbereich Prenzlauer Allee" sizes="20vw" parallax="9" />
+              <Picture name="empfang-p25" alt="Empfang mit dem geschwungenen Bogen" sizes="20vw" parallax="9" />
             </figure>
             <figure class="s-gallery__item s-gallery__item--lg">
-              <Picture name="praxis-03" alt="Behandlungsräume mit Tageslicht" sizes="45vw" parallax="9" />
+              <Picture name="behandlungszimmer-rot" alt="Behandlungszimmer mit Tageslicht" sizes="45vw" parallax="9" />
               <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
             </figure>
             <figure class="s-gallery__item s-gallery__item--md">
-              <Picture name="praxis-02" alt="Wartebereich Christburger Straße" sizes="20vw" parallax="9" />
+              <Picture name="wartebereich" alt="Wartebereich mit Holzbank am Fenster" sizes="20vw" parallax="9" />
               <figcaption class="s-gallery__caption">Christburger Straße</figcaption>
             </figure>
             <figure class="s-gallery__item s-gallery__item--sm">
-              <Picture name="abstract-01" alt="" sizes="10vw" parallax="9" />
+              <Picture name="waschbecken" alt="" sizes="10vw" parallax="9" />
             </figure>
           </div>
 
-          <!-- Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. -->
+          {/* Slider-Steuerung: Pfeile links, Punkte rechts — wie im Entwurf. */}
           <div class="container s-gallery__nav" data-reveal="fade">
             <div class="s-gallery__arrows">
               <button class="s-gallery__arrow" data-gallery-prev type="button" aria-label="Vorheriger Standort">
@@ -129,7 +176,7 @@ const ringImages: RingImage[] = images?.length
   .s-gallery__title {
     text-align: center;
     margin-bottom: var(--sp-6);
-    font-size: clamp(2rem, 3.2vw, 3.5rem);
+    font-size: var(--fs-h1-xs);
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -178,7 +225,7 @@ const ringImages: RingImage[] = images?.length
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     font-family: var(--f-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--c-dark);
@@ -238,7 +285,7 @@ const ringImages: RingImage[] = images?.length
     margin-bottom: calc(var(--sp-8) - 0.205em);
     font-family: var(--f-sans);
     font-weight: 500;
-    font-size: clamp(3.5rem, 16.4vw, 17.75rem);
+    font-size: var(--fs-display-xl);
     line-height: 1;
     letter-spacing: -0.019em;
     color: transparent;
@@ -291,6 +338,9 @@ const ringImages: RingImage[] = images?.length
       padding-block: var(--sp-8);
     }
 
+    /* Eigene Rampe statt --fs-display-xl: Auf einer Spalte soll die
+       Konturschrift die Breite ausnutzen, nicht der Leiter folgen. 24vw ist
+       daran gemessen, nicht daran, wo die Stufe läge. */
     .s-cols__item .s-cols__display {
       font-size: clamp(3.5rem, 24vw, 8rem);
     }

@@ -18,9 +18,9 @@ interface Props {
 const { lines } = Astro.props;
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            HERO — Wortmarke mit dem Zahn zwischen den Zeilen
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-hero" data-hero>
         <ToothLines />
 
@@ -39,18 +39,18 @@ const { lines } = Astro.props;
             <h1 class="s-hero__wordmark">
               <span class="s-hero__word" data-hero-word>Mund</span>
 
-              <!-- Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
+              {/* Zwei Ebenen: außen der Scroll-Parallax, innen der Auftritt.
                    Beide schreiben sonst dieselbe Transform und überschreiben
-                   sich gegenseitig, sobald man während des Intros scrollt. -->
+                   sich gegenseitig, sobald man während des Intros scrollt. */}
               <span class="s-hero__tooth" data-hero-tooth>
-                <!-- Dritte Ebene für die Zeigernähe: Auftritt (innen) und
+                {/* Dritte Ebene für die Zeigernähe: Auftritt (innen) und
                      Scroll-Parallax (außen) schreiben beide transform, eine
-                     gemeinsame Ebene würde sich gegenseitig überschreiben. -->
+                     gemeinsame Ebene würde sich gegenseitig überschreiben. */}
                 <span class="s-hero__tooth-drift" data-hero-tooth-drift>
                 <span class="s-hero__tooth-inner" data-hero-tooth-inner>
-                  <!-- Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
+                  {/* Eigene Ebene für den Backdrop-Blur: sie trägt dieselbe
                        Alphamaske wie der Zahn, dadurch wird nur das milchglasig,
-                       was tatsächlich hinter dem Objekt liegt. -->
+                       was tatsächlich hinter dem Objekt liegt. */}
                   <span class="s-hero__tooth-glass"></span>
                   <Picture name="tooth-3d" alt="" sizes="(max-width: 900px) 60vw, 29vw" eager />
                 </span>
@@ -453,10 +453,10 @@ const { lines } = Astro.props;
       /* Steht als Größe da, weil die Lage des Blocks weiter unten damit
          rechnet — zwei getrennte Werte liefen beim nächsten Eingriff
          auseinander. */
-      --hero-kopf: clamp(88px, 22vw, 120px);
+      --hero-head: clamp(88px, 22vw, 120px);
 
       min-height: 100svh;
-      padding-top: var(--hero-kopf);
+      padding-top: var(--hero-head);
       /* Knapp: Die Bewertungsleiste soll unten stehen, nicht darüber
          schweben. Den Platz für sie hält der Innenabstand am Innenblock
          frei, nicht dieser hier. */
@@ -503,7 +503,7 @@ const { lines } = Astro.props;
          dem er hängt. */
       gap: clamp(var(--sp-8), 25vh, 240px);
       width: 100%;
-      margin-top: max(0px, calc(50vh - 42.9vw - var(--hero-kopf)));
+      margin-top: max(0px, calc(50vh - 42.9vw - var(--hero-head)));
       margin-inline: 0;
       margin-bottom: 0;
     }
@@ -554,7 +554,7 @@ const { lines } = Astro.props;
        für zwei Spalten keinen Platz. */
     .s-hero__meta p {
       max-width: none;
-      font-size: 0.8125rem;
+      font-size: var(--fs-label-md);
     }
 
     /* Die rechte Spalte bleibt rechtsbündig — sie ist der Gegenpol zur

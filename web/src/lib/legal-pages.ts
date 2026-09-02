@@ -16,7 +16,7 @@ import { LEGAL_PAGES_QUERY, LEGAL_PAGE_QUERY } from "./queries";
  * zu zeigen. Genau das ist jetzt aufgelöst.
  *
  * Kein Rückfall auf eingebauten Text. Ein Impressum, das die Website selbst
- * mitbringt, wäre die gefährlichste Slocations Platzhalter: Es sieht vollständig
+ * mitbringt, wäre die gefährlichste Sorte Platzhalter: Es sieht vollständig
  * aus, steht unter fremdem Namen und ist rechtlich falsch.
  */
 

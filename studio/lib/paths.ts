@@ -70,10 +70,19 @@ const TOP_LEVEL = ["pillar", "legalPage"];
 const DIRECTORIES: Record<string, string> = {
   service: "leistungen",
   post: "magazin",
-  /* Eine Person liegt unter der Praxisseite, nicht auf eigener Ebene: Sie
-     ist kein selbständiges Thema, sondern ein Teil des Teams — und wer die
-     Adresse kürzt, landet dort, wo alle stehen. */
-  person: "praxis",
+  /* `person` steht hier vorerst NICHT.
+     Der Eintrag lautete `person: "praxis"`, und er stimmte, solange es
+     Personenseiten gab. Seit der Team-Abschnitt nur noch Porträts zeigt,
+     werden sie nicht mehr gebaut (siehe `web/src/pages/praxis/[slug].astro`).
+     Stünde der Eintrag weiter hier, böte das Studio bei jeder Person einen
+     Verweis auf eine Adresse an, die 404 liefert — und das ist schlechter
+     als kein Verweis.
+
+     Zurück gehört er, sobald der Schalter in jener Datei wieder auf true
+     steht: der Typ `person` mit dem Verzeichnis `praxis`, so wie er hier
+     stand. Ausgeschrieben steht die Zeile bewusst NICHT im Kommentar — sie
+     wäre von einem Parser nicht von einem echten Eintrag zu unterscheiden.
+  */
 };
 
 /** Einzeldokumente und ihr fester Pfad. */

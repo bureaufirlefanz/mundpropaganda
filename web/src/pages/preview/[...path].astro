@@ -154,6 +154,7 @@ if (target.kind === "homepage") {
   <Service
     data={content.service}
     title={content.title}
+    slug={target.slug ?? ""}
     stories={content.homepage?.storiesItems ?? []}
     posts={content.posts}
   />

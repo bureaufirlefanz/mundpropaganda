@@ -25,18 +25,18 @@ interface Props {
 const { topline, title, text, posts } = Astro.props;
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            MAGAZIN — Wortmarke auf Markerbalken, daneben der Einstieg,
            darunter ein Karussell aus Bild + überlappender weißer Karte
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-magazine" id="magazin" data-magazine>
         <div class="container">
           <span class="c-topline" data-reveal="fade">{topline}</span>
 
           <div class="s-magazine__head">
-            <!-- Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
+            {/* Die Balken sind Flächen hinter der Schrift, keine Textfarbe.
                  Leicht gegeneinander gedreht, das „ZU" liegt als weiße
-                 Plakette dazwischen. -->
+                 Plakette dazwischen. */}
             <div class="s-magazine__type" data-reveal="up">
               <span class="s-magazine__bar">Mund</span>
               <span class="s-magazine__chip">zu</span>
@@ -121,7 +121,7 @@ const { topline, title, text, posts } = Astro.props;
     color: var(--c-dark);
     font-family: var(--f-sans);
     font-weight: 500;
-    font-size: clamp(3rem, 11.6vw, 12.5rem);
+    font-size: var(--fs-display-lg);
     line-height: 0.86;
     letter-spacing: -0.03em;
     text-transform: uppercase;
@@ -151,7 +151,7 @@ const { topline, title, text, posts } = Astro.props;
     color: var(--c-dark);
     font-family: var(--f-sans);
     font-weight: 500;
-    font-size: clamp(1.5rem, 5.2vw, 5.625rem);
+    font-size: var(--fs-display-sm);
     line-height: 1;
     letter-spacing: -0.02em;
     text-transform: uppercase;

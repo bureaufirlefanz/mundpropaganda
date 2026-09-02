@@ -55,6 +55,35 @@ export function initAnchors() {
       e.preventDefault();
       if (lenis) lenis.scrollTo(target, { offset: -100 });
       else target.scrollIntoView({ behavior: "smooth" });
+
+      /* Den Fokus mitnehmen, nicht nur das Bild.
+       *
+       * `preventDefault()` oben nimmt dem Browser die Sprungmarke aus der
+       * Hand — und damit auch das, was er dabei sonst erledigt: den Fokus auf
+       * das Ziel setzen. Ohne diese Zeilen scrollt die Seite, während der
+       * Fokus auf dem Verweis stehen bleibt. Der nächste Tabulatorschritt
+       * führt dann zurück in das Verzeichnis, aus dem man gerade gesprungen
+       * ist, statt in den Abschnitt, den man lesen wollte.
+       *
+       * Am deutlichsten war es am Sprung zum Inhalt: Auf der Startseite steht
+       * `#main` ganz oben, es gab also nichts zu scrollen. Ein Klick bewirkte
+       * sichtbar gar nichts, und der Sprung sah kaputt aus — er war es auch,
+       * nur nicht dort, wo man hinsah.
+       *
+       * `tabindex="-1"` nur, wo es fehlt: Ein Abschnitt ist von sich aus
+       * nicht fokussierbar. Das Attribut wird nach dem Verlassen wieder
+       * entfernt, damit im Dokument keine Spur bleibt, die niemand gesetzt
+       * hat.
+       *
+       * `preventScroll: true`, weil sonst der Browser zusätzlich springt und
+       * gegen die weiche Bewegung von Lenis arbeitet. */
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+        target.addEventListener("blur", () => target.removeAttribute("tabindex"), {
+          once: true,
+        });
+      }
+      target.focus({ preventScroll: true });
     });
   });
 }

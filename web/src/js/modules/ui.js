@@ -28,6 +28,20 @@ export function initAccordion() {
       gsap.set(panel, { height: startOpen ? "auto" : 0 });
       trigger.setAttribute("aria-expanded", String(startOpen));
 
+      /* `inert` auf dem zugeklappten Panel.
+       *
+       * `height: 0` mit `overflow: hidden` versteckt den Inhalt für das Auge,
+       * nimmt ihn aber NICHT aus dem Tabulatorlauf. Auf der Karriereseite lief
+       * der Fokus dadurch in jedes zugeklappte Stellenpanel und landete auf
+       * „Auf diese Stelle bewerben" — einem Knopf, den niemand sehen konnte.
+       * Gemessen im Tastaturlauf: fünf solcher Stationen hintereinander.
+       *
+       * `inert` und nicht `hidden`: `hidden` setzt `display: none`, und dann
+       * gibt es keine Höhe mehr zu animieren — das Auf- und Zuklappen
+       * springt. `inert` lässt die Darstellung in Ruhe und nimmt nur die
+       * Bedienbarkeit weg, also genau das, was hier zu viel war. */
+      panel.inert = !startOpen;
+
       trigger.addEventListener("click", () => {
         const isOpen = item.dataset.open === "true";
 
@@ -38,7 +52,11 @@ export function initAccordion() {
             other
               .querySelector("[data-accordion-trigger]")
               ?.setAttribute("aria-expanded", "false");
-            gsap.to(other.querySelector("[data-accordion-panel]"), {
+            const anderes = other.querySelector("[data-accordion-panel]");
+            /* Sofort sperren, nicht erst nach der Bewegung: Wer währenddessen
+               Tab drückt, käme sonst noch in ein Panel, das gerade zugeht. */
+            if (anderes) anderes.inert = true;
+            gsap.to(anderes, {
               height: 0,
               duration: 0.45,
               ease: "power3.inOut",
@@ -48,6 +66,11 @@ export function initAccordion() {
 
         item.dataset.open = String(!isOpen);
         trigger.setAttribute("aria-expanded", String(!isOpen));
+        /* Beim Aufklappen sofort freigeben, beim Zuklappen sofort sperren.
+           In beiden Richtungen gilt: erst die Bedienbarkeit, dann die
+           Bewegung — sonst hängt der Tabulatorlauf eine halbe Sekunde
+           hinter dem her, was zu sehen ist. */
+        panel.inert = isOpen;
         gsap.to(panel, {
           height: isOpen ? 0 : "auto",
           duration: 0.5,
@@ -72,7 +95,7 @@ export function initBeforeAfter() {
       /* Der Wert muss auch angesagt werden, nicht nur gezeichnet: ohne
          aria-valuenow liest ein Vorlesegerät den Regler als leer vor. */
       handle.setAttribute("aria-valuenow", String(Math.round(position)));
-      handle.setAttribute("aria-valuetext", `${Math.round(position)} % after`);
+      handle.setAttribute("aria-valuetext", `${Math.round(position)} % nachher`);
     };
 
     const setPos = (clientX) => {
@@ -125,11 +148,77 @@ export function initBeforeAfter() {
    Form-Handling" — stammte aus einer Zukunft, die es nicht mehr gibt.)
    -------------------------------------------------------------------- */
 
+/**
+ * Der Grund im Klartext (WCAG 2.2, 3.3.1 Error Identification und 3.3.3 Error
+ * Suggestion).
+ *
+ * Aus dem ValidityState und nicht als Text an jedem Feld: Der Browser weiß
+ * bereits, WAS nicht stimmt — fehlender Pflichtwert, falsches Format, zu kurz.
+ * Diese Unterscheidung hier einmal in Worte zu fassen ist verlässlicher, als
+ * sie an fünfzehn Feldern zu wiederholen und beim sechzehnten zu vergessen.
+ *
+ * Jede Meldung nennt auch, was zu tun ist. „Ungültige Eingabe" erfüllt 3.3.1,
+ * aber nicht 3.3.3 — der Hinweis muss auf die Lösung zeigen.
+ */
+function fehlertext(input) {
+  const v = input.validity;
+  const art = (input.type || "").toLowerCase();
+
+  if (v.valueMissing) {
+    if (art === "checkbox") return "Bitte setze den Haken, um fortzufahren.";
+    if (input.tagName === "SELECT") return "Bitte wähle einen Eintrag aus der Liste.";
+    return "Bitte fülle dieses Feld aus.";
+  }
+  if (v.typeMismatch) {
+    if (art === "email") return "Bitte gib eine E-Mail-Adresse mit @ an, etwa name@beispiel.de.";
+    if (art === "tel") return "Bitte gib eine Telefonnummer an, nur Ziffern und Leerzeichen.";
+    if (art === "url") return "Bitte gib eine vollständige Adresse an, beginnend mit https://.";
+    return "Bitte prüfe das Format dieser Eingabe.";
+  }
+  if (v.tooShort) return `Bitte gib mindestens ${input.minLength} Zeichen ein.`;
+  if (v.tooLong) return `Bitte kürze auf höchstens ${input.maxLength} Zeichen.`;
+  if (v.rangeUnderflow) return `Bitte wähle einen Wert ab ${input.min}.`;
+  if (v.rangeOverflow) return `Bitte wähle einen Wert bis höchstens ${input.max}.`;
+  if (v.stepMismatch) return "Bitte wähle einen der zulässigen Schritte.";
+  if (v.patternMismatch) return "Bitte halte dich an das vorgegebene Format.";
+  return "Bitte prüfe diese Eingabe.";
+}
+
+/**
+ * Meldung setzen oder räumen — und die Verknüpfung gleich mit.
+ *
+ * `aria-describedby` ist der Faden zwischen Feld und Grund. Ohne ihn liest ein
+ * Vorlesegerät zwar „ungültig" (aus `aria-invalid`), findet den danebenstehenden
+ * Satz aber nicht: Er gehört zu keinem Feld, er steht nur zufällig in der Nähe.
+ *
+ * Beim Räumen wird der Faden wieder gelöst statt auf eine leere Meldung zu
+ * zeigen — eine Beschreibung, die ins Leere greift, ist schlechter als keine.
+ */
+function meldung(field, input, text) {
+  const el = field.querySelector(".c-field__message");
+  if (!el) return;
+
+  if (text) {
+    el.textContent = text;
+    el.hidden = false;
+    if (el.id) input.setAttribute("aria-describedby", el.id);
+  } else {
+    el.textContent = "";
+    el.hidden = true;
+    if (el.id && input.getAttribute("aria-describedby") === el.id) {
+      input.removeAttribute("aria-describedby");
+    }
+  }
+}
+
 export function initForm() {
   document.querySelectorAll("[data-form]").forEach((form) => {
+    const status = form.querySelector("[data-form-status]");
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       let firstInvalid = null;
+      let anzahl = 0;
 
       form.querySelectorAll("[data-field]").forEach((field) => {
         const input = field.querySelector("input, textarea, select");
@@ -141,10 +230,21 @@ export function initForm() {
            `aria-invalid` ist die Auskunft fürs Vorlesegerät. */
         if (invalid) input.setAttribute("aria-invalid", "true");
         else input.removeAttribute("aria-invalid");
+        meldung(field, input, invalid ? fehlertext(input) : "");
+        if (invalid) anzahl++;
         if (invalid && !firstInvalid) firstInvalid = field;
       });
 
       if (firstInvalid) {
+        /* Die Zusammenfassung wird angesagt, das einzelne Feld nicht: Der
+           Fokus springt gleich dorthin, und `aria-describedby` liefert den
+           Grund dann von selbst. Beides zugleich läse denselben Satz zweimal. */
+        if (status) {
+          status.textContent =
+            anzahl === 1
+              ? "Ein Feld braucht noch eine Angabe. Der Fokus steht darauf."
+              : `${anzahl} Felder brauchen noch eine Angabe. Der Fokus steht auf dem ersten.`;
+        }
         gsap.fromTo(
           firstInvalid,
           { x: -6 },
@@ -156,14 +256,28 @@ export function initForm() {
 
       const button = form.querySelector('[type="submit"] .c-btn__label');
       if (button) button.textContent = "Danke - wir melden uns";
+      /* WCAG 2.2, 4.1.3: Die geänderte Aufschrift des Knopfes ist eine
+         Änderung im Dokument, keine Meldung. Ohne diese Zeile erfährt niemand
+         davon, der nicht gerade hinsieht. */
+      if (status) {
+        status.textContent =
+          "Danke, deine Anfrage ist eingegangen. Wir melden uns in Kürze.";
+      }
     });
 
     // Fehlerzustand verschwindet, sobald der Nutzer korrigiert.
     form.querySelectorAll("[data-field]").forEach((field) => {
-      field.addEventListener("input", (e) => {
+      const raeumen = (e) => {
         if (field.dataset.invalid === "true") field.dataset.invalid = "false";
-        if (e.target.removeAttribute) e.target.removeAttribute("aria-invalid");
-      });
+        const input = e.target;
+        if (input.removeAttribute) input.removeAttribute("aria-invalid");
+        meldung(field, input, "");
+      };
+      field.addEventListener("input", raeumen);
+      /* `change` zusätzlich: Ein Häkchen und eine Auswahlliste lösen kein
+         `input` in jedem Browser aus, die Meldung bliebe dort stehen,
+         nachdem sie erledigt ist. */
+      field.addEventListener("change", raeumen);
     });
 
     // Dateiname in die gestylte Hülle spiegeln.

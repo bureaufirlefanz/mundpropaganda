@@ -1,6 +1,11 @@
 ---
 /**
- * Der Kopf der Karriereseite: Wortmarke, darunter das Bild als Bogen.
+ * Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen.
+ *
+ * Zwei Seiten, ein Baustein. Die Praxisseite hatte einen eigenen Kopf
+ * (`PracticeHero`) mit zweispaltigem Text und zwei versetzten Bildern. Der
+ * ist entfallen: Beide Seiten stellen dieselbe Frage — wo lande ich, und bei
+ * wem — und beantworten sie am besten mit einem Wort und einem Raum.
  *
  * Anders als `ServiceHero`, und aus einem Grund: Eine Leistungsseite muss
  * erklären, was sie anbietet — dort trägt der Kopf Topline, Titel und einen
@@ -28,9 +33,33 @@ interface Props {
   topline?: string;
   image?: ImageSource;
   alt?: string;
+  /**
+   * Das gestaltete Ersatzmotiv, solange im Studio keines hängt.
+   *
+   * Wählbar, seit dieser Kopf auch die Praxisseite trägt: Dort wäre ein
+   * Behandlungsbild das falsche Versprechen — man will die Räume sehen, nicht
+   * den Stuhl. Voreinstellung bleibt die Karriereseite.
+   */
+  fallback?: string;
+  /**
+   * Ob das Bild beim Scrollen auf Vollbild aufzieht.
+   *
+   * Wahlfrei und aus: Auf der Karriereseite steht der Kopf für sich, dort
+   * wäre das eine Bewegung ohne Anlass. Auf der Praxisseite trägt sie den
+   * Übergang vom Kopf in die Seite — man fährt in den Raum hinein, in den
+   * man kommt.
+   */
+  zoom?: boolean;
 }
 
-const { title, topline, image, alt = "" } = Astro.props;
+const {
+  title,
+  topline,
+  image,
+  alt = "",
+  fallback = "team-management",
+  zoom = false,
+} = Astro.props;
 ---
 
 <section class="s-chero">
@@ -45,7 +74,23 @@ const { title, topline, image, alt = "" } = Astro.props;
         zerlegt sieht aus wie eine Ladeanimation. */}
     <h1 class="s-chero__title" data-split="lines">{title}</h1>
 
-    <div class="s-chero__media" data-reveal="scale">
+    {/* Einblendung NUR ohne Zoom.
+
+       Beide schreiben `transform`, und `reveal.js` fährt am Ende jeder
+       Variante `REST` an — darin steht `scale: 1`. Lagen beide auf demselben
+       Element, überschrieb die Einblendung den Zoom, sobald sie fertig war:
+       Der Maßstab sprang zurück auf 1, das Bild blieb in seinem Kasten.
+       Gemessen als `translate(0px, 0px)` in der inline-Angabe, wo
+       `scale(1.0588)` stehen sollte.
+
+       Auch `fade` hilft nicht — `REST` gilt für alle Varianten. Deshalb keine
+       Einblendung, sondern gar keine: Das Kopfbild steht über der Falz und
+       ist von der ersten Sekunde an zu sehen. Seine Bewegung ist der Zoom. */}
+    <div
+      class="s-chero__media"
+      data-reveal={zoom ? undefined : "scale"}
+      data-chero-zoom={zoom ? "" : undefined}
+    >
       {isCmsImage(image) ? (
         <CmsImage
           source={image}
@@ -55,7 +100,7 @@ const { title, topline, image, alt = "" } = Astro.props;
           eager
         />
       ) : (
-        <Picture name="treatment-02" alt={alt} sizes="(max-width: 900px) 92vw, 94vw" eager />
+        <Picture name={fallback} alt={alt} sizes="(max-width: 900px) 92vw, 94vw" eager />
       )}
     </div>
 
@@ -115,6 +160,31 @@ const { title, topline, image, alt = "" } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* Das Aufziehen.
+
+     Das Bild sitzt im Fluss und bekommt beim Scrollen einen Maßstab, bis es
+     den Bildschirm deckt. Danach läuft die Seite gewöhnlich weiter — es gibt
+     kein Pinning, keine Extrastrecke, keine Bühne.
+
+     `transform-origin: center top`: Es soll nach unten und zu den Seiten
+     aufmachen, nicht nach oben unter die Navigation schieben.
+
+     `will-change` nur solange nötig — das setzt das Modul, nicht diese Regel:
+     eine dauerhafte Kompositionsebene für ein Bild dieser Größe kostet
+     Speicher, den man auf einem Telefon merkt. */
+  .s-chero__media[data-chero-zoom] {
+    /* Oben mittig: Das Bild macht nach unten und zu den Seiten auf und
+       schiebt sich nicht nach oben unter die Navigationsleiste. */
+    transform-origin: top center;
+  }
+
+  /* Ohne Bewegung passiert nichts — der Kopf steht, wie er steht. */
+  @media (prefers-reduced-motion: reduce) {
+    .s-chero__media[data-chero-zoom] {
+      transform: none !important;
+    }
   }
 
   @media (max-width: 900px) {

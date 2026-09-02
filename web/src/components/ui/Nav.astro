@@ -8,8 +8,14 @@
  * zwei verschiedene Sätze — „Direkt" am Schreibtisch, „Praxis" am Telefon —
  * ohne dass ein Grund dafür erkennbar wäre; es war schlicht zweimal getipptes
  * Markup.
+ *
+ * Die vierte Spalte trägt jetzt das Werbefeld (`ui/NavPromo.astro`) statt
+ * einer weiteren Linkliste. `menuColumns` aus dem Studio wird deshalb nicht
+ * mehr gerendert — siehe die Notiz am Aufrufort weiter unten.
  */
 import Button from "./Button.astro";
+import NavPromo from "./NavPromo.astro";
+import { navPromo } from "../../content/nav-promo";
 import { loadServiceList, forGroup, servicePath, GROUPS } from "../../lib/service-list";
 import { loadNavigation, resolved } from "../../lib/navigation";
 
@@ -22,17 +28,18 @@ const here = Astro.url.pathname;
 const mainMenu = await resolved(nav?.mainMenu, here);
 const action = (await resolved([nav?.action ?? null], here))[0];
 
-/* Die Zusatzspalten, jede für sich aufgelöst. Ein Verweis ohne Ziel fällt
-   dabei heraus, eine Spalte ohne Verweise ebenfalls — statt eine leere
-   Überschrift stehen zu lassen. */
-const extraColumns = (
-  await Promise.all(
-    (nav?.menuColumns ?? []).map(async (col) => ({
-      title: col?.title ?? "",
-      links: await resolved(col?.links, here),
-    }))
-  )
-).filter((col) => col.title && col.links.length > 0);
+/* Drei Leistungsgruppen plus Werbefeld ergeben die vier Spalten des Rasters.
+   `menuColumns` aus dem Studio wird hier bewusst nicht mehr gelesen:
+
+   Das Feld trug genau eine Spalte („Direkt") mit vier Verweisen, die alle
+   schon im Hauptmenü oder im Fuß stehen. Ein zweiter Weg zu denselben vier
+   Seiten ist kein Gewinn, die Stelle ist die auffälligste im Menü — dort
+   steht jetzt der Verweis auf die Pillar Page.
+
+   **Das Feld gehört damit aus dem Schema.** Solange es im Studio steht und
+   hier niemand es liest, verspricht die Oberfläche eine Wirkung, die es nicht
+   gibt — genau die Sorte Lüge, die Stufe 2 des Umbaus beseitigt hat. Das
+   Schema anzufassen ist aber nicht Teil dieser Aufgabe (Briefing §4). */
 
 ---
 
@@ -86,14 +93,9 @@ const extraColumns = (
         </div>
       ))}
 
-      {extraColumns.map((column) => (
-        <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{column.title}</p>
-          {column.links.map((l) => (
-            <a class="c-megamenu__link" href={l.href}>{l.text}</a>
-          ))}
-        </div>
-      ))}
+      <div class="c-megamenu__promo" data-megamenu-item>
+        <NavPromo {...navPromo} />
+      </div>
     </div>
   </div>
 
@@ -111,14 +113,9 @@ const extraColumns = (
           ))}
         </div>
       ))}
-      {extraColumns.map((column) => (
-        <div data-megamenu-item>
-          <p class="c-megamenu__col-title">{column.title}</p>
-          {column.links.map((l) => (
-            <a class="c-megamenu__link" href={l.href}>{l.text}</a>
-          ))}
-        </div>
-      ))}
+      <div class="c-megamenu__promo" data-megamenu-item>
+        <NavPromo {...navPromo} />
+      </div>
     </div>
   </div>
 </header>
@@ -186,7 +183,7 @@ const extraColumns = (
     background: color-mix(in srgb, var(--c-white) 72%, transparent);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    box-shadow: 0 8px 32px -14px rgb(64 50 41 / 0.16);
+    box-shadow: var(--shadow-bar);
   }
 
   /* Die Leiste fährt als Teil der Hero-Choreografie von oben herein
@@ -236,7 +233,7 @@ const extraColumns = (
     padding: 7px 10px;
     font-family: var(--f-mono);
     font-weight: 300;
-    font-size: 0.8125rem;
+    font-size: var(--fs-label-md);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     border-radius: var(--r-sm);
@@ -294,7 +291,7 @@ const extraColumns = (
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     border-radius: var(--r-lg);
-    box-shadow: 0 24px 56px -24px rgb(64 50 41 / 0.22);
+    box-shadow: var(--shadow-panel);
     overflow: hidden;
     visibility: hidden;
     height: 0;
@@ -318,12 +315,30 @@ const extraColumns = (
     visibility: visible;
   }
 
+  /* Die Innenabstände stehen als eigene Werte, weil das Werbefeld sie
+     zurückrechnet — es soll am Rand des Panels sitzen, nicht auf der Flucht
+     der Textspalten. Fest verdrahtet ließen sich die drei Zahlen nur an zwei
+     Stellen gleichzeitig ändern. */
   .c-megamenu__inner {
+    --menu-pad-x: clamp(24px, 3vw, 48px);
+    --menu-pad-top: var(--sp-6);
+    --menu-pad-bottom: var(--sp-8);
+    --menu-promo-inset: var(--sp-1);
+
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--site-gutter);
-    padding-inline: clamp(24px, 3vw, 48px);
-    padding-block: var(--sp-6) var(--sp-8);
+    padding: var(--menu-pad-top) var(--menu-pad-x) var(--menu-pad-bottom);
+  }
+
+  /* Nach außen bis auf `--menu-promo-inset` an die Panelkante, nach innen
+     bleibt die Rasterlücke stehen. Dadurch ist das Feld höher als die
+     Linkspalten daneben und liest sich als eigene Fläche, nicht als vierte
+     Spalte mit Bild. */
+  .c-megamenu__promo {
+    margin-top: calc(var(--menu-promo-inset) - var(--menu-pad-top));
+    margin-right: calc(var(--menu-promo-inset) - var(--menu-pad-x));
+    margin-bottom: calc(var(--menu-promo-inset) - var(--menu-pad-bottom));
   }
 
   .c-megamenu__col-title {
@@ -400,6 +415,14 @@ const extraColumns = (
     .c-megamenu__inner {
       grid-template-columns: 1fr;
       gap: var(--sp-6);
+    }
+
+    /* Einspaltig sitzt das Feld unten in der Liste. Zöge es dort nach oben,
+       liefe es in die letzte Leistungsgruppe hinein. */
+    .c-megamenu__promo {
+      margin-top: 0;
+      margin-left: calc(var(--menu-promo-inset) - var(--menu-pad-x));
+      margin-right: calc(var(--menu-promo-inset) - var(--menu-pad-x));
     }
   }
 </style>

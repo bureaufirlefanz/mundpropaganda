@@ -1,0 +1,296 @@
+---
+/**
+ * Das Inhaltsverzeichnis einer Pillar Page (Figma 177:2107).
+ *
+ * Der Aufbau, wie er im Entwurf steht:
+ *
+ *   - Die dunkle Fläche läuft **links aus dem Bild heraus** und endet bei
+ *     etwa 55 % der Breite. Oben und unten steht der Seitengrund.
+ *   - Das Porträt liegt rechts daneben, gerundet, und **überragt die Fläche
+ *     oben wie unten**. Dieses Übersteh ist der Kniff des Abschnitts; ohne
+ *     ihn stehen zwei gleich hohe Kästen nebeneinander.
+ *   - Darunter, rechtsbündig unter der dunklen Fläche, die Bildunterschrift.
+ *
+ * Aus dem Entwurf, gegen Tokens gelegt:
+ *
+ *   - Fläche `#403229` → `--c-dark`, Schrift `#d6d6d6` → `--c-grey`
+ *   - Nummernkreis `#ff84c8` → `--c-brand`, Ziffer in `--c-dark`
+ *   - Überschrift 40px → `--fs-h3`, Einträge → `--fs-h5`
+ *   - Ziffer in GT Pressura Mono → `--f-mono`
+ *
+ * ── Warum die Nummern im Markup stehen ───────────────────────────────────
+ *
+ * Dieselbe Nummer steht am Abschnitt selbst und in der Abschnittsnavigation.
+ * Wer „7" liest, soll „7" wiederfinden. Ein `counter()` im CSS wäre für ein
+ * Vorleseprogramm unsichtbar.
+ *
+ * ── Die Einträge sind nicht gepflegt ─────────────────────────────────────
+ *
+ * Sie entstehen aus den Abschnitten der Seite, wie die Sprungmarken und die
+ * Abschnittsnavigation. Eine gepflegte Liste liefe auseinander, sobald jemand
+ * einen Abschnitt umbenennt — und zwar lautlos.
+ */
+import CmsImage from "../ui/CmsImage.astro";
+import type { Heading } from "../../lib/table-of-contents";
+import type { ImageSource } from "../../lib/images";
+
+interface Props {
+  headings: Heading[];
+  headline?: string;
+  /** Das Porträt rechts. Ohne eines nimmt die Fläche die volle Breite. */
+  image?: ImageSource;
+  alt?: string;
+  /** Steht rechtsbündig unter der Fläche, z. B. der Name der Person. */
+  caption?: string;
+}
+
+const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
+---
+
+{headings.length > 0 && (
+  <section class="s-contents">
+    <div class="s-contents__inner">
+      <div class="s-contents__panel">
+          <h2 class="s-contents__title" id="inhalt" data-split="lines">{headline}</h2>
+
+          <ol class="s-contents__list" aria-labelledby="inhalt" data-reveal-stagger="0.03">
+            {headings.map((h, i) => (
+              <li class="s-contents__item" data-reveal-child>
+                <a class="s-contents__link" href={`#${h.id}`}>
+                  <span class="c-number s-contents__num" aria-hidden="true">{i + 1}</span>
+                  <span class="s-contents__label">{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+      </div>
+
+      {image && (
+        <figure class="s-contents__media" data-reveal="scale">
+          <CmsImage source={image} alt={alt} widths={[640, 1024, 1600]} sizes="(max-width: 1000px) 100vw, 45vw" />
+        </figure>
+      )}
+
+      {caption && <p class="s-contents__caption">{caption}</p>}
+    </div>
+  </section>
+)}
+
+<style>
+  /* Volle Fensterbreite: Die dunkle Fläche läuft links aus dem Bild.
+     Dieselbe Technik wie `.s-benefits`. */
+  .s-contents {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    /* Platz für den Übersteh des Bildes nach oben und unten. */
+    padding-block: clamp(var(--sp-8), 4vw, 80px);
+  }
+
+  /* Zwei Zeilen: oben Fläche und Bild nebeneinander, darunter die
+     Bildunterschrift. Sie steht außerhalb der ersten Zeile, damit sie deren
+     Höhe nicht mitbestimmt — sonst wüchse das Bild um die Zeilenhöhe der
+     Unterschrift mit. */
+  .s-contents__inner {
+    display: grid;
+    /* Rechts derselbe Rand wie überall auf der Seite. Ohne ihn stößt das
+       Bild an die Fensterkante, und eine gerundete Ecke wird dort zum
+       angeschnittenen Bogen. */
+    padding-right: var(--site-margin);
+    /* 55/45 wie im Entwurf, rechts ein schmaler Rand, damit das Bild nicht
+       am Fensterrand klebt. */
+    grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+    grid-template-rows: auto auto;
+    /* `stretch`, nicht `start`: Nur so nimmt das Bild die Höhe der Fläche an
+       — und erst dann können die negativen Ränder darüber hinausragen. */
+    align-items: stretch;
+  }
+
+  .s-contents__panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s-contents__media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .s-contents__caption {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .s-contents__panel {
+    padding: clamp(var(--sp-6), 4.5vw, 78px) clamp(var(--sp-5), 3.8vw, 65px);
+    background: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+  .s-contents__title {
+    margin-bottom: clamp(var(--sp-6), 4.5vw, 78px);
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: var(--lh-heading);
+  }
+
+  /* Zwei Spalten, fünf Zeilen. `auto-flow: column` füllt erst die linke
+     Spalte von oben nach unten, dann die rechte — so steht 1–5 links und
+     6–10 rechts, wie im Entwurf. */
+  .s-contents__list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+    gap: clamp(var(--sp-4), 2.2vw, 38px) clamp(var(--sp-6), 6vw, 105px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .s-contents__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Siehe `.c-number` in shared.css. */
+  .s-contents__num {
+    --number-size: 28px;
+  }
+
+  /* Eine Stufe unter der Überschrift des Abschnitts: `--fs-h5` statt
+     `--fs-h4`. Zehn Einträge in 32px drängten die Liste an den Rand der
+     Fläche. */
+  .s-contents__label {
+    font-size: var(--fs-h5);
+    line-height: 1.15;
+  }
+
+  /* Überfährt man einen Eintrag, blassen die übrigen ab — der Blick bleibt
+     dort, wo der Zeiger steht.
+
+     `:has()` am Rahmen statt `:hover` an jedem Geschwister: Es braucht keine
+     Klasse und keinen Zuhörer, und es fasst auch den Fall mit, dass der
+     Zeiger zwischen zwei Einträgen steht.
+
+     Nur bei echtem Zeigergerät: Auf dem Handy gäbe es kein Überfahren, wohl
+     aber einen hängenbleibenden Zustand nach dem Antippen. */
+  /* Überfährt man einen Eintrag, treten die übrigen auf 50 % zurück; der
+     überfahrene bleibt, wie er ist — keine Farbe, kein Unterstrich, keine
+     Bewegung. Das Nachrechts-Rücken gehört ins Abschnittsmenü.
+
+     **Die Deckkraft sitzt auf dem Link, nicht auf dem `<li>`.** Das `<li>`
+     trägt `data-reveal-child`, und die Reveal-Animation lässt dort nach dem
+     Einblenden `opacity: 1` als Inline-Stil stehen. Inline schlägt
+     Stylesheet — die Regel griff deshalb nie. Der Link wird von der
+     Animation nicht angefasst.
+
+     Nur bei echtem Zeigergerät: Auf dem Handy bliebe der Zustand nach dem
+     Antippen hängen. */
+  @media (hover: hover) {
+    .s-contents__link {
+      transition: opacity var(--d-fast) var(--e-swift);
+    }
+
+    .s-contents__list:has(.s-contents__link:hover) .s-contents__link {
+      opacity: 0.5;
+    }
+
+    /* Derselbe Vorspann wie in der Regel darüber, plus `:hover` — sonst
+       verliert diese Regel. `:has()` erbt die Spezifität seines Inhalts, die
+       Ausblend-Regel wiegt dadurch (0,4,0); ein schlichtes
+       `.s-contents__list .s-contents__link:hover` käme nur auf (0,3,0) und
+       würde überstimmt. Genau das war zu sehen: alle zehn auf 50 %. */
+    .s-contents__list:has(.s-contents__link:hover) .s-contents__link:hover {
+      opacity: 1;
+    }
+  }
+
+  .s-contents__link:focus-visible {
+    outline: var(--bw) solid var(--c-grey);
+    outline-offset: 6px;
+  }
+
+  /* Rechtsbündig unter der Fläche, auf dem Seitengrund.
+
+     Der rechte Innenabstand hält sie aus dem Bereich heraus, den das Bild
+     nach links überlappt — sonst verschwindet sie darunter, weil das Bild
+     eine Ebene höher liegt. Er ist deshalb an denselben Wert gekoppelt. */
+  .s-contents__caption {
+    margin-top: var(--sp-4);
+    padding-left: clamp(var(--sp-5), 3.8vw, 65px);
+    padding-right: clamp(110px, 5.5vw, 130px);
+    font-size: var(--fs-text-small);
+    line-height: 1.4;
+    color: var(--c-text);
+    text-align: right;
+  }
+
+  /* Das Bild liegt ÜBER der dunklen Fläche und läuft nach rechts bis zum
+     Fensterrand. Deshalb nur links gerundet — rechts sitzt es bündig.
+     
+     Der Übersteh nach oben und unten entsteht über negative Ränder auf einem
+     gestreckten Element: Es ist dadurch genau um zweimal diesen Betrag höher
+     als die Fläche. Der negative Rand nach links schiebt es auf die Fläche.
+
+     `z-index`, damit es tatsächlich darüber liegt und nicht darunter. */
+  .s-contents__media {
+    position: relative;
+    z-index: 1;
+    margin-block: clamp(-72px, -3.4vw, -32px);
+    margin-left: clamp(-90px, -4.5vw, -40px);
+    overflow: hidden;
+    /* Rundum, bei jeder Fensterbreite. Vorher war es links gerundet und
+       rechts bündig — das sah bei jeder Breite anders aus und an der Kante
+       abgeschnitten. Eine Regel statt drei Sonderfällen. */
+    border-radius: var(--r-md);
+  }
+
+  /* :global(img) — das Bild kommt aus CmsImage.astro und trägt das
+     Scope-Attribut dieser Datei nicht. */
+  .s-contents__media :global(img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1000px) {
+    .s-contents__inner {
+      grid-template-columns: 1fr;
+      padding-inline: var(--site-margin);
+    }
+
+    /* Das Porträt zuerst, ohne Übersteh: Auf dem Handy stünde ein
+       überlappendes Bild zwischen Verzeichnis und erstem Abschnitt. */
+    .s-contents__media {
+      grid-column: 1;
+      grid-row: 1;
+      margin: 0 0 var(--sp-5);
+      aspect-ratio: 4 / 3;
+    }
+
+    .s-contents__panel {
+      grid-row: 2;
+    }
+
+    .s-contents__caption {
+      grid-row: 3;
+    }
+
+    .s-contents__caption {
+      text-align: left;
+    }
+  }
+
+  /* Unter 620px wird aus zwei Spalten eine: Zehn Einträge nebeneinander
+     brächen sonst mitten im Wort um. */
+  @media (max-width: 620px) {
+    .s-contents__list {
+      grid-auto-flow: row;
+      grid-template-rows: none;
+      gap: var(--sp-4);
+    }
+  }
+</style>

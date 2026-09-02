@@ -1,0 +1,26 @@
+# Nicht von uns
+node_modules/
+package-lock.json
+
+# Bauergebnisse
+dist/
+.astro/
+.netlify/
+studio/dist/
+
+# Abgeleitete Dateien. Wer sie formatiert, formatiert das nächste Mal wieder:
+# ihr Inhalt kommt aus einem Generator, nicht aus dem Editor.
+schema.json
+web/src/lib/sanity.types.ts
+web/BAUSTEINE.md
+
+# Prototypen. `prototypen/vite/` ist Archiv und wird laut CLAUDE.md nicht mehr
+# angefasst; `prototypen/webflow/` liegt auf Eis. Beides durch einen Formatierer
+# zu schicken erzeugt einen großen Unterschied an Dateien, die niemand liest
+# und die nichts ausliefern.
+prototypen/
+
+# Aufnahmen und Rohmaterial
+.shots/
+aufnahmen/
+assets/raw/

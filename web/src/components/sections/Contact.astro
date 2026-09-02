@@ -5,6 +5,22 @@
  *
  * Geprüft wird clientseitig in modules/ui.js über `data-form`; versendet wird
  * nichts — das ist im Prototyp so und bleibt es hier.
+ *
+ * ── Die erweiterte Fassung ───────────────────────────────────────────────
+ *
+ * `extended` hängt drei Felder an: Rückrufnummer, beste Erreichbarkeit und
+ * ein vorhandenes Angebot zum Hochladen. Sie stehen heute nur auf der Pillar
+ * Page zu Veneers.
+ *
+ * **Wahlfrei und additiv, nicht als zweiter Baustein.** Der Kontaktbereich
+ * steht auf Startseite, Magazin, Praxis und allen Leistungsseiten; eine
+ * zweite Datei mit denselben sechs Feldern liefe beim nächsten Feinschliff
+ * auseinander. Ohne `extended` entsteht exakt dasselbe Formular wie zuvor.
+ *
+ * Warum die drei nur bei Veneers stehen: Sie ergeben nur dort Sinn, wo jemand
+ * bereits ein Angebot einer anderen Praxis in der Hand hält und einen Rückruf
+ * dazu möchte. Auf der Startseite wären es drei Pflichtfragen mehr vor einer
+ * einfachen Terminanfrage.
  */
 import Button from "../ui/Button.astro";
 import Panel from "../ui/Panel.astro";
@@ -14,9 +30,21 @@ import { loadServiceList, forTable } from "../../lib/service-list";
 interface Props {
   /** Vorauswahl im Feld „Leistung". */
   service?: string;
+  /** Die drei Zusatzfelder — siehe Kopf. */
+  extended?: boolean;
 }
 
-const { service } = Astro.props;
+const { service, extended = false } = Astro.props;
+
+/* Die Zeitfenster stehen hier und nicht im CMS: Sie sind die Öffnungszeiten in
+   Blöcken, keine Redaktionsentscheidung. Ändern die sich, ändert sich auch der
+   Seitenfuß — dann fällt es auf. */
+const REACHABLE = [
+  "Vormittags (8–12 Uhr)",
+  "Mittags (12–15 Uhr)",
+  "Nachmittags (15–19 Uhr)",
+  "Egal, ruft einfach an",
+];
 
 /* Überschrift und Einstieg kommen aus den Einstellungen — der Kontaktbereich
    steht auf mehreren Seiten und ist überall derselbe. Der Baustein holt sie
@@ -40,9 +68,10 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
     <div class="c-field" data-field data-reveal-child>
       <label class="c-field__label" for="f-name">Name <span>*</span></label>
       <div class="c-field__control">
-        <input id="f-name" name="name" type="text" placeholder="Dein Name" required />
+        <input id="f-name" name="name" type="text" placeholder="Dein Name" autocomplete="name" required />
         <span class="c-field__error" aria-hidden="true">!</span>
       </div>
+      <p class="c-field__message" id="f-name-fehler" hidden></p>
     </div>
 
     <div class="c-field" data-field data-reveal-child>
@@ -59,9 +88,10 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
     <div class="c-field" data-field data-reveal-child>
       <label class="c-field__label" for="f-mail">E-Mail-Adresse <span>*</span></label>
       <div class="c-field__control">
-        <input id="f-mail" name="email" type="email" placeholder="hello@veneers.de" required />
+        <input id="f-mail" name="email" type="email" placeholder="hello@veneers.de" autocomplete="email" required />
         <span class="c-field__error" aria-hidden="true">!</span>
       </div>
+      <p class="c-field__message" id="f-mail-fehler" hidden></p>
     </div>
 
     <div class="c-field c-field--tall" data-field data-reveal-child>
@@ -70,6 +100,7 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
         <textarea id="f-msg" name="message" placeholder="Hi Mundpropaganda" required></textarea>
         <span class="c-field__error" aria-hidden="true">!</span>
       </div>
+      <p class="c-field__message" id="f-msg-fehler" hidden></p>
     </div>
 
     <div class="c-field" data-field data-reveal-child>
@@ -80,18 +111,78 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
           {SERVICES.map((l) => <option selected={l === service}>{l}</option>)}
         </select>
       </div>
+      <p class="c-field__message" id="f-service-fehler" hidden></p>
     </div>
 
-    <div class="c-field c-field--full" data-reveal-child>
+    {extended && (
+      <>
+        <div class="c-field" data-field data-reveal-child>
+          <label class="c-field__label" for="f-callback">Telefon für den Rückruf</label>
+          <div class="c-field__control">
+            <input id="f-callback" name="callback" type="tel" placeholder="0170 1234567" autocomplete="tel" />
+            <span class="c-field__error" aria-hidden="true">!</span>
+          </div>
+          <p class="c-field__message" id="f-callback-fehler" hidden></p>
+        </div>
+
+        <div class="c-field" data-field data-reveal-child>
+          <label class="c-field__label" for="f-reachable">Wann erreichen wir dich am besten?</label>
+          <div class="c-field__control">
+            <select id="f-reachable" name="reachable">
+              <option value="">Zeitraum auswählen</option>
+              {REACHABLE.map((r) => <option>{r}</option>)}
+            </select>
+          </div>
+          <p class="c-field__message" id="f-reachable-fehler" hidden></p>
+        </div>
+
+        {/* PDF zuerst: So kommen Angebote meistens. Bilder bleiben erlaubt,
+            weil ein abfotografierter Kostenplan genauso brauchbar ist. */}
+        <div class="c-field c-field--full" data-field data-reveal-child>
+          <label class="c-field__label" for="f-quote">
+            Hast du schon ein Angebot? Lade es hier hoch
+          </label>
+          <div class="c-field__control c-file" data-file>
+            <input id="f-quote" name="quote" type="file" accept="application/pdf,image/*" />
+            <span class="c-file__face">
+              <span data-file-name>Angebot auswählen</span>
+              <svg aria-hidden="true"><use href="#i-upload" /></svg>
+            </span>
+          </div>
+        </div>
+      </>
+    )}
+
+    {/* `data-field` fehlte hier. Ohne das lief die Pflichtprüfung an der
+        Checkbox vorbei — und weil das Formular `novalidate` trägt, prüfte
+        auch der Browser nicht nach. Die Zustimmung war damit trotz
+        `required` faktisch wahlfrei. */}
+    <div class="c-field c-field--full" data-field data-reveal-child>
       <label class="c-checkbox">
-        <input type="checkbox" name="privacy" required />
-        <span>Privacy Policy bestätigen</span>
+        <input id="f-privacy" type="checkbox" name="privacy" required />
+        <span>Datenschutzerklärung bestätigen</span>
       </label>
+      <p class="c-field__message" id="f-privacy-fehler" hidden></p>
     </div>
 
     <div class="c-field c-field--full" data-reveal-child>
       <Button label="Unverbindliches Angebot anfordern" type="submit" variant="block" />
     </div>
+
+    {/* WCAG 2.2, 4.1.3 Statusmeldungen. Bis hierher war die einzige Rückmeldung
+        nach dem Absenden die geänderte Aufschrift des Knopfes. Wer nicht
+        hinsieht, erfährt davon nichts: Ein Textwechsel irgendwo im Dokument
+        wird nicht angesagt.
+
+        `role="status"` und nicht `role="alert"`: Die Meldung ist eine
+        Bestätigung, keine Störung. Sie wird vorgelesen, sobald das
+        Vorlesegerät ohnehin Luft hat, statt die laufende Ausgabe zu
+        unterbrechen.
+
+        Das Element steht von Anfang an im Dokument und bleibt leer. Ein erst
+        beim Absenden eingefügter Bereich wird von manchen Vorlesegeräten
+        nicht beobachtet — die Region muss vorher da sein. */}
+    <p class="c-form__status" data-form-status role="status" aria-live="polite"></p>
   </form>
 </Panel>
 
@@ -129,11 +220,21 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
   }
 
   /* Padding muss ausgeschrieben zurückgesetzt werden — sonst greift die
-     generische Feld-Regel weiter oben und bläst das Kästchen auf. */
+     generische Feld-Regel weiter oben und bläst das Kästchen auf.
+
+     24px und nicht mehr 20px: WCAG 2.2, 2.5.8 Target Size (Minimum) verlangt
+     für Bedienelemente mindestens 24 × 24 CSS-Pixel. Das Kästchen ist das
+     einzige Ziel auf der Seite, das darunter lag — gemessen 20 × 20.
+
+     Die Ausnahme für Ziele im Fließtext greift hier nicht: Sie gilt für
+     Verweise innerhalb eines Satzes, nicht für ein Formularfeld. Und das
+     Häkchen bleibt in einem Label, dessen Text ebenfalls schaltet — die
+     tatsächliche Trefferfläche ist also größer. Das Kästchen selbst muss die
+     Vorgabe trotzdem erfüllen. */
   .c-checkbox input {
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     flex: 0 0 auto;
     border: 1.5px solid var(--c-neutral-800);
@@ -187,8 +288,18 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
     color: var(--c-neutral-800);
   }
 
+  /* Das Feld selbst ist durchsichtig (opacity 0) und liegt über der Hülle —
+     es kann also gar keinen sichtbaren Ring bekommen. Die Anzeige übernimmt
+     die Hülle, und zwar mit demselben Umriss wie überall sonst.
+
+     Vorher stand hier nur ein rosa Rahmen: 2.03:1 gegen die Fläche, also
+     unter den 3:1, die WCAG 2.2, 1.4.11 für die Fokusanzeige verlangt. Und
+     weil das eigentliche Feld unsichtbar ist, war das die einzige Anzeige,
+     die es gab. */
   .c-file input:focus-visible + .c-file__face {
-    border-color: var(--c-brand);
+    outline: 2px solid var(--c-dark);
+    outline-offset: 2px;
+    border-color: var(--c-dark);
   }
 
   .c-file[data-filled="true"] .c-file__face {

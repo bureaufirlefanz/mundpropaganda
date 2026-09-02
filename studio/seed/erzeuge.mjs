@@ -160,7 +160,7 @@ rows.push({
   magazinText: vorgabe(magazine, "text"),
 
   faqTitel: "Häufige Fragen",
-  faqText: "Nichts dabei? Schreiben Sie uns - wir antwlocationsn in der Regel am selben Werktag.",
+  faqText: "Nichts dabei? Schreiben Sie uns - wir antworten in der Regel am selben Werktag.",
   faq: vorgabe(index, "FRAGEN").map(key("frage")),
 });
 

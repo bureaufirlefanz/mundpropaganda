@@ -30,8 +30,28 @@ interface Props {
   noIndex?: boolean;
   /** Absolute URL des Teilen-Motivs. Aus dem CMS, deshalb schon absolut. */
   image?: string;
+  /**
+   * Ob die Seite einen eigenen Kontaktabschnitt zeigt.
+   *
+   * Entscheidet, wo die Sprungmarke `#kontakt` liegt. Das Angebotsformular
+   * steht nur noch auf wenigen Seiten; überall sonst führen die vier bis
+   * sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen in den
+   * Fuß, wo Telefon, E-Mail, Standorte und Zeiten ohnehin stehen.
+   *
+   * Die Angabe ist nötig, weil es die id sonst zweimal gäbe: einmal am Panel,
+   * einmal am Fuß. Ein Dokument mit doppelter id ist nicht nur unsauber — der
+   * Browser springt zum ersten Treffer, und welcher das ist, entscheidet die
+   * Reihenfolge im Markup statt die Absicht.
+   */
+  contactSection?: boolean;
 }
-const { title, description = "", noIndex = false, image } = Astro.props;
+const {
+  title,
+  description = "",
+  noIndex = false,
+  image,
+  contactSection = false,
+} = Astro.props;
 
 /* Die Angaben zur ganzen Website holt der Rahmen selbst und nicht über Props:
    Sie sind auf jeder Seite dieselben, und ein Durchreichen durch elf Templates
@@ -120,8 +140,8 @@ const blockIndexing = noIndex || !website.searchEngines;
     {metaDescription && <meta name="twitter:description" content={metaDescription} />}
     {shareImage && <meta name="twitter:image" content={shareImage} />}
 
-    <!-- Die beiden Schnitte, die above the fold sichtbar sind — sonst
-         blitzt die Fallback-Schrift im Hero auf. -->
+    {/* Die beiden Schnitte, die above the fold sichtbar sind — sonst
+         blitzt die Fallback-Schrift im Hero auf. */}
     <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GT-Pressura-Mono-Light.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/svg/tooth-3d-mask.png" as="image" />
@@ -146,22 +166,32 @@ const blockIndexing = noIndex || !website.searchEngines;
       />
     )}
 
-    <!-- Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
+    {/* Astros eigener Router. Ersetzt die selbstgebaute Navigation aus
          modules/transition.js: er tauscht nur den geänderten Teil des
-         Dokuments aus, statt die Seite neu zu laden. -->
+         Dokuments aus, statt die Seite neu zu laden. */}
     <ClientRouter />
 
   </head>
 
   <body>
+    {/* WCAG 2.2, 2.4.1 Bypass Blocks. Vor dem Inhalt jeder Seite stehen
+        Navigation und Menü — mit der Tastatur waren das bis hierher rund
+        zwanzig Anschläge, auf jeder Seite neu. Der Sprung muss das erste
+        fokussierbare Element im Dokument sein, sonst ist er nicht zu
+        erreichen, bevor die Blöcke kommen, die er überspringen soll. */}
+    <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
+
     <Icons />
     <Backdrop transition:persist />
     <Transition />
     <Nav transition:persist />
 
-    <main><slot /></main>
+    {/* `tabindex="-1"`: Ohne das nimmt ein <main> den Fokus nicht an, der
+        Sprung verschöbe nur den Bildausschnitt und der Tabulator liefe
+        danach weiter in der Navigation. */}
+    <main id="main" tabindex="-1"><slot /></main>
 
-    <Footer />
+    <Footer id={contactSection ? undefined : "kontakt"} />
 
     <script>
       import { init } from "../js/init.js";

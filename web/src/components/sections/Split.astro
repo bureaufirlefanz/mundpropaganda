@@ -24,17 +24,17 @@ interface Props {
 const { topline, title, paragraphs, image } = Astro.props;
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            FORM & FUNKTION — Split mit organischer brauner Fläche
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-split">
-        <!-- Bild von rechts, braune Fläche von links: die beiden fahren
-             gegeneinander ein und schließen die Komposition. -->
+        {/* Bild von rechts, braune Fläche von links: die beiden fahren
+             gegeneinander ein und schließen die Komposition. */}
         <div class="s-split__media" data-reveal="right" data-reveal-trigger=".s-split">
           {isCmsImage(image) ? (
             <CmsImage source={image} alt="Patientin lächelt nach der Behandlung" widths={[640, 1024, 1600, 2200]} sizes="(max-width: 900px) 100vw, 58vw" data-parallax="10" />
           ) : (
-            <Picture name="portrait-hero" alt="Patientin lächelt nach der Behandlung" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
+            <Picture name="bleaching-beratung-spiegel" alt="Beratung am Behandlungsstuhl, die Patientin sieht ihr Ergebnis im Spiegel" sizes="(max-width: 900px) 100vw, 58vw" parallax="10" />
           )}
         </div>
 
@@ -66,12 +66,16 @@ const { topline, title, paragraphs, image } = Astro.props;
   /* Die Ecke steht als eigene Größe da, weil sie an zwei Stellen gebraucht
      wird — und dadurch nicht auseinanderlaufen kann. */
   .s-split__media {
-    --ecke: clamp(80px, 11.6vw, 200px);
+    /* Ein Sonderwert, und das mit Absicht: Die Form gehört zu diesem einen
+       Abschnitt auf der Startseite und wird sonst nirgends verwendet. Sie
+       fällt deshalb nicht unter die Regel, dass außer dem Kopfbild jedes Bild
+       `--r-md` nimmt. */
+    --corner: clamp(80px, 11.6vw, 200px);
     /* Welche Ecken gerundet sind, steht ebenfalls an einer Stelle: Radius und
        clip-path müssen dieselbe Form beschreiben, sonst schneidet das eine
        anders als das andere rundet. Auf schmalen Fenstern wird nur diese
        Zeile ersetzt. */
-    --ecken: var(--ecke) 0 0 0;
+    --corners: var(--corner) 0 0 0;
 
     position: absolute;
     top: 6.2%;
@@ -79,7 +83,7 @@ const { topline, title, paragraphs, image } = Astro.props;
     right: 0;
     bottom: 0;
     z-index: 1;
-    border-radius: var(--ecken);
+    border-radius: var(--corners);
     overflow: hidden;
 
     /* Zusätzlich zur gerundeten Überlaufsperre, nicht statt ihr.
@@ -90,7 +94,7 @@ const { topline, title, paragraphs, image } = Astro.props;
        Rundung eine helle Haarlinie stehen.
        `clip-path` beschneidet den ganzen Teilbaum in einem Schritt und wird
        antialiasiert — dieselbe Form, nur zuverlässiger angewandt. */
-    clip-path: inset(0 round var(--ecken));
+    clip-path: inset(0 round var(--corners));
   }
 
   /* :global(img), weil das Bild aus Picture.astro kommt und deshalb das
@@ -142,7 +146,7 @@ const { topline, title, paragraphs, image } = Astro.props;
   }
 
   .s-split__panel p {
-    max-width: 353px;
+    max-width: var(--mw-panel);
     font-size: var(--fs-text-main);
     line-height: 1.22;
   }
@@ -174,8 +178,8 @@ const { topline, title, paragraphs, image } = Astro.props;
        ist aus dem Seitenverhältnis gerechnet (4:3 auf die Satzbreite), nicht
        geschätzt — sonst stimmte es bei genau einer Fensterbreite. */
     .s-split__head {
-      --foto-height: calc((100vw - 2 * var(--site-margin)) * 3 / 4);
-      --ueberlappung: calc(var(--foto-height) / 3);
+      --photo-height: calc((100vw - 2 * var(--site-margin)) * 3 / 4);
+      --overlap: calc(var(--photo-height) / 3);
 
       /* z-index 0, das Foto trägt 1: Die Fläche schiebt sich HINTER das Bild,
          nicht darüber. Sie reicht damit bis auf zwei Drittel des Fotos herauf
@@ -186,8 +190,8 @@ const { topline, title, paragraphs, image } = Astro.props;
       position: relative;
       z-index: 0;
       max-width: none;
-      margin-top: calc(-1 * var(--ueberlappung));
-      padding: calc(var(--ueberlappung) + var(--sp-8)) var(--site-margin) var(--sp-6);
+      margin-top: calc(-1 * var(--overlap));
+      padding: calc(var(--overlap) + var(--sp-8)) var(--site-margin) var(--sp-6);
       background: var(--c-dark);
       color: var(--c-bg);
     }
@@ -201,8 +205,8 @@ const { topline, title, paragraphs, image } = Astro.props;
        Eingerückt statt randfüllend: Ein Bild, das die ganze Breite nimmt,
        macht aus der Section einen Banner. */
     .s-split__media {
-      --ecke: var(--r-lg);
-      --ecken: var(--ecke) var(--ecke) 0 0;
+      --corner: var(--r-lg);
+      --corners: var(--corner) var(--corner) 0 0;
 
       order: -1;
       /* Über der braunen Fläche, die von unten dahinter heraufreicht. */

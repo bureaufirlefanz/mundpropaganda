@@ -87,7 +87,7 @@ const cards = Array.from({ length: count }, (_, i) => ({
             />
           ) : (
             <Picture
-              name={image.name ?? "praxis-01"}
+              name={image.name ?? "empfang-p25"}
               alt={repeated ? "" : (image.alt ?? "")}
               sizes="(max-width: 700px) 80vw, 38vw"
             />
@@ -120,8 +120,8 @@ const cards = Array.from({ length: count }, (_, i) => ({
     --ring-gap: 20px;
 
     /* Kartenmaß an einer Stelle, damit die Bühne daraus rechnen kann. */
-    --karte-width: clamp(260px, 34vw, 500px);
-    --karte-height: clamp(360px, 45vw, 660px);
+    --card-width: clamp(260px, 34vw, 500px);
+    --card-height: clamp(360px, 45vw, 660px);
 
     /* Die Perspektive verkleinert jede Karte um einen FESTEN Faktor. Er ist
        fest, weil der Radius mit der Kartenbreite wächst (siehe ring.js) und
@@ -135,11 +135,11 @@ const cards = Array.from({ length: count }, (_, i) => ({
 
        Ändert sich einer der beiden Faktoren in ring.js, muss dieser Wert
        mitgehen. */
-    --karte-sicht: 0.738;
+    --card-visible: 0.738;
 
     /* Rand über und unter den Karten. Mehr braucht die Bühne nicht — sie
        schneidet nur seitlich ab. */
-    --buehne-luft: 24px;
+    --stage-air: 24px;
   }
 
   /* Die Bühne trägt die Perspektive (setzt ring.js aus dem Radius) und fängt
@@ -160,7 +160,7 @@ const cards = Array.from({ length: count }, (_, i) => ({
      Überschrift und zu den Pfeilen wirkte. */
   .c-ring__stage {
     position: relative;
-    height: calc(var(--karte-height) * var(--karte-sicht) + 2 * var(--buehne-luft));
+    height: calc(var(--card-height) * var(--card-visible) + 2 * var(--stage-air));
     overflow: hidden;
     cursor: grab;
     touch-action: pan-y;
@@ -173,10 +173,19 @@ const cards = Array.from({ length: count }, (_, i) => ({
   }
 
   /* Sichtbarer Fokus — der Ring ist über die Pfeiltasten bedienbar, also
-     muss man auch sehen, wann er den Fokus hat (WCAG 2.4.7). */
+     muss man auch sehen, wann er den Fokus hat (WCAG 2.4.7).
+
+     Nach INNEN gezeichnet: Die Bühne sitzt bündig im Abschnitt, und der
+     trägt `overflow: hidden` für die Karten, die über seinen Rand laufen.
+     Ein Ring mit 6px Versatz nach außen lag damit vollständig außerhalb der
+     sichtbaren Fläche — gemessen im Tastaturlauf, Luft 0 Pixel. Er war nicht
+     schwach, er war gar nicht da.
+
+     2px statt `--bw` (1px): Dieselbe Stärke wie überall sonst. Ein Pixel
+     Haarlinie ist auf einem bewegten Bildhintergrund kaum auszumachen. */
   .c-ring__stage:focus-visible {
-    outline: var(--bw) solid var(--c-text);
-    outline-offset: 6px;
+    outline: 2px solid var(--c-text);
+    outline-offset: -2px;
     border-radius: var(--r-md);
   }
 
@@ -198,7 +207,7 @@ const cards = Array.from({ length: count }, (_, i) => ({
        ring.js liest den Wert nicht, braucht ihn aber als Obergrenze für den
        Parallax-Ausschlag — er steht deshalb hier oben bei den übrigen
        Maßen der Karte und nicht in einem zweiten Block weiter unten. */
-    --image-vorrat: 19%;
+    --image-pool: 19%;
 
     position: absolute;
     top: 50%;
@@ -207,8 +216,8 @@ const cards = Array.from({ length: count }, (_, i) => ({
        folgt der Kartenbreite (siehe ring.js), also wächst der ganze Ring
        mit — die Motive rücken näher und laufen weiter über den Rand hinaus,
        statt nur in der Mitte größer zu werden. */
-    width: var(--karte-width);
-    height: var(--karte-height);
+    width: var(--card-width);
+    height: var(--card-height);
     margin: 0;
     /* Zentriert über `translate`, nicht über negative Ränder: die Ränder
        müssten die geklammerten Maße oben spiegeln und liefen beim nächsten
@@ -237,8 +246,8 @@ const cards = Array.from({ length: count }, (_, i) => ({
   .c-ring__card :global(img) {
     position: absolute;
     top: 0;
-    left: calc(-1 * var(--image-vorrat));
-    width: calc(100% + 2 * var(--image-vorrat));
+    left: calc(-1 * var(--image-pool));
+    width: calc(100% + 2 * var(--image-pool));
     /* base.css deckelt jedes Bild mit `max-width: 100%` — eine sinnvolle
        Grundregel, die hier aber genau das abschneidet, was den Vorrat
        ausmacht. Ohne diese Zeile blieb das Bild chromebreit, und beim
@@ -295,9 +304,9 @@ const cards = Array.from({ length: count }, (_, i) => ({
   @media (max-width: 700px) {
     .c-ring {
       --ring-gap: 10px;
-      --karte-width: 92vw;
-      --karte-height: 115vw;
-      --buehne-luft: 12px;
+      --card-width: 92vw;
+      --card-height: 115vw;
+      --stage-air: 12px;
     }
 
     .c-ring__nav {

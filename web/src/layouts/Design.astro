@@ -48,6 +48,11 @@ const PAGES = [
   </head>
 
   <body class="d-body">
+    {/* WCAG 2.2, 2.4.1 — wie in Base.astro. Muss das erste
+        fokussierbare Element sein, sonst ist der Sprung nicht zu
+        erreichen, bevor die Navigation kommt. */}
+    <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
+
     <Icons />
 
     <header class="d-header">
@@ -61,7 +66,7 @@ const PAGES = [
       </nav>
     </header>
 
-    <main class="d-main"><slot /></main>
+    <main class="d-main" id="main" tabindex="-1"><slot /></main>
 
     <script>
       import { init } from "../js/init.js";
@@ -208,6 +213,20 @@ const PAGES = [
         border: var(--bw) solid var(--c-line);
         border-radius: var(--r-md);
         background: var(--c-surface);
+      }
+
+      /* Auf der Bühne zeichnet der Fokusring nach innen.
+
+         Einige Bühnen beschneiden absichtlich (`overflow: hidden`), damit ein
+         Beispiel nicht über seinen Kasten hinausläuft — und schnitten damit
+         auch den Ring der Bedienelemente darin weg. Gemessen im Tastaturlauf
+         über /design/komponenten: die Karussellpfeile, Luft 1 Pixel.
+
+         Die Regel steht hier und nicht an den Komponenten: Auf den echten
+         Seiten sitzen dieselben Pfeile frei und bekommen ihren Ring wie
+         vorgesehen außen. Das Problem gehört der Bühne. */
+      .d-stage :focus-visible {
+        outline-offset: -2px;
       }
 
       .d-stage--dark {

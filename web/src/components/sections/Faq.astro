@@ -8,7 +8,8 @@ import Accordion from "../ui/Accordion.astro";
 import type { Question } from "../../lib/shapes";
 
 interface Props {
-  title: string;
+  /** Wahlfrei — siehe `ui/SectionHeading.astro`. */
+  title?: string;
   questions: Question[];
   topline?: string;
   text?: string;

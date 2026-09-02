@@ -42,13 +42,13 @@ const { items, action } = Astro.props;
 const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-02", "motion-03"];
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            TRANSFORMATION STORIES
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-stories" data-stories>
-        <!-- Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
+        {/* Voller Kreis, breiter als das Viewport. Er dreht sich mit dem
              Scroll — dadurch läuft der Schriftzug am oberen Rand entlang,
-             ohne dass er als Marquee gebaut werden muss. -->
+             ohne dass er als Marquee gebaut werden muss. */}
         <div class="s-stories__ring" data-stories-ring aria-hidden="true">
           <svg viewBox="0 0 1000 1000">
             <defs>
@@ -70,8 +70,8 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
 
         <div class="s-stories__deck" data-deck>
           <div class="s-stories__stack" data-deck-stack>
-            <!-- Vollflächige Motive: freigestellte PNGs würden die Karten
-                 dahinter durchscheinen lassen. -->
+            {/* Vollflächige Motive: freigestellte PNGs würden die Karten
+                 dahinter durchscheinen lassen. */}
             {items.map((e, i) => (
               <figure class="s-stories__card" data-deck-card>
                 {isCmsImage(e.image) ? (
@@ -107,8 +107,8 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
         <div class="s-quote__inner">
           <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
 
-          <!-- Wechselt mit der vordersten Karte oben. Alle Zitate liegen
-               übereinander, sichtbar ist immer genau eines. -->
+          {/* Wechselt mit der vordersten Karte oben. Alle Zitate liegen
+               übereinander, sichtbar ist immer genau eines. */}
           <div class="s-quote__stage" data-deck-quotes>
             {items.map((e, i) => (
               <blockquote class="s-quote__text" data-deck-quote data-active={i === 0 ? "true" : undefined}>{e.quote}</blockquote>
@@ -230,7 +230,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     column-gap: clamp(76px, calc(8.2vw + 16px), 132px);
     row-gap: clamp(48px, calc(4.4vw + 16px), 78px);
 
-    margin-top: clamp(40px, 5vw, 96px);
+    margin-top: var(--flow-lg);
 
     /* Knapp gehalten: zusammen mit dem Innenabstand des Zitatbands darunter
        bleiben rund 24px zwischen Zähler und Zitat. Mehr, und die beiden
@@ -270,7 +270,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     overflow: hidden;
     transform-origin: center bottom;
     will-change: transform, opacity;
-    box-shadow: 0 24px 60px -20px rgb(64 50 41 / 0.28);
+    box-shadow: var(--shadow-card);
     user-select: none;
     -webkit-user-drag: none;
   }
@@ -293,7 +293,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
     background: var(--c-brand);
     color: var(--c-dark);
     font-family: var(--f-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-label-md);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     white-space: nowrap;
@@ -365,15 +365,15 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
   .s-quote__inner {
     position: relative;
     display: flex;
-    gap: clamp(24px, 3vw, 56px);
+    gap: var(--flow-sm);
     align-items: flex-start;
     justify-content: center;
-    max-width: 1100px;
+    max-width: var(--mw-wide);
     margin-inline: auto;
   }
 
   .s-quote__mark {
-    font-size: clamp(4rem, 9vw, 9rem);
+    font-size: var(--fs-display-md);
     line-height: 0.7;
     font-weight: 500;
     color: var(--c-dark);
@@ -392,7 +392,7 @@ const MOTIFS = ["story-portrait-01", "story-portrait-02", "motion-01", "motion-0
   .s-quote__text {
     grid-area: 1 / 1;
     columns: 2;
-    column-gap: clamp(32px, 4vw, 72px);
+    column-gap: var(--flow-md);
     font-size: var(--fs-text-large);
     line-height: 1.4;
     opacity: 0;

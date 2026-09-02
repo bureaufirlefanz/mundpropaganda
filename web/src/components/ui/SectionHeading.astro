@@ -1,0 +1,84 @@
+---
+/**
+ * Die nummerierte Abschnittsüberschrift einer Pillar Page
+ * (Figma 177:2162 + 177:1731).
+ *
+ * Runder Zähler in der Markenfarbe, darunter die Überschrift — beides mittig
+ * über die volle Breite.
+ *
+ * ── Warum sie hier steht und nicht im Baustein ───────────────────────────
+ *
+ * Im Entwurf ist die Überschrift ein eigenes Element über dem Abschnitt, kein
+ * Teil davon: Sie läuft über die ganze Breite, während der Abschnitt darunter
+ * seinem eigenen Raster folgt. Sie hier zu rendern hält außerdem die Zählung
+ * an einer Stelle — der Baustein weiß nicht, der wievielte er ist, und müsste
+ * es sich sagen lassen.
+ *
+ * ── Die Nummer ───────────────────────────────────────────────────────────
+ *
+ * Einstellig, ohne führende Null: „1", nicht „01". Dieselbe Zahl steht im
+ * Inhaltsverzeichnis und in der Abschnittsnavigation — wer „7" liest, soll
+ * „7" wiederfinden.
+ *
+ * Sie steht im Markup und nicht als CSS-Zähler, weil sie zur Aussage gehört
+ * und nicht zur Zierde: Ein `counter()` wäre für ein Vorleseprogramm
+ * unsichtbar.
+ */
+interface Props {
+  /** Die laufende Nummer, bereits 1-basiert. */
+  number: number;
+  headline: string;
+  /** 2 oder 3 — ein Cluster-Artikel braucht dieselbe Form womöglich als h3. */
+  level?: 2 | 3;
+}
+
+const { number, headline, level = 2 } = Astro.props;
+const Heading = `h${level}` as "h2" | "h3";
+---
+
+<div class="c-sectionheading container">
+  <span class="c-number c-sectionheading__num" data-reveal="fade">{number}</span>
+  <Heading class="c-sectionheading__title" data-split="lines">{headline}</Heading>
+</div>
+
+<style>
+  .c-sectionheading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(var(--sp-5), 3.5vw, 60px);
+    padding-block: var(--section-space) 0;
+    text-align: center;
+  }
+
+  /* Siehe `.c-number` in shared.css. Der Kreis stellt sich dort an den Anfang
+     seiner Achse — `align-self: start`, damit er in Karten und Rasterzellen
+     nicht zur Pille streckt. In dieser Spalte ist die Querachse waagerecht:
+     Dieselbe Zeile schöbe den Kreis an den linken Rand, obwohl die Überschrift
+     darunter mittig steht. `center` holt ihn zurück in die Mitte. */
+  .c-sectionheading__num {
+    --number-size: 28px;
+    align-self: center;
+  }
+
+  /* Dieselbe Größe wie die Überschrift im Kopf der Leistungsseiten, aber
+     mittig und über die volle Breite — so steht sie im Entwurf. */
+  .c-sectionheading__title {
+    max-width: 22ch;
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  @media (max-width: 1000px) {
+    .c-sectionheading {
+      padding-block: var(--section-space-sm) 0;
+    }
+
+    .c-sectionheading__title {
+      max-width: none;
+    }
+  }
+</style>

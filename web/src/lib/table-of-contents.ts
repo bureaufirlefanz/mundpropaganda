@@ -63,7 +63,7 @@ interface Block {
 export function headingsFrom(blocks: unknown): Heading[] {
   if (!Array.isArray(blocks)) return [];
 
-  const vergeben = new Map<string, number>();
+  const taken = new Map<string, number>();
   const headings: Heading[] = [];
 
   for (const [i, block] of blocks.entries()) {
@@ -77,15 +77,64 @@ export function headingsFrom(blocks: unknown): Heading[] {
       .trim();
     if (!text) continue;
 
-    const basis = idFrom(text) || "abschnitt";
-    const wievielt = (vergeben.get(basis) ?? 0) + 1;
-    vergeben.set(basis, wievielt);
-
     headings.push({
       key: b._key ?? `block-${i}`,
-      id: wievielt === 1 ? basis : `${basis}-${wievielt}`,
+      id: uniqueId(text, taken),
       text,
       level: b.style === "h2" ? 2 : 3,
+    });
+  }
+
+  return headings;
+}
+
+/**
+ * Eine eindeutige Kennung, mit laufender Nummer bei Wiederholung.
+ *
+ * Geteilt von beiden Sammlern: Auf einer Pillar Page treffen die
+ * Überschriften der Textabschnitte und die fester Abschnitte („Kosten",
+ * „Häufige Fragen") in einem Verzeichnis zusammen, und die Kennungen müssen
+ * über beide Quellen hinweg eindeutig bleiben.
+ */
+function uniqueId(text: string, taken: Map<string, number>): string {
+  const base = idFrom(text) || "abschnitt";
+  const nth = (taken.get(base) ?? 0) + 1;
+  taken.set(base, nth);
+  return nth === 1 ? base : `${base}-${nth}`;
+}
+
+/**
+ * Sprungmarken für eine Seite, die aus benannten Abschnitten besteht statt
+ * aus einem Textstrom — die Leistungsseiten.
+ *
+ * Nimmt Überschriften in der Reihenfolge, in der die Seite sie rendert:
+ * einfache Zeichenketten oder Objekte mit `heading`, damit die
+ * `textSections` aus dem CMS direkt hineingereicht werden können. Was leer
+ * ist, fällt heraus — ein Verzeichniseintrag ohne Ziel wäre schlimmer als
+ * ein fehlender.
+ *
+ * **Dieselbe `idFrom()` wie oben.** Zwei Funktionen, die „ungefähr dasselbe"
+ * slugifizieren, laufen auseinander, und das fällt erst beim Klicken auf.
+ * Deshalb entsteht die Kennung weiterhin an genau einer Stelle.
+ *
+ * `key` ist hier der Index — anders als beim Beitrag gibt es keinen `_key`
+ * von Sanity, weil die Abschnitte nicht alle aus einem Array kommen.
+ */
+export function headingsFromSections(
+  sections: (string | { heading?: string | null } | null | undefined)[]
+): Heading[] {
+  const taken = new Map<string, number>();
+  const headings: Heading[] = [];
+
+  for (const [i, entry] of sections.entries()) {
+    const text = (typeof entry === "string" ? entry : entry?.heading ?? "").trim();
+    if (!text) continue;
+
+    headings.push({
+      key: `section-${i}`,
+      id: uniqueId(text, taken),
+      text,
+      level: 2,
     });
   }
 
@@ -101,7 +150,7 @@ export function headingsFrom(blocks: unknown): Heading[] {
  * nie. Was er bekommt, ist sein eigener Block. Also steht die Kennung dort.
  *
  * Kopiert statt geändert: Das Ergebnis der Abfrage wird an mehreren Stellen
- * gelesen, und ein Feld, das beim Rendern hineinwächst, ist die Slocations
+ * gelesen, und ein Feld, das beim Rendern hineinwächst, ist die Sorte
  * Nebenwirkung, die man drei Bausteine später sucht.
  */
 export function withHeadingIds(blocks: unknown, headings: Heading[]): PortableTextBlock[] {

@@ -48,6 +48,23 @@ const { headings, title = "Inhalt" } = Astro.props;
     overflow-y: auto;
     /* Die Bildlaufleiste des Verzeichnisses gehört nicht ins Bild. */
     scrollbar-width: none;
+
+    /* Luft für den Fokusring, ohne die Liste zu verschieben.
+
+       `overflow-y: auto` klingt, als beträfe es nur die Senkrechte. Tut es
+       nicht: Steht eine Achse auf `visible` und die andere nicht, rechnet der
+       Browser die erste auf `auto` hoch — waagerecht wurde also ebenfalls
+       beschnitten. Die Einträge laufen über die volle Breite, ihr Ring lag
+       damit außerhalb und war weg.
+
+       Innenabstand plus gleich großer negativer Außenabstand: Der Ring
+       bekommt seine vier Pixel, die Liste steht optisch, wo sie stand. */
+    padding-inline: 4px;
+    margin-inline: -4px;
+    /* Senkrecht dasselbe: Der letzte Eintrag sitzt bündig an der Unterkante
+       des scrollbaren Kastens, sein Ring lag darunter. */
+    padding-block: 4px;
+    margin-block: -4px;
   }
 
   .c-toc::-webkit-scrollbar {

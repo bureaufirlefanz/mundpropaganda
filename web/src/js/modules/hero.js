@@ -91,7 +91,7 @@ export function initHero() {
        Animiert werden weiterhin die Zeichen — `s.chars` liefert sie
        unverändert. */
     const splits = [...words].map(
-      (w) => new SplitText(w, { type: "words,chars", mask: "chars", wordsClass: "hero-wort" })
+      (w) => new SplitText(w, { type: "words,chars", mask: "chars", wordsClass: "hero-word" })
     );
     const chars = splits.flatMap((s) => s.chars);
 

@@ -56,7 +56,7 @@ const MOTIF_AFTER = "teeth-macro-after";
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow="50"
-        aria-valuetext="50 % after"
+        aria-valuetext="50 % nachher"
       >
         <span class="s-ba__grip">
           <svg aria-hidden="true"><use href="#i-arrow" /></svg>
@@ -101,7 +101,7 @@ const MOTIF_AFTER = "teeth-macro-after";
   .s-ba__frame {
     position: relative;
     aspect-ratio: 16 / 9;
-    max-width: 1100px;
+    max-width: var(--mw-wide);
     margin-inline: auto;
     border-radius: var(--r-md);
     overflow: hidden;
@@ -170,7 +170,7 @@ const MOTIF_AFTER = "teeth-macro-after";
     border-radius: var(--r-round);
     background: var(--c-brand);
     color: var(--c-dark);
-    box-shadow: 0 4px 20px rgb(0 0 0 / 0.15);
+    box-shadow: var(--shadow-handle);
     transition: scale var(--d-fast) var(--e-swift),
       box-shadow var(--d-fast) var(--e-swift);
   }
@@ -195,7 +195,7 @@ const MOTIF_AFTER = "teeth-macro-after";
   .s-ba__frame:hover .s-ba__grip,
   .s-ba__handle:focus-visible .s-ba__grip {
     scale: 1.08;
-    box-shadow: 0 6px 26px rgb(0 0 0 / 0.22);
+    box-shadow: var(--shadow-handle-active);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -208,7 +208,7 @@ const MOTIF_AFTER = "teeth-macro-after";
   .s-ba__labels {
     display: flex;
     justify-content: space-between;
-    max-width: 1100px;
+    max-width: var(--mw-wide);
     margin: var(--sp-3) auto 0;
     font-family: var(--f-mono);
     font-weight: 300;

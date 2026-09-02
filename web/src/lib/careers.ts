@@ -16,7 +16,7 @@ import { CAREERS_QUERY, JOBS_QUERY } from "./queries";
  * Der Typ existierte, stand im Studio und wurde von niemandem gelesen.
  *
  * Kein Rückfall auf Beispieldaten. Fehlt ein Abschnitt, erscheint er nicht —
- * eine erfundene Stellenausschreibung wäre die teuerste Slocations Platzhalter.
+ * eine erfundene Stellenausschreibung wäre die teuerste Sorte Platzhalter.
  */
 
 export type CareersContent = NonNullable<WithoutNull<CAREERS_QUERY_RESULT>>;

@@ -41,7 +41,7 @@ const stars = reviews ? Math.round(reviews.average) : 0;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-family: var(--f-sans);
-    font-size: 0.8125rem;
+    font-size: var(--fs-label-md);
     line-height: 1;
     color: var(--c-dark);
   }
@@ -73,7 +73,7 @@ const stars = reviews ? Math.round(reviews.average) : 0;
   @media (max-width: 520px) {
     .c-reviews {
       gap: var(--sp-1);
-      font-size: 0.6875rem;
+      font-size: var(--fs-micro);
     }
 
     .c-reviews__meta {

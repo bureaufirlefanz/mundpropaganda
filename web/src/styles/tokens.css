@@ -40,11 +40,41 @@
   --fs-h1: clamp(2.5rem, 4.05vw, 4.375rem);          /* 70px  */
   --fs-h2: clamp(1.75rem, 2.31vw, 2.5rem);           /* 40px  */
   --fs-h3: var(--fs-h2);
+  /* 32px — die Stufe zwischen Überschrift und Fließtext. Trägt die Einträge
+     im Inhaltsverzeichnis der Pillar Pages (Figma 177:2116). */
+  --fs-h4: clamp(1.375rem, 1.85vw, 2rem);            /* 32px  */
   --fs-h5: clamp(1.125rem, 1.39vw, 1.5rem);          /* 24px  */
   --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem);/* 20px  */
   --fs-text-main: clamp(1rem, 1.04vw, 1.125rem);     /* 18px  */
   --fs-text-small: 1rem;                             /* 16px  */
   --fs-label: 0.75rem;                               /* 12px — Micro-Labels */
+
+  /* Die Zwischenstufen. Sie standen bis zum 02.09.2026 nicht hier, sondern
+     als eigene clamp()-Rampe in fast jedem Baustein: 48 font-size-Regeln,
+     26 verschiedene Grade auf fünf Seiten, davon 16 auf keiner Skala. Viele
+     davon lagen um wenige Pixel auseinander und meinten dasselbe — dreimal
+     `0.75rem` statt `--fs-label`, `clamp(1.375rem, 1.85vw, 2rem)` als
+     wörtliche Kopie von `--fs-h4`.
+
+     Die Werte sind nicht neu erfunden: Jede Stufe übernimmt den Wert, den
+     die Homepage an dieser Stelle schon hatte. Die Homepage ist der Maßstab,
+     die Unterseiten rücken auf sie ein.
+
+     Die Leiter läuft lückenlos von oben nach unten:
+     283 · 250 · 200 · 144 · 125 · 90 · 70 · 64 · 55 · 48 · 40 · 36 · 32 ·
+     28 · 24 · 20 · 18 · 16 · 14 · 13 · 12 · 11 */
+  --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem);  /* 283px — Standort-Ring */
+  --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem);     /* 200px — Magazin-Wortmarke */
+  --fs-display-md: clamp(4rem, 9vw, 9rem);           /* 144px — Geschichten, Personenseite */
+  --fs-display-sm: clamp(1.5rem, 5.2vw, 5.625rem);   /* 90px  — Magazin-Kopf, Team, Praxis, Zahlen */
+  --fs-h1-sm: clamp(2rem, 3.7vw, 4rem);              /* 64px  — Experten, Preise, Ablauf */
+  --fs-h1-xs: clamp(2rem, 3.2vw, 3.5rem);            /* 55px  — Galerie-Kopf, Geschichte */
+  --fs-h2-lg: clamp(1.75rem, 2.8vw, 3rem);           /* 48px  — Panel, Merkmale */
+  --fs-h2-sm: clamp(1.5rem, 2.08vw, 2.25rem);        /* 36px  — Einleitung, Statement */
+  --fs-h4-sm: clamp(1.25rem, 1.7vw, 1.75rem);        /* 28px  — Vorteile, Zeitleiste, Werte */
+  --fs-label-lg: 0.875rem;                           /* 14px  — Knopfbeschriftung */
+  --fs-label-md: 0.8125rem;                          /* 13px  — Navigation, Meta-Zeilen */
+  --fs-micro: 0.6875rem;                             /* 11px  — Fehlerzeichen, Badge auf Schmalgerät */
 
   --lh-display: 0.92;
   --lh-tight: 1;
@@ -75,17 +105,103 @@
   --section-space-sm: clamp(48px, 4.8vw, 84px);
   --section-space-lg: clamp(120px, 11.6vw, 200px);
 
+  /* Fluide Abstände INNERHALB einer Section — eine Ebene unter
+     `--section-space`, das zwischen Sections steht.
+
+     Warum es sie braucht: Bis zum 02.09.2026 brachte fast jeder Baustein
+     seine eigene clamp()-Rampe mit, rund 78 Stück. Sieben davon endeten auf
+     96px, vier auf 72px, vier auf 56px — jeweils mit leicht anderem
+     Startwert, ohne dass der Unterschied etwas bedeutet hätte. Die feste
+     Skala `--sp-*` konnte das nicht auffangen: Sie ist bewusst starr, diese
+     Abstände sollen mit dem Fenster wachsen.
+
+     Die Werte stammen aus den Bausteinen der Homepage (Geschichten,
+     Standards, Fuß), damit dort kein Pixel wandert. */
+  --flow-sm: clamp(24px, 3vw, 56px);
+  --flow-md: clamp(32px, 4vw, 72px);
+  --flow-lg: clamp(40px, 5vw, 96px);
+  --flow-xl: clamp(56px, 7vw, 120px);
+  --flow-2xl: clamp(64px, 8.7vw, 150px);
+
   /* --- Layout --------------------------------------------------------- */
   --site-margin: clamp(16px, 2.78vw, 48px);
   --site-gutter: clamp(16px, 1.85vw, 32px);
   --site-max: 1728px;
   --grid-cols: 12;
 
+  /* Breiten unterhalb der Seitenbreite. Sie stehen hier, weil sie mehrfach
+     gebraucht werden und dieselbe Entscheidung ausdrücken — nicht, weil jede
+     Zahl im CSS ein Token werden müsste.
+
+     `--mw-wide` ist das Maß der breiten, zentrierten Medienblöcke: der
+     Vorher/Nachher-Rahmen und die Bühne der Geschichten. Beide sind 16:9 und
+     sollen auf großen Schirmen nicht bis an die Seitenränder laufen.
+
+     `--mw-panel` ist das Textmaß in der dunklen Panel-Spalte (Figma). Nur eine
+     Stelle, aber ein Maß mit Begründung: Darüber bricht der Absatz in Zeilen,
+     die für die Spaltenbreite zu lang zu lesen sind. */
+  --mw-wide: 1100px;
+  --mw-panel: 353px;
+
   /* --- Radius --------------------------------------------------------- */
   --r-sm: 8px;
   --r-md: 16px;
   --r-lg: 32px;
+  /* Die große Panel-Rundung der Pillar Pages (Figma 177:1736). Der Kopf legt
+     eine helle Fläche über das randabfallende Bild; 32px wirken dort zu
+     knapp, 46px sind der Wert aus dem Entwurf. */
+  --r-xl: 46px;
   --r-round: 99999px;
+  /* Der feste Radius der Abschnittsnavigation. 26px ist die halbe Höhe des
+     geschlossenen Knopfs (51px) — geschlossen ergibt das die Pille des
+     Entwurfs, aufgeklappt einen gerundeten Kasten.
+
+     Bewusst ein fester Wert und nicht `--r-round`: Der skalierte mit der
+     Höhe mit, und beim Aufklappen von 51 auf 416px wanderte die Rundung
+     sichtbar mit. Ein fester Wert bleibt ruhig — und braucht deshalb gar
+     keine Animation. */
+  --r-dock: 26px;
+
+  /* --- Körnung ---------------------------------------------------------
+     Die Papierstruktur, die `ui/Backdrop.astro` als feste Auflage über die
+     Seite legt. Steht hier als Token, weil jede Fläche, die einen eigenen
+     deckenden Grund malt, sie selbst mitbringen muss — sonst wirkt sie glatt
+     neben dem gekörnten Seitengrund. Genau das war am Kopf der Pillar Page
+     als Kante zu sehen. */
+  --grain-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-opacity: 0.34;
+  /* Für Flächen, die ihren eigenen deckenden Grund malen und die Körnung
+     selbst auflegen müssen.
+
+     Warum ein zweiter Wert: `Backdrop` multipliziert seine Körnung gegen eine
+     eigene, durchsichtige Ebene und landet dadurch schwächer auf der Seite,
+     als dieselbe Deckkraft direkt auf einer Farbfläche tut. Gemessen am Kopf
+     der Pillar Page: die Seite verliert 5 Stufen gegenüber #d6d6d6, eine
+     Fläche mit 0.34 verlöre 10. 0.17 trifft die Seite. */
+  --grain-opacity-surface: 0.17;
+
+  /* --- Schatten --------------------------------------------------------
+     Die einzigen Stellen der Seite, an denen etwas eine Fläche über einer
+     anderen wirft. Sie standen bis eben als ausgeschriebene `rgb()`-Werte in
+     vier Bausteinen — und `64 50 41` ist nichts anderes als `--c-dark`, nur
+     von Hand abgetippt.
+
+     Warum die ganze Angabe hier steht und nicht nur die Farbe: Versatz,
+     Weichzeichnung und Ausdehnung sind dieselbe Gestaltungsentscheidung wie
+     der Farbton. Bliebe nur die Farbe ein Token, stünden die drei Längen
+     weiter verstreut in den Dateien, und ein Schatten, der überall gleich
+     aussehen soll, wäre wieder an vier Stellen zu ändern.
+
+     Bewusst `rgb()` und nicht `color-mix()` mit `--c-dark`: Der Browser
+     rechnet color-mix zu `color(srgb …)` aus, während dieselbe Farbe als
+     `rgba(…)` herauskommt. Optisch identisch, für den Stilvergleich in
+     `npm run web:styles` aber ein Unterschied — und der soll echte
+     Abweichungen melden, nicht Schreibweisen. */
+  --shadow-bar: 0 8px 32px -14px rgb(64 50 41 / 0.16);
+  --shadow-panel: 0 24px 56px -24px rgb(64 50 41 / 0.22);
+  --shadow-card: 0 24px 60px -20px rgb(64 50 41 / 0.28);
+  --shadow-handle: 0 4px 20px rgb(0 0 0 / 0.15);
+  --shadow-handle-active: 0 6px 26px rgb(0 0 0 / 0.22);
 
   /* --- Border --------------------------------------------------------- */
   --bw: 1px;
@@ -95,8 +211,16 @@
      langsam-auslaufend (kein Bounce) — passt zum ruhigen, teuren Look.
      -------------------------------------------------------------------- */
   --e-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --e-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --e-swift: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Die ruhige Dauerschleife: Faden und Zahnlinien atmen damit endlos.
+     Bewusst nah an der Geraden — ein echtes ease-in-out steht in der Mitte
+     zu lange still, die Bewegung wirkt dann wie ein Ruckeln. Sie stand
+     zweimal wörtlich in den Bausteinen, bevor sie hier landete.
+
+     `--e-in-out` ist am 02.09.2026 entfallen. Es stand im Styleguide mit dem
+     Zweck „Aufklappen" und wurde an keiner einzigen Stelle benutzt — das
+     Akkordeon, also genau das genannte Beispiel, klappt mit `--e-out` auf. */
+  --e-ambient: cubic-bezier(0.32, 0.14, 0.68, 0.86);
   --d-fast: 0.25s;
   --d-base: 0.45s;
   --d-slow: 0.8s;
@@ -107,6 +231,12 @@
   --z-nav: 100;
   --z-overlay: 200;
   --z-cursor: 300;
+  /* Über allem. Der Sprung zum Inhalt ist wertlos, sobald ihn irgendetwas
+     verdeckt — und genau das passierte: Er stand auf 100, die Navigation
+     steht auf --z-nav (ebenfalls 100), und bei Gleichstand gewinnt das später
+     gezeichnete Element. Sichtbar war der Sprung damit nur zur Hälfte, hinter
+     der Leiste, die er überspringen soll. */
+  --z-skiplink: 400;
 }
 
 /* Sektionen können ihr Farbschema lokal umschalten. */

@@ -1,0 +1,127 @@
+---
+/**
+ * A set-off note for study references, legal wording and warnings.
+ *
+ * `<aside>` and no invented ARIA role: the element already says "related,
+ * but not the main thread", which is exactly what this is. `role="note"`
+ * would add nothing, and `role="alert"` would be wrong — it interrupts a
+ * screen reader mid-sentence, and none of these notes are urgent enough
+ * for that.
+ *
+ * `variant` bleibt als Angabe erhalten, ändert aber das Aussehen nicht mehr:
+ * Alle drei Arten stehen auf derselben braunen Fläche. Ein Warnhinweis auf
+ * einer Behandlungsseite ist eine Fußnote zur Behandlung, keine
+ * Fehlermeldung — ihn farblich herauszuheben gäbe ihm auf der Seite mehr
+ * Gewicht, als er im Text hat.
+ */
+interface Props {
+  variant?: "source" | "info" | "warning";
+  title?: string;
+  href?: string;
+  linkLabel?: string;
+}
+
+const {
+  variant = "info",
+  title,
+  href,
+  linkLabel = "Zur Quelle",
+} = Astro.props;
+
+/** Only leave the site in a new tab. An internal link staying in the same
+    tab keeps the back button working. */
+const isExternal = href?.startsWith("http") ?? false;
+---
+
+<aside class="c-sourcenote" data-variant={variant}>
+  {title && <p class="c-sourcenote__title">{title}</p>}
+
+  <div class="c-sourcenote__body">
+    <slot />
+  </div>
+
+  {href && (
+    <a
+      class="c-sourcenote__link"
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener" : undefined}
+    >
+      {linkLabel}
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+        <path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" />
+      </svg>
+    </a>
+  )}
+</aside>
+
+<style>
+  /* Braune Fläche, graue Schrift — ein abgesetzter Kasten, der als solcher
+     zu erkennen ist. Vorher war es eine kaum sichtbare Aufhellung mit einem
+     Streifen links; auf dem ohnehin grauen Seitengrund sah das nach einem
+     Fehler aus statt nach einer Auszeichnung. */
+  .c-sourcenote {
+    max-width: 68ch;
+    padding: var(--sp-5) var(--sp-6);
+    border-radius: var(--r-md);
+    background: var(--c-dark);
+    color: var(--c-grey);
+  }
+
+
+
+
+  /* Eigene Farbe statt geerbter: Der Kasten steht mal auf dem Seitengrund,
+     mal auf einer Fläche. Ohne Angabe erbte der Titel dort den gedämpften
+     Ton und kam auf 4,32:1 — WCAG 1.4.3 verlangt 4,5:1 (gemeldet von
+     `npm run web:check` auf der Komponentenseite). */
+  .c-sourcenote__title {
+    color: var(--c-grey);
+    margin: 0 0 var(--sp-2);
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* 65 % ist der Wert, ab dem grauer Text auf Braun die 4.5:1 erreicht —
+     derselbe, den `tokens.css` für dunkle Flächen ansetzt. */
+  .c-sourcenote__body {
+    font-size: var(--fs-text-small);
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--c-grey) 65%, transparent);
+  }
+
+  /* The slot content is written by the caller and carries the caller's
+     scope, not this component's — without `:global()` these rules would
+     never match. */
+  .c-sourcenote__body :global(p) {
+    margin: 0;
+  }
+
+  .c-sourcenote__body :global(p + p) {
+    margin-top: var(--sp-2);
+  }
+
+  .c-sourcenote__link {
+    color: var(--c-grey);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: var(--sp-3);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .c-sourcenote__link svg {
+    transition: translate var(--d-base) var(--e-out);
+  }
+
+  .c-sourcenote__link:hover svg {
+    translate: 4px 0;
+  }
+</style>

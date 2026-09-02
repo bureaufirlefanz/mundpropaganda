@@ -1,0 +1,258 @@
+---
+/**
+ * Der Zusammenbau einer Pillar Page.
+ *
+ * **Strukturell eigenständig, in den Bausteinen geteilt.** Eine Pillar Page
+ * hat mit einer Leistungsseite nichts gemeinsam außer den Komponenten: Sie
+ * ist auf ein Suchwort geschrieben, umfasst ein Vielfaches an Text und stellt
+ * ihre Abschnitte je Thema anders. Deshalb eine eigene Vorlage, ein eigener
+ * Datenvertrag (`lib/pillar-sections.ts`) und eine eigene Route — und
+ * dieselben `Intro`, `Prices`, `Compare`, `Steps` und `CtaBand` wie nebenan.
+ *
+ * Die Vorlage lädt nichts. Sie bekommt eine `PillarPage` und verteilt. Woher
+ * die kommt, entscheidet die Route: heute eine Datei unter `content/`,
+ * später Sanity. Dass hier kein `sanityClient` steht, ist die Bedingung
+ * dafür, dass der Umzug ein Import-Austausch bleibt.
+ *
+ * ── Hierarchie ───────────────────────────────────────────────────────────
+ *
+ * Genau ein `<h1>`: der Seitentitel im Kopf. Jeder Abschnitt trägt ein
+ * `<h2>`, Zwischentitel innerhalb eines Textabschnitts ein `<h3>`. Die
+ * Topline ist ein `<span>` und keine Überschrift — sie benennt die Rubrik,
+ * nicht den Inhalt, und als Überschrift verdoppelte sie jede Ebene.
+ *
+ * ── Sprungmarken ─────────────────────────────────────────────────────────
+ *
+ * Drei Dinge brauchen dieselbe Antwort: das Inhaltsverzeichnis im Text, die
+ * Abschnittsnavigation am unteren Rand und die `id` am Abschnitt selbst.
+ * Sie entstehen deshalb aus einer Quelle — `navLabelOf()` sagt, welcher
+ * Abschnitt einen Eintrag bekommt und wie er heißt, `headingsFromSections()`
+ * macht daraus die Kennungen mit derselben `idFrom()` wie die Beitragsseiten.
+ *
+ * **Beschriftung und Überschrift sind zweierlei.** Im Dock steht
+ * „Abschleifen", auf der Seite „Müssen die Zähne für Veneers abgeschliffen
+ * werden?". Zehn ausgeschriebene Fragen wären keine Übersicht mehr. Die
+ * Sprungmarke entsteht aus der kurzen Fassung — `#abschleifen` statt einer
+ * Adresse, die über eine Zeile läuft.
+ */
+import Base from "../layouts/Base.astro";
+import PillarHero from "../components/sections/PillarHero.astro";
+import QuickFacts from "../components/sections/QuickFacts.astro";
+import Contents from "../components/sections/Contents.astro";
+import Intro from "../components/sections/Intro.astro";
+import Prices from "../components/sections/Prices.astro";
+import Compare from "../components/sections/Compare.astro";
+import Contact from "../components/sections/Contact.astro";
+import Prose from "../components/sections/Prose.astro";
+import Steps from "../components/sections/Steps.astro";
+import Faq from "../components/sections/Faq.astro";
+import BeforeAfter from "../components/sections/BeforeAfter.astro";
+import Stories from "../components/sections/Stories.astro";
+import CtaBand from "../components/sections/CtaBand.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import SectionDock from "../components/ui/SectionDock.astro";
+import { headingsFromSections } from "../lib/table-of-contents";
+import { navLabelOf, type PillarPage } from "../lib/pillar-sections";
+import type { HomepageContent } from "../lib/homepage";
+
+interface Props {
+  page: PillarPage;
+  /** Dieselben Stimmen wie auf Start- und Leistungsseiten, dort gepflegt. */
+  stories?: HomepageContent["storiesItems"];
+}
+
+const { page, stories = [] } = Astro.props;
+const { sections } = page;
+
+/* In Renderreihenfolge. Wer einen Abschnitt verschiebt, verschiebt seinen
+   Eintrag im Verzeichnis und in der Navigation mit. */
+const anchors = headingsFromSections(sections.map(navLabelOf));
+
+/* Ein Zeiger je Abschnitt. Der Index zählt nur die Abschnitte mit Marke, in
+   derselben Reihenfolge, in der `anchors` entstanden ist — damit trifft der
+   n-te markierte Abschnitt den n-ten Eintrag, auch wenn zwei Überschriften
+   gleich lauten. */
+let marked = -1;
+const idFor = (index: number): string | undefined => {
+  if (!navLabelOf(sections[index]!)) return undefined;
+  marked += 1;
+  return anchors[marked]?.id;
+};
+
+/* Die laufende Nummer eines markierten Abschnitts, 1-basiert — dieselbe, die
+   im Verzeichnis und in der Abschnittsnavigation steht. `idFor()` zählt beim
+   Rendern mit, deshalb ist `marked` danach der Index dieses Abschnitts. */
+const numberOf = () => marked + 1;
+
+/* Das Menü lohnt erst ab einer Handvoll Abschnitten — dieselbe Schwelle wie
+   beim Verzeichnis der Beiträge. */
+const showDock = anchors.length >= 4;
+---
+
+{/* Ob die Seite einen Kontaktabschnitt zeigt, steht im Inhalt — die Pillar
+    Page setzt ihre Abschnitte aus dem Baukasten zusammen. Trägt sie keinen,
+    wandert `#kontakt` in den Fuß. */}
+<Base
+  title={`${page.title} - Mundpropaganda`}
+  description={page.seoDescription ?? page.lead}
+  contactSection={page.sections.some((s) => s._type === "contact")}
+>
+  {/* Eigener Kopf, kein `ServiceHero`: Der Entwurf legt hier eine helle
+      Fläche über ein randabfallendes Bild, während die Leistungsseite Text
+      links und Bild rechts stellt. Zwei verschiedene Bauten, zwei Bausteine. */}
+  <PillarHero
+    title={page.title}
+    eyebrow={page.topline}
+    image={page.image}
+    alt={page.imageAlt ?? ""}
+  />
+
+  {
+    sections.map((section, index) => {
+      const id = idFor(index);
+
+      switch (section._type) {
+        case "quickFacts":
+          return (
+            <QuickFacts
+              topline={section.topline}
+              headline={section.headline}
+              items={section.items}
+            />
+          );
+
+        case "contents":
+          return (
+            <Contents
+              headings={anchors}
+              headline={section.headline}
+              image={section.image}
+              alt={section.alt ?? ""}
+              caption={section.caption}
+            />
+          );
+
+        case "intro":
+          return (
+            <div class="s-pillar__anchor" id={id} data-toc-target={id}>
+              {id && <SectionHeading number={numberOf()} headline={section.headline!} />}
+              <Intro
+                topline={section.topline}
+                headline={id ? undefined : section.headline}
+                columns={section.columns}
+                image={section.image}
+                alt={section.alt ?? ""}
+                variant={section.variant}
+              />
+            </div>
+          );
+
+        case "pricing":
+          return (
+            <>
+              {/* `title=""` und nicht `undefined`: Die Voreinstellung
+                  „Kosten" im Baustein griffe sonst wieder, und die
+                  Überschrift stünde zweimal da. */}
+              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              <Prices
+                id={id}
+                title={id ? "" : section.headline}
+                pricing={section.pricing}
+                note={section.note}
+                disclaimer={section.disclaimer}
+              />
+            </>
+          );
+
+        case "compare":
+          return (
+            <div class="s-pillar__anchor" id={id} data-toc-target={id}>
+              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              <Compare
+                topline={section.topline}
+                headline={id ? undefined : section.headline}
+                columns={section.columns}
+                lines={section.lines}
+                note={section.note}
+              />
+            </div>
+          );
+
+        case "prose":
+          return (
+            <>
+              {id && <SectionHeading number={numberOf()} headline={section.heading} />}
+              <Prose
+                id={id!}
+                body={section.body}
+                image={section.image}
+                alt={section.alt ?? ""}
+                side={section.side}
+                note={section.note}
+              />
+            </>
+          );
+
+        case "steps":
+          return (
+            <div class="s-pillar__anchor" id={id} data-toc-target={id}>
+              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              <Steps steps={section.steps} />
+            </div>
+          );
+
+        case "faq":
+          return (
+            <div class="s-pillar__anchor" id={id} data-toc-target={id}>
+              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              <Faq
+                title={id ? "" : section.headline}
+                text={section.text}
+                questions={section.questions}
+              />
+            </div>
+          );
+
+        case "beforeAfter":
+          return (
+            <BeforeAfter
+              topline={section.topline}
+              before={section.before}
+              after={section.after}
+            />
+          );
+
+        case "stories":
+          return stories.length ? <Stories items={stories} /> : null;
+
+        case "contact":
+          return <Contact service={section.service} extended={section.extended} />;
+
+        case "ctaBand":
+          return (
+            <CtaBand
+              headline={section.headline}
+              text={section.text}
+              actionLabel={section.actionLabel}
+              actionHref={section.actionHref}
+              image={section.image}
+              alt={section.alt ?? ""}
+            />
+          );
+      }
+    })
+  }
+
+  {showDock && <SectionDock headings={anchors} label="Abschnitte auf dieser Seite" />}
+</Base>
+
+<style>
+  /* Der Anker sitzt auf einer Hülle, nicht auf der Überschrift: Ein Sprung
+     landet damit über dem Abschnitt statt mitten darin.
+
+     `scroll-margin-top` mit demselben Wert wie in `Post.astro` — die klebende
+     Leiste würde die Überschrift sonst verdecken. */
+  .s-pillar__anchor {
+    scroll-margin-top: calc(var(--nav-height, 96px) + var(--sp-4));
+  }
+</style>

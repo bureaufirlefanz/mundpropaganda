@@ -23,6 +23,18 @@ export function initFilter() {
   const cards = [...document.querySelectorAll("[data-category]")];
   if (!button || !panel || !cards.length) return;
 
+  /* Die Region für die Ergebnisansage. Sie liegt außerhalb von `[data-filter]`,
+     deshalb vom Dokument aus gesucht. Fehlt sie, wird nur nicht angesagt —
+     das Filtern selbst hängt nicht daran. */
+  const status = document.querySelector("[data-filter-status]");
+
+  /* Der Klartext einer Kategorie steht bereits auf ihrem Knopf. Ihn dort
+     abzulesen ist verlässlicher, als die Zuordnung ein zweites Mal zu pflegen:
+     `data-category` trägt den Rohwert aus dem Schema („technik"), angesagt
+     werden soll aber, was auch auf dem Bildschirm steht. */
+  const beschriftung = (wert) =>
+    options.find((o) => (o.dataset.filterValue || "") === wert)?.textContent.trim() || wert;
+
   /* --- Auf- und Zuklappen ------------------------------------------------ */
 
   const tags = [...panel.querySelectorAll("[data-filter-value]")];
@@ -135,6 +147,17 @@ export function initFilter() {
     }
 
     if (dot) dot.hidden = !value;
+
+    /* WCAG 2.2, 4.1.3: Das Ergebnis ansagen. Gezählt wird an den Daten und
+       nicht an `card.hidden` — beim Ausblenden setzt eine Animation das
+       Attribut erst in ihrem `onComplete`, die Zählung liefe der Anzeige also
+       um eine Vierteldrehung hinterher und nennte die Zahl von vorhin. */
+    if (status) {
+      const treffer = cards.filter((c) => !value || c.dataset.category === value).length;
+      const wo = value ? `in der Kategorie ${beschriftung(value)}` : "insgesamt";
+      status.textContent =
+        treffer === 1 ? `Ein Beitrag ${wo}.` : `${treffer} Beiträge ${wo}.`;
+    }
   }
 
   for (const o of options) {

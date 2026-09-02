@@ -18,7 +18,14 @@ import Accordion from "../../components/ui/Accordion.astro";
 /* --- Kontrast ---------------------------------------------------------
    Zur Bauzeit gerechnet. Die Farben stehen hier als Hex, weil sich clamp()
    und color-mix() nicht in Node auswerten lassen — sie sind aus tokens.css
-   übernommen und über den Prüflauf abgesichert, nicht frei gewählt. */
+   übernommen, nicht frei gewählt.
+
+   Abgesichert ist das seit dem 15.08.2026 durch `checkStyleguideColours()`
+   in `scripts/check-web.mjs`: Die Prüfung vergleicht jeden Wert hier mit dem
+   zugehörigen `--c-*` in tokens.css. Vorher stand an dieser Stelle, das sei
+   „über den Prüflauf abgesichert" — das war es nicht, kein Skript hat die
+   beiden Listen je verglichen. Ein geänderter Farbton in tokens.css hätte
+   die Tafel lautlos falsch werden lassen. */
 const HEX = {
   brand: "#ff84c8",
   dark: "#403229",
@@ -55,32 +62,110 @@ const COLORS = [
   { name: "--c-neutral-200", hex: HEX["neutral-200"], role: "Flächen: Karten, Eingabefelder", against: HEX["neutral-800"], againstName: "--c-neutral-800" },
 ];
 
-/* Abgeleitete Töne. Die Deckungswerte sind gerechnet — siehe tokens.css. */
-const DERIVED = [
-  { name: "--c-text-muted", rule: "--c-dark auf 75 %", purpose: "Nebentext auf Grau", value: 4.53 },
-  { name: "--c-text-muted (Taupe)", rule: "--c-dark auf 82 %", purpose: "Nebentext auf Taupe", value: 4.55 },
-  { name: "--c-text-muted (dunkel)", rule: "--c-grey auf 65 %", purpose: "Nebentext auf Braun", value: 4.62 },
-  { name: "--c-line", rule: "--c-dark auf 28 %", purpose: "Trennlinien - Schmuck, kein Bedienelement", value: null },
-];
+/* Abgeleitete Töne.
 
+   Die Kontrastwerte hier waren bis zum 02.09.2026 feste Zahlen im Quelltext,
+   obwohl der Seitenkopf verspricht, sie seien gerechnet. Genau das ging schief:
+   Der Taupe-Wert stand auf 4,55:1, weil das Token einmal auf 81 % gestanden
+   hatte. Bei den heutigen 82 % sind es 4,68:1. Jetzt rechnet dieselbe Formel
+   wie oben, und die Deckung steht nur noch an einer Stelle. */
+const mix = (fg: string, bg: string, p: number) => {
+  const [F, B] = [channels(fg), channels(bg)];
+  return "#" + [0, 1, 2].map((i) => Math.round(F[i] * p + B[i] * (1 - p)).toString(16).padStart(2, "0")).join("");
+};
+
+const DERIVED = [
+  { name: "--c-text-muted", cover: 0.75, on: HEX.grey, onName: "--c-grey", ink: HEX.dark, purpose: "Nebentext auf Grau" },
+  { name: "--c-text-muted (Taupe)", cover: 0.82, on: HEX.taupe, onName: "--c-taupe", ink: HEX.dark, purpose: "Nebentext auf Taupe" },
+  { name: "--c-text-muted (dunkel)", cover: 0.65, on: HEX.dark, onName: "--c-dark", ink: HEX.grey, purpose: "Nebentext auf Braun" },
+  { name: "--c-line", cover: 0.28, on: HEX.grey, onName: "--c-grey", ink: HEX.dark, purpose: "Trennlinien - Schmuck, kein Bedienelement", decoration: true },
+].map((a) => ({ ...a, value: contrast(mix(a.ink, a.on, a.cover), a.on) }));
+
+/* Die vollständige Leiter, lückenlos von 283 px bis 11 px. Bis zum 02.09.2026
+   standen hier neun Stufen, während die Seiten 26 verschiedene Grade
+   rendersten - 16 davon auf keiner Skala, verteilt auf 48 eigene
+   font-size-Regeln. Die Zwischenstufen sind nicht neu erfunden: Jede
+   übernimmt den Wert, den die Homepage an dieser Stelle schon hatte. */
 const SIZES = [
+  { token: "--fs-display-xl", figma: "283 px", purpose: "Konturschrift im Standort-Ring", text: "Berlin" },
   { token: "--fs-display", figma: "250 px", purpose: "Wortmarke im Hero", text: "Mund" },
+  { token: "--fs-display-lg", figma: "200 px", purpose: "Wortmarke des Magazins", text: "Magazin" },
+  { token: "--fs-display-md", figma: "144 px", purpose: "Geschichten, Personenseite", text: "Anna" },
   { token: "--fs-display-2", figma: "125 px", purpose: "Konturzahlen der Standorte", text: "P25" },
+  { token: "--fs-display-sm", figma: "90 px", purpose: "Magazinkopf, Team, Praxis, Kennzahlen", text: "24" },
   { token: "--fs-h1", figma: "70 px", purpose: "Seitentitel der Leistungsseiten", text: "Veneers" },
+  { token: "--fs-h1-sm", figma: "64 px", purpose: "Experten, Preise, Ablauf", text: "Unsere Experten" },
+  { token: "--fs-h1-xs", figma: "55 px", purpose: "Galeriekopf, Geschichte", text: "Unsere Standorte" },
+  { token: "--fs-h2-lg", figma: "48 px", purpose: "Panel, Merkmale", text: "Vier Tage Woche" },
   { token: "--fs-h2", figma: "40 px", purpose: "Überschrift einer Section", text: "Unsere Standorte" },
+  { token: "--fs-h2-sm", figma: "36 px", purpose: "Einleitung, Statement", text: "Eine volle Stunde" },
+  { token: "--fs-h4", figma: "32 px", purpose: "Inhaltsverzeichnis, Stellen, Preise", text: "Zahnreinigung" },
+  { token: "--fs-h4-sm", figma: "28 px", purpose: "Vorteile, Zeitleiste, Werte", text: "Eigenes Meisterlabor" },
   { token: "--fs-h5", figma: "24 px", purpose: "Meta-Zeilen im Hero", text: "Zahnarzt Prenzlauer Berg" },
   { token: "--fs-text-large", figma: "20 px", purpose: "Einleitungstexte", text: "Wir nehmen uns eine volle Stunde." },
   { token: "--fs-text-main", figma: "18 px", purpose: "Fließtext", text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus." },
   { token: "--fs-text-small", figma: "16 px", purpose: "Toplines, Beschriftungen", text: "Prenzlauer Berg" },
+  { token: "--fs-label-lg", figma: "14 px", purpose: "Knopfbeschriftung", text: "Termin buchen" },
+  { token: "--fs-label-md", figma: "13 px", purpose: "Navigation, Meta-Zeilen", text: "Leistungen" },
   { token: "--fs-label", figma: "12 px", purpose: "Kleinstbeschriftungen", text: "Ab 690 € je Zahn" },
+  { token: "--fs-micro", figma: "11 px", purpose: "Fehlerzeichen, Badge auf Schmalgerät", text: "4,9 von 5" },
+];
+
+/* `--fs-h3` ist ein Alias auf `--fs-h2` und steht deshalb nicht als eigene
+   Stufe in der Leiter. */
+
+const LINE_HEIGHTS = [
+  { token: "--lh-display", value: "0.92", purpose: "Wortmarken - die Zeilen sollen sich berühren" },
+  { token: "--lh-tight", value: "1", purpose: "Einzeilige Konturzahlen" },
+  { token: "--lh-heading", value: "1.1", purpose: "Überschriften" },
+  { token: "--lh-body", value: "1.5", purpose: "Fließtext" },
+];
+
+const TRACKING = [
+  { token: "--tracking-display", value: "-0.02em", purpose: "Große Grade laufen enger, sonst zerfallen sie" },
+  { token: "--tracking-mono", value: "0.04em", purpose: "Gesperrte Mono-Beschriftungen" },
 ];
 
 const SPACING = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-8", "--sp-10", "--sp-12", "--sp-16"];
-const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-round"];
+const FLOW = [
+  { token: "--flow-sm", value: "24 - 56 px", purpose: "Enge Reihen, Fußzeilen" },
+  { token: "--flow-md", value: "32 - 72 px", purpose: "Spalten nebeneinander" },
+  { token: "--flow-lg", value: "40 - 96 px", purpose: "Kartenraster" },
+  { token: "--flow-xl", value: "56 - 120 px", purpose: "Kopf einer Section zum Inhalt" },
+  { token: "--flow-2xl", value: "64 - 150 px", purpose: "Der große Absatz innerhalb einer Section" },
+];
+
+const LAYOUT = [
+  { token: "--site-margin", value: "16 - 48 px", purpose: "Seitenrand links und rechts" },
+  { token: "--site-gutter", value: "16 - 32 px", purpose: "Spaltenabstand im Raster" },
+  { token: "--site-max", value: "1728 px", purpose: "Größte Satzbreite, danach wächst nichts mehr" },
+  { token: "--grid-cols", value: "12", purpose: "Spalten des Rasters" },
+  { token: "--mw-wide", value: "1100 px", purpose: "Breite Medienblöcke: Vorher/Nachher, Bühne" },
+  { token: "--mw-panel", value: "353 px", purpose: "Textmaß in der dunklen Panel-Spalte" },
+];
+
+const SHADOWS = [
+  { token: "--shadow-bar", purpose: "Die schwebende Leiste" },
+  { token: "--shadow-panel", purpose: "Panel über der Seite" },
+  { token: "--shadow-card", purpose: "Karten im Raster" },
+  { token: "--shadow-handle", purpose: "Griff im Vorher/Nachher-Regler" },
+  { token: "--shadow-handle-active", purpose: "Derselbe Griff, angefasst" },
+];
+
+const LAYERS = [
+  { token: "--z-base", value: "1", purpose: "Grundebene" },
+  { token: "--z-sticky", value: "50", purpose: "Mitlaufende Elemente" },
+  { token: "--z-nav", value: "100", purpose: "Navigation" },
+  { token: "--z-overlay", value: "200", purpose: "Menü, Overlays" },
+  { token: "--z-cursor", value: "300", purpose: "Zeiger" },
+  { token: "--z-skiplink", value: "400", purpose: "Sprung zum Inhalt - muss über allem liegen" },
+];
+
+const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-dock", "--r-round"];
 const CURVES = [
   { token: "--e-out", purpose: "Standard. Schnell los, lange auslaufend." },
-  { token: "--e-in-out", purpose: "Wenn Anfang und Ende gleich wiegen - Aufklappen." },
   { token: "--e-swift", purpose: "Kurze Zustandswechsel: Farbe, Deckkraft." },
+  { token: "--e-ambient", purpose: "Endlose Dauerschleife - Faden, Zahnlinien." },
 ];
 const DURATIONS = [
   { token: "--d-fast", value: "0.25 s", purpose: "Farbwechsel beim Überfahren" },
@@ -88,7 +173,7 @@ const DURATIONS = [
   { token: "--d-slow", value: "0.8 s", purpose: "Aufklappen, Umblenden" },
 ];
 
-const SYMBOLS = ["i-arrow", "i-chevron", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
+const SYMBOLS = ["i-arrow", "i-chevron", "i-filter", "i-star", "i-upload", "i-instagram", "i-facebook", "i-linkedin", "i-youtube", "i-x", "i-logo"];
 
 const SAMPLE_QUESTIONS = [
   { question: "Wie bekomme ich einen Termin?", answer: "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein." },
@@ -119,10 +204,11 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <span class="d-section__number">01</span>
       <h2 class="d-section__title">Farben</h2>
       <p class="d-section__text">
-        Sechs Farben, mehr nicht. Daneben steht das gemessene Kontrastverhältnis
-        gegen den Grund, auf dem die Farbe tatsächlich vorkommt - WCAG&nbsp;AA
-        verlangt 4,5:1 für Fließtext, 3:1 für große Schrift und für
-        Bedienelemente.
+        Sechs Farben tragen die Gestaltung; dazu kommen Weiß und Schwarz als
+        Werkzeug, für Eingabefelder und Verläufe. Daneben steht das gemessene
+        Kontrastverhältnis gegen den Grund, auf dem die Farbe tatsächlich
+        vorkommt - WCAG&nbsp;AA verlangt 4,5:1 für Fließtext, 3:1 für große
+        Schrift und für Bedienelemente.
       </p>
     </div>
 
@@ -167,9 +253,18 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
           {DERIVED.map((a) => (
             <tr>
               <td><code>{a.name}</code></td>
-              <td>{a.rule}</td>
+              <td>
+                <code>{a.ink === HEX.grey ? "--c-grey" : "--c-dark"}</code>
+                {` auf ${Math.round(a.cover * 100)} %`}
+              </td>
               <td>{a.purpose}</td>
-              <td>{a.value ? `${formatNumber(a.value)}:1` : "-"}</td>
+              <td>
+                {formatNumber(a.value)}:1
+                {" "}
+                <span class={a.decoration ? "d-marker d-marker--weak" : a.value >= 4.5 ? "d-marker d-marker--good" : "d-marker d-marker--partial"}>
+                  {a.decoration ? "Schmuck" : a.value >= 4.5 ? "Fließtext" : "nur groß"}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -204,6 +299,24 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
           <p class="d-font-sample" style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em">Light 300 gesperrt</p>
         </div>
       </div>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Zeilenhöhe und Laufweite</span></div>
+      <p class="d-sample__text">
+        Beide gehören zur Skala und standen bis zum 02.09.2026 nicht auf dieser
+        Seite. Bei der Laufweite ist das nicht folgenlos geblieben: Neben den
+        zwei Token stehen im Bestand zwölf ausgeschriebene Werte an 115 Stellen,
+        27 davon schreiben genau den Wert aus, den ein Token schon hält.
+      </p>
+      <table class="d-table">
+        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
+        <tbody>
+          {[...LINE_HEIGHTS, ...TRACKING].map((a) => (
+            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
+          ))}
+        </tbody>
+      </table>
     </div>
 
     <div class="d-sample">
@@ -250,6 +363,46 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     </div>
 
     <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Fluide Abstände innerhalb einer Section</span>
+        <span class="d-sample__path">--flow-*</span>
+      </div>
+      <p class="d-sample__text">
+        Eine Ebene unter <code>--section-space</code>. Die feste Skala oben kann
+        das nicht leisten - sie ist bewusst starr, diese Abstände sollen mit dem
+        Fenster wachsen. Bis zum 02.09.2026 brachte fast jeder Baustein dafür
+        seine eigene <code>clamp()</code>-Rampe mit, rund 78 Stück: sieben
+        endeten auf 96&nbsp;px, vier auf 72, vier auf 56, jeweils mit anderem
+        Startwert, ohne dass der Unterschied etwas bedeutet hätte.
+      </p>
+      <table class="d-table">
+        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
+        <tbody>
+          {FLOW.map((a) => (
+            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Layout</span></div>
+      <p class="d-sample__text">
+        Die Maße der Seite selbst. <code>--site-margin</code> und
+        <code>--site-gutter</code> sind die meistbenutzten Token des Projekts
+        und standen bis zum 02.09.2026 auf keiner Tafel.
+      </p>
+      <table class="d-table">
+        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
+        <tbody>
+          {LAYOUT.map((a) => (
+            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-sample">
       <div class="d-sample__header"><span class="d-sample__name">Radien</span></div>
       <div class="d-stage d-stage--row">
         {RADII.map((r) => (
@@ -260,8 +413,14 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
         ))}
       </div>
       <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Rahmenstärke ist überall <code>--bw</code> (1&nbsp;px). Es gibt keine
-        zweite - eine Seite mit drei Linienstärken wirkt unentschieden.
+        Rahmenstärke ist <code>--bw</code> (1&nbsp;px), überall bis auf fünf
+        Stellen. Die sind Gestaltung und kein Versehen: 10&nbsp;px um die
+        Promokachel der Navigation, 2&nbsp;px als Markierung an Zeitleiste,
+        Stellenliste und Personenzitat, 1,5&nbsp;px an der Auswahl im Formular.
+        Bis zum 02.09.2026 stand hier, es gebe „keine zweite" - dabei waren es
+        schon damals vier verschiedene, und acht weitere Stellen schrieben
+        <code>1px</code> aus, statt das Token zu nehmen. Wer eine sechste
+        einführt, sollte sie hier eintragen können. Sonst ist es keine.
       </p>
     </div>
   </section>
@@ -312,9 +471,16 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
       <h2 class="d-section__title">Knöpfe und Links</h2>
       <p class="d-section__text">
         Der Knopf ist zweiteilig: Pille mit Beschriftung, abgesetzt daneben der
-        runde Pfeil. Beim Überfahren wandert der Pfeil nach rechts und beide
-        Teile kehren ihre Farben um - der Knopf öffnet sich in Leserichtung.
-        Jedes Bedienelement sinkt beim Klick leicht ein.
+        runde Pfeil. Beim Überfahren rückt der Pfeil nach rechts ab - der Knopf
+        öffnet sich in Leserichtung. Das ist die einzige Rückmeldung, und zwar
+        mit Absicht: Vorher kippte zusätzlich die Farbe um, und der Farbsprung
+        übertönte das feinere Signal. Beim Klick sinken Bedienelemente leicht
+        ein, mit einer Ausnahme - Akkordeons tun es nicht, eine ganze Zeile, die
+        beim Aufklappen zusammenzuckt, wirkt wie ein Ruckeln.
+      </p>
+      <p class="d-section__text">
+        Bis zum 02.09.2026 stand hier, beim Überfahren kehrten „beide Teile ihre
+        Farben um". Das war seit dem Umbau des Knopfs nicht mehr wahr.
       </p>
     </div>
 
@@ -375,13 +541,13 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
         <div class="c-field">
           <label class="c-field__label" for="sg-name">Name <span>*</span></label>
           <div class="c-field__control">
-            <input id="sg-name" type="text" placeholder="Ihr Name" />
+            <input id="sg-name" type="text" placeholder="Ihr Name" autocomplete="name" />
           </div>
         </div>
         <div class="c-field">
           <label class="c-field__label" for="sg-mail">E-Mail-Adresse <span>*</span></label>
           <div class="c-field__control">
-            <input id="sg-mail" type="email" placeholder="name@beispiel.de" />
+            <input id="sg-mail" type="email" placeholder="name@beispiel.de" autocomplete="email" />
           </div>
         </div>
         <div class="c-field c-field--tall">
@@ -424,6 +590,70 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
           </div>
         ))}
       </div>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- */}
+  <section class="d-section">
+    <div class="d-section__header">
+      <span class="d-section__number">08</span>
+      <h2 class="d-section__title">Schatten, Körnung, Ebenen</h2>
+      <p class="d-section__text">
+        Der Rest des Systems. Diese drei Gruppen standen bis zum 02.09.2026 auf
+        keiner Tafel, obwohl sie an 19 Stellen im Einsatz sind - ein Styleguide,
+        der ein Drittel seiner eigenen Token nicht kennt, beschreibt nicht die
+        Seite, sondern einen Ausschnitt davon.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Schatten</span></div>
+      <p class="d-sample__text">
+        Die einzigen Stellen, an denen etwas eine Fläche über einer anderen
+        wirft. Die Farbe ist immer <code>--c-dark</code>, nie reines Schwarz.
+      </p>
+      <div class="d-stage d-stage--row" style="flex-wrap: wrap; gap: var(--sp-6)">
+        {SHADOWS.map((s) => (
+          <div class="d-radius">
+            <div class="d-shadow-probe" style={`box-shadow: var(${s.token})`}></div>
+            <code>{s.token}</code>
+            <p class="d-size__purpose" style="margin-top: var(--sp-1)">{s.purpose}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Körnung</span></div>
+      <p class="d-sample__text">
+        Die Papierstruktur, die <code>ui/Backdrop.astro</code> über die Seite
+        legt. Zwei Deckkraftwerte, weil eine Fläche mit eigenem deckenden Grund
+        die Körnung anders trifft als der Seitengrund:
+        <code>--grain-opacity</code> (0,34) für die Auflage,
+        <code>--grain-opacity-surface</code> (0,17) für Flächen, die sie selbst
+        mitbringen müssen. Das Bild steht als <code>--grain-image</code> bereit.
+      </p>
+      <div class="d-stage d-stage--row">
+        <div class="d-grain d-grain--page"><span>Seitengrund</span></div>
+        <div class="d-grain d-grain--surface"><span>Eigene Fläche</span></div>
+      </div>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header"><span class="d-sample__name">Ebenen</span></div>
+      <table class="d-table">
+        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
+        <tbody>
+          {LAYERS.map((a) => (
+            <tr><td><code>{a.token}</code></td><td>{a.value}</td><td>{a.purpose}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="d-sample__text" style="margin-top: var(--sp-4)">
+        Der Sprung zum Inhalt liegt bewusst über der Navigation. Bei Gleichstand
+        gewinnt das später gezeichnete Element - er stand einmal auf derselben
+        Ebene wie die Leiste und war dadurch halb verdeckt.
+      </p>
     </div>
   </section>
 
@@ -672,6 +902,42 @@ const formatNumber = (n: number) => n.toLocaleString("de-DE", { minimumFractionD
     .d-form .c-field--tall {
       grid-column: 1 / -1;
     }
+
+    /* --- Schatten und Körnung --- */
+    .d-shadow-probe {
+      width: 120px;
+      height: 72px;
+      margin-bottom: var(--sp-2);
+      border-radius: var(--r-md);
+      background: var(--c-neutral-200);
+    }
+
+    .d-grain {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 180px;
+      height: 96px;
+      border-radius: var(--r-md);
+      background: var(--c-dark);
+      color: var(--c-grey);
+      font-family: var(--f-mono);
+      font-size: var(--fs-label);
+      overflow: hidden;
+    }
+
+    .d-grain::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: var(--grain-image);
+      pointer-events: none;
+    }
+
+    .d-grain--page::after { opacity: var(--grain-opacity); }
+    .d-grain--surface::after { opacity: var(--grain-opacity-surface); }
+
+    .d-grain span { position: relative; z-index: 1; }
 
     /* --- Symbole --- */
     .d-symbol {

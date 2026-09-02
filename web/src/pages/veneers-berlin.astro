@@ -1,0 +1,32 @@
+---
+/**
+ * `/veneers-berlin` — die erste Pillar Page.
+ *
+ * Sie liegt auf der obersten Ebene, nicht unter `/leistungen`. Die Begründung
+ * steht in `studio/lib/paths.ts` und gilt unabhängig davon, woher der Inhalt
+ * kommt: Eine Pillar Page ist auf ein Suchwort gebaut, jedes Verzeichnis
+ * davor verwässert das Signal. `/leistungen/veneers` bleibt davon unberührt
+ * — das ist die Leistungsseite und eine andere Seite mit einer anderen
+ * Aufgabe.
+ *
+ * **Der Inhalt liegt vorläufig im Repository** (`content/veneers-pillar.ts`)
+ * und noch nicht in Sanity. Diese Datei ist die einzige Stelle, die das
+ * weiß: Sobald der Baukasten im Schema steht, wird aus dem Import hier ein
+ * `loadPillar(...)`, und `Pillar.astro` bleibt unverändert.
+ *
+ * Solange das so ist, gehört `veneers-berlin` **nicht** in die Liste der
+ * Slugs, die `/[slug].astro` aus Sanity baut — sonst beanspruchten zwei
+ * Routen dieselbe Adresse und die Reihenfolge im Build entschiede, welche
+ * gewinnt. `slugAvailable()` im Studio schützt nur gegen die festen Pfade,
+ * nicht gegeneinander.
+ */
+import Pillar from "../templates/Pillar.astro";
+import { veneersPillar } from "../content/veneers-pillar";
+import { loadHomepage } from "../lib/homepage";
+
+/* Die Stimmen sind geteilter Inhalt: Sie stehen auf der Startseite, den
+   Leistungsseiten und hier — gepflegt werden sie an einer Stelle. */
+const { storiesItems } = await loadHomepage();
+---
+
+<Pillar page={veneersPillar} stories={storiesItems} />

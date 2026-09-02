@@ -15,7 +15,17 @@ import { starteBrowser, erwarteServer } from "./lib/chrome.mjs";
 import { VIEWPORTS, beobachte, scrolleDurch, messe, befunde, pruefeSeite, melde } from "./lib/smoke.mjs";
 import { pruefeSeite as wcagMessen, wcagBefunde } from "./lib/wcag.mjs";
 
-const BASE = "http://localhost:4321";
+/* Standardmäßig der Dev-Server, aber umstellbar:
+ *
+ *     MP_BASE=http://localhost:4322 node scripts/check-web.mjs
+ *
+ * Der Vorschau-Server liefert den fertigen Build. Das ist näher an dem, was
+ * ausgeliefert wird — und deutlich sparsamer: Der Dev-Server hält jedes Modul
+ * einzeln im Speicher, samt @vite/client. Auf einer Maschine mit knappem
+ * Arbeitsspeicher stürzte der Renderer während des Durchlaufs reproduzierbar
+ * ab („Execution context was destroyed"), jedes Mal auf einer anderen Seite.
+ * Dieselbe Konvention wie in scripts/takt.mjs. */
+const BASE = process.env.MP_BASE ?? "http://localhost:4321";
 
 /* Über alle drei Breakpoints laufen nur die ersten beiden Seiten. Die
    Leistungsseiten teilen sich eine Route und damit ihren Aufbau — jede von
@@ -206,7 +216,7 @@ async function pruefeOhneBewegung(browser, path, vp) {
 }
 
 /**
- * WCAG 2.1 AA, soweit es sich messen lässt: Kontrast, zugängliche Namen,
+ * WCAG 2.2 AA, soweit es sich messen lässt: Kontrast, zugängliche Namen,
  * Formularbeschriftungen, Überschriftenfolge.
  *
  * Mit abgeschalteter Bewegung, sonst stehen die Reveals noch auf Deckkraft 0
@@ -314,7 +324,16 @@ async function loadHiddenTypes() {
 
 async function loadPathModel() {
   const { readFile } = await import("node:fs/promises");
-  const source = await readFile("studio/lib/paths.ts", "utf8");
+  /* Kommentare weg, bevor gesucht wird.
+
+     `paare()` unten liest mit einem Regex über den Rohtext. Eine
+     auskommentierte Zeile wie `person: "praxis",` sieht darin genauso aus wie
+     ein echter Eintrag — und wurde als solcher gezählt. Gemessen: Die
+     Routen-Deckung meldete einen Typ als „ohne Seite", dessen Eintrag längst
+     im Kommentar stand und der gar keine Seite mehr haben sollte. */
+  const source = (await readFile("studio/lib/paths.ts", "utf8"))
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "");
 
   const block = (name) => {
     const match = source.match(new RegExp(`${name}[^=]*=\\s*([\\[{][\\s\\S]*?[\\]}]);`));
@@ -421,6 +440,51 @@ async function checkImages() {
  * Anker sind Teil der Adresse und gehören damit zum Publikum, nicht zum Code:
  * `#standorte`, nicht `#locations`. Dieselbe Regel wie für die Pfade.
  */
+/**
+ * Die Farbtafel im Styleguide gegen `tokens.css`.
+ *
+ * `pages/design/styleguide.astro` hält die acht Grundfarben als ausgeschriebene
+ * Hexwerte — nötig, weil die Seite Kanäle und Kontraste ausrechnet und Node
+ * dafür keine `var()` und kein `color-mix()` auswerten kann. Der Kommentar
+ * dort behauptete, das sei „über den Prüflauf abgesichert". War es nicht: Kein
+ * Skript hat die beiden Listen je verglichen.
+ *
+ * Damit war der Styleguide die einzige Stelle, an der die Seite über sich
+ * selbst falsche Auskunft geben konnte, ohne dass irgendetwas anschlägt — wer
+ * einen Farbton in `tokens.css` ändert, ändert das ganze Erscheinungsbild, und
+ * die Tafel, die ihn dokumentiert, zeigte weiter den alten. Genau die Sorte
+ * lautloser Abweichung, gegen die es die anderen Prüfungen hier gibt.
+ */
+async function checkStyleguideColours() {
+  const { readFile } = await import("node:fs/promises");
+
+  const tokens = await readFile("web/src/styles/tokens.css", "utf8");
+  const guide = await readFile("web/src/pages/design/styleguide.astro", "utf8");
+
+  const block = guide.match(/const HEX = \{([^}]*)\}/s);
+  if (!block) {
+    console.log("  ✗ Farbtafel im Styleguide nicht gefunden — Aufbau geändert?");
+    return 1;
+  }
+
+  const gefunden = [...block[1].matchAll(/"?([a-z0-9-]+)"?:\s*"(#[0-9a-fA-F]{6})"/g)];
+  let schief = 0;
+
+  for (const [, name, hex] of gefunden) {
+    const token = tokens.match(new RegExp(`--c-${name}:\\s*(#[0-9a-fA-F]{6})`));
+    if (!token) {
+      console.log(`  ✗ --c-${name} steht im Styleguide, aber nicht in tokens.css`);
+      schief++;
+    } else if (token[1].toLowerCase() !== hex.toLowerCase()) {
+      console.log(`  ✗ --c-${name}: tokens.css sagt ${token[1]}, der Styleguide zeigt ${hex}`);
+      schief++;
+    }
+  }
+
+  if (!schief) console.log(`  ✓ ${gefunden.length} Farben im Styleguide stimmen mit tokens.css überein`);
+  return schief;
+}
+
 async function checkAnchors() {
   const { readFile, readdir } = await import("node:fs/promises");
   const { join, relative } = await import("node:path");
@@ -501,18 +565,29 @@ for (const path of PAGES) {
   problems += melde(path, await pruefeOhneBewegung(browser, path, VIEWPORTS[0]));
 }
 
-/* Startseite, eine Leistungsseite, die Karriereseite — und die beiden
-   Design-Seiten. Auf den Design-Seiten steht jeder Baustein beisammen, ein
-   Kontrastfehler in irgendeiner Komponente fällt dort also auf, auch wenn
-   die Seite, die sie einsetzt, gerade nicht im Durchlauf ist. Die
-   Karriereseite steht dabei, weil sie als einzige Seite eine aufklappbare
-   Stellenliste und die Zahlenleiste trägt. */
-console.log(`\n── Barrierefreiheit (WCAG 2.1 AA) ──`);
+/* JEDE Seite, nicht mehr eine Auswahl.
+
+   Hier standen fünf: Startseite, eine Leistungsseite, Karriere und die beiden
+   Design-Seiten. Die Begründung war, dass auf den Design-Seiten jeder Baustein
+   beisammensteht — ein Kontrastfehler in irgendeiner Komponente fällt dort
+   also auf.
+
+   Das stimmt für die Kontraste und für alles andere, was an einer Komponente
+   hängt. Es stimmt NICHT für die Kriterien, die an der Seite hängen: der
+   Sprung zum Inhalt, genau eine h1, die Überschriftenfolge über die ganze
+   Seite, die Zielgrößen im tatsächlichen Layout, `autocomplete` an den
+   Feldern, die auf DIESER Seite stehen. Ein Katalog beweist davon nichts.
+
+   Gemessen war der Unterschied nicht theoretisch: Von 29 Seiten liefen 5
+   durch die Prüfung, und die beiden Design-Seiten fielen als Einzige mit
+   fehlendem Sprung zum Inhalt auf — ausgerechnet die zwei, die ein anderes
+   Layout benutzen. Bei fünf von 29 ist so etwas Zufall, nicht Deckung.
+
+   Der Preis ist Laufzeit. Der Durchgang ist der gründliche, nicht der
+   schnelle: `scripts/check.mjs` ist der Rauchtest für zwischendurch. */
+console.log(`\n── Barrierefreiheit (WCAG 2.2 AA) ──`);
 let unpruefbar = 0;
-const BARRIERE = [
-  ...PAGES.slice(0, VOLL),
-  ...PAGES.filter((p) => p === "/karriere" || p.startsWith("/design/")),
-];
+const BARRIERE = PAGES;
 for (const path of BARRIERE) {
   const { list, result } = await pruefeBarrierefreiheit(browser, path, VIEWPORTS[0]);
   unpruefbar += result.unpruefbar.length;
@@ -538,6 +613,9 @@ problems += await checkImages();
 
 console.log(`\n── Sprungmarken ──`);
 problems += await checkAnchors();
+
+console.log(`\n── Farbtafel im Styleguide ──`);
+problems += await checkStyleguideColours();
 
 await browser.close();
 console.log(problems ? `\n${problems} Befund(e).` : "\nAlles sauber.");

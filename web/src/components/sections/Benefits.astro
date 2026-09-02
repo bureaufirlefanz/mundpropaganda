@@ -18,9 +18,9 @@ const { topline, headline, items } = Astro.props;
    Über den Index und modulo: Ohne das trüge jeder Punkt dasselbe Bild, und
    der Wechsel beim Aufklappen wäre nicht zu sehen. */
 const MOTIFS = [
-  "/img/treatment-01-1600.webp",
-  "/img/lab-veneers-1024.webp",
-  "/img/teeth-macro-1024.webp",
+  "/img/team-prophylaxe-1600.webp",
+  "/img/tee-kueche-1024.webp",
+  "/img/team-labor-1024.webp",
 ];
 ---
 
@@ -88,7 +88,7 @@ const MOTIFS = [
 
   .s-benefits__head {
     grid-column: 1;
-    margin-bottom: clamp(48px, 7vw, 120px);
+    margin-bottom: var(--flow-xl);
   }
 
   .s-benefits__title {
@@ -151,7 +151,7 @@ const MOTIFS = [
     border: var(--bw) solid color-mix(in srgb, var(--c-bg) 45%, transparent);
     border-radius: var(--r-round);
     font-family: var(--f-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
     line-height: 1;
     opacity: 0.55;
     transition: opacity var(--d-base) var(--e-out),
@@ -161,7 +161,7 @@ const MOTIFS = [
   /* Deutlich größer als der Fließtext darunter — im Entwurf trägt der Name
      die Zeile, der Text ordnet sich unter. */
   .s-benefits__name {
-    font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+    font-size: var(--fs-h4-sm);
     font-weight: 400;
     line-height: 1.2;
     opacity: 0.55;

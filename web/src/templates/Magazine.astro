@@ -10,7 +10,6 @@
  */
 import Base from "../layouts/Base.astro";
 import PostList from "../components/sections/PostList.astro";
-import Contact from "../components/sections/Contact.astro";
 import type { Post, MagazineIntro } from "../lib/magazine";
 
 interface Props {
@@ -36,7 +35,15 @@ const description = intro?.seo?.description || intro?.lead || "";
 
   {posts.length > 0 && <PostList posts={posts} />}
 
-  <Contact />
+  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+      Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
+      sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
+      Keramikinlays, Pillar Page).
+
+      Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
+      am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
+      sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
 </Base>
 
 <style>

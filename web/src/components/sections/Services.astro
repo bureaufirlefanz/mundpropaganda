@@ -16,6 +16,7 @@ const { title } = Astro.props;
 import Button from "../ui/Button.astro";
 import { loadServiceList, forTable, forList, servicePath } from "../../lib/service-list";
 import { isCmsImage, imageUrl, motifPath } from "../../lib/images";
+import { serviceMotif } from "../../lib/service-images";
 
 const list = await loadServiceList();
 const lines = forTable(list);
@@ -29,27 +30,17 @@ const more = forList(list);
    Beschriftung, das Bild nie. Gemessen an allen sechs Zeilen der Startseite,
    alle sechs ohne Wert. Das Preview war damit nicht kaputt, sondern hatte
    nichts zu zeigen. */
-const MOTIFS = [
-  "treatment-01",
-  "lab-veneers",
-  "teeth-macro",
-  "treatment-03",
-  "praxis-03",
-  "treatment-02",
-] as const;
+/* Die Zuordnung steht in `lib/service-images.ts` — dieselbe Quelle, aus der
+   auch der Kopf der Leistungsseite liest. Läge sie hier, zeigte die Tabelle
+   auf der Startseite ein anderes Bild als die Seite dahinter. */
 
 /* Das Vorschaubild hängt als Pfad im data-Attribut, weil services.js es an den
    Zeiger heftet — dafür braucht es eine fertige URL, kein Bildobjekt. */
-const previewPath = (l: (typeof lines)[number], i: number) => {
+const previewPath = (l: (typeof lines)[number]) => {
   const v = l.preview;
   if (isCmsImage(v)) return imageUrl(v, 640);
   if (typeof v === "string" && v) return v;
-  /* Hier ausnahmsweise über die Position und nicht über einen Streuwert aus
-     dem Slug: Das Preview gibt es nur in dieser einen Tabelle, es kann also
-     mit keiner zweiten Darstellung uneins werden. Und die Position ist das
-     einzige, was sechs verschiedene Motive garantiert — der Streuwert traf
-     bei sechs Zeilen nur drei davon. */
-  return motifPath(MOTIFS[i % MOTIFS.length]);
+  return motifPath(serviceMotif(l.slug));
 };
 
 /* Die Linkliste steht in einem Raster mit drei Spalten und fließt zeilenweise.
@@ -60,9 +51,9 @@ const previewPath = (l: (typeof lines)[number], i: number) => {
    richtig, ohne dass hier etwas gerechnet werden muss. */
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            UNSERE SERVICES — Tabelle mit Cursor-Preview
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-services" id="leistungen" data-services>
         <div class="container">
           <h2 class="s-services__title" data-split="lines">{title}</h2>
@@ -85,7 +76,7 @@ const previewPath = (l: (typeof lines)[number], i: number) => {
                 href={servicePath(l)}
                 data-service-row
                 data-reveal-child
-                data-preview={previewPath(l, i)}
+                data-preview={previewPath(l)}
                 data-preview-label="Mehr Info"
               >
                 <span class="s-services__name">{l.name}</span>

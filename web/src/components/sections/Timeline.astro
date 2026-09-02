@@ -46,7 +46,7 @@ const { headline, stages } = Astro.props;
         <h3 class="s-timeline__stage-title">
           {/* Die Nummer gehört zur Gestaltung, nicht zum Text — für
               Vorlesegeräte ergibt die Reihenfolge sich aus der Liste. */}
-          <span class="s-timeline__number" aria-hidden="true">{i + 1}</span>
+          <span class="c-number s-timeline__number" aria-hidden="true">{i + 1}</span>
           {e.title}
         </h3>
         <p class="s-timeline__text">{e.text}</p>
@@ -142,7 +142,7 @@ const { headline, stages } = Astro.props;
     display: flex;
     align-items: baseline;
     gap: 0.5em;
-    font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+    font-size: var(--fs-h4-sm);
     font-weight: 400;
     line-height: 1.15;
     letter-spacing: -0.01em;
@@ -160,20 +160,17 @@ const { headline, stages } = Astro.props;
      `align-self: center` statt der Grundlinie des Titels: Ein Kreis hat
      keine Grundlinie, an der man ihn ausrichten könnte — er säße sonst
      sichtbar zu tief. */
+  /* Stand als Einziger umgekehrt da: dunkler Kreis, helle Ziffer. Jetzt wie
+     überall pink mit brauner Ziffer, siehe `.c-number` in shared.css.
+
+     Die Größe bleibt in `em`, weil der Kreis hier an der Schriftgröße seiner
+     Bahn hängt und nicht an einem festen Maß. */
   .s-timeline__number {
+    --number-size: 1.7em;
+    --number-font: 0.62em;
+
     flex: 0 0 auto;
     align-self: center;
-    display: grid;
-    place-items: center;
-    width: 1.7em;
-    height: 1.7em;
-    border-radius: var(--r-round);
-    background: var(--c-dark);
-    color: var(--c-grey);
-    font-weight: 400;
-    font-size: 0.62em;
-    line-height: 1;
-    letter-spacing: 0;
   }
 
   .s-timeline__text {

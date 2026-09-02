@@ -10,7 +10,9 @@
 interface Props {
   id?: string;
   topline: string;
-  title: string;
+  /** Wahlfrei — auf Pillar Pages steht die Überschrift nummeriert darüber
+      (`ui/SectionHeading.astro`). */
+  title?: string;
   /** Zusatzzeile unter der Headline. Nicht jedes Panel hat eine. */
   text?: string;
 }
@@ -21,8 +23,8 @@ const { id, topline, title, text } = Astro.props;
 <section class="container s-panel" id={id}>
   <div class="s-panel__head">
     <span class="c-topline">{topline}</span>
-    <h2 class="s-panel__title" data-split="lines">{title}</h2>
-    {text && <p class="t-body t-muted">{text}</p>}
+    {title && <h2 class="s-panel__title" data-split="lines">{title}</h2>}
+    {text && <p class="s-panel__text t-body t-muted">{text}</p>}
   </div>
 
   <slot />
@@ -41,6 +43,21 @@ const { id, topline, title, text } = Astro.props;
   .s-panel__head {
     position: sticky;
     top: 120px;
+  }
+
+  /* Die Leseweite gehört an den Fließtext, nicht an den ganzen Kopf.
+
+     Vorher stand `max-width: 24ch` am Kopf — und `ch` rechnet in der
+     Schriftgröße des Elements, hier also der des Fließtexts. Ergebnis waren
+     246px, die auch für die Überschrift galten. Die ist aber mehr als doppelt
+     so groß: „Unverbindliches" braucht bei 40px rund 268px, passte nicht, und
+     die Zeilenmaske von SplitText hat das Wort abgeschnitten statt umbrechen
+     zu lassen. Auf jeder Seite mit einem Panel, sobald ein langes Wort in der
+     Überschrift stand.
+
+     Die Überschrift nutzt jetzt ihre Rasterspalte; der Fließtext behält seine
+     Leseweite. */
+  .s-panel__text {
     max-width: 24ch;
   }
 
@@ -50,7 +67,7 @@ const { id, topline, title, text } = Astro.props;
 
   .s-panel__title {
     margin-bottom: var(--sp-5);
-    font-size: clamp(1.75rem, 2.8vw, 3rem);
+    font-size: var(--fs-h2-lg);
     font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.02em;

@@ -1,0 +1,251 @@
+---
+/**
+ * Accountability for a medical service page: who wrote the text, who checked
+ * it professionally, when that last happened, and what it is based on.
+ *
+ * Medical copy without an author is a claim nobody stands behind. The block
+ * therefore names people rather than a house voice, and it renders nothing at
+ * all when no data is there. A placeholder like "Redaktion" would be an
+ * assertion about authorship, which is exactly what this block exists to
+ * avoid.
+ *
+ * The component only presents what it is handed. It does not fetch the
+ * person, does not guess a review date and does not build a source list from
+ * the body text.
+ */
+import CmsImage from "./CmsImage.astro";
+import { isCmsImage, type ImageSource } from "../../lib/images";
+
+interface Person {
+  name: string;
+  role?: string | null;
+  image?: ImageSource | null;
+  slug?: string | null;
+}
+
+interface Source {
+  text: string;
+  url?: string | null;
+}
+
+interface Props {
+  author?: Person | null;
+  reviewedBy?: (Omit<Person, "image">) | null;
+  /** ISO date. */
+  lastReviewed?: string | null;
+  sources?: Source[] | null;
+}
+
+const { author, reviewedBy, lastReviewed, sources } = Astro.props;
+
+/* Author and reviewer differ in one detail only: the reviewer has no
+   portrait. One list keeps the markup single instead of doubling it. */
+interface Entry extends Person {
+  label: string;
+}
+
+const entries: Entry[] = [];
+if (author?.name) entries.push({ label: "Autor", ...author });
+if (reviewedBy?.name) entries.push({ label: "Fachlich geprüft von", ...reviewedBy });
+
+const sourceList = (sources ?? []).filter((source) => source?.text);
+
+/* An unparseable date would otherwise reach the page as the literal string
+   "Invalid Date". Better to drop the line than to print that. */
+const reviewedDate = lastReviewed ? new Date(lastReviewed) : null;
+const reviewedLabel =
+  reviewedDate && !Number.isNaN(reviewedDate.getTime())
+    ? reviewedDate.toLocaleDateString("de-DE", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
+
+/* Only http(s) targets leave the site. A source given as a printed reference
+   or as an internal path gets neither a new tab nor a noopener hint. */
+const isExternal = (url: string) => /^https?:/i.test(url);
+
+const hasContent = entries.length > 0 || Boolean(reviewedLabel) || sourceList.length > 0;
+---
+
+{hasContent && (
+  <aside class="c-author-note" aria-label="Angaben zum Text">
+    {entries.length > 0 && (
+      <div class="c-author-note__people">
+        {entries.map((entry) => (
+          <div class="c-author-note__person">
+            {isCmsImage(entry.image) && (
+              <div class="c-author-note__image">
+                <CmsImage source={entry.image} alt="" widths={[96, 192]} sizes="48px" />
+              </div>
+            )}
+            <div class="c-author-note__identity">
+              <p class="c-author-note__label">{entry.label}</p>
+              <p class="c-author-note__name">
+                {entry.slug ? (
+                  <a class="c-author-note__link" href={`/praxis/${entry.slug}`}>{entry.name}</a>
+                ) : (
+                  entry.name
+                )}
+              </p>
+              {entry.role && <p class="c-author-note__role">{entry.role}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {reviewedLabel && (
+      <p class="c-author-note__reviewed">
+        <span class="c-author-note__label">Zuletzt geprüft</span>
+        <time class="c-author-note__date" datetime={lastReviewed}>{reviewedLabel}</time>
+      </p>
+    )}
+
+    {sourceList.length > 0 && (
+      <div class="c-author-note__sources">
+        <p class="c-author-note__label">Verwendete Quellen</p>
+        <ol class="c-author-note__list">
+          {sourceList.map((source) => (
+            <li class="c-author-note__source">
+              {source.url ? (
+                <a
+                  class="c-author-note__link"
+                  href={source.url}
+                  target={isExternal(source.url) ? "_blank" : undefined}
+                  rel={isExternal(source.url) ? "noopener" : undefined}
+                >{source.text}</a>
+              ) : (
+                source.text
+              )}
+            </li>
+          ))}
+        </ol>
+      </div>
+    )}
+  </aside>
+)}
+
+<style>
+  /* A surface of its own, set off from the running text by a rule and a
+     generous gap above it. The block is an appendix to the page, not another
+     paragraph of it. */
+  .c-author-note {
+    margin-top: var(--section-space-sm);
+    padding: var(--sp-6) var(--sp-5) var(--sp-5);
+    border-top: var(--bw) solid var(--c-line);
+    border-radius: var(--r-md);
+    background: var(--c-surface);
+  }
+
+  /* Two people side by side where there is room. Below that they stack,
+     because name plus role next to a portrait needs the width. */
+  .c-author-note__people {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--sp-4) var(--site-gutter);
+  }
+
+  .c-author-note__person {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  /* Same measure and rounding as the author of a magazine post. */
+  .c-author-note__image {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-round);
+    overflow: hidden;
+  }
+
+  /* CmsImage renders the <img>, so it carries no scope attribute. */
+  .c-author-note__image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .c-author-note__identity {
+    min-width: 0;
+  }
+
+  .c-author-note__label {
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.35;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .c-author-note__name {
+    margin-top: var(--sp-1);
+    font-size: var(--fs-text-small);
+    line-height: 1.3;
+  }
+
+  .c-author-note__role {
+    margin-top: 2px;
+    font-family: var(--f-mono);
+    font-weight: 300;
+    font-size: var(--fs-label);
+    line-height: 1.35;
+    color: var(--c-text-muted);
+  }
+
+  .c-author-note__link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color var(--d-fast) var(--e-swift);
+  }
+
+  @media (hover: hover) {
+    .c-author-note__link:hover {
+      color: var(--c-text-muted);
+    }
+  }
+
+  .c-author-note__reviewed {
+    margin-top: var(--sp-5);
+  }
+
+  /* The label sits on its own line above the date. As a <span> inside the
+     paragraph it needs the block, the shared label rule does not carry one. */
+  .c-author-note__reviewed .c-author-note__label {
+    display: block;
+    margin-bottom: var(--sp-1);
+  }
+
+  .c-author-note__date {
+    font-size: var(--fs-text-small);
+    line-height: 1.3;
+  }
+
+  .c-author-note__sources {
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-4);
+    border-top: var(--bw) solid var(--c-line);
+  }
+
+  .c-author-note__list {
+    margin: var(--sp-3) 0 0;
+    padding-left: var(--sp-3);
+    list-style: decimal;
+  }
+
+  .c-author-note__source {
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  .c-author-note__source + .c-author-note__source {
+    margin-top: var(--sp-1);
+  }
+</style>

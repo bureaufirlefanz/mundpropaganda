@@ -19,16 +19,23 @@
  * es nicht gibt. Jetzt kann das Markup keine falsche mehr nennen, weil es
  * gar keine mehr nennt.
  */
+import type { HTMLAttributes } from "astro/types";
 import BREITEN from "../../lib/image-widths.json";
 
-interface Props {
+interface Props extends HTMLAttributes<"img"> {
   name: string;
   alt?: string;
   sizes?: string;
   eager?: boolean;
   parallax?: string;
 }
-const { name, alt = "", sizes = "100vw", eager = false, parallax } = Astro.props;
+
+/* Alles Weitere geht ans <img> durch — `style` für einen abweichenden
+   Bildausschnitt, `data-*` für die Module. Ohne das musste jede Stelle, die
+   ein Attribut braucht, auf `CmsImage` mit festem Pfad ausweichen und verlor
+   dabei AVIF und srcset. */
+const { name, alt = "", sizes = "100vw", eager = false, parallax, ...rest } =
+  Astro.props;
 
 const list = (BREITEN as Record<string, number[]>)[name];
 
@@ -57,5 +64,6 @@ const fallback = `/img/${name}-${list[0]}.webp`;
     fetchpriority={eager ? "high" : undefined}
     decoding={eager ? undefined : "async"}
     data-parallax={parallax}
+    {...rest}
   />
 </picture>

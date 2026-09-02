@@ -46,6 +46,17 @@ src/js/           init.js plus modules/
 routes, and two folders with the same name side by side are exactly the
 confusion this split is meant to prevent.
 
+## Before building a component
+
+`BAUSTEINE.md` next door lists every component, template and layout — grouped
+by job, with what each one does, its props, where it is used, and whether it
+appears in the catalogue at `/design/komponenten`.
+
+**Read it before writing a new component.** Two components for the same job
+drift apart at the next round of polish, and the site then looks different in
+two places. Regenerate it with `npm run bausteine`; it is produced from the
+files, never maintained by hand.
+
 ## The binding part
 
 `STRUKTUR.md` next door is not garnish, it is the house rules: style layers,

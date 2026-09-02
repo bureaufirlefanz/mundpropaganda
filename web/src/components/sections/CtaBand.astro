@@ -1,0 +1,157 @@
+---
+/**
+ * Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314).
+ *
+ * Randabfallendes Bild über die volle Fensterbreite, darauf links eine helle
+ * Karte: Überschrift, darunter ein kurzer Text und der Knopf nebeneinander.
+ *
+ * Aus dem Entwurf, gegen Tokens gelegt:
+ *
+ *   - Karte in `--c-grey`, Rundung `--r-md`
+ *   - Überschrift 40px → `--fs-h3`
+ *   - Text klein und gedämpft, Knopf in Markenfarbe (`ui/Button.astro`)
+ *
+ * ── Was dieser Baustein nicht tut ────────────────────────────────────────
+ *
+ * Er baut **keine Pfade**. Der Verweis kommt fertig herein — im Projekt
+ * entstehen Ziele über `lib/navigation.ts#linkHref()`, und eine zweite
+ * Stelle, die URLs zusammensetzt, liefe davon irgendwann ab.
+ *
+ * Die Telefonnummer ist entfallen: Im Entwurf trägt die Karte genau einen
+ * Knopf. Zwei Handlungswege nebeneinander teilen die Aufmerksamkeit, und der
+ * Anruf steht ohnehin dauerhaft in der Kopfzeile.
+ */
+import Button from "../ui/Button.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import type { ImageSource } from "../../lib/images";
+
+interface Props {
+  headline: string;
+  text?: string;
+  actionLabel?: string;
+  /** Fertiger Pfad. Dieser Baustein setzt keine URLs zusammen. */
+  actionHref?: string;
+  image?: ImageSource;
+  alt?: string;
+}
+
+const { headline, text, actionLabel, actionHref, image, alt = "" } = Astro.props;
+---
+
+<section class="s-ctaband">
+  {image && (
+    <div class="s-ctaband__media">
+      <CmsImage source={image} alt={alt} widths={[1024, 1600, 2200]} sizes="100vw" />
+    </div>
+  )}
+
+  <div class="s-ctaband__card" data-reveal="up">
+    <h2 class="s-ctaband__headline" data-split="lines">{headline}</h2>
+
+    {(text || (actionLabel && actionHref)) && (
+      <div class="s-ctaband__foot">
+        {text && <p class="s-ctaband__text">{text}</p>}
+        {actionLabel && actionHref && <Button label={actionLabel} href={actionHref} />}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* Volle Fensterbreite. Dieselbe Technik wie `.s-benefits`. */
+  .s-ctaband {
+    position: relative;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    display: grid;
+  }
+
+  /* Bild und Karte liegen in derselben Rasterzelle — die Karte darüber. So
+     bestimmt das Bild die Höhe des Abschnitts, ohne dass etwas absolut
+     positioniert werden muss. */
+  .s-ctaband__media,
+  .s-ctaband__card {
+    grid-area: 1 / 1;
+  }
+
+  .s-ctaband__media {
+    /* Verhältnis aus dem Entwurf: 1728 zu 645. */
+    aspect-ratio: 1728 / 645;
+    min-height: 380px;
+    overflow: hidden;
+  }
+
+  /* :global(img) — das Bild kommt aus CmsImage.astro und trägt das
+     Scope-Attribut dieser Datei nicht. */
+  .s-ctaband__media :global(img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* Links, senkrecht mittig. `place-self` statt absoluter Lage: Die Karte
+     bleibt dadurch im Fluss und wächst mit ihrem Inhalt. */
+  .s-ctaband__card {
+    place-self: center start;
+    width: min(38%, calc(100% - 2 * var(--site-gutter)));
+    margin-inline-start: clamp(var(--site-gutter), 6.9vw, 120px);
+    padding: clamp(var(--sp-5), 2.3vw, 40px);
+    border-radius: var(--r-md);
+    background: var(--c-grey);
+    color: var(--c-dark);
+  }
+
+  /* Satzbreite so eng, dass die Überschrift zweizeilig bricht — im Entwurf
+     steht „Erst reden, dann / entscheiden." auf zwei Zeilen, und das ist der
+     Rhythmus der Karte. */
+  .s-ctaband__headline {
+    max-width: 16ch;
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    line-height: var(--lh-heading);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Text und Knopf nebeneinander, unten in der Karte. Der Text bekommt die
+     verfügbare Breite, der Knopf nur seine eigene. */
+  .s-ctaband__foot {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-top: clamp(var(--sp-6), 4vw, 70px);
+  }
+
+  .s-ctaband__text {
+    max-width: 32ch;
+    font-size: var(--fs-text-small);
+    line-height: 1.45;
+    color: var(--c-text-muted);
+  }
+
+  /* Schmaler wird die Karte breiter, sonst bleibt vom Text eine Spalte aus
+     Einzelwörtern. Unter 700px steht der Knopf unter dem Text. */
+  @media (max-width: 1100px) {
+    .s-ctaband__card {
+      width: min(58%, calc(100% - 2 * var(--site-gutter)));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .s-ctaband__card {
+      width: calc(100% - 2 * var(--site-gutter));
+      margin-inline: var(--site-gutter);
+    }
+
+    .s-ctaband__foot {
+      flex-direction: column;
+      align-items: start;
+    }
+
+    .s-ctaband__media {
+      aspect-ratio: 3 / 4;
+    }
+  }
+</style>

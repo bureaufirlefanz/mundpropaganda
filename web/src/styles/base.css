@@ -130,10 +130,70 @@ p {
   color: var(--c-dark);
 }
 
+/* Fokusanzeige — zweifarbig, und das ist keine Geschmacksfrage.
+   WCAG 2.2, 1.4.11 verlangt für die Fokusanzeige 3:1 gegen den Grund daneben.
+   Die Markenfarbe erreicht das nur auf Dunkel:
+
+     #ff84c8 auf --c-grey  (Seitengrund)   1.54:1
+     #ff84c8 auf Weiß                      2.24:1
+     #ff84c8 auf --c-neutral-200           2.03:1
+     #ff84c8 auf --c-dark                  5.50:1
+
+   Eine einzelne Farbe kann das Problem nicht lösen. Gerechnet: Gegen den
+   hellen Grund muss die Leuchtdichte unter 0.19 liegen, gegen den dunklen
+   über 0.21. Diese beiden Bedingungen schließen einander aus, es gibt keinen
+   Volltonwert dazwischen.
+
+   Ein DUNKLER Ring löst die helle Seite vollständig — gerechnet gegen jeden
+   Grund, auf dem etwas fokussierbar sitzt:
+
+     --c-dark auf --c-grey          8.47:1
+     --c-dark auf Weiß             12.28:1
+     --c-dark auf --c-neutral-200  10.63:1
+     --c-dark auf --c-brand         5.50:1
+
+   Bleibt der dunkle Grund, und den fängt die Regel darunter ab.
+
+   **Kein zweiter Ring als `box-shadow` mehr.** Er stand hier als Gegenfarbe,
+   war aber überflüssig — und teuer: Ein Schatten wird von jedem Vorfahren mit
+   `overflow: hidden` abgeschnitten. Im Tastaturlauf traf das Akkordeon,
+   Magazin-Karussell und Bildring, also genau die Stellen, an denen ein Ring
+   am nötigsten ist. Ein Umriss allein wird zwar auch beschnitten, aber nur
+   dort, wo das Element bündig an der Kante sitzt; für diese Fälle steht die
+   Ausnahme weiter unten.
+
+   Kein `border-radius` mehr an dieser Stelle: Der alte Wert von 2px zwang
+   jeden runden Knopf im Fokus in eine fast eckige Form. Ohne die Zeile folgt
+   der Umriss der Form, die das Element ohnehin hat. */
 :focus-visible {
-  outline: 2px solid var(--c-brand);
-  outline-offset: 3px;
-  border-radius: 2px;
+  outline: 2px solid var(--c-dark);
+  outline-offset: 2px;
+}
+
+/* Auf dunklem Grund die Gegenfarbe. Dort verschmölze der dunkle Ring mit dem
+   Grund (1:1), der helle steht mit 12.28:1. */
+.c-footer :focus-visible,
+.c-navpromo:focus-visible,
+.s-cta :focus-visible,
+[data-theme="dark"] :focus-visible {
+  outline-color: var(--c-white);
+}
+
+/* Nach innen, wo außen kein Platz ist.
+
+   Diese Elemente sitzen bündig in einem Vorfahren mit `overflow: hidden` —
+   gemessen im Tastaturlauf, Luft 0 Pixel. Ein Ring außerhalb der Kante wird
+   dort vollständig weggeschnitten, und die Fokusanzeige fehlt genau an den
+   Bedienelementen, die man am häufigsten anspringt.
+
+   `outline-offset: -2px` zeichnet ihn stattdessen innen. Er liegt damit
+   innerhalb der eigenen Fläche und kann von niemandem beschnitten werden.
+   Der Ring rückt dadurch um vier Pixel näher an den Inhalt; das ist der
+   Preis, und er ist kleiner als ein unsichtbarer Ring. */
+.c-accordion__trigger:focus-visible,
+.c-post:focus-visible,
+.c-ring__stage:focus-visible {
+  outline-offset: -2px;
 }
 
 /* --- Typo-Utilities -------------------------------------------------- */
@@ -278,6 +338,62 @@ p {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Sprung zum Inhalt (WCAG 2.2, 2.4.1).
+
+   Nicht `.sr-only` wiederverwendet: Der Sprung muss sichtbar WERDEN, sobald
+   er den Fokus hat — ein dauerhaft weggeschnittenes Element hilft nur
+   Vorlesegeräten, nicht der Person, die mit der Tastatur arbeitet und sehen
+   muss, wohin sie gerade zielt.
+
+   `transform` statt `display: none` oder `visibility: hidden`: Beide nähmen
+   das Element aus dem Tabulatorlauf, und dann gäbe es nichts zu fokussieren.
+   Verschoben ist es weiterhin da.
+
+   `--z-skiplink` und keine nackte Zahl: Hier stand 100 — derselbe Wert, den
+   `--z-nav` trägt. Bei Gleichstand entscheidet die Reihenfolge im Dokument,
+   und die Navigation kommt später. Der Sprung erschien dadurch im Fokus
+   hinter genau der Leiste, die er überspringen soll. */
+.c-skiplink {
+  position: fixed;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: var(--z-skiplink);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--c-dark);
+  color: var(--c-grey);
+  font-family: var(--f-mono);
+  font-size: var(--fs-text-small);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--sp-4)));
+  transition: transform var(--d-fast) var(--e-out);
+}
+
+/* `:focus` und nicht `:focus-visible`: Der Sprung wird ausschließlich mit der
+   Tastatur erreicht, und `:focus-visible` greift nicht, wenn der Fokus aus
+   dem Skript kommt — etwa nach einem Seitenwechsel über den Router oder in
+   einer automatischen Prüfung. Er bliebe dann verschoben, obwohl er den Fokus
+   hat, und niemand sähe, worauf gerade gezielt wird. */
+.c-skiplink:focus {
+  transform: translateY(0);
+}
+
+/* Ohne Bewegung springt er, statt zu fahren — sichtbar wird er in beiden
+   Fällen. */
+@media (prefers-reduced-motion: reduce) {
+  .c-skiplink {
+    transition: none;
+  }
+}
+
+/* `main` trägt `tabindex="-1"`, damit der Sprung dort ankommt. Der Umriss
+   bleibt weg: Das Ziel ist kein Bedienelement, und ein Ring um den halben
+   Bildschirm sagt nichts darüber, was als Nächstes fokussiert ist. Die
+   Anzeige gehört an die Bedienelemente, und die haben sie. */
+main:focus {
+  outline: none;
 }
 
 /* Bild-Wrapper mit Ratio + Cover — überall wiederverwendet. */
@@ -440,13 +556,13 @@ button,
 .c-btn,
 [role="button"],
 label.c-file {
-  --klick-druck: 0.98;
+  --press-scale: 0.98;
 }
 
 /* Runde Symbolknöpfe sind klein — sie brauchen mehr, um überhaupt zu wirken. */
 .s-gallery__arrow,
 .s-stories__nav {
-  --klick-druck: 0.88;
+  --press-scale: 0.88;
 }
 
 /* Akkordeons sinken NIE ein. Eine ganze Zeile, die beim Aufklappen
@@ -456,14 +572,14 @@ label.c-file {
    Klasse: Sie gilt damit auch für die Stellenliste, die dasselbe Modul
    benutzt, und für jedes Akkordeon, das noch dazukommt. */
 [data-accordion-trigger] {
-  --klick-druck: 1;
+  --press-scale: 1;
 }
 
 button:active,
 .c-btn:active,
 [role="button"]:active,
 label.c-file:active {
-  scale: var(--klick-druck, 0.98);
+  scale: var(--press-scale, 0.98);
 }
 
 /* Ohne Bewegung keine Skalierung. */
@@ -491,6 +607,6 @@ label.c-file:active {
    (Startseite wie Leistungsseiten) benutzen dasselbe Modul.
    -------------------------------------------------------------------- */
 
-.hero-wort {
+.hero-word {
   white-space: nowrap;
 }

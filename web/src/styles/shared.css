@@ -108,12 +108,41 @@ html.js [data-hero-scroll] {
   }
 }
 
+/* `gap: 0` ist kein Versehen. Die Punkte tragen ihre Zielfläche jetzt selbst
+   (24 × 24, siehe unten), und die Flächen sollen aneinanderstoßen statt sich
+   zu überlappen — bei 24px Kantenlänge und ohne Fuge liegen die Mittelpunkte
+   genau 24px auseinander. Das ist die Grenze, an der WCAG 2.2, 2.5.8 die
+   Abstandsausnahme noch gelten lässt.
+
+   Sichtbar rücken die Punkte dadurch von 15px auf 24px Abstand. Das ist eine
+   Änderung am Bild und war nicht zu vermeiden: Ein 7px-Punkt alle 15px ist
+   weder groß genug noch weit genug auseinander, und die Vorgabe verlangt
+   eines von beidem. */
 .s-gallery__dots {
   display: flex;
-  gap: var(--sp-1);
+  gap: 0;
 }
 
+/* Der Knopf ist die Zielfläche, der Punkt darin ist die Anzeige.
+
+   Vorher war beides dasselbe Element: 7 × 7 Pixel groß, und damit ein Ziel,
+   das man mit dem Daumen nur zufällig trifft. WCAG 2.2, 2.5.8 verlangt
+   24 × 24. Die Fläche wächst, der Punkt bleibt — gezeichnet wird er in
+   `::before`, damit die Anzeige nicht an der Größe des Ziels hängt. */
 .s-gallery__dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-round);
+  background: transparent;
+  cursor: pointer;
+}
+
+.s-gallery__dot::before {
+  content: "";
   width: 7px;
   height: 7px;
   border-radius: var(--r-round);
@@ -122,7 +151,7 @@ html.js [data-hero-scroll] {
     transform var(--d-base) var(--e-out);
 }
 
-.s-gallery__dot[aria-selected="true"] {
+.s-gallery__dot[aria-selected="true"]::before {
   background: var(--c-dark);
   transform: scale(1.25);
 }
@@ -189,11 +218,28 @@ html.js [data-hero-scroll] {
   color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
 }
 
-.c-field input:focus,
-.c-field select:focus,
-.c-field textarea:focus {
-  outline: none;
-  border-color: var(--c-brand);
+/* Hier stand `outline: none` mit einem rosa Rahmen als Ersatz. Zwei Fehler in
+   einer Regel:
+
+   1. Der rosa Rahmen erreicht gegen die Feldfläche 2.03:1. WCAG 2.2, 1.4.11
+      verlangt 3:1 für die Fokusanzeige. Der Umriss war abgeschaltet, der
+      Ersatz zu schwach — zusammen also keine Anzeige.
+   2. Derselbe rosa Rahmen markiert weiter unten den FEHLERZUSTAND. Fokus und
+      Fehler sahen damit identisch aus. Wer in ein Feld klickte, sah aus wie
+      jemand, der etwas falsch gemacht hat.
+
+   Jetzt: der Umriss der Seite, dunkel, außerhalb der Kante. Der Rahmen darf
+   sich weiterhin mitfärben — aber dunkel, damit er dem Fehlerzustand nicht
+   ins Gehege kommt.
+
+   `:focus-visible` statt `:focus`: Beim Klick mit der Maus ist der Ring nicht
+   nötig, dort sieht man den Zeiger. */
+.c-field input:focus-visible,
+.c-field select:focus-visible,
+.c-field textarea:focus-visible {
+  outline: 2px solid var(--c-dark);
+  outline-offset: 2px;
+  border-color: var(--c-dark);
 }
 
 .c-field[data-invalid="true"] input,
@@ -215,9 +261,111 @@ html.js [data-hero-scroll] {
   border-radius: var(--r-round);
   background: var(--c-brand);
   color: var(--c-white);
-  font-size: 0.6875rem;
+  font-size: var(--fs-micro);
 }
 
 .c-field[data-invalid="true"] .c-field__error {
   display: grid;
+}
+
+/* Der Grund im Klartext (WCAG 2.2, 3.3.1 und 3.3.3).
+
+   Bis hierher bestand die ganze Fehlermeldung aus einem roten Rahmen und
+   einem "!" — und das "!" trug `aria-hidden`, war also nicht einmal für
+   Vorlesegeräte da. Wer nicht erraten konnte, was an der Eingabe falsch war,
+   bekam keine Auskunft. 3.3.1 verlangt, dass der Fehler in Text benannt wird,
+   3.3.3 zusätzlich einen Hinweis, wie er zu beheben ist. Beides schreibt
+   `initForm` in dieses Element, aus dem ValidityState des Feldes — dadurch
+   steht der Grund an einer Stelle und nicht als Kopie an jedem Feld.
+
+   Das Element steht immer im Markup und trägt `hidden`, solange es nichts zu
+   sagen gibt. `[hidden]` bleibt dabei wirksam: Ohne den Selektor unten
+   überschriebe die Anzeige-Eigenschaft das Attribut, und jedes Feld trüge
+   eine leere Zeile unter sich. */
+.c-field__message {
+  margin-top: var(--sp-1);
+  color: var(--c-dark);
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-label);
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+
+.c-field__message[hidden] {
+  display: none;
+}
+
+/* Rückmeldung des ganzen Formulars. Leer und unsichtbar, bis sie etwas
+   enthält — sie darf keinen Platz beanspruchen, solange nichts passiert ist. */
+.c-form__status {
+  margin-top: var(--sp-3);
+  color: var(--c-neutral-800);
+  font-family: var(--f-mono);
+  font-weight: 300;
+  font-size: var(--fs-text-small);
+}
+
+.c-form__status:empty {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   Nummernkreis
+   ==========================================================================
+   Eine Regel für alle Aufzählungen mit Ziffer. Bis hierher trug jeder
+   Baustein seine eigene: `Steps` 40px in Sans, `Contents` und
+   `SectionHeading` 28px in Mono, `Timeline` sogar umgekehrt — dunkler Kreis,
+   helle Ziffer. Vier Antworten auf dieselbe Frage, und drei davon wurden
+   irgendwann falsch.
+
+   **Die Regel:** Auf hellem wie auf dunklem Grund ist der Kreis pink und die
+   Ziffer braun. Auf pinkem Grund kehrt sich das Paar um — brauner Kreis,
+   pinke Ziffer. Der Kreis bleibt dadurch immer die Farbe, die er auf seinem
+   Untergrund nicht hat.
+
+   Beide Paare erreichen 5.5:1 und liegen damit über den 4.5:1, die WCAG
+   1.4.3 für Fließtext verlangt. Das ist kein Zufall, sondern der Grund, warum
+   die Umkehrung überhaupt geht: Braun und Pink stehen zueinander im selben
+   Verhältnis, egal welches von beiden vorn liegt.
+
+   Die Größe bleibt Sache des Bausteins — über `--number-size` und die
+   Schriftgröße. Nur Farbe, Form und Schnitt stehen hier. */
+.c-number {
+  /* Er nimmt seine eigene Breite, nie die des Elternteils.
+     
+     In einer Rasterzelle oder einer Flex-Spalte streckt sich ein Kind über
+     die volle Breite, wenn man es nicht daran hindert — der Kreis wurde
+     dadurch zur Pille über die ganze Kartenbreite. Alle drei Angaben, weil
+     der Kreis in Rastern, in Flex-Spalten und im normalen Fluss steht und
+     jede Umgebung ihre eigene Regel dafür hat. */
+  justify-self: start;
+  align-self: start;
+  width: fit-content;
+
+  display: grid;
+  place-items: center;
+  min-width: var(--number-size, 28px);
+  height: var(--number-size, 28px);
+  padding-inline: 0.35em;
+  border-radius: var(--r-round);
+  background: var(--c-brand);
+  color: var(--c-dark);
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: var(--number-font, var(--fs-text-small));
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* Auf pinker Fläche. `data-surface="brand"` gehört an den Abschnitt, der die
+   Fläche setzt — dann gilt die Umkehrung für jeden Kreis darin, ohne dass
+   ein Baustein davon wissen muss.
+
+   Heute setzt keine Section eine pinke Fläche. Die Regel steht trotzdem hier
+   und nicht erst, wenn es soweit ist: Wer die erste baut, soll sie vorfinden
+   und nicht neu erfinden. */
+[data-surface="brand"] .c-number {
+  background: var(--c-dark);
+  color: var(--c-brand);
 }

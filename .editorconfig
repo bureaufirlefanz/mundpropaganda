@@ -1,0 +1,17 @@
+# Gilt im Editor, bevor Prettier läuft — und für die Dateitypen, die Prettier
+# gar nicht anfasst. Die Werte sind dieselben wie in prettier.config.mjs;
+# stünden hier andere, würde jedes Speichern gegen jedes Formatieren arbeiten.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+# Zwei abschließende Leerzeichen sind in Markdown ein Zeilenumbruch. Sie hier
+# wegzuschneiden ändert den Text, nicht nur seine Form.
+trim_trailing_whitespace = false

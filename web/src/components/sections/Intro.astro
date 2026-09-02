@@ -1,12 +1,39 @@
 ---
 import Button from "../ui/Button.astro";
+import CmsImage from "../ui/CmsImage.astro";
+import type { ImageSource } from "../../lib/images";
 /**
  * Einstiegstext: Überschrift links, daneben zwei Textspalten.
  */
 interface Props {
-  topline: string;
-  headline: string;
+  /**
+   * Die Rubrik über der Überschrift.
+   *
+   * Wahlfrei: Der Einstiegsblock der Pillar Pages trägt keine — dort steht
+   * die Rubrik schon im Kopf darüber, und zweimal „Guides" untereinander
+   * wäre eine Dopplung. Alle bestehenden Aufrufer geben eine mit, ihr Markup
+   * bleibt dadurch unverändert.
+   */
+  topline?: string;
+  /** Wahlfrei: Auf Pillar Pages steht die Überschrift als eigener,
+      nummerierter Block darüber (`ui/SectionHeading.astro`). */
+  headline?: string;
   columns: string[];
+  /**
+   * Bild über den Spalten. Nur in der Ausprägung `centered` vorgesehen —
+   * dort steht es mittig und schmäler als die Seite (Figma 177:1731).
+   */
+  image?: ImageSource;
+  alt?: string;
+  /**
+   * `centered` ist die Fassung der Pillar Pages: Bild mittig, darunter zwei
+   * Textspalten als zentrierter Block. Die Überschrift steht dort nicht hier,
+   * sondern nummeriert darüber (`ui/SectionHeading.astro`).
+   *
+   * Ohne Angabe bleibt es beim dreispaltigen Raster der übrigen Seiten —
+   * deren Markup ändert sich dadurch nicht.
+   */
+  variant?: "default" | "centered";
   /**
    * Der Einstiegstext, der vorher im Kopf der Seite stand.
    *
@@ -18,13 +45,13 @@ interface Props {
   actionHref?: string;
 }
 
-const { topline, headline, columns, lead, action, actionHref } = Astro.props;
+const { topline, headline, columns, lead, action, actionHref, image, alt = "", variant = "default" } = Astro.props;
 ---
 
-<section class="container s-intro">
+<section class:list={["container", "s-intro", variant === "centered" && "s-intro--centered"]}>
   <div class="s-intro__head">
-    <span class="c-topline" data-reveal="fade">{topline}</span>
-    <h2 class="s-intro__title" data-split="lines">{headline}</h2>
+    {topline && <span class="c-topline" data-reveal="fade">{topline}</span>}
+    {headline && <h2 class="s-intro__title" data-split="lines">{headline}</h2>}
     {lead && <p class="s-intro__lead" data-reveal="up">{lead}</p>}
     {action && (
       <div class="s-intro__action" data-reveal="up" data-reveal-delay="0.08">
@@ -32,9 +59,26 @@ const { topline, headline, columns, lead, action, actionHref } = Astro.props;
       </div>
     )}
   </div>
-  {columns.map((t, i) => (
-    <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>
-  ))}
+  {image && (
+    <figure class="s-intro__media" data-reveal="scale">
+      <CmsImage source={image} alt={alt} widths={[640, 1024, 1600]} sizes="(max-width: 1000px) 92vw, 48vw" />
+    </figure>
+  )}
+
+  {/* Die Hülle nur in der zentrierten Fassung: Dort trägt sie das
+      Zweispaltenraster. Sie auch sonst zu setzen änderte das DOM der
+      Leistungsseiten — `display: contents` hielte zwar die Darstellung
+      gleich, aber `npm run web:styles` vergleicht die Elementfolge, und ein
+      zusätzliches Element ist eben doch eine Änderung. */}
+  {variant === "centered" ? (
+    <div class="s-intro__columns">
+      {columns.map((t, i) => (
+        <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>
+      ))}
+    </div>
+  ) : (
+    columns.map((t, i) => <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>)
+  )}
 </section>
 
 <style>
@@ -67,7 +111,7 @@ const { topline, headline, columns, lead, action, actionHref } = Astro.props;
   }
 
   .s-intro__title {
-    font-size: clamp(1.5rem, 2.08vw, 2.25rem);
+    font-size: var(--fs-h2-sm);
     font-weight: 400;
     line-height: 1.25;
     letter-spacing: -0.01em;
@@ -77,6 +121,58 @@ const { topline, headline, columns, lead, action, actionHref } = Astro.props;
     max-width: 40ch;
     font-size: var(--fs-text-main);
     line-height: 1.45;
+  }
+
+  /* --- Die Fassung der Pillar Pages ------------------------------------
+     Bild mittig und schmäler als die Seite, darunter zwei Textspalten als
+     zentrierter Block. Maße aus dem Entwurf: Bild etwa 47 % der Breite, der
+     Textblock etwa 60 %. */
+  .s-intro--centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 0 var(--section-space);
+  }
+
+  .s-intro--centered .s-intro__media {
+    width: min(47%, 100%);
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--r-md);
+  }
+
+  .s-intro--centered .s-intro__media :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .s-intro--centered .s-intro__columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(var(--sp-5), 4.2vw, 85px);
+    width: min(60%, 100%);
+    margin-top: clamp(var(--sp-6), 2.6vw, 46px);
+  }
+
+  .s-intro--centered p {
+    max-width: none;
+  }
+
+  @media (max-width: 1000px) {
+    .s-intro--centered .s-intro__media {
+      width: 92%;
+    }
+
+    .s-intro--centered .s-intro__columns {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .s-intro--centered .s-intro__columns {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 900px) {

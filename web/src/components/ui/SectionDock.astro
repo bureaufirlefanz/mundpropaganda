@@ -1,0 +1,294 @@
+---
+/**
+ * Section Anchor Dock — a fixed pill at the bottom edge that names the
+ * current section and expands into the full section list on hover/tap.
+ *
+ * Adopted from Osmo Supply's "Section Anchor Dock", the same way
+ * `sections/Compare.astro` adopted its table: mechanics, class names,
+ * data attributes and ARIA roles are kept verbatim; we only deviate where
+ * the house rules demand it. The deviations, so nobody "fixes" them back:
+ *
+ *   1. Colours, radii, z-index and offsets map to tokens (no hex values in
+ *      components). The em paddings stay — they scale the pill with its own
+ *      font size, which is part of the mechanic.
+ *   2. No CDN scripts, no `registerPlugin` — `js/lib/gsap.js` provides both
+ *      centrally. The behaviour lives in `js/modules/section-dock.js`.
+ *   3. No DOMContentLoaded self-start; `init.js` phase 2 calls the module,
+ *      and it re-runs after every router swap.
+ *   4. The hidden start state lives in CSS at `html.js`, not in a gsap.set:
+ *      the module runs after first paint, and anything it hid would flash.
+ *   5. Without JavaScript the list renders statically as a plain anchor
+ *      list — same promise `.c-toc` makes.
+ *   6. `z-index: var(--z-sticky)`, deliberately NOT `--z-nav`: the dock must
+ *      never cover the navigation.
+ *   7. Link clicks ride the site-wide Lenis handler from `initAnchors()`
+ *      (which the module complements with `getLenis()` where it needs the
+ *      instance directly) — no `window.__lenis`, that global is dev-only.
+ *
+ * The dock is a second presentation of the same `Heading[]` data the table
+ * of contents uses. One page gets `.c-toc` OR the dock, never both.
+ */
+import type { Heading } from "../../lib/table-of-contents";
+
+interface Props {
+  headings: Heading[];
+  /** aria-label of the nav. */
+  label?: string;
+}
+
+const { headings, label = "Auf dieser Seite" } = Astro.props;
+
+/* The template bails out below two links; rendering a dock for one section
+   would be a button that answers a question nobody asked. */
+const enough = headings.length >= 2;
+
+/* Einstellig, ohne führende Null — dieselbe Zahl wie im Inhaltsverzeichnis
+   und an der Abschnittsüberschrift. Wer „7" liest, soll „7" wiederfinden. */
+const number = (i: number) => String(i + 1);
+---
+
+{enough && (
+  <nav data-section-dock-init aria-label={label} class="c-section-dock">
+    <div data-section-dock-pill class="c-section-dock__pill">
+      <button
+        data-section-dock-toggle
+        aria-expanded="false"
+        aria-controls="section-dock-list"
+        class="c-section-dock__toggle"
+        type="button"
+      >
+        <span data-section-dock-label-wrap class="c-section-dock__label-wrap">
+          <span class="c-section-dock__label">
+            <span class="c-section-dock__link-num">{number(0)}</span>
+            <span>{headings[0].text}</span>
+          </span>
+        </span>
+      </button>
+      <div data-section-dock-list id="section-dock-list" class="c-section-dock__list">
+        <div data-section-dock-indicator class="c-section-dock__indicator"></div>
+        <ul class="c-section-dock__items">
+          {headings.map((h, i) => (
+            <li>
+              <a
+                data-active={i === 0 ? "" : undefined}
+                data-section-dock-link
+                href={`#${h.id}`}
+                class="c-section-dock__link"
+              >
+                <span class="c-section-dock__link-num">{number(i)}</span>
+                <span>{h.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </nav>
+)}
+
+<style>
+  .c-section-dock {
+    z-index: var(--z-sticky);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    position: fixed;
+    bottom: calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+  }
+
+  /* Hidden until the module reveals it — in CSS, because the module runs
+     after first paint. Only under html.js: without JavaScript the dock
+     must stay visible as a static list (see below). */
+  html.js .c-section-dock {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+
+  /* Fester Radius statt `--r-round`: Der wächst mit der Höhe mit, und beim
+     Aufklappen von 51 auf 416px wanderte die Rundung sichtbar mit. `--r-dock`
+     ist die halbe Höhe des geschlossenen Knopfs — geschlossen also eine
+     Pille, aufgeklappt ein gerundeter Kasten, und dazwischen passiert nichts,
+     was man animieren müsste. */
+  .c-section-dock__pill {
+    color: var(--c-dark);
+    background-color: var(--c-neutral-200);
+    border-radius: var(--r-dock);
+    overflow: hidden;
+  }
+
+  .c-section-dock__toggle {
+    white-space: nowrap;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    /* 7px ringsum. Den zusätzlichen Abstand rechts bringt der Text selbst
+       mit — so bleibt der Kreis links auf demselben Abstand wie oben und
+       unten, ohne dass die Pille rechts zu knapp wird. */
+    padding: 7px;
+    display: block;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Die Maske für den Wechsel der Beschriftung. Ihre Höhe muss den
+     Ziffernkreis fassen (1.9em bei 0.75em Schriftgrad ≈ 1.43em), sonst
+     stößt er unten an — genau das war zu sehen: 9px Luft oben, 7px unten.
+
+     Flex mit `align-items: center`, damit die Beschriftung mittig darin
+     sitzt statt auf der Schriftlinie. `overflow: hidden` und
+     `position: relative` bleiben: Daran hängt die Auf-/Ab-Animation beim
+     Wechsel. */
+  .c-section-dock__label-wrap {
+    height: 1.6em;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* :global() below the wrap: swapLabel() clones these nodes at runtime and
+     the clones keep working only because the selectors do not depend on the
+     clone's position in the original tree. */
+  /* In der aufgeklappten Liste bleibt die Ziffer schlichter Text. Zehn rosa
+     Kreise untereinander nähmen der Liste jede Ruhe, und die Auszeichnung
+     des aktiven Eintrags trägt ohnehin der Marker dahinter. */
+  /* Bewusst em statt Token: Die Ziffer soll dem Grad ihres Eintrags folgen. */
+  .c-section-dock :global(.c-section-dock__link-num) {
+    font-size: 0.75em;
+    line-height: 1;
+    color: var(--c-text-muted);
+  }
+
+  /* Nur im geschlossenen Zustand: Dort ist die Ziffer ein runder Kreis in
+     der Markenfarbe — der Button zeigt, bei welchem Abschnitt man steht. */
+  .c-section-dock :global(.c-section-dock__label .c-section-dock__link-num) {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.9em;
+    height: 1.9em;
+    padding-inline: 0.4em;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+  }
+
+  /* Auf dem aktiven Eintrag liegt der rosa Marker; die Ziffer nimmt dort nur
+     die Schriftfarbe an. */
+  .c-section-dock :global([data-section-dock-link][data-active] .c-section-dock__link-num) {
+    color: color-mix(in srgb, var(--c-dark) 70%, transparent);
+  }
+
+  /* Flex statt `block`: Ziffernkreis und Text stehen auf einer Mittelachse.
+     Als `block` saß der Kreis auf der Schriftlinie und ragte unten aus dem
+     Button heraus — 9px Luft oben, 7px unten. */
+  .c-section-dock :global(.c-section-dock__label) {
+    line-height: 1.5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+  }
+
+  /* Der Abstand rechts gehört zum Text, nicht zum Button — dadurch bleibt
+     der Kreis links auf denselben 7px wie oben und unten.
+
+     `:global()`, weil `swapLabel()` diese Kinder zur Laufzeit erzeugt: Sie
+     tragen kein Scope-Attribut, und eine scoped Regel trifft sie nie. */
+  .c-section-dock :global(.c-section-dock__label > span:last-child) {
+    padding-right: var(--sp-2);
+  }
+
+  .c-section-dock__list {
+    opacity: 0;
+    visibility: hidden;
+    width: max-content;
+    padding: 0.5em;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* Der Marker hinter dem aktiven Eintrag ist rosa, die Schrift darauf
+     braun — so steht es im Entwurf. Vorher war es umgekehrt (brauner Marker,
+     weiße Schrift), was die Marke an der auffälligsten Stelle der Navigation
+     nicht zeigte. */
+  .c-section-dock__indicator {
+    z-index: 1;
+    pointer-events: none;
+    background-color: var(--c-brand);
+    border-radius: var(--r-round);
+    width: 2em;
+    height: 2em;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .c-section-dock__items {
+    flex-flow: column;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+  }
+
+  /* In der Liste stehen Ziffer und Text auf einer Mittelachse, mit mehr
+     Abstand als im geschlossenen Button — dort trägt der Kreis den Abstand
+     selbst, hier braucht die nackte Ziffer ihn. */
+  .c-section-dock :global(.c-section-dock__link) {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .c-section-dock__link {
+    z-index: 2;
+    white-space: nowrap;
+    color: inherit;
+    border-radius: var(--r-round);
+    padding: 0.5em 1em;
+    text-decoration: none;
+    /* Beim Überfahren rückt der Eintrag ein Stück nach rechts. `translate`
+       statt `padding`: Es läuft auf der Grafikkarte und stößt das Raster
+       nicht an — der Marker dahinter bleibt dadurch, wo er ist. */
+    transition-property: color, translate;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+    position: relative;
+  }
+
+  /* Nur bei echtem Zeigergerät: Auf dem Handy bliebe der Zustand nach dem
+     Antippen hängen. */
+  @media (hover: hover) {
+    .c-section-dock__link:hover {
+      translate: var(--sp-1) 0;
+    }
+  }
+
+  .c-section-dock :global([data-section-dock-link][data-active]) {
+    color: var(--c-dark);
+  }
+
+  /* Without JavaScript: a plain, fully working anchor list instead of a
+     pill that would never open. Same promise .c-toc makes. */
+  html:not(.js) .c-section-dock {
+    position: static;
+    margin-block: var(--sp-6);
+  }
+
+  html:not(.js) .c-section-dock__toggle {
+    display: none;
+  }
+
+  html:not(.js) .c-section-dock__list {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  html:not(.js) .c-section-dock__indicator {
+    display: none;
+  }
+</style>

@@ -14,6 +14,7 @@ import { initReveals, initSplitHeadlines } from "./modules/reveal.js";
 import { initHighlightMarkerTextReveal } from "./modules/marker.js";
 import { initNav } from "./modules/nav.js";
 import { initHero } from "./modules/hero.js";
+import { initHeroZoom } from "./modules/hero-zoom.js";
 import { initServicesPreview } from "./modules/services.js";
 import { initStandards } from "./modules/standards.js";
 import { initGallery, initMediaParallax } from "./modules/gallery.js";
@@ -26,6 +27,7 @@ import { initThread } from "./modules/thread.js";
 import { initAccordion, initBeforeAfter, initForm } from "./modules/ui.js";
 import { initToc } from "./modules/toc.js";
 import { initFilter } from "./modules/filter.js";
+import { initSectionDock } from "./modules/section-dock.js";
 import { initEmbeds } from "./modules/embed.js";
 import { initApplication } from "./modules/application.js";
 
@@ -105,26 +107,52 @@ export function init() {
     initStories();
     initToothRings();
 
+    initHeroZoom();
     initAccordion();
     initBeforeAfter();
     initForm();
     initToc();
     initFilter();
+    initSectionDock();
     initEmbeds();
     initApplication();
 
+    /* Der durchlaufende Pfad misst seine Länge Stützstelle für Stützstelle im
+       Bildschirmraum aus — der teuerste Posten des Starts.
+     *
+     * Er hing bis hierher am ERSTEN Scrollen, zusammen mit `ScrollTrigger
+     * .refresh()`. Gemessen war das eine zusammenhängende Aufgabe von 142 ms
+     * auf dem Hauptstrang, ausgelöst in dem Moment, in dem jemand losscrollt.
+     * Genau dann sieht man sie auch: Der erste Radschub bleibt hängen, danach
+     * läuft alles mit 120 fps. Das war das Ruckeln.
+     *
+     * Jetzt hängt er an seinem eigenen Abschnitt. Der Faden beginnt bei den
+     * Standards, also weit unter der Kante — bis dorthin zu scrollen dauert
+     * mehrere Sekunden, und in dieser Zeit ist der Hauptstrang frei. Die
+     * Messung passiert damit, während niemand auf sie wartet.
+     *
+     * `rootMargin: 200%` startet sie rund zwei Bildschirmhöhen vorher: früh
+     * genug, dass die Länge feststeht, bevor der Faden ins Bild kommt (bis
+     * dahin hält ihn das CSS verdeckt), spät genug, dass sie nicht mehr mit
+     * dem Auftritt konkurriert. */
+    const faden = document.querySelector("[data-thread]");
+    if (faden && "IntersectionObserver" in window) {
+      const beobachter = new IntersectionObserver(
+        (eintraege, selbst) => {
+          if (!eintraege.some((e) => e.isIntersecting)) return;
+          selbst.disconnect();
+          initThread();
+        },
+        { rootMargin: "200% 0px" }
+      );
+      beobachter.observe(faden);
+    } else if (faden) {
+      /* Ohne Beobachter der alte Weg — lieber eine lange Aufgabe als ein
+         Faden, der nie erscheint. */
+      whenScrolled(initThread);
+    }
+
     whenScrolled(() => {
-      /* Der durchlaufende Pfad misst seine Länge Stützstelle für Stützstelle
-         im Bildschirmraum aus. Das ist auch nach dem Straffen der teuerste
-         Posten des Starts (rund 70 ms fürs Messen, noch einmal so viel für das
-         anschließende Vermessen aller Trigger) — und er beginnt erst bei den
-         Standards, also weit unter der Kante. Während der Hero-Choreografie
-         hat er dort nichts verloren.
-
-         Bis dahin hält ihn das CSS verdeckt; sichtbar wird er, sobald die
-         Länge feststeht. */
-      initThread();
-
       // Bilder verändern nach dem Laden die Seitenhöhe — Trigger neu vermessen.
       ScrollTrigger.refresh();
 

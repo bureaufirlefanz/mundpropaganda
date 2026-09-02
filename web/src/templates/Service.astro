@@ -32,13 +32,32 @@ interface Props {
   data: Service | undefined;
   /** Aus der Liste, falls das Dokument fehlt — sonst stünde oben nichts. */
   title: string;
+  /** Entscheidet, ob das Angebotsformular unten steht. Siehe MIT_FORMULAR. */
+  slug: string;
   /** Dieselben Stimmen wie auf der Startseite, dort gepflegt. */
   stories: HomepageContent["storiesItems"];
   /** Beiträge, die im Studio auf genau diese Leistung verweisen. */
   posts: Post[];
 }
 
-const { data: d, title, stories, posts } = Astro.props;
+const { data: d, title, slug, stories, posts } = Astro.props;
+
+/* Wo das Angebotsformular steht.
+ *
+ * Es stand bis hierher unter jeder Leistungsseite, jeder Praxis-, Magazin-
+ * und Beitragsseite. „Unverbindliches Angebot anfordern" ist aber kein
+ * allgemeiner Kontaktweg, sondern eine Frage nach einem Kostenvoranschlag —
+ * und die ergibt nur dort Sinn, wo es etwas zu veranschlagen gibt.
+ *
+ * Die Liste steht hier und nicht im CMS, weil sie eine Entscheidung über den
+ * Auftritt ist und keine Pflege. Kommt eine Leistung dazu, gehört sie
+ * bewusst eingetragen.
+ *
+ * Überall sonst führt `#kontakt` in den Fuß — dort stehen Telefon, E-Mail,
+ * beide Anschriften und die Zeiten. Siehe `contactSection` in
+ * `layouts/Base.astro`. */
+const MIT_FORMULAR = ["veneers", "keramikinlays"];
+const zeigtFormular = MIT_FORMULAR.includes(slug);
 
 /* Ein Abschnitt ist wahlfrei, aber nicht halb.
  *
@@ -69,10 +88,15 @@ const steps =
     : undefined;
 ---
 
-<Base title={`${title} - Mundpropaganda`} description={d?.seoDescription ?? d?.hero?.text}>
+<Base
+  title={`${title} - Mundpropaganda`}
+  description={d?.seoDescription ?? d?.hero?.text}
+  contactSection={zeigtFormular}
+>
   <ServiceHero
     topline={d?.topline}
     title={title}
+    slug={slug}
     text={d?.hero?.text}
     image={d?.hero?.image}
     alt={d?.hero?.image?.alt ?? ""}
@@ -111,5 +135,5 @@ const steps =
 
   {d?.faq?.length ? <Faq title={`Häufige Fragen zu ${title}`} questions={d.faq} /> : null}
 
-  <Contact service={title} />
+  {zeigtFormular && <Contact service={title} />}
 </Base>

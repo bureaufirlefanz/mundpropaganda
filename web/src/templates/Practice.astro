@@ -10,7 +10,9 @@
  *   Values     Wofür steht ihr, und was heißt das konkret
  *   Team       Wer behandelt mich — Gruppenfoto, dann das Raster
  *   Locations  Wo finde ich euch
- *   Contact    Und wie erreiche ich euch
+ *
+ * Kein Kontaktabschnitt mehr: Das Angebotsformular steht nur noch dort, wo
+ * es etwas zu veranschlagen gibt. `#kontakt` führt hier in den Fuß.
  *
  * Zwischen Story und Team liegt das dunkle Haltungs-Band. Das ist kein
  * Zierrat: Ohne den Farbwechsel liest sich die Seite als eine einzige lange
@@ -21,12 +23,13 @@
  * Team und Standorte kommen aus ihren eigenen Quellen und nicht von hier.
  */
 import Base from "../layouts/Base.astro";
-import PracticeHero from "../components/sections/PracticeHero.astro";
+import CareersHero from "../components/sections/CareersHero.astro";
+import Intro from "../components/sections/Intro.astro";
 import Story from "../components/sections/Story.astro";
 import Values from "../components/sections/Values.astro";
+import Features from "../components/sections/Features.astro";
 import Team from "../components/sections/Team.astro";
-import Locations from "../components/sections/Locations.astro";
-import Contact from "../components/sections/Contact.astro";
+import Gallery from "../components/sections/Gallery.astro";
 import type { PracticeContent, Member } from "../lib/practice";
 import type { Location } from "../lib/settings";
 
@@ -92,21 +95,111 @@ const locationsSection =
   description={d?.seo?.description || d?.lead || ""}
   noIndex={d?.seo?.noIndex}
 >
-  <PracticeHero
-    topline={d?.topline ?? "Praxis"}
-    title={d?.title ?? "Praxis"}
-    lead={d?.lead ?? undefined}
-    image={d?.image}
-    imageSecondary={d?.imageSecondary}
+  {/* Derselbe Kopf wie auf der Karriereseite. `praxis-03` als Ersatzmotiv,
+      solange im Studio kein Bild hängt — am Dokument `practice` ist `image`
+      derzeit leer.
+
+      Die Zuordnung der Felder liegt im CMS: `topline` trägt „Zwei Praxen,
+      ein Anspruch", `title` trägt „Über uns". Der Kopf zeigt die Topline
+      klein darüber und den Titel groß in Versalien. */}
+  <CareersHero
+    topline={d?.topline ?? undefined}
+    title={d?.title ?? "Über uns"}
+    image={d?.image ?? undefined}
+    fallback="empfang-p25"
+    zoom
+  />
+
+  {/* Der Einstieg unter dem Kopf, wie auf der Pillar Page.
+   *
+   * Dort steht an derselben Stelle derselbe Baustein in derselben Fassung:
+   * eine Überschrift, die den Satz über zwei bis drei Zeilen bricht, und
+   * darunter zwei Textspalten. Er beantwortet die Frage, die jemand nach dem
+   * Kopfbild hat — worum geht es hier eigentlich —, bevor die Seite in ihre
+   * Kapitel geht.
+   *
+   * Auf der Pillar Page ist die Antwort „was Veneers sind". Hier ist sie
+   * „wer wir sind". Gleiche Form, anderer Inhalt.
+   *
+   * **Der Text steht hier und nicht im Studio.** Das ist dieselbe Ausnahme
+   * wie beim `Features`-Block weiter unten und aus demselben Grund: Am
+   * Dokument `practice` gibt es kein Feld dafür. Wandert er ins CMS, wandert
+   * er als `intro`-Feldgruppe mit Überschrift und Spalten, und diese Zeilen
+   * werden zur Rückfallebene. */}
+  <Intro
+    headline="Hier erfährst du, wer wir sind und wie wir arbeiten."
+    columns={[
+      "Zwei Praxen in Prenzlauer Berg, ein Team, ein Anspruch: Wir erklären eine Behandlung, " +
+        "bevor sie beginnt. Wir nehmen uns die Zeit, dir zu zeigen, was wir sehen, und sagen " +
+        "dir auch, wenn gerade nichts zu tun ist.",
+      "Was wir brauchen, steht im Haus: das eigene Labor, die digitale Abformung, das " +
+        "3D-Röntgen. Und was besser jemand anderes macht, sagen wir dir und vermitteln weiter. " +
+        "Beides gehört zu einer ehrlichen Antwort.",
+    ]}
   />
 
   {story && <Story {...story} />}
 
   {values && <Values {...values} />}
 
+  {/* Technik und Labor, kurz.
+   *
+   * Beide haben auf der alten Website eine eigene Seite mit allem, was es
+   * dazu zu sagen gibt. Hier steht nur, was jemanden angeht, der wissen will,
+   * wie hier gearbeitet wird: drei Geräte und ein Labor im Haus. Wer mehr
+   * will, fragt im Termin — eine zweite vollständige Seite an dieser Stelle
+   * wäre ein Prospekt.
+   *
+   * `Features` wiederverwendet und nicht neu gebaut: Der Baustein macht
+   * genau das, alternierende Bild/Text-Zeilen, und wird auf den
+   * Leistungsseiten schon so eingesetzt. Die Motive stehen ausgeschrieben,
+   * weil der Rückfall nach Position hier das Falsche zeigte. */}
+  <Features
+    lines={[
+      {
+        topline: "Technik",
+        title: "Hightech da, wo sie etwas ändert",
+        text:
+          "Das 3D-Röntgen arbeitet in einem Modus, der eine räumliche Aufnahme mit der Dosis " +
+          "einer flachen schafft. Nach einer Operation bringen wir körpereigene Wachstumsfaktoren " +
+          "aus deinem Blut zurück in die Wunde, das verkürzt die Heilung. Und die Kaubewegung " +
+          "messen wir digital, statt sie zu schätzen.",
+        motif: "roentgen",
+      },
+      {
+        topline: "Praxislabor",
+        title: "Das Labor steht im Haus",
+        text:
+          "Kronen, Brücken, Inlays und Zahnersatz entstehen hier, nicht bei einem Partner in " +
+          "einer anderen Stadt. Das spart Wege und Tage, und wenn etwas nicht sitzt, ist der " +
+          "Zahntechniker eine Tür weiter. Abgeformt wird digital gescannt, ohne Masse im Mund.",
+        motif: "labor-detail",
+      },
+    ]}
+  />
+
   {teamSection && <Team id="team" {...teamSection} />}
 
-  {locationsSection && <Locations id="standorte" {...locationsSection} />}
+  {/* Dieselbe Darstellung wie auf der Startseite: die Motive auf einem
+      Zylinder, der sich drehen und ziehen lässt. Vorher stand hier eine
+      eigene Standorte-Section mit Karten — zwei Darstellungen derselben zwei
+      Praxen, und die Startseite hatte die stärkere.
 
-  <Contact />
+      `Gallery` holt die Anschriften und Zeiten selbst aus den Einstellungen,
+      deshalb reicht die Überschrift. Ohne gepflegte Motive im Studio nimmt
+      es die gestalteten Ersatzbilder — dieselbe Regel wie auf der
+      Startseite. */}
+  {locationsSection && (
+    <Gallery variant="ring" title={locationsSection.headline} />
+  )}
+
+  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+      Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
+      sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
+      Keramikinlays, Pillar Page).
+
+      Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
+      am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
+      sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
 </Base>

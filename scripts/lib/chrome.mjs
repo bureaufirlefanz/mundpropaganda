@@ -13,6 +13,16 @@ export function starteBrowser(args = []) {
   return puppeteer.launch({
     executablePath: CHROME,
     headless: "new",
+    /* Puppeteer bricht einen Aufruf im Browser nach 30 s ab. Die
+       Barrierefreiheitsprüfung wertet eine ganze Seite in einem Durchgang
+       aus, und auf der Komponentenseite — die jeden Baustein einmal
+       rendert — reichten 30 s nicht mehr. Der Lauf endete dann mit einem
+       `ProtocolError` statt mit einem Befund, also ohne Aussage über die
+       Seite.
+
+       Drei Minuten, nicht unbegrenzt: Hängt wirklich etwas, soll das Skript
+       weiterhin abbrechen und nicht bis zum Sankt-Nimmerleins-Tag warten. */
+    protocolTimeout: 180_000,
     args: ["--force-device-scale-factor=1", "--hide-scrollbars", ...args],
   });
 }

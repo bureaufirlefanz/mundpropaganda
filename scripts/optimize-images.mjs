@@ -17,6 +17,25 @@ const SRC = "assets/raw";
 const OUT = "web/public/img";
 const WIDTHS = [640, 1024, 1600, 2200];
 
+/* Obergrenze für die Zusatzstufe unten.
+ *
+ * Die Regel „native Breite ergänzen, wenn die größte Stufe deutlich darunter
+ * liegt" stammt aus der Zeit der Figma-Exporte: Dort ging es um einzelne
+ * Grafiken wie den Hero-Zahn, die zwischen zwei Stufen fielen. Bei Fotos aus
+ * der Kamera greift sie bei jedem einzelnen — 3840 statt 2200 —, und das
+ * schlägt durch: Gemessen wogen die nativen Stufen 5.4 MB von 39 MB im
+ * Ausgabeordner, `portrait-hero-4096.webp` allein 1.4 MB.
+ *
+ * 2560 ist der Deckel. Gerechnet: Der Satzspiegel der Seite ist auf
+ * --site-max = 1728px begrenzt, die einzige Fläche darüber ist der
+ * randabfallende Kopf. 2560 deckt den auf einem Schirm mit doppelter
+ * Pixeldichte bis 1280 CSS-Pixel voll ab und darüber mit 1.5-facher Dichte —
+ * bei AVIF ist das nicht zu unterscheiden, wohl aber die Dateigröße.
+ *
+ * Wer eine höhere Stufe braucht, trägt sie in WIDTHS ein. Dann steht sie da,
+ * weil jemand sie wollte, und nicht, weil die Kamera zufällig so viel kann. */
+const MAX_NATIV = 2560;
+
 /* Große Flächenbilder brauchen mehr Breiten als kleine Karten. */
 const QUALITY = { webp: 78, avif: 55 };
 
@@ -42,7 +61,7 @@ for (const file of files) {
   // Breite ergänzen — sonst verschenken wir Schärfe bei Bildern wie dem
   // Hero-Zahn, der zwischen zwei Stufen fällt.
   const largest = widths.at(-1) ?? 0;
-  if (largest < meta.width * 0.85) widths.push(meta.width);
+  if (largest < meta.width * 0.85) widths.push(Math.min(meta.width, MAX_NATIV));
 
   for (const w of widths) {
     const pipeline = sharp(src).resize({ width: w, withoutEnlargement: true });

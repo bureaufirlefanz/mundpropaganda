@@ -7,9 +7,11 @@
  */
 import Button from "../ui/Button.astro";
 import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
 import Reviews from "../ui/Reviews.astro";
 import ToothLines from "../ui/ToothLines.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
+import { serviceMotif } from "../../lib/service-images";
 
 /* Der Titel trägt den Hero und ist Pflicht. Topline, Fließtext und Bild sind
    wahlfrei (Klasse 2): Eine Leistung, die noch keinen Einstiegstext hat, zeigt
@@ -17,6 +19,8 @@ import { isCmsImage, type ImageSource } from "../../lib/images";
    Für das Bild gilt weiter der Rückfall auf das gestaltete Motiv. */
 interface Props {
   title: string;
+  /** Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`. */
+  slug?: string;
   topline?: string;
   text?: string;
   image?: ImageSource;
@@ -28,6 +32,7 @@ interface Props {
 
 const {
   title,
+  slug,
   topline,
   text,
   image,
@@ -59,12 +64,16 @@ const longestUnit =
    ins Bild rechts daneben, weil nowrap es nicht umbrechen ließ. */
 const sizeCap = (100 / (0.67 * longestUnit)).toFixed(2);
 
-/* Klasse 3: das gestaltete Motiv, solange im Studio keines hochgeladen ist.
-   Es steht hier und nicht mehr in der Datenschicht — der Baustein kennt sein
-   Motiv, `services.ts` ginge das nichts an. Ohne diesen Rückfall bliebe die
-   halbe Seite weiß, und ein leeres Bildfeld heißt „noch nicht hochgeladen",
-   nicht „bewusst gelöscht". */
-const MOTIF = "/img/portrait-hero-1600.webp";
+/* Klasse 3: das Ersatzmotiv, solange im Studio keines hochgeladen ist. Ohne
+   den Rückfall bliebe die halbe Seite weiß, und ein leeres Bildfeld heißt
+   „noch nicht hochgeladen", nicht „bewusst gelöscht".
+
+   Hier stand EIN fester Pfad für alle elf Leistungsseiten — jede zeigte
+   dasselbe Bild, und keines davon passte zu mehr als einer Leistung. Jetzt
+   kommt es aus `lib/service-images.ts`, derselben Quelle, aus der auch die
+   Tabelle auf der Startseite liest. Wer dort auf „Bleaching" klickt, findet
+   das Bild wieder, das ihn hergebracht hat. */
+const MOTIF = serviceMotif(slug);
 ---
 
 <section class="s-shero container" data-hero>
@@ -90,13 +99,26 @@ const MOTIF = "/img/portrait-hero-1600.webp";
   <div class="s-shero__media">
     {/* LCP-Bild der Seite — deshalb eager. Es füllt die halbe Fensterbreite,
         unter 900px die ganze. */}
-    <CmsImage
-      source={isCmsImage(image) ? image : MOTIF}
-      alt={alt}
-      widths={[640, 1024, 1600, 2200]}
-      sizes="(max-width: 900px) 100vw, 50vw"
-      eager
-    />
+    {isCmsImage(image) ? (
+      <CmsImage
+        source={image}
+        alt={alt}
+        widths={[640, 1024, 1600, 2200]}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        eager
+      />
+    ) : (
+      /* `Picture` und nicht `CmsImage` mit einem Pfad: `serviceMotif` gibt
+         einen Motivnamen zurück, keinen fertigen Pfad — und nur `Picture`
+         liefert dafür AVIF und WebP samt srcset. Vorher stand hier eine
+         einzelne 1600er WebP für alle elf Leistungsseiten. */
+      <Picture
+        name={MOTIF}
+        alt={alt}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        eager
+      />
+    )}
   </div>
 </section>
 

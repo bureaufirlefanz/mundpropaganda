@@ -15,6 +15,7 @@
  * Reihe aus „0 Jahren" und „0 Behandlungen" wäre schlechter als keine.
  */
 import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Figure {
@@ -59,25 +60,31 @@ const { topline, headline, columns, image, figures } = Astro.props;
     )}
   </div>
 
-  {isCmsImage(image) && (
-    <div class="s-story__media">
-      <div class="s-story__image" data-reveal="right">
+  {/* Klasse 3 wie überall auf der Seite: Ohne gepflegtes Motiv steht das
+      gestaltete Ersatzbild. Ohne diesen Rückfall bricht das zweispaltige
+      Raster in sich zusammen — der Text nähme dann die volle Breite und
+      liefe auf 58 Zeichen Lesemaß mitten in einer leeren Spalte. */}
+  <div class="s-story__media">
+    <div class="s-story__image" data-reveal="right">
+      {isCmsImage(image) ? (
         <CmsImage
           source={image}
           alt=""
           widths={[640, 1024, 1600]}
           sizes="(max-width: 900px) 92vw, 42vw"
         />
-      </div>
+      ) : (
+        <Picture name="experten-gespraech-tisch" alt="" sizes="(max-width: 900px) 92vw, 42vw" />
+      )}
     </div>
-  )}
+  </div>
 </section>
 
 <style>
   .s-story {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-    gap: clamp(var(--sp-8), 6vw, 120px);
+    gap: var(--flow-xl);
     align-items: start;
     padding-block: var(--section-space);
   }
@@ -119,12 +126,12 @@ const { topline, headline, columns, image, figures } = Astro.props;
     flex-direction: column-reverse;
     gap: var(--sp-1);
     padding-top: var(--sp-4);
-    border-top: 1px solid var(--c-line);
+    border-top: var(--bw) solid var(--c-line);
   }
 
   .s-story__figure-value {
     margin: 0;
-    font-size: clamp(2rem, 3.4vw, 3.25rem);
+    font-size: var(--fs-h1-xs);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -150,8 +157,9 @@ const { topline, headline, columns, image, figures } = Astro.props;
   .s-story__image {
     overflow: hidden;
     aspect-ratio: 4 / 5;
-    border-radius: var(--r-lg) var(--r-lg) clamp(80px, 10vw, 160px)
-      clamp(80px, 10vw, 160px);
+/* Skala, nicht Sonderwert: Nur das Kopfbild einer Seite ist stark
+       gerundet. Jedes andere Bild nimmt `--r-md`. */
+    border-radius: var(--r-md);
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 

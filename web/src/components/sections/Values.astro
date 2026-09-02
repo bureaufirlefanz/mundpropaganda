@@ -42,7 +42,7 @@ const { topline, headline, text, items } = Astro.props;
     <ol class="s-values__list" data-reveal-stagger="0.08">
       {items.map((w, i) => (
         <li class="s-values__item" data-reveal-child>
-          <span class="s-values__number" aria-hidden="true">
+          <span class="c-number s-values__number" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>
           <h3 class="s-values__item-title">{w.title}</h3>
@@ -68,7 +68,7 @@ const { topline, headline, text, items } = Astro.props;
 
   .s-values__head {
     max-width: 46ch;
-    margin-bottom: clamp(56px, 7vw, 120px);
+    margin-bottom: var(--flow-xl);
   }
 
   /* Die Topline ist auf hellem Grund gedacht; auf dem dunklen Band braucht
@@ -103,7 +103,7 @@ const { topline, headline, text, items } = Astro.props;
   .s-values__list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+    gap: var(--flow-lg) var(--site-gutter);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -120,18 +120,18 @@ const { topline, headline, text, items } = Astro.props;
   /* Zweistellig mit führender Null und in Mono — die einzige Stelle dieser
      Seite, an der die Monoschrift steht. Sie ist hier eine Kennung und kein
      Fließtext, genau der Fall, für den sie vorgesehen ist. */
+  /* War pinke Schrift ohne Fläche: gemessen 1.54:1 gegen den Seitengrund,
+     also praktisch unlesbar. Als Kreis mit brauner Ziffer sind es 5.5:1.
+     Siehe `.c-number` in shared.css — dass er nicht streckt, steht dort. */
   .s-values__number {
+    --number-size: 32px;
+
     margin-bottom: var(--sp-5);
-    font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: var(--fs-label);
-    letter-spacing: 0.08em;
-    color: var(--c-brand);
   }
 
   .s-values__item-title {
     margin-bottom: var(--sp-3);
-    font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+    font-size: var(--fs-h4-sm);
     font-weight: 400;
     line-height: 1.2;
     letter-spacing: -0.01em;

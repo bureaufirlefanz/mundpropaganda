@@ -1,0 +1,144 @@
+---
+/**
+ * Das Werbefeld im großen Menü.
+ *
+ * Es steht dort, wo bis eben die Spalte „Direkt" stand — vier Verweise, die
+ * sich alle auch anderswo auf der Seite finden. Die Stelle ist die auffälligste
+ * im ganzen Menü, und eine Zweitverwertung des Hauptmenüs nutzt sie nicht.
+ * Eine Pillar Page dagegen hat im Menü sonst keinen Platz: Sie ist keine
+ * Leistung, gehört also in keine der drei Gruppen daneben.
+ *
+ * **Die ganze Karte ist der Verweis, der Knopf darin ist keiner.** Deshalb
+ * `static` am Button — er rendert dann ein `<span>`. Ein `<a>` in einem `<a>`
+ * lässt der Parser nicht zu; er schließt das äußere vorzeitig, und die Karte
+ * zerfällt in zwei Teile, von denen nur einer klickt.
+ *
+ * Die Inhalte kommen als Props herein und stehen heute in `content/`. Wenn das
+ * Feld ins Studio wandert, wird daraus ein Objekt an `navigation` — die vier
+ * Felder hier sind schon die, die es tragen soll.
+ */
+import Button from "./Button.astro";
+import CmsImage from "./CmsImage.astro";
+import type { ImageSource } from "../../lib/images";
+
+interface Props {
+  /** Zwei bis drei Wörter. Der Kasten ist eine Menüspalte breit. */
+  headline: string;
+  href: string;
+  label?: string;
+  image?: ImageSource;
+  alt?: string;
+}
+
+const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
+---
+
+<a class="c-navpromo" href={href}>
+  <div class="c-navpromo__media">
+    {image && (
+      <CmsImage
+        source={image}
+        alt={alt}
+        widths={[400, 800]}
+        sizes="(max-width: 900px) 90vw, 22vw"
+      />
+    )}
+  </div>
+
+  <div class="c-navpromo__body">
+    <p class="c-navpromo__headline">{headline}</p>
+    <span class="c-navpromo__action">
+      <Button label={label} static />
+    </span>
+  </div>
+</a>
+
+<style>
+  /* Bild oben, brauner Block darunter mit Überschrift und Button.
+
+     `grid-template-rows: 1fr auto`: Der Block unten ist so hoch, wie sein
+     Inhalt braucht, das Bild nimmt den Rest. Andersherum (`auto 1fr`) hinge
+     die Höhe des Blocks an der Bildhöhe, und eine dreizeilige Überschrift
+     liefe unten heraus. */
+  .c-navpromo {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: 100%;
+    /* Dieselbe Rundung wie das Panel, an dessen Kante der Kasten sitzt. Eine
+       kleinere las sich daneben als Versehen. */
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--c-dark);
+    color: var(--c-grey);
+    text-decoration: none;
+
+    /* Innerer Rand, der das Bild einfasst. Dieselbe Farbe wie die Fläche
+       darunter — der Rahmen ist keine eigene Linie, er rückt das Bild von
+       der Kante ab.
+
+       Ein `border` und kein `box-shadow: inset`: Der eingesetzte Schatten
+       wird zwar über dem Hintergrund gezeichnet, aber unter den Kindern.
+       Das Bild läge darüber und der Rand wäre genau dort unsichtbar, wo er
+       wirken soll. Der Rahmen verkleinert dagegen die Inhaltsbox, das Bild
+       sitzt darin. `box-sizing: border-box` steht global in base.css, die
+       Außenmaße des Kastens ändern sich dadurch nicht. */
+    border: 10px solid var(--c-dark);
+  }
+
+  .c-navpromo__media {
+    /* `min-height: 0` ist bei einer 1fr-Zeile nicht wahlfrei: Ohne das wächst
+       die Zeile auf die Eigenhöhe des Bildes, statt sich auf den übrigen
+       Platz zu beschränken — der Kasten würde über seine Spalte hinauslaufen. */
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Das Bild kommt aus CmsImage und trägt dessen Scope, nicht diesen —
+     ohne `:global()` träfe die Regel nie. */
+  .c-navpromo__media :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .c-navpromo__body {
+    display: grid;
+    justify-items: start;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+  }
+
+  .c-navpromo__headline {
+    /* Zwei Zeilen, und der Umbruch an der richtigen Stelle: `balance` nimmt
+       von zwei möglichen Aufteilungen die mit der kürzeren langen Zeile, also
+       „Alles zum / Thema Veneers" statt „Alles zum Thema / Veneers". */
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    line-height: var(--lh-heading);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Nur das Bild bewegt sich, nicht der Button: Zwei Bewegungen an derselben
+     Stelle lesen sich als Ruckeln. */
+  @media (hover: hover) {
+    .c-navpromo :global(.c-btn) {
+      transition: none;
+    }
+
+    .c-navpromo__media :global(img) {
+      transition: scale var(--d-slow) var(--e-out);
+    }
+
+    .c-navpromo:hover .c-navpromo__media :global(img) {
+      scale: 1.04;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c-navpromo:hover .c-navpromo__media :global(img) {
+      scale: 1;
+    }
+  }
+</style>

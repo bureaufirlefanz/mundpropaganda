@@ -48,7 +48,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
                 Überschrift vorangestellt vorgelesen würde — „null eins
                 Zahnmedizinische Fachangestellte". Die Reihenfolge ergibt
                 sich für Vorlesegeräte ohnehin aus der Liste. */}
-            <span class="s-jobs__number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <span class="c-number s-jobs__number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
 
             <span class="s-jobs__name">{s.title}</span>
 
@@ -159,14 +159,15 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     transition: color var(--d-fast) var(--e-swift);
   }
 
+  /* Siehe `.c-number` in shared.css. Stand vorher als stumpfe Ziffer in
+     `--c-text-muted` da — dieselbe Aufzählung, drei Seiten weiter mit Kreis. */
   .s-jobs__number {
-    font-size: var(--fs-label);
-    letter-spacing: 0.06em;
-    color: var(--c-text-muted);
+    --number-size: 28px;
+    --number-font: var(--fs-label);
   }
 
   .s-jobs__name {
-    font-size: clamp(1.25rem, 2vw, 2rem);
+    font-size: var(--fs-h4);
     font-weight: 400;
     line-height: 1.15;
     letter-spacing: -0.01em;

@@ -50,8 +50,9 @@ export interface CompareRow {
 }
 
 interface Props {
-  topline: string;
-  headline: string;
+  topline?: string;
+  /** Wahlfrei — siehe `ui/SectionHeading.astro`. */
+  headline?: string;
   columns: CompareColumn[];
   lines: CompareRow[];
   /** Kleingedrucktes unter der Tabelle. */
@@ -66,8 +67,8 @@ const caption = (w: CompareValue) =>
 
 <section class="s-compare container">
   <div class="s-compare__head">
-    <span class="c-topline" data-reveal="fade">{topline}</span>
-    <h2 class="s-compare__title" data-split="lines">{headline}</h2>
+    {topline && <span class="c-topline" data-reveal="fade">{topline}</span>}
+    {headline && <h2 class="s-compare__title" data-split="lines">{headline}</h2>}
   </div>
 
   <div
@@ -119,8 +120,6 @@ const caption = (w: CompareValue) =>
                   >
                     {w.kind === "ja" ? <polyline points="5 12 10 17 19 7" /> : <line x1="6" y1="12" x2="18" y2="12" />}
                   </svg>
-                ) : w.kind === "pille" ? (
-                  <div class="comparison-row__pill">{w.text}</div>
                 ) : (
                   <p class="comparison-row__label">{w.text}</p>
                 )}
@@ -138,6 +137,17 @@ const caption = (w: CompareValue) =>
 <style>
   .s-compare {
     padding-block: var(--section-space);
+  }
+
+  /* Ohne Topline und Überschrift ist der Kopf leer — dann sammelt sich über
+     der Tabelle der Abstand der Section, der des Kopfes und der der
+     nummerierten Überschrift darüber. `:has()` fängt genau diesen Fall. */
+  .s-compare:not(:has(.s-compare__title)):not(:has(.c-topline)) {
+    padding-top: var(--sp-6);
+  }
+
+  .s-compare:not(:has(.s-compare__title)):not(:has(.c-topline)) .s-compare__head {
+    margin-bottom: 0;
   }
 
   .s-compare__head {
@@ -181,19 +191,36 @@ const caption = (w: CompareValue) =>
   .comparison-wrap {
     width: 100%;
     position: relative;
-    border-top: var(--bw) solid var(--c-line);
   }
 
   /* Bleibt beim Scrollen unter der Navigationsleiste stehen, damit immer
      erkennbar ist, welche Spalte welche ist. Der Grund ist deckend — sonst
      schöben sich die Zeilen sichtbar darunter durch. */
+  /* Im Kopf bleibt genau eine Linie: die unter ihm. Sie trennt die Namen der
+     Varianten von den Werten und ist damit die einzige, die etwas sagt.
+
+     Weg sind die Linie über dem Kopf und die senkrechten zwischen den Namen —
+     die haben das Raster der Zeilen darunter nur verdoppelt und die Tabelle
+     nach Formular aussehen lassen.
+
+     Der Kopf klebt nicht beim Scrollen: Ohne Fläche wäre er, sobald die ersten
+     Zeilen darunter durchliefen, nicht mehr zu lesen. */
   .comparison-header {
-    z-index: 10;
-    background: var(--c-bg);
     border-bottom: var(--bw) solid var(--c-line);
     display: flex;
-    position: sticky;
-    top: 92px;
+  }
+
+  /* Senkrechte Linien zwischen den Varianten — nur in den Zeilen, nicht im
+     Kopf. Sie trennen, was verglichen wird, ohne eine Spalte durch eine
+     Fläche hervorzuheben. Die erste Spalte bekommt keine, sonst stünde eine
+     Linie direkt neben dem Zeilennamen. */
+  .comparison-row__cell + .comparison-row__cell {
+    border-left: var(--bw) solid var(--c-line);
+  }
+
+  /* Auch zwischen Merkmalsspalte und erstem Wert. */
+  .comparison-row__cells {
+    border-left: var(--bw) solid var(--c-line);
   }
 
   .comparison-header__corner {
@@ -226,7 +253,7 @@ const caption = (w: CompareValue) =>
   }
 
   .comparison-header__name {
-    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+    font-size: var(--fs-h5);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.02em;
@@ -237,11 +264,12 @@ const caption = (w: CompareValue) =>
     display: flex;
   }
 
-  .comparison-row:last-child {
-    border-bottom: 0;
-  }
+  /* Die letzte Zeile behält ihre Linie: Sie schließt die Tabelle nach unten
+     ab. Ohne sie hörte das Raster einfach auf, statt zu enden — im Kopf steht
+     eine Linie, unten stand keine. */
 
-  /* Wechselnde Zeilen: hilft dem Auge, waagerecht in der Spur zu bleiben. */
+  /* Wechselnde Zeilen: hilft dem Auge, waagerecht in der Spur zu bleiben —
+     und ersetzt den mitlaufenden Kopf, den die Tabelle nicht mehr hat. */
   .comparison-row:nth-of-type(even) {
     background: color-mix(in srgb, var(--c-dark) 4%, transparent);
   }
@@ -294,16 +322,6 @@ const caption = (w: CompareValue) =>
     color: var(--c-text);
   }
 
-  .comparison-row__pill {
-    padding: 0.45em 0.8em;
-    border-radius: var(--r-round);
-    background: var(--c-brand);
-    color: var(--c-dark);
-    font-size: var(--fs-text-small);
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0;
-  }
 
   .comparison-row__icon {
     aspect-ratio: 1;

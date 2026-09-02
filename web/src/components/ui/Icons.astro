@@ -1,9 +1,9 @@
 <svg width="0" height="0" style="position: absolute" aria-hidden="true">
   <defs>
     <symbol id="i-filter" viewBox="0 0 16 16" fill="none">
-    <!-- Drei Regler unterschiedlicher Länge. Ein Trichter wäre das
+    {/* Drei Regler unterschiedlicher Länge. Ein Trichter wäre das
          verbreitetere Zeichen, liest sich aber als "Download" mit, sobald er
-         klein wird; die Regler bleiben auf 16px eindeutig. -->
+         klein wird; die Regler bleiben auf 16px eindeutig. */}
     <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
   </symbol>
 
@@ -83,11 +83,17 @@
     </symbol>
 
     <symbol id="i-youtube" viewBox="0 0 24 24">
+      <!-- Ein Pfad mit Aussparung, nicht zwei uebereinander: Das Dreieck war
+           mit --c-dark uebermalt und verschwand damit auf jedem hellen Grund,
+           wo currentColor dieselbe Farbe ist. Mit evenodd stanzt es sich aus
+           der Flaeche aus und traegt, wie jedes andere Symbol, keine eigene
+           Farbe mehr. -->
       <path
-        d="M22.5 8.4a3 3 0 0 0-2-2C18.7 6 12 6 12 6s-6.7 0-8.5.4a3 3 0 0 0-2 2A31 31 0 0 0 1 12a31 31 0 0 0 .5 3.6 3 3 0 0 0 2 2C5.3 18 12 18 12 18s6.7 0 8.5-.4a3 3 0 0 0 2-2A31 31 0 0 0 23 12a31 31 0 0 0-.5-3.6z"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M22.5 8.4a3 3 0 0 0-2-2C18.7 6 12 6 12 6s-6.7 0-8.5.4a3 3 0 0 0-2 2A31 31 0 0 0 1 12a31 31 0 0 0 .5 3.6 3 3 0 0 0 2 2C5.3 18 12 18 12 18s6.7 0 8.5-.4a3 3 0 0 0 2-2A31 31 0 0 0 23 12a31 31 0 0 0-.5-3.6zM10 15V9l5 3z"
         fill="currentColor"
       />
-      <path d="M10 15V9l5 3z" fill="var(--c-dark)" />
     </symbol>
 
     <symbol id="i-x" viewBox="0 0 24 24">

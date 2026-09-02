@@ -6,6 +6,16 @@ import { loadFooter, resolved } from "../../lib/navigation";
 
 // Dieselbe Quelle wie Services-Tabelle und Menü. Gezeigt werden die
 // Hauptservices; die Zusatzlinks der Startseite bleiben dort.
+interface Props {
+  /**
+   * Sprungziel. Trägt `kontakt`, wenn die Seite keinen eigenen
+   * Kontaktabschnitt hat — siehe `contactSection` in `layouts/Base.astro`.
+   */
+  id?: string;
+}
+
+const { id } = Astro.props;
+
 const services = forTable(await loadServiceList());
 const e = await loadSettings();
 
@@ -52,96 +62,98 @@ const columns = (
 ).filter((col) => col.title && col.links.length > 0);
 ---
 
-<footer class="c-footer">
-  <!-- Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
-       der Seite. -->
-  <a class="c-footer__wordmark" href="/" data-reveal="up">Mundpropaganda</a>
+<footer class="c-footer" id={id}>
+  <div class="c-footer__inner">
+    {/* Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
+         der Seite. */}
+    <a class="c-footer__wordmark" href="/" data-reveal="up">Mundpropaganda</a>
 
-  <div class="c-footer__top">
-    <div class="c-footer__contact">
-      <div class="c-footer__social">
-        {profiles.map((p) => (
-          <a href={p.url} aria-label={p.title}><svg><use href={p.symbol} /></svg></a>
-        ))}
+    <div class="c-footer__top">
+      <div class="c-footer__contact">
+        <div class="c-footer__social">
+          {profiles.map((p) => (
+            <a href={p.url} aria-label={p.title}><svg><use href={p.symbol} /></svg></a>
+          ))}
+        </div>
+
+        {/* Je Zeile geprüft: Ein `tel:`-Link ohne Nummer ist kein leerer Text,
+            sondern ein Link, der beim Antippen die Wählmaske mit nichts darin
+            öffnet. Was fehlt, steht deshalb gar nicht erst da. */}
+        <div class="c-footer__lines">
+          {e.phone && <a class="c-link" href={telLink(e.phone)}>{e.phone}</a>}
+          {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
+        </div>
+
+        {action && <Button label={action.text} href={action.href} />}
+
+        {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
+            Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
+            breit genug für zwei nebeneinander. Quelle sind dieselben
+            Einstellungen wie in der Standorte-Section. */}
+        <div class="c-footer__locations">
+          {e.locations.map((o) => (
+            <div>
+              {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
+                  ohnehin die Straße, und „Praxis Prenzlauer Allee /
+                  Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
+                  Halbgeviertstrich wie sonst auch auf der Seite. */}
+              <p class="c-footer__location-name">Praxis – {o.shortCode}</p>
+              {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
+                  solche an. Der Browser setzt das Element kursiv, das wird
+                  unten zurückgenommen. */}
+              <address>{o.street}<br />{o.city}</address>
+
+              {/* Nur wenn Zeiten gepflegt sind. Ein Block mit der Überschrift
+                  „Öffnungszeiten" und nichts darunter wäre schlimmer als
+                  keiner: Wer davorsteht, hält es für einen Fehler und ruft an.
+
+                  <dl> und nicht <p>: Tage und Zeit sind Begriff und Erklärung,
+                  und Vorlesegeräte lesen das Paar dann zusammen vor. */}
+              {o.hours && o.hours.length > 0 && (
+                <dl class="c-footer__hours">
+                  {o.hours.map((z) => (
+                    <>
+                      <dt>{z.days}</dt>
+                      <dd>{z.time}</dd>
+                    </>
+                  ))}
+                </dl>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Je Zeile geprüft: Ein `tel:`-Link ohne Nummer ist kein leerer Text,
-          sondern ein Link, der beim Antippen die Wählmaske mit nichts darin
-          öffnet. Was fehlt, steht deshalb gar nicht erst da. */}
-      <div class="c-footer__lines">
-        {e.phone && <a class="c-link" href={telLink(e.phone)}>{e.phone}</a>}
-        {e.email && <a class="c-link" href={`mailto:${e.email}`}>{e.email}</a>}
-      </div>
-
-      {action && <Button label={action.text} href={action.href} />}
-
-      {/* Die beiden Praxen stehen unter dem Kontakt, nicht in einer eigenen
-          Spalte: Eine Anschrift gehört zum Kontakt, und die Kontaktspalte ist
-          breit genug für zwei nebeneinander. Quelle sind dieselben
-          Einstellungen wie in der Standorte-Section. */}
-      <div class="c-footer__locations">
-        {e.locations.map((o) => (
-          <div>
-            {/* Im Fuß nur das Kürzel, nicht der volle Name: darunter steht
-                ohnehin die Straße, und „Praxis Prenzlauer Allee /
-                Prenzlauer Allee 25“ wäre dieselbe Angabe zweimal.
-                Halbgeviertstrich wie sonst auch auf der Seite. */}
-            <p class="c-footer__location-name">Praxis – {o.shortCode}</p>
-            {/* <address> statt <p>: Vorlesegeräte kündigen die Anschrift als
-                solche an. Der Browser setzt das Element kursiv, das wird
-                unten zurückgenommen. */}
-            <address>{o.street}<br />{o.city}</address>
-
-            {/* Nur wenn Zeiten gepflegt sind. Ein Block mit der Überschrift
-                „Öffnungszeiten" und nichts darunter wäre schlimmer als
-                keiner: Wer davorsteht, hält es für einen Fehler und ruft an.
-
-                <dl> und nicht <p>: Tage und Zeit sind Begriff und Erklärung,
-                und Vorlesegeräte lesen das Paar dann zusammen vor. */}
-            {o.hours && o.hours.length > 0 && (
-              <dl class="c-footer__hours">
-                {o.hours.map((z) => (
-                  <>
-                    <dt>{z.days}</dt>
-                    <dd>{z.time}</dd>
-                  </>
-                ))}
-              </dl>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
-      <p class="c-footer__nav-title">{f?.servicesHeading}</p>
-      {services.map((l) => (
-        <a class="c-link" href={servicePath(l)}>{l.name}</a>
-      ))}
-    </nav>
-
-    {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
-        Zeile höher als die anderen — drei Spalten, von denen eine ohne
-        Anlass aus der Reihe fällt. */}
-    {columns.map((column) => (
-      <nav class="c-footer__nav" aria-label={column.title}>
-        <p class="c-footer__nav-title">{column.title}</p>
-        {column.links.map((l) => (
-          <a class="c-link" href={l.href}>{l.text}</a>
+      <nav class="c-footer__nav" aria-label={f?.servicesHeading ?? "Leistungen"}>
+        <p class="c-footer__nav-title">{f?.servicesHeading}</p>
+        {services.map((l) => (
+          <a class="c-link" href={servicePath(l)}>{l.name}</a>
         ))}
       </nav>
-    ))}
-  </div>
 
-  <div class="c-footer__bottom">
-    <p>© {year}{f?.copyright ? ` ${f.copyright}` : ""}</p>
-    {legalLinks.length > 0 && (
-      <div class="c-footer__legal">
-        {legalLinks.map((l) => (
-          <a class="c-link" href={l.href}>{l.text}</a>
-        ))}
-      </div>
-    )}
+      {/* Überschrift wie bei den Nachbarn. Ohne sie begann diese Spalte eine
+          Zeile höher als die anderen — drei Spalten, von denen eine ohne
+          Anlass aus der Reihe fällt. */}
+      {columns.map((column) => (
+        <nav class="c-footer__nav" aria-label={column.title}>
+          <p class="c-footer__nav-title">{column.title}</p>
+          {column.links.map((l) => (
+            <a class="c-link" href={l.href}>{l.text}</a>
+          ))}
+        </nav>
+      ))}
+    </div>
+
+    <div class="c-footer__bottom">
+      <p>© {year}{f?.copyright ? ` ${f.copyright}` : ""}</p>
+      {legalLinks.length > 0 && (
+        <div class="c-footer__legal">
+          {legalLinks.map((l) => (
+            <a class="c-link" href={l.href}>{l.text}</a>
+          ))}
+        </div>
+      )}
+    </div>
   </div>
 </footer>
 
@@ -149,30 +161,47 @@ const columns = (
   /* Wortmarke über die volle Panelbreite, darunter drei Spalten, unten die
      Rechtszeile. Maße aus dem Entwurf (Panel 1693 von 1728 Seitenbreite).
 
-     Auf --site-max gedeckelt wie alle übrigen Blöcke. Ohne das läuft das
-     Panel auf breiten Schirmen weiter, während die Wortmarke bei ihrem
-     Höchstgrad stehenbleibt — rechts entsteht dann eine Lücke.
+     **Zwei Ebenen, seit die Fläche bis an die Ränder läuft.** Die braune
+     Fläche nimmt die ganze Fensterbreite abzüglich der Außenfuge; der Inhalt
+     darin bleibt auf --site-max gedeckelt und zentriert. Vorher war beides
+     dasselbe Element, und auf Schirmen über 1728px stand der Fuß als
+     abgesetzter Block in der Mitte, während der Rest der Seite bis nach
+     außen ging.
+
+     Unterhalb von --site-max ändert sich dadurch nichts: Der Innencontainer
+     ist dort 100 % breit, und die gerechneten Maße bleiben Zeile für Zeile
+     dieselben.
 
      z-index wie bei main im Rahmen: der Footer liegt über den
      Hintergrundebenen. */
   .c-footer {
     --footer-gap: clamp(12px, 1.04vw, 18px);
 
-    /* Bezugsgröße für die Wortmarke. Sie soll den Satzspiegel des Panels
-       ausfüllen, und der ist nicht das Fenster: Innenabstand und Außenfuge
-       nehmen bei 1728px zusammen 7 % der Fensterbreite, bei 390px aber
-       18,5 %. Eine in vw gerechnete Schrift muss dabei überlaufen. */
-    container-type: inline-size;
-
     position: relative;
     z-index: 1;
-    width: min(var(--site-max), calc(100% - var(--footer-gap) * 2));
+    width: calc(100% - var(--footer-gap) * 2);
     margin: 0 auto var(--footer-gap);
-    padding: clamp(24px, 2.4vw, 42px) clamp(24px, 2.8vw, 48px) 0;
     border-radius: var(--r-md);
     background: var(--c-dark);
     color: var(--c-grey);
     overflow: hidden;
+  }
+
+  /* Der Satzspiegel. Er trägt den Innenabstand, nicht die Fläche darum —
+     dadurch bleibt der Inhaltskasten exakt so breit wie vorher (bei 1728px:
+     1728 - 2 × 48 = 1632px), und die in `cqw` gerechnete Wortmarke behält
+     ihren Grad auf das Pixel genau.
+
+     Bezugsgröße für die Wortmarke ist deshalb dieser Kasten und nicht die
+     braune Fläche: Sie soll den Satzspiegel ausfüllen, und der ist weder das
+     Fenster noch die Fläche. Innenabstand und Außenfuge nehmen bei 1728px
+     zusammen 7 % der Fensterbreite, bei 390px aber 18,5 %. Eine in vw
+     gerechnete Schrift muss dabei überlaufen. */
+  .c-footer__inner {
+    container-type: inline-size;
+    width: min(var(--site-max), 100%);
+    margin-inline: auto;
+    padding: clamp(24px, 2.4vw, 42px) clamp(24px, 2.8vw, 48px) 0;
   }
 
   /* GT Pressura Mono wie im Entwurf, und der Grad ist gerechnet, nicht
@@ -187,9 +216,10 @@ const columns = (
      dort schnitt sie der Rahmen ab, und aus MUNDPROPAGANDA wurde
      MUNDPROPAGAND.
 
-     Kein clamp mehr: Der Fuß ist auf --site-max gedeckelt, damit auch die
-     Bezugsgröße — der Grad kann gar nicht über den Entwurfswert hinaus
-     wachsen. */
+     Kein clamp mehr: Der Satzspiegel (.c-footer__inner) ist auf --site-max
+     gedeckelt, damit auch die Bezugsgröße — der Grad kann gar nicht über den
+     Entwurfswert hinaus wachsen. Dass die braune Fläche darum inzwischen
+     weiter läuft, ändert daran nichts: `cqw` misst den Innencontainer. */
   .c-footer__wordmark {
     display: block;
     font-family: var(--f-mono);
@@ -353,14 +383,14 @@ const columns = (
     border-top: var(--bw) solid color-mix(in srgb, var(--c-grey) 22%, transparent);
     font-family: var(--f-mono);
     font-weight: 300;
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .c-footer__legal {
     display: flex;
-    gap: clamp(var(--sp-4), 3vw, 56px);
+    gap: var(--flow-sm);
   }
 
   @media (max-width: 900px) {

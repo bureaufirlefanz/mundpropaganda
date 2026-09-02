@@ -8,6 +8,7 @@
  * Prototyps, dieses hier das CDN.
  */
 import { isCmsImage, imageUrl, imageSrcset, type ImageSource } from "../../lib/images";
+import WIDTHS from "../../lib/image-widths.json";
 
 interface Props {
   source: ImageSource | undefined | null;
@@ -51,6 +52,30 @@ const description = alt || (cms ? (source as any).alt ?? "" : "");
    CMS-Bilder auf einem fremden Host — ohne das bleibt der Rahmen bis dahin
    leer. Als Hintergrund am Bild selbst, damit nichts zusätzlich im DOM steht. */
 const lqip = cms ? (source as any).asset?.metadata?.lqip : undefined;
+
+/* Eine Zeichenkette kann zweierlei sein: ein fertiger Pfad („/img/x-800.webp",
+   so übergibt es `ServiceHero`) oder der bloße Name eines Motivs aus der
+   lokalen Pipeline („teeth-macro"). Bis hierher landete der Name ungeprüft im
+   `src`, und der Browser lud eine Adresse, die es nicht gibt — auf der Pillar
+   Page waren das vier tote Bilder. Ein Name ohne Schrägstrich wird deshalb
+   jetzt aufgelöst, mit allen Breiten, die die Pipeline erzeugt hat.
+
+   Lauter Abbruch bei unbekanntem Namen, dieselbe Begründung wie in
+   `Picture.astro`: Ein Tippfehler soll den Build anhalten und nicht erst auf
+   der fertigen Seite auffallen. */
+const motif = !cms && typeof source === "string" && !source.includes("/") ? source : null;
+const motifWidths = motif ? (WIDTHS as Record<string, number[]>)[motif] : undefined;
+
+if (motif && !motifWidths?.length) {
+  throw new Error(
+    `CmsImage: Motiv „${motif}" steht nicht in image-widths.json. ` +
+      `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
+      `\`npm run images\`.`
+  );
+}
+
+const motifSrcset = (ext: string) =>
+  motifWidths!.map((w) => `/img/${motif}-${w}.${ext} ${w}w`).join(", ");
 ---
 
 {
@@ -68,6 +93,21 @@ const lqip = cms ? (source as any).asset?.metadata?.lqip : undefined;
         ? `background-image:url(${lqip});background-size:cover;background-position:center`
         : undefined}
     />
+  ) : motif ? (
+    /* AVIF zuerst, WebP als Rückfall — dieselbe Reihenfolge wie in
+       `Picture.astro`, damit ein Motiv überall gleich ausgeliefert wird. */
+    <picture>
+      <source type="image/avif" srcset={motifSrcset("avif")} sizes={sizes} />
+      <source type="image/webp" srcset={motifSrcset("webp")} sizes={sizes} />
+      <img
+        {...rest}
+        src={`/img/${motif}-${motifWidths![0]}.webp`}
+        alt={description}
+        loading={eager ? "eager" : "lazy"}
+        fetchpriority={eager ? "high" : undefined}
+        decoding={eager ? undefined : "async"}
+      />
+    </picture>
   ) : (
     <img
       {...rest}

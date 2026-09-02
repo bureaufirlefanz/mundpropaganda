@@ -1,0 +1,261 @@
+---
+/**
+ * Ein Textabschnitt mit Bild daneben (Figma 177:1732 und 177:2276).
+ *
+ * **Ein Layout, zwei Seiten.** Im Entwurf wechseln sich diese Abschnitte ab:
+ * beim Mock-up steht der Text links und das Bild rechts, beim Abschleifen
+ * umgekehrt. Das ist dieselbe Anordnung, gespiegelt — deshalb ein Baustein
+ * mit `side` und nicht zwei.
+ *
+ * **Dieselbe Anordnung wie `Features.astro`** auf der Leistungsseite: Bild
+ * als gerundete Karte, Text daneben, im Raster der Seite. Maße und Rundung
+ * sind von dort übernommen (`aspect-ratio: 800/706`, `--r-md`), damit eine
+ * Zeile hier und dort gleich sitzt.
+ *
+ * Die Überschrift steht nicht hier, sondern nummeriert darüber
+ * (`ui/SectionHeading.astro`) — so verlangt es der Entwurf, und so bleibt die
+ * Zählung an einer Stelle.
+ *
+ * `id` sitzt auf der `<section>`, nicht auf einer Überschrift: Ein Sprung
+ * landet damit über dem Abschnitt statt mitten darin.
+ */
+import { PortableText } from "astro-portabletext";
+import CmsImage from "../ui/CmsImage.astro";
+import SourceNote from "../ui/SourceNote.astro";
+import type { ImageSource } from "../../lib/images";
+import type { PortableTextBlock } from "@portabletext/types";
+
+/** Der abgesetzte Kasten unter dem Text: Studienbeleg, Abrechnungshinweis. */
+export interface ProseNote {
+  variant?: "source" | "info" | "warning" | null;
+  title?: string | null;
+  text?: string | null;
+  href?: string | null;
+  linkLabel?: string | null;
+}
+
+interface Props {
+  /** Sprungmarke, erzeugt von `idFrom()` — hier wird keine gebaut. */
+  id: string;
+  body: PortableTextBlock[];
+  /**
+   * Bild aus dem CMS — oder der Name eines gestalteten Motivs aus
+   * `lib/image-widths.json`. `CmsImage` bedient beides.
+   */
+  image?: ImageSource;
+  alt?: string;
+  /** Auf welcher Seite das Bild steht. Ohne Angabe rechts. */
+  side?: "left" | "right";
+  note?: ProseNote | null;
+}
+
+const { id, body, image, alt = "", side = "right", note } = Astro.props;
+
+/* Der Kasten entsteht nur, wenn er einen Text hat — ein Rahmen um nichts
+   wäre schlimmer als kein Kasten. */
+const hasNote = Boolean(note?.text);
+---
+
+<section class:list={["container", "s-prose", `s-prose--${side}`]} id={id} data-toc-target={id}>
+  <div class="s-prose__inner">
+    {image && (
+      <figure class="s-prose__media" data-reveal="scale">
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[640, 1024, 1600, 2200]}
+          sizes="(max-width: 1000px) 100vw, 46vw"
+        />
+      </figure>
+    )}
+
+    <div class="s-prose__body" data-reveal="up">
+      {/* Eigene Hülle um den Fließtext: Die `:global()`-Regeln unten gälten
+          sonst auch für den Hinweiskasten darunter, der einen eigenen `<p>`
+          mitbringt. Der erbte dadurch Fließtextgröße und gedämpfte Farbe und
+          fiel unter den Kontrastwert — gemeldet von `npm run web:check`. */}
+      <div class="s-prose__text">
+        <PortableText value={body} />
+      </div>
+
+      {hasNote && (
+        <div class="s-prose__note">
+          <SourceNote
+            variant={note!.variant ?? "info"}
+            title={note!.title ?? undefined}
+            href={note!.href ?? undefined}
+            linkLabel={note!.linkLabel ?? undefined}
+          >
+            {note!.text}
+          </SourceNote>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Volle Fensterbreite, damit das Bild zur Seite auslaufen kann. Dieselbe
+     Technik wie `.s-benefits`. */
+  .s-prose {
+    padding-block: var(--sp-10);
+  }
+
+  /* Zwei Spalten, mittig zueinander. Das Bild nimmt gut 46 %, der Text steht
+     mit Abstand zum Fensterrand — Maße aus dem Entwurf. */
+  .s-prose__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--site-gutter);
+  }
+
+  /* Das Bild ist höher als der Text — so steht es im Entwurf. Ein festes
+     Verhältnis statt der natürlichen Höhe: Sonst bestimmte die Länge des
+     Textes, wie hoch das Bild wird, und zwei Abschnitte nebeneinander sähen
+     verschieden aus. */
+  /* Maße aus `Features.astro`, damit eine Bild-Text-Zeile hier und auf der
+     Leistungsseite gleich sitzt. */
+  .s-prose__media {
+    margin: 0;
+    aspect-ratio: 800 / 706;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    /* Eigene Ebene, damit die Rundung bei bewegtem Bild nicht pro Frame neu
+       gegen die Bildkante gerechnet wird. */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* :global(img) — das Bild kommt aus CmsImage.astro und trägt das
+     Scope-Attribut dieser Datei nicht. */
+  .s-prose__media :global(img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* --- Bild rechts ------------------------------------------------------ */
+  .s-prose--right .s-prose__media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .s-prose--right .s-prose__body {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* --- Bild links ------------------------------------------------------- */
+  .s-prose--left .s-prose__media {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s-prose--left .s-prose__body {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Die Textspalte nimmt ihre Spalte aus, statt bei 46ch aufzuhören — sonst
+     steht zwischen Text und Bild eine leere Bahn. 62ch bleibt lesbar, und
+     der Innenabstand hält den Text vom Bild weg. */
+  .s-prose__body {
+    max-width: 62ch;
+    padding-inline: var(--sp-5) var(--sp-8);
+  }
+
+  /* Steht das Bild links, gehört der größere Abstand auf die andere Seite. */
+  .s-prose--left .s-prose__body {
+    padding-inline: var(--sp-8) var(--sp-5);
+  }
+
+  /* :global() durchgehend — PortableText baut dieses Markup zur Laufzeit,
+     nichts davon trägt das Scope-Attribut. Dieselben Regeln wie die
+     Textspalte in `Post.astro`, damit ein Absatz überall gleich liest. */
+  .s-prose__text :global(p) {
+    font-size: var(--fs-text-main);
+    line-height: 1.6;
+    color: var(--c-text-muted);
+  }
+
+  .s-prose__text :global(p + p) {
+    margin-top: var(--sp-4);
+  }
+
+  /* Keine Einrückung: Die Aufzählung steht auf derselben Kante wie die
+     Absätze darüber. Marker deshalb innen — außen bräuchten sie den
+     Einzug, den sie hier nicht bekommen sollen. */
+  .s-prose__text :global(ul),
+  .s-prose__text :global(ol) {
+    margin: var(--sp-4) 0 0;
+    padding-left: 0;
+    list-style-position: inside;
+    font-size: var(--fs-text-main);
+    line-height: 1.6;
+    color: var(--c-text-muted);
+  }
+
+  .s-prose__text :global(li + li) {
+    margin-top: var(--sp-2);
+  }
+
+  .s-prose__text :global(strong) {
+    font-weight: 500;
+    color: var(--c-text);
+  }
+
+  .s-prose__text :global(a) {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: var(--bw);
+  }
+
+  .s-prose__text :global(a:hover) {
+    text-decoration-color: var(--c-brand);
+    text-decoration-thickness: calc(var(--bw) * 2);
+  }
+
+  /* Zwischentitel im Fließtext — das Schema lässt sie zu, also brauchen sie
+     eine Gestalt. */
+  .s-prose__text :global(h3) {
+    margin-top: var(--sp-6);
+    font-size: var(--fs-text-large);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--c-text);
+  }
+
+  .s-prose__note {
+    margin-top: var(--sp-6);
+  }
+
+  /* Einspaltig, Bild oben über die volle Breite. Der Auslauf zur Seite ergibt
+     hier keinen Sinn mehr — er lebt vom Nebeneinander. */
+  @media (max-width: 1000px) {
+    .s-prose {
+      padding-block: var(--section-space-sm);
+    }
+
+    .s-prose__inner {
+      grid-template-columns: 1fr;
+      gap: var(--sp-6);
+    }
+
+    .s-prose--left .s-prose__media,
+    .s-prose--right .s-prose__media {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .s-prose--left .s-prose__body,
+    .s-prose--right .s-prose__body {
+      grid-column: 1;
+      grid-row: 2;
+      max-width: none;
+      padding-inline: 0;
+    }
+  }
+</style>

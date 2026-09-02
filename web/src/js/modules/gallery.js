@@ -99,8 +99,25 @@ function initCarousel(cfg) {
     const target = cfg.startInMiddle
       ? item.offsetLeft + item.offsetWidth / 2 - window.innerWidth / 2
       : item.offsetLeft;
-    // Nicht über die Enden hinausfahren.
-    const max = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+    /* Nicht über die Enden hinausfahren.
+     *
+     * Gerechnet wird gegen den INHALTSKASTEN des Sichtfensters, nicht gegen
+     * `clientWidth`. Der Unterschied ist der Innenabstand: Das Sichtfenster
+     * ist `.container` mit `padding-inline: var(--site-margin)`, bei 1440px
+     * also 40px je Seite. `clientWidth` zählt die mit, die Spur darf sie aber
+     * nicht überfahren.
+     *
+     * Gemessen war die Grenze dadurch 80px zu kurz (2066 statt 2146), und die
+     * Folge betraf nicht nur die Tastatur: Die letzte Karte ließ sich auch
+     * über den Pfeilknopf nie vollständig ins Bild holen — sie stand immer
+     * 40px über den rechten Rand hinaus. */
+    const fenster = track.parentElement;
+    const fensterStil = getComputedStyle(fenster);
+    const sichtbar =
+      fenster.clientWidth -
+      parseFloat(fensterStil.paddingLeft) -
+      parseFloat(fensterStil.paddingRight);
+    const max = Math.max(0, track.scrollWidth - sichtbar);
 
     gsap.to(track, {
       x: -gsap.utils.clamp(0, max, target),
@@ -120,6 +137,33 @@ function initCarousel(cfg) {
 
   section.querySelector(cfg.next)?.addEventListener("click", () => go(index + stepSize()));
   section.querySelector(cfg.prev)?.addEventListener("click", () => go(index - stepSize()));
+
+  /* Die Spur nachführen, wenn der Fokus in eine Karte springt.
+
+     Ohne das lief der Tabulator durch alle Karten, aber die Spur blieb
+     stehen: Die fokussierte Karte lag außerhalb des Bildes, und wer mit der
+     Tastatur arbeitet, sah schlicht nicht, wo er gerade ist. Gemessen im
+     Tastaturlauf über die Startseite — zwei Karten standen bei t=222 rechts
+     außerhalb.
+
+     `focusin` und nicht `focus`: Der Fokus landet auf einem Element INNERHALB
+     der Karte (dem Verweis), nicht auf der Karte selbst. `focus` steigt nicht
+     auf, `focusin` schon.
+
+     Nur nachführen, wenn die Karte wirklich außerhalb liegt. Sonst rückte die
+     Spur bei jedem Tabulatorschritt nach, auch wenn längst alles zu sehen
+     ist — und das Bild wackelte bei jeder Bewegung. */
+  track.addEventListener("focusin", (e) => {
+    const karte = e.target.closest(cfg.item);
+    if (!karte) return;
+
+    const sicht = track.parentElement.getBoundingClientRect();
+    const k = karte.getBoundingClientRect();
+    if (k.left >= sicht.left - 1 && k.right <= sicht.right + 1) return;
+
+    const i = items.indexOf(karte);
+    if (i >= 0) go(i);
+  });
 
   go(cfg.startInMiddle ? Math.floor(items.length / 2) : 0);
 

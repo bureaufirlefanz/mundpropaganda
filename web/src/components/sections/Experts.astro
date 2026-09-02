@@ -23,12 +23,12 @@ interface Props {
 const { title, names, paragraphs, image } = Astro.props;
 ---
 
-<!-- ==================================================================
+{/* ==================================================================
            UNSERE EXPERTEN
-           ================================================================== -->
+           ================================================================== */}
       <section class="s-experts" id="experten">
-        <!-- Bild sitzt links und läuft über den Seitenrand hinaus, der Text
-             steht rechts auf einer schmalen Spalte — so im Entwurf. -->
+        {/* Bild sitzt links und läuft über den Seitenrand hinaus, der Text
+             steht rechts auf einer schmalen Spalte — so im Entwurf. */}
         <div class="s-experts__media" data-reveal="fade">
           {isCmsImage(image) ? (
             <CmsImage source={image} alt={names.replace(/\n/g, " ")} widths={[640, 1024, 1600]} sizes="(max-width: 900px) 100vw, 62vw" data-parallax="9" />
@@ -94,7 +94,7 @@ const { title, names, paragraphs, image } = Astro.props;
   }
 
   .s-experts__title {
-    font-size: clamp(2rem, 3.7vw, 4rem);
+    font-size: var(--fs-h1-sm);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.02em;

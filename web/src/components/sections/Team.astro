@@ -15,6 +15,7 @@
  * Gesicht auf einer Praxisseite ist die teuerste Art von Füllmaterial.
  */
 import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Member {
@@ -35,6 +36,10 @@ interface Props {
 }
 
 const { id, topline, headline, text, photo, members } = Astro.props;
+
+
+
+
 ---
 
 <section class="s-team" id={id}>
@@ -49,54 +54,24 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     </div>
   )}
 
-  <div class="container">
+  <div class="container s-team__inner">
     <div class="s-team__head">
       <span class="c-topline" data-reveal="fade">{topline}</span>
       <h2 class="s-team__title" data-split="lines">{headline}</h2>
       {text && <p class="s-team__text" data-reveal="up" data-reveal-delay="0.1">{text}</p>}
     </div>
 
-    <ul class="s-team__grid" data-reveal-stagger="0.06">
-      {members.map((p) => (
-        <li class="s-team__cell" data-reveal-child>
-          {/* Der Link umschließt die ganze Kachel — ein Tippziel von 300px
-              Höhe statt eines Namens von 20px. */}
-          <a class="c-member" href={`/praxis/${p.slug}`}>
-            <span class="c-member__media">
-              {isCmsImage(p.image) ? (
-                <CmsImage
-                  source={p.image}
-                  alt=""
-                  widths={[400, 640, 900]}
-                  sizes="(max-width: 620px) 92vw, (max-width: 1000px) 46vw, 24vw"
-                />
-              ) : (
-                <span class="c-member__fallback" aria-hidden="true">
-                  {p.name.replace(/^(Dr\.|Prof\.)\s*/, "").charAt(0)}
-                </span>
-              )}
-            </span>
+    {/* Keine Fotos in diesem Abschnitt.
 
-            <span class="c-member__body">
-              <span class="c-member__name">{p.name}</span>
-              <span class="c-member__role">{p.role}</span>
-              {p.text && <span class="c-member__text">{p.text}</span>}
-              <span class="c-member__more" aria-hidden="true">
-                Profil
-                <svg viewBox="0 0 24 24" width="14" height="14">
-                  <path
-                    d="M5 12h13M12 5l7 7-7 7"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  />
-                </svg>
-              </span>
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+        Hier stand nacheinander ein Raster aus Personenkacheln, ein Streifen
+        aus Porträts und zuletzt ein Masonry aus Teamfotos. Alle drei zeigten
+        Menschen ohne Namen — und ohne Namen ist ein Gesicht auf einer
+        Praxisseite eine Behauptung, keine Auskunft.
+
+        Der Abschnitt trägt jetzt nur seinen Text. Sobald die Personenseiten
+        stehen, kommen die Kacheln mit Namen und Verweis zurück; bis dahin ist
+        weniger richtiger. Die Fotos liegen weiterhin in der Pipeline und
+        heißen `team-*`. */}
   </div>
 </section>
 
@@ -111,10 +86,10 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   .s-team__photo {
     width: 100vw;
     margin-inline: calc(50% - 50vw);
-    margin-bottom: clamp(56px, 7vw, 120px);
+    margin-bottom: var(--flow-xl);
     aspect-ratio: 21 / 9;
     overflow: hidden;
-    border-radius: clamp(100px, 12vw, 220px) clamp(100px, 12vw, 220px) 0 0;
+    border-radius: var(--r-md);
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 
@@ -125,9 +100,24 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     object-fit: cover;
   }
 
+  /* Text links, Gesichter rechts.
+
+     Vorher standen beide untereinander und beide linksbündig: Der Kopf war
+     auf 46 Zeichen gedeckelt, der Porträtstreifen auf 260px je Bild — bei
+     zwei Personen blieb damit die rechte Hälfte des Abschnitts leer, über
+     die ganze Höhe. Nebeneinander tragen sich die beiden gegenseitig.
+
+     `align-items: start`, damit der Text oben steht und nicht auf die Mitte
+     eines möglicherweise zweizeiligen Porträtstreifens rutscht. */
+  .s-team__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(var(--sp-8), 5vw, 96px);
+    align-items: start;
+  }
+
   .s-team__head {
     max-width: 46ch;
-    margin-bottom: clamp(48px, 6vw, 96px);
   }
 
   .s-team__title {
@@ -147,14 +137,35 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     color: var(--c-text-muted);
   }
 
-  .s-team__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-    gap: clamp(32px, 3.5vw, 56px) var(--site-gutter);
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  /* Ein Streifen aus Gesichtern, kein Kartenraster.
+
+     Flex und nicht Grid mit `auto-fit`: Das Raster verteilte die vorhandenen
+     Spalten auf die volle Breite, und bei zwei Personen wurden daraus zwei
+     Porträts von je 700px. Der Abschnitt bestand dann aus zwei Gesichtern
+     und sonst nichts.
+
+     `flex-basis` mit Obergrenze: Ein Porträt wird nie breiter als 260px,
+     egal wie wenige es sind. Kommen mehr dazu, füllen sie die Zeile und
+     rutschen erst dann um. Die Größe hängt damit an der Gestaltung und
+     nicht an der Anzahl der Personen im Studio. */
+  
+  
+  /* Hochformat wie ein Porträt, oben gerundet wie die übrigen Bildflächen
+     der Seite. */
+  .s-team__face {
+    aspect-ratio: 3 / 4;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
+
+  .s-team__face :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
 
   /* --- Die Kachel ------------------------------------------------------- */
 
@@ -173,8 +184,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     aspect-ratio: 3 / 4;
     /* Oben gebogen, unten gebrochen — dieselbe Form wie die großen Bilder
        der Seite, nur kleiner. */
-    border-radius: clamp(48px, 6vw, 96px) clamp(48px, 6vw, 96px) var(--r-md)
-      var(--r-md);
+    border-radius: var(--r-md);
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 
@@ -197,7 +207,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     place-items: center;
     background: var(--c-brand);
     color: var(--c-dark);
-    font-size: clamp(3rem, 6vw, 5rem);
+    font-size: var(--fs-display-sm);
     font-weight: 500;
     line-height: 1;
   }
@@ -258,6 +268,12 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   }
 
   @media (max-width: 900px) {
+    /* Untereinander: Zwei Spalten auf einem Telefon wären zwei Schlitze. */
+    .s-team__inner {
+      grid-template-columns: 1fr;
+      gap: var(--flow-sm);
+    }
+
     .s-team {
       padding-block: var(--section-space-sm);
     }

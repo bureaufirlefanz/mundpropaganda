@@ -21,10 +21,15 @@ aufnahmen/
 schema.json
 web/src/lib/sanity.types.ts
 
-# Original exports. Two portraits alone are 17 MB; the pipeline turns them
-# into 1.7 MB under web/public/img/, and those ARE versioned because the build
-# needs them. Keeping the originals in history would mean carrying every
-# revision of a 10 MB PNG forever, for files nothing reads at build time.
+# Originals and client deliveries. Two portraits alone are 17 MB, one shoot is
+# 95 MB; the pipeline turns them into 1.7 MB under web/public/img/, and those
+# ARE versioned because the build needs them. Keeping the originals in history
+# would mean carrying every revision of a 10 MB PNG forever, for files nothing
+# reads at build time. The rule covers the whole folder, not only assets/raw:
+# the delivery from 2026-08-29 landed next to it and was untracked but not
+# ignored, so `git status` showed 95 MB of photographs as new files.
+assets/*
+!assets/raw/
 assets/raw/*
 !assets/raw/README.md
 

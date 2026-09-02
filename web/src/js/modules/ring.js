@@ -41,7 +41,7 @@ const REST = 3;
  * Höchstausschlag der Bildverschiebung, als Anteil der KARTENBREITE.
  *
  * Der Wert muss zum Vorrat passen, den das CSS bereitstellt
- * (`--image-vorrat`), sonst liefe an einer Kante der Grund durch. Deshalb
+ * (`--image-pool`), sonst liefe an einer Kante der Grund durch. Deshalb
  * wird er unten in Pixel umgerechnet und nicht als Prozentwert gesetzt:
  * `translateX` in Prozent bezieht sich auf die Breite des BILDES, und das
  * ist mit dem Vorrat auf beiden Seiten 18 % breiter als der Rahmen. 9 %
@@ -238,7 +238,7 @@ function buildRing(root) {
   };
 
   /* Auslaufen ist kürzer als Anlaufen: Anhalten soll auf den Zeiger
-     antwlocationsn, Wiederanfahren darf sich Zeit lassen und nicht anspringen. */
+     antworten, Wiederanfahren darf sich Zeit lassen und nicht anspringen. */
   stage.addEventListener("pointerenter", () => rampSpeed(0, 0.7));
   stage.addEventListener("pointerleave", () => rampSpeed(1, 1.1));
 

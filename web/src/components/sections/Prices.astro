@@ -2,27 +2,93 @@
 /**
  * Preisraster. Jede Karte trägt eine Bezeichnung und eine Preis-Pille, die
  * bündig unten sitzt — dadurch stehen die Pillen aller Karten auf einer Linie.
+ *
+ * ── Die Zusätze für die Pillar Pages ─────────────────────────────────────
+ *
+ * `from`, `reduction`, `durability`, `note` und `disclaimer` sind wahlfrei
+ * und **rein additiv**: Ohne sie entsteht exakt dasselbe Markup wie zuvor.
+ * Das ist kein Zufall, sondern die Bedingung — die zwölf Leistungsseiten
+ * pflegen fertige Beträge, und ein „ab", das sich von selbst davorsetzt,
+ * hätte sie alle auf einmal umgeschrieben.
+ *
+ * Deshalb steht die reiche Fassung der Pille in einem eigenen Zweig, statt
+ * die schlichte um zwei Spans zu erweitern. Ein Baustein, zwei Ausprägungen,
+ * eine Gestaltung.
+ *
+ *   - **„ab" kommt aus einem Schalter, nicht aus dem getippten Wert.**
+ *     Zahnärztliche Leistungen werden nach GOZ abgerechnet, ein Festpreis
+ *     ist nicht zulässig. Stünde das Wort in den Daten, vergäße es jemand in
+ *     einer Zeile.
+ *   - **Der Abrechnungshinweis ist Pflicht, sobald Preise dastehen**
+ *     (Briefing §8). Ohne ihn wirken die Beträge endgültig, und das sind sie
+ *     nie.
  */
 import type { Price } from "../../lib/shapes";
 
 interface Props {
+  /** Wahlfrei — siehe `ui/SectionHeading.astro`. Voreinstellung „Kosten“
+      bleibt für die Leistungsseiten. */
   title?: string;
   pricing: Price[];
+  /** Sprungmarke. Ohne Angabe bleibt es bei „kosten" wie bisher. */
+  id?: string;
+  /** Der Sonderfall, der in keine Zeile passt. */
+  note?: string;
+  /** Pflicht, sobald Preise dastehen — siehe Kopf. */
+  disclaimer?: string;
 }
 
-const { title = "Kosten", pricing } = Astro.props;
+const { title = "Kosten", pricing, id = "kosten", note, disclaimer } = Astro.props;
+
+/* Ein gemeinsamer Schalter: Trägt irgendeine Zeile eine Zusatzangabe,
+   halten alle Karten den Platz frei. Sonst endeten Karten derselben Reihe
+   auf verschiedenen Höhen. */
+const hasFacts = pricing.some((p) => p.reduction || p.durability);
 ---
 
-<section class="s-prices container" id="kosten">
-  <h2 class="s-prices__title" data-split="lines">{title}</h2>
+<section class="s-prices container" id={id} data-toc-target={id}>
+  {title && <h2 class="s-prices__title" data-split="lines">{title}</h2>}
   <div class="s-prices__grid" data-reveal-stagger="0.08">
     {pricing.map((p) => (
       <article class="c-price" data-reveal-child>
         <h3 class="c-price__name">{p.name}</h3>
-        <span class="c-price__tag">{p.price}</span>
+
+        {hasFacts && (
+          <dl class="c-price__facts">
+            {p.reduction && (
+              <div class="c-price__fact">
+                <dt>Zahnabtrag</dt>
+                <dd>{p.reduction}</dd>
+              </div>
+            )}
+            {p.durability && (
+              <div class="c-price__fact">
+                <dt>Haltbarkeit</dt>
+                <dd>{p.durability}</dd>
+              </div>
+            )}
+          </dl>
+        )}
+
+        {p.from || p.unit ? (
+          /* Dreiteilig wie im Entwurf (Figma 177:2029): „AB" klein links, der
+             Betrag groß in der Mitte, die Einheit klein rechts. Die beiden
+             kleinen Teile stehen in eigenen Spans, damit sie im Lesefluss
+             bleiben, während der Betrag Tabellenziffern bekommt. */
+          <span class="c-price__tag c-price__tag--split">
+            <span class="c-price__from">{p.from ? "ab" : ""}</span>
+            <span class="c-price__amount">{p.price}</span>
+            <span class="c-price__unit">{p.unit ?? ""}</span>
+          </span>
+        ) : (
+          <span class="c-price__tag">{p.price}</span>
+        )}
       </article>
     ))}
   </div>
+
+  {note && <p class="s-prices__note" data-reveal="up">{note}</p>}
+  {disclaimer && <p class="s-prices__disclaimer" data-reveal="up">{disclaimer}</p>}
 </section>
 
 <style>
@@ -33,7 +99,7 @@ const { title = "Kosten", pricing } = Astro.props;
   .s-prices__title {
     text-align: center;
     margin-bottom: var(--sp-10);
-    font-size: clamp(2rem, 3.7vw, 4rem);
+    font-size: var(--fs-h1-sm);
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -75,7 +141,7 @@ const { title = "Kosten", pricing } = Astro.props;
   }
 
   .c-price__name {
-    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-size: var(--fs-h4);
     font-weight: 400;
     line-height: 1.15;
     letter-spacing: -0.01em;
@@ -99,5 +165,106 @@ const { title = "Kosten", pricing } = Astro.props;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     text-align: center;
+  }
+
+  /* --- Zusätze der Pillar Pages ------------------------------------------
+     Alles hierunter greift nur, wenn die entsprechenden Angaben gepflegt
+     sind. Die schlichte Karte der Leistungsseiten trifft keine dieser
+     Regeln — `npm run web:styles` hält das fest. */
+
+  .c-price__facts {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: var(--fs-text-small);
+    line-height: 1.35;
+  }
+
+  .c-price__fact {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--sp-3);
+  }
+
+  .c-price__fact dt {
+    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+  }
+
+  .c-price__fact dd {
+    margin: 0;
+  }
+
+  /* Drei Spalten: Die beiden kleinen Teile sind gleich breit, dadurch sitzt
+     der Betrag mittig, auch wenn „ab" oder die Einheit fehlt. */
+  /* `align-items: baseline` stellt „ab", Betrag und Einheit auf eine
+     gemeinsame Schriftlinie — das ist richtig. Es zentriert die Zeile aber
+     nicht in der Pille: Bei 76px Höhe saß der Betrag sichtbar zu hoch.
+     `align-content: center` rückt die ganze Zeile in die Mitte, die
+     gemeinsame Schriftlinie bleibt davon unberührt. */
+  .c-price__tag--split {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: baseline;
+    align-content: center;
+    gap: var(--sp-2);
+    /* Der Betrag ist jetzt so hoch wie eine Überschrift — die Pille von 50px
+       wäre dafür zu knapp. */
+    min-height: 68px;
+    padding-inline: var(--sp-4);
+  }
+
+  /* „ab" und die Einheit bleiben Label: Monospace, klein, in Versalien —
+     dieselbe Auszeichnung wie die Toplines der Seite. */
+  .c-price__from,
+  .c-price__unit {
+    font-family: var(--f-mono);
+    font-size: var(--fs-label);
+    font-weight: 300;
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+
+  .c-price__from {
+    text-align: left;
+  }
+
+  .c-price__unit {
+    text-align: right;
+  }
+
+  /* Der Betrag ist der Inhalt der Pille: Überschriftgrad und die Schrift der
+     Seite, nicht die Monospace der Label um ihn herum. Tabellenziffern, damit
+     die Beträge über die Karten hinweg auf derselben Stelle stehen. */
+  .c-price__amount {
+    font-family: var(--f-sans);
+    font-size: var(--fs-h4);
+    font-weight: 400;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  .s-prices__note {
+    max-width: 68ch;
+    margin: var(--sp-8) auto 0;
+    font-size: var(--fs-text-small);
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--c-text-muted);
+    text-align: center;
+  }
+
+  /* Kein Kleingedrucktes im abtuenden Sinn: Er ist der Grund, warum oben
+     überhaupt „ab“ stehen darf. Gleiche Lesegröße wie die Anmerkung, ohne
+     die Kursive, die ihn zur Randnotiz machen würde. */
+  .s-prices__disclaimer {
+    max-width: 68ch;
+    margin: var(--sp-6) auto 0;
+    padding-top: var(--sp-6);
+    border-top: var(--bw) solid var(--c-line);
+    font-size: var(--fs-text-small);
+    line-height: 1.6;
+    color: var(--c-text-muted);
   }
 </style>

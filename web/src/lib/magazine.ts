@@ -24,7 +24,7 @@ import {
  *
  * Kein Rückfall auf Beispielbeiträge: Gibt es keine, zeigt das Karussell
  * nichts, und der Abschnitt verschwindet. Ein erfundener Magazinbeitrag wäre
- * die teuerste Slocations Platzhalter — er sieht aus wie ein Versprechen an
+ * die teuerste Sorte Platzhalter — er sieht aus wie ein Versprechen an
  * Patientinnen und Patienten.
  */
 

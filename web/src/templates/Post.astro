@@ -25,7 +25,6 @@
  */
 import { PortableText } from "astro-portabletext";
 import Base from "../layouts/Base.astro";
-import Contact from "../components/sections/Contact.astro";
 import CmsImage from "../components/ui/CmsImage.astro";
 import Picture from "../components/ui/Picture.astro";
 import Button from "../components/ui/Button.astro";
@@ -187,7 +186,15 @@ const minutes = readingTime(d?.text);
     </section>
   )}
 
-  <Contact />
+  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+      Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
+      sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
+      Keramikinlays, Pillar Page).
+
+      Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
+      am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
+      sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
 </Base>
 
 <style>
@@ -499,7 +506,7 @@ const minutes = readingTime(d?.text);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
-    gap: clamp(48px, 5vw, 88px) var(--site-gutter);
+    gap: var(--flow-lg) var(--site-gutter);
   }
 
   /* --- Schmalere Fenster ------------------------------------------------

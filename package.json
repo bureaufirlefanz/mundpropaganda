@@ -1,9 +1,16 @@
 {
   "name": "mundpropaganda",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run format:check && npm run check:css && npm run check:types",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:types": "npm run types && npm --prefix web run check && npm run studio:check",
+    "check:css": "node scripts/check-css.mjs",
     "proto:dev": "vite --config prototypen/vite/vite.config.js",
     "proto:build": "vite build --config prototypen/vite/vite.config.js",
     "proto:preview": "vite preview --config prototypen/vite/vite.config.js",
@@ -18,17 +25,20 @@
     "web:check": "npm run types && npm --prefix web run check && node scripts/check-web.mjs",
     "web:styles": "node scripts/styles.mjs",
     "studio": "npm --prefix studio run dev",
-  "studio:check": "npm --prefix studio run check",
+    "studio:check": "npm --prefix studio run check",
     "web": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
     "web:preview": "node scripts/preview.mjs",
-    "web:deploy": "cd web && npx --yes netlify-cli@latest deploy --prod --build --site=a89dd2ef-d430-454e-8489-541c2c8a86df"
+    "web:deploy": "cd web && npx --yes netlify-cli@latest deploy --prod --build --site=a89dd2ef-d430-454e-8489-541c2c8a86df",
+    "bausteine": "node scripts/bausteine.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "prettier": "3.9.6",
+    "prettier-plugin-astro": "0.14.1",
     "puppeteer-core": "^25.3.0",
     "sass": "^1.102.0",
     "sharp": "^0.35.3",

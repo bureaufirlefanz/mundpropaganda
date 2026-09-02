@@ -1,5 +1,5 @@
 /**
- * WCAG-2.1-AA-Prüfungen, die sich im Browser messen lassen.
+ * WCAG-2.2-AA-Prüfungen, die sich im Browser messen lassen.
  *
  * Bewusst nur das Automatisierbare: Kontrast, zugängliche Namen,
  * Formularbeschriftungen, Überschriftenfolge, sichtbarer Fokus. Ob ein
@@ -12,6 +12,10 @@
 
 /** Im Seitenkontext ausgeführt. Gibt reine Daten zurück. */
 export function pruefeSeite() {
+  const FOKUSSIERBAR =
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]),' +
+    ' textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
   /* --- Farben --------------------------------------------------------- */
 
   const zahl = (s) => parseFloat(s);
@@ -187,6 +191,125 @@ export function pruefeSeite() {
   }
   const h1 = ebenen.filter((e) => e.n === 1).length;
 
+  /* --- 2.4.1 Bypass Blocks --------------------------------------------
+     Der Sprung muss das ERSTE fokussierbare Element sein. Steht er weiter
+     hinten, ist er nicht zu erreichen, bevor die Blöcke kommen, die er
+     überspringen soll — und dann erfüllt er seinen Zweck nicht.
+     -------------------------------------------------------------------- */
+
+  const fokussierbar = [...document.querySelectorAll(FOKUSSIERBAR)].filter(
+    (el) => el.getBoundingClientRect().width > 0 || getComputedStyle(el).position === "fixed"
+  );
+  const erstes = fokussierbar[0];
+  const sprungZiel = erstes?.getAttribute("href") || "";
+  const sprung = {
+    vorhanden: Boolean(erstes && sprungZiel.startsWith("#")),
+    zielExistiert: sprungZiel.startsWith("#")
+      ? Boolean(document.querySelector(sprungZiel))
+      : false,
+    /* Ohne `tabindex` nimmt ein <main> den Fokus nicht an: Der Sprung
+       verschöbe nur den Ausschnitt, und der Tabulator liefe danach weiter in
+       der Navigation. */
+    zielFokussierbar: sprungZiel.startsWith("#")
+      ? document.querySelector(sprungZiel)?.hasAttribute("tabindex") ?? false
+      : false,
+  };
+
+  /* --- 1.3.5 Identify Input Purpose ------------------------------------
+     Nur Felder, deren Zweck eindeutig ist. `autocomplete` an einem Freitext
+     zu verlangen wäre falsch — die Liste der Zwecke in WCAG kennt keinen
+     dafür.
+     -------------------------------------------------------------------- */
+
+  const ZWECK = {
+    name: "name",
+    email: "email",
+    tel: "tel",
+    phone: "tel",
+    callback: "tel",
+    vorname: "given-name",
+    nachname: "family-name",
+  };
+
+  const ohneZweck = [...document.querySelectorAll("input")]
+    .filter((f) => {
+      if (f.type === "hidden" || f.type === "file" || f.type === "checkbox") return false;
+      const erwartet = ZWECK[(f.name || "").toLowerCase()] || (f.type === "email" ? "email" : f.type === "tel" ? "tel" : null);
+      return erwartet && !f.getAttribute("autocomplete");
+    })
+    .map((f) => `input[name=${f.name || "?"}]`);
+
+  /* --- 2.5.8 Target Size (Minimum) -------------------------------------
+     24 × 24 CSS-Pixel. Ausgenommen sind Ziele im Fließtext — ein Verweis
+     mitten im Satz kann nicht größer werden, ohne die Zeile zu sprengen.
+     Erkannt daran, dass der Vorfahre ein Textabsatz ist.
+     -------------------------------------------------------------------- */
+
+  const imFliesstext = (el) => Boolean(el.closest("p, li, address, dd, dt, blockquote, figcaption"));
+
+  /* Die Abstandsausnahme, ausgeschrieben. Ein Ziel darf kleiner als 24 × 24
+     sein, solange um seinen Mittelpunkt ein Kreis von 24px Durchmesser passt,
+     ohne den Kreis eines anderen Ziels zu schneiden. Gestapelte Verweise mit
+     genug Luft dazwischen sind damit in Ordnung — und genau davon lebt eine
+     Fußzeile.
+
+     Ohne diese Rechnung meldet die Prüfung jeden Verweis in einer Linkspalte,
+     und eine Prüfung, die zu viel meldet, wird genauso ignoriert wie eine, die
+     zu wenig findet. */
+  const mitte = (r) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+
+  const ziele = fokussierbar
+    .map((el) => ({ el, r: el.getBoundingClientRect() }))
+    .filter(({ r }) => r.width > 0 && r.height > 0);
+
+  const genugAbstand = (a) => {
+    const ma = mitte(a.r);
+    return ziele.every((b) => {
+      if (b.el === a.el) return true;
+      const mb = mitte(b.r);
+      const d = Math.hypot(ma.x - mb.x, ma.y - mb.y);
+      /* Zwei Kreise mit je 24px Durchmesser berühren sich ab 24px
+         Mittenabstand. Darunter überschneiden sie sich. */
+      return d >= 24;
+    });
+  };
+
+  const zuKlein = ziele
+    .filter(({ el, r }) => {
+      if (imFliesstext(el)) return false;
+      if (r.width >= 24 && r.height >= 24) return false;
+      return !genugAbstand({ el, r });
+    })
+    .map(({ el, r }) => `${bezeichne(el)} ${Math.round(r.width)}×${Math.round(r.height)}`);
+
+  /* --- 1.4.11 Non-text Contrast: die Fokusanzeige ----------------------
+     Gemessen wird die Umrissfarbe gegen den Grund dahinter. Ein Ring, den
+     man nicht sieht, ist keine Anzeige — und genau das war der Fall, solange
+     die Markenfarbe hier stand: 1.54:1 auf dem Seitengrund.
+     -------------------------------------------------------------------- */
+
+  const probe = fokussierbar.find((el) => el.getBoundingClientRect().width > 0);
+  let fokusKontrast = null;
+  if (probe) {
+    const s = getComputedStyle(probe);
+    const umriss = farbe(s.outlineColor);
+    const dahinter = grund(probe);
+    if (umriss && dahinter.farbe) {
+      const v = verhaeltnis(umriss, dahinter.farbe);
+      fokusKontrast = { ist: Math.round(v * 100) / 100, soll: 3 };
+    }
+  }
+
+  /* --- 4.1.3 Status Messages -------------------------------------------
+     Geprüft wird die Anwesenheit, nicht der Inhalt: Ob der Satz stimmt, kann
+     kein Skript beurteilen. Dass eine Region da ist, bevor sie gebraucht
+     wird, schon — und genau daran scheitert es sonst, weil eine erst später
+     eingefügte Region nicht beobachtet wird.
+     -------------------------------------------------------------------- */
+
+  const brauchtStatus = Boolean(document.querySelector("[data-form], [data-filter]"));
+  const hatStatus = Boolean(document.querySelector('[role="status"], [aria-live]'));
+
   return {
     kontrast,
     unpruefbar: [...unpruefbar],
@@ -195,6 +318,11 @@ export function pruefeSeite() {
     felderOhneLabel,
     spruenge,
     h1,
+    sprung,
+    ohneZweck,
+    zuKlein,
+    fokusKontrast,
+    statusFehlt: brauchtStatus && !hatStatus,
   };
 }
 
@@ -223,6 +351,39 @@ export function wcagBefunde(r) {
   }
   if (r.h1 !== 1) {
     list.push(`${r.h1} h1 auf der Seite — genau eine ist gemeint`);
+  }
+
+  /* --- WCAG 2.2 --------------------------------------------------------- */
+
+  if (!r.sprung.vorhanden) {
+    list.push("2.4.1: Kein Sprung zum Inhalt als erstes fokussierbares Element");
+  } else if (!r.sprung.zielExistiert) {
+    list.push("2.4.1: Der Sprung zum Inhalt zeigt auf eine id, die es nicht gibt");
+  } else if (!r.sprung.zielFokussierbar) {
+    list.push("2.4.1: Das Sprungziel hat kein tabindex und nimmt den Fokus nicht an");
+  }
+
+  if (r.ohneZweck.length) {
+    list.push(
+      `1.3.5: ${r.ohneZweck.length} Feld(er) ohne autocomplete: ${r.ohneZweck.join(", ")}`
+    );
+  }
+
+  if (r.zuKlein.length) {
+    list.push(
+      `2.5.8: ${r.zuKlein.length} Ziel(e) unter 24×24 außerhalb des Fließtexts: ${r.zuKlein[0]}`
+    );
+  }
+
+  if (r.fokusKontrast && r.fokusKontrast.ist < r.fokusKontrast.soll) {
+    list.push(
+      `1.4.11: Fokusanzeige nur ${r.fokusKontrast.ist}:1 gegen den Grund, ` +
+        `${r.fokusKontrast.soll}:1 verlangt`
+    );
+  }
+
+  if (r.statusFehlt) {
+    list.push("4.1.3: Formular oder Filter auf der Seite, aber keine Statusregion");
   }
 
   return list;

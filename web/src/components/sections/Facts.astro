@@ -94,7 +94,7 @@ const { topline, headline, figures } = Astro.props;
      Zahlen stehen linksbündig in je eigener Rasterzelle, beim Zählen wandert
      also nur die rechte Kante, und die grenzt an nichts. */
   .s-facts__value {
-    font-size: clamp(3rem, 6vw, 6.5rem);
+    font-size: var(--fs-display-sm);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.03em;

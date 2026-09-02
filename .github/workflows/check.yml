@@ -1,0 +1,86 @@
+# Prüft bei jedem Push und jedem Pull Request, was ohne Browser prüfbar ist.
+#
+# Warum es das gibt: `web:check` und `studio:check` waren gut, liefen aber nur,
+# wenn jemand daran dachte. Genau daran hing der teuerste Fehler dieses
+# Projekts — neun undefinierte Variablen in `prepare()`-Rümpfen, die jede
+# Vorschau im Studio warfen, während alle Website-Prüfungen grün blieben. Sie
+# fielen erst auf, als jemand das Studio öffnete. Ein Wächter, der von
+# Erinnerung abhängt, ist kein Wächter.
+#
+# Was hier NICHT läuft, und warum:
+#
+#   `scripts/check-web.mjs` und `scripts/styles.mjs` brauchen Chrome unter
+#   einem festen macOS-Pfad (siehe `scripts/lib/chrome.mjs`) und einen
+#   laufenden Server. Beides gehört auf den Rechner, nicht in einen Runner.
+#   Sie bleiben der Durchgang von Hand vor dem Ausliefern.
+#
+# Die beiden Sanity-Angaben unten sind keine Geheimnisse: Sie stehen offen in
+# `studio/sanity.cli.ts` und identifizieren nur das Projekt. Ein Lesetoken
+# wird nicht gebraucht, weil hier nichts abgefragt wird — `sanity schema
+# extract` liest die Schemadateien im Ordner, nicht die API.
+
+name: Prüfung
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Ein zweiter Push auf denselben Zweig macht den ersten Lauf gegenstandslos.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pruefung:
+    runs-on: ubuntu-latest
+
+    env:
+      PUBLIC_SANITY_PROJECT_ID: a6bjftwf
+      PUBLIC_SANITY_DATASET: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Aus .nvmrc, damit hier und auf dem Rechner dieselbe Version läuft
+          # und die Versionsangabe nur an einer Stelle steht.
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+            studio/package-lock.json
+
+      # `npm ci` statt `npm install`: Es hält sich an die Lockfiles und
+      # scheitert, wenn package.json und Lockfile auseinanderlaufen. Genau das
+      # soll auffallen.
+      - name: Abhängigkeiten
+        run: |
+          npm ci
+          npm ci --prefix web
+          npm ci --prefix studio
+
+      # Einzelne Schritte statt `npm test` in einem Rutsch: Schlägt etwas fehl,
+      # steht in der Übersicht, was — und nicht bloß, dass.
+      - name: Formatierung
+        run: npm run format:check
+
+      - name: CSS-Regeln
+        run: npm run check:css
+
+      - name: Typen erzeugen
+        run: npm run types
+
+      - name: Typen der Website
+        run: npm --prefix web run check
+
+      - name: Typen und Schema des Studios
+        run: npm run studio:check
+
+      # Zum Schluss, weil ein Build länger dauert als jede Prüfung davor: Wer
+      # einen Tippfehler im Typ hat, soll das nach einer Minute erfahren und
+      # nicht nach fünf.
+      - name: Build
+        run: npm run web:build

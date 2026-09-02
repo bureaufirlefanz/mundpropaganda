@@ -1,0 +1,108 @@
+---
+/**
+ * "Auf einen Blick" — a compact term/value overview at the top of a service
+ * page: duration, cost, durability, anaesthesia.
+ *
+ * A definition list and not a table: there is no second axis here, only a
+ * term and its answer. A table would promise a comparison the content does
+ * not have, and screen readers would announce row and column numbers for it.
+ *
+ * No image on purpose. This block is the answer to the four questions a
+ * visitor already has when they arrive, and it has to be readable before
+ * anything else on the page has loaded.
+ */
+interface Props {
+  id?: string;
+  topline?: string;
+  headline?: string;
+  items: { label: string; value: string }[];
+}
+
+const { id, topline, headline, items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="s-quickfacts container" id={id}>
+    {(topline || headline) && (
+      <div class="s-quickfacts__head">
+        {topline && <span class="c-topline" data-reveal="fade">{topline}</span>}
+        {headline && <h2 class="s-quickfacts__title" data-split="lines">{headline}</h2>}
+      </div>
+    )}
+
+    <dl class="s-quickfacts__list" data-reveal-stagger="0.04">
+      {items.map((item) => (
+        <div class="s-quickfacts__row" data-reveal-child>
+          <dt class="s-quickfacts__label">{item.label}</dt>
+          <dd class="s-quickfacts__value">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+)}
+
+<style>
+  .s-quickfacts {
+    padding-block: var(--section-space);
+  }
+
+  .s-quickfacts__head {
+    max-width: 40ch;
+    margin-bottom: var(--sp-8);
+  }
+
+  .s-quickfacts__title {
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* Two columns from 700px up. `auto-fit` with a `min(100%, …)` floor keeps
+     the rows from being squeezed below their own text width — below the
+     breakpoint the same rule already collapses to one column, the media
+     query only makes that intent explicit. */
+  .s-quickfacts__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 0 var(--site-gutter);
+    margin: 0;
+  }
+
+  /* The rule sits on top of every row, not below: with an even number of
+     rows in two columns the last line would otherwise close only one
+     column and leave the block visibly lopsided. */
+  .s-quickfacts__row {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0 var(--sp-5);
+    padding-block: var(--sp-3);
+    border-top: var(--bw) solid var(--c-line);
+  }
+
+  .s-quickfacts__label {
+    font-size: var(--fs-text-small);
+    line-height: 1.5;
+    color: var(--c-text-muted);
+  }
+
+  .s-quickfacts__value {
+    margin: 0;
+    font-size: var(--fs-text-main);
+    line-height: 1.5;
+    color: var(--c-text);
+  }
+
+  @media (max-width: 900px) {
+    .s-quickfacts {
+      padding-block: var(--section-space-sm);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .s-quickfacts__list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

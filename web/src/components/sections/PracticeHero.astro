@@ -7,16 +7,26 @@
  * die Praxisseite aufruft, will dagegen sofort lesen — meist steht die
  * Entscheidung für eine Behandlung schon an, und die Frage ist, bei wem.
  *
- * Deshalb hier linksbündig und zweispaltig: Titel links, Einstieg rechts auf
- * der Grundlinie der letzten Titelzeile. Darunter zwei Bilder, das zweite
- * versetzt über der rechten Ecke des ersten. Der Versatz ist der ganze
- * Effekt — ein einzelnes Bild in voller Breite hätte diese Seite mit jeder
- * anderen gemeinsam.
+ * Deshalb linksbündig: Topline, Titel, darunter der Einstieg in eigener
+ * Spalte auf Lesebreite. Titel und Einstieg stehen untereinander und nicht
+ * mehr nebeneinander — nebeneinander mussten beide schmal bleiben (13 und
+ * 42 Zeichen), und ein Titel, der nach drei Wörtern umbricht, liest sich als
+ * Layoutzwang statt als Satz.
  *
- * Ohne zweites Bild steht das erste allein und über die volle Breite. Das
- * ist keine Notlösung, sondern der ruhigere von zwei richtigen Zuständen.
+ * **Darunter ein großes Bild über die volle Breite**, randabfallend bis an
+ * die Fensterkante. Vorher standen dort zwei versetzte Bilder; der Versatz
+ * war der ganze Effekt, kostete aber die Größe: Das Hauptmotiv lief auf 78 %
+ * der Spaltenbreite und war damit kleiner als auf jeder anderen Seite. Für
+ * den Kopf der Praxisseite ist die Fläche selbst das Argument — man sieht
+ * den Raum, in den man kommt.
+ *
+ * `imageSecondary` wird hier nicht mehr gezeigt. Das Feld bleibt vorerst im
+ * Schema, damit ein gepflegtes Motiv nicht verloren geht; wenn es dabei
+ * bleibt, gehört es aus dem Studio entfernt — ein Feld, das nichts bewirkt,
+ * ist schlimmer als keines.
  */
 import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
 import ToothLines from "../ui/ToothLines.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
 
@@ -28,8 +38,11 @@ interface Props {
   imageSecondary?: ImageSource;
 }
 
-const { topline, title, lead, image, imageSecondary } = Astro.props;
-const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
+/* `imageSecondary` wird bewusst nicht ausgelesen: Der Kopf zeigt seit dem
+   Umbau ein großes Bild. Die Prop bleibt in der Schnittstelle, damit ein
+   gepflegtes Motiv im Studio nicht stillschweigend verschwindet — siehe
+   Kopfkommentar. */
+const { topline, title, lead, image } = Astro.props;
 ---
 
 <section class="s-phero">
@@ -41,30 +54,31 @@ const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
       <h1 class="s-phero__title" data-split="lines">{title}</h1>
       {lead && <p class="s-phero__lead" data-reveal="up" data-reveal-delay="0.12">{lead}</p>}
     </div>
+  </div>
 
-    {isCmsImage(image) && (
-      <div class="s-phero__media" data-two-images={hasSecondImage ? "" : undefined}>
-        <div class="s-phero__image s-phero__image--large" data-reveal="scale">
-          <CmsImage
-            source={image}
-            alt=""
-            widths={[640, 1024, 1600, 2200]}
-            sizes="(max-width: 900px) 92vw, 78vw"
-            eager
-          />
-        </div>
+  {/* Außerhalb des Containers: Das Bild läuft bis an die Fensterkante, nur die
+      Außenfuge bleibt stehen, damit es sich als Fläche der Seite liest und
+      nicht als Kasten darin.
 
-        {hasSecondImage && (
-          <div class="s-phero__image s-phero__image--small" data-reveal="scale" data-reveal-delay="0.15">
-            <CmsImage
-              source={imageSecondary}
-              alt=""
-              widths={[400, 640, 1024]}
-              sizes="(max-width: 900px) 44vw, 26vw"
-            />
-          </div>
-        )}
-      </div>
+      Klasse 3 wie bei den Beitragskarten: Solange im Studio kein Motiv hängt,
+      steht das gestaltete Ersatzbild da. Am Dokument `practice` ist `image`
+      derzeit leer — ohne Rückfall bliebe der Kopf der Praxisseite eine
+      Textwüste, und ein leerer Kasten wäre schlimmer als ein Bild, das nicht
+      das endgültige ist.
+
+      Über `Picture` und nicht über `CmsImage`: Nur das erste liefert AVIF und
+      WebP als <source> samt srcset für die lokalen Motive. */}
+  <div class="s-phero__media" data-reveal="scale">
+    {isCmsImage(image) ? (
+      <CmsImage
+        source={image}
+        alt=""
+        widths={[900, 1440, 1920, 2600]}
+        sizes="100vw"
+        eager
+      />
+    ) : (
+      <Picture name="empfang-p25" alt="" sizes="100vw" eager />
     )}
   </div>
 </section>
@@ -74,6 +88,10 @@ const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
      Unterkante in die nächste Section weiter, nur seitlich sollen sie die
      Seite nicht breiter machen. `hidden` erzeugte einen Scrollcontainer. */
   .s-phero {
+    /* Dieselbe Fuge wie am Fuß — die Seite rückt oben und unten gleich weit
+       von den Rändern ab. */
+    --hero-gap: clamp(12px, 1.04vw, 18px);
+
     position: relative;
     overflow-x: clip;
     padding-block: calc(var(--section-space) + 96px) var(--section-space);
@@ -84,19 +102,33 @@ const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
     z-index: 1;
   }
 
-  /* Titel links, Einstieg rechts. `align-items: end` setzt den Absatz auf die
-     Grundlinie der letzten Titelzeile statt an den oberen Rand — sonst
-     schwebt er neben einer dreizeiligen Überschrift im Nichts. */
+  /* Untereinander, nicht nebeneinander.
+
+     Vorher zwei Spalten: Titel links auf 13 Zeichen gedeckelt, Einstieg
+     rechts auf 42. Beide mussten schmal bleiben, damit sie nebeneinander
+     passen — der Titel brach dadurch nach zwei bis drei Wörtern um, und der
+     Absatz stand in einer Rinne. Untereinander darf der Titel so breit
+     werden, wie sein Satz es verlangt, und der Einstieg behält trotzdem
+     seine Lesebreite. */
   .s-phero__head {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    gap: var(--sp-6) clamp(var(--sp-8), 6vw, 120px);
-    align-items: end;
+    gap: var(--sp-5);
+    justify-items: start;
   }
 
   .s-phero__title {
-    grid-column: 1;
-    max-width: 13ch;
+    /* 18 statt 13 Zeichen: breit genug für eine Zeile aus zwei bis drei
+       Wörtern, schmal genug, dass die Überschrift nicht über den halben
+       Bildschirm läuft und beim Lesen den Sprung an den Zeilenanfang
+       verlangt. */
+    max-width: 18ch;
+
+    /* Eine Stufe über --fs-h1 und eine unter --fs-display-2.
+       Bei 1440px stand die Überschrift mit 58px in einer Fläche von 1440 —
+       sie las sich als Zwischentitel, nicht als Kopf der Seite. Der Kopf
+       trägt hier die ganze obere Hälfte, bis das Bild beginnt, und braucht
+       entsprechend Grad. */
+    font-size: var(--fs-display-sm);
     font-size: var(--fs-display-2);
     font-weight: 500;
     line-height: 0.94;
@@ -105,57 +137,47 @@ const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
   }
 
   .s-phero__lead {
-    grid-column: 2;
-    max-width: 42ch;
-    padding-bottom: 0.4em;
+    max-width: 52ch;
+    /* Eine Stufe über dem Fließtext. Der Einstieg ist der einzige Absatz im
+       Kopf; auf Fließtextgröße verschwand er unter der großen Überschrift. */
+    font-size: var(--fs-text-large);
+    /* Etwas eingerückt gegen den Titel. Der Versatz ersetzt die verlorene
+       zweite Spalte: Er hält Überschrift und Fließtext auseinander, ohne
+       dass eine von beiden schmal werden muss. */
+    margin-left: clamp(0px, 4vw, 96px);
     font-size: var(--fs-text-large);
     line-height: 1.5;
     color: var(--c-text-muted);
   }
 
-  /* --- Die Bilder ------------------------------------------------------- */
+  /* --- Das Bild --------------------------------------------------------- */
 
-  .s-phero__media {
-    position: relative;
-    margin-top: clamp(var(--sp-8), 6vw, var(--sp-12));
-  }
+  /* Über die volle Fensterbreite, nur die Außenfuge bleibt stehen — dieselbe
+     Fuge, mit der der Fuß unten von den Rändern abrückt. Dadurch liest sich
+     der Kopf als Fläche der Seite und nicht als Kasten im Satzspiegel.
 
-  /* Oben stärker gerundet als unten — dieselbe Bogenform wie die Linien
+     Oben stärker gerundet als unten — dieselbe Bogenform wie die Linien
      dahinter, aus dem Zahnumriss abgeleitet. Ein Bild mit gleicher Rundung
      an allen vier Ecken stünde quer dazu. */
-  .s-phero__image {
+  .s-phero__media {
+    position: relative;
+    z-index: 1;
+    width: calc(100% - var(--hero-gap) * 2);
+    margin: clamp(var(--sp-8), 6vw, var(--sp-12)) auto 0;
+    /* 3:2 und nicht 21:9. Über die volle Fensterbreite wurde aus dem
+       Breitbild ein Briefschlitz von 1400 × 600 — viel Fläche, wenig Raum
+       darin. 3:2 zeigt den Raum, in den man kommt, statt eines Streifens
+       davon. */
+    aspect-ratio: 3 / 2;
     overflow: hidden;
     border-radius: clamp(80px, 10vw, 180px) clamp(80px, 10vw, 180px) var(--r-lg)
       var(--r-lg);
     background: color-mix(in srgb, var(--c-dark) 8%, transparent);
   }
 
-  .s-phero__image--large {
-    aspect-ratio: 16 / 9;
-  }
-
-  /* Nur wenn ein zweites Bild da ist, weicht das große zurück — allein darf
-     es die volle Breite behalten. */
-  .s-phero__media[data-two-images] .s-phero__image--large {
-    width: 78%;
-  }
-
-  /* Versetzt über der rechten Ecke. `bottom` und nicht `top`: Das kleine
-     Bild soll unten überstehen und die Section nach unten öffnen, nicht
-     oben in die Überschrift ragen. */
-  .s-phero__image--small {
-    position: absolute;
-    right: 0;
-    bottom: clamp(-56px, -4vw, -28px);
-    width: clamp(180px, 26%, 340px);
-    aspect-ratio: 3 / 4;
-    border-radius: clamp(56px, 7vw, 120px) clamp(56px, 7vw, 120px) var(--r-md)
-      var(--r-md);
-  }
-
-  /* :global(img), weil die Bilder aus CmsImage.astro kommen und das
-     Scope-Attribut dieser Datei nicht tragen. */
-  .s-phero__image :global(img) {
+  /* :global(img), weil das Bild aus CmsImage.astro kommt und das
+     Scope-Attribut dieser Datei nicht trägt. */
+  .s-phero__media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -174,25 +196,19 @@ const hasSecondImage = isCmsImage(image) && isCmsImage(imageSecondary);
 
     .s-phero__title,
     .s-phero__lead {
-      grid-column: 1;
       max-width: none;
     }
 
     .s-phero__lead {
+      /* Auf schmalen Fenstern kein Versatz — er nähme dem Absatz die halbe
+         Breite und brächte nichts, weil ohnehin nichts daneben steht. */
+      margin-left: 0;
       padding-bottom: 0;
     }
 
-    .s-phero__media[data-two-images] .s-phero__image--large {
-      width: 84%;
-    }
-
-    .s-phero__image--large {
+    /* Hochformatiger, weil 21:9 auf einem Telefon ein Schlitz wäre. */
+    .s-phero__media {
       aspect-ratio: 4 / 3;
-    }
-
-    .s-phero__image--small {
-      bottom: -24px;
-      width: 38%;
     }
   }
 </style>

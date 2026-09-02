@@ -11,6 +11,7 @@
  * Startzustand im CSS, den dieses Modul erst auflösen müsste.
  */
 import { gsap, ScrollTrigger } from "../lib/gsap.js";
+import { getLenis } from "./scroll.js";
 
 export function initToc() {
   const toc = document.querySelector("[data-toc]");
@@ -91,7 +92,11 @@ export function initToc() {
   /* Klick: sanft hinscrollen und sofort hervorheben. Die Sprungmarke im href
      bleibt stehen — ohne JavaScript springt der Browser hart, und das ist das
      richtige Verhalten. */
-  const lenis = window.__lenis;
+  /* getLenis(), not window.__lenis: scroll.js only exposes the global in dev
+     builds, so in production this handler silently bailed out on every click
+     and the generic initAnchors() fallback took over — with the wrong offset
+     and without the immediate highlight. */
+  const lenis = getLenis();
   for (const [id, a] of links) {
     a.addEventListener("click", (e) => {
       const target = document.getElementById(id);
