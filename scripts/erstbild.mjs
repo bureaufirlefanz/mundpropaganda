@@ -41,7 +41,9 @@ page.on("request", (r) => {
 });
 
 const url = `${BASE}${path}`;
-await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 }).catch(() => {});
+await page
+  .goto(url, { waitUntil: "networkidle2", timeout: 30000 })
+  .catch(() => {});
 await page.evaluate(() => document.fonts.ready);
 await new Promise((r) => setTimeout(r, 400));
 
@@ -61,26 +63,37 @@ const zustand = await page.evaluate(() => {
     zahn: sicht(".s-hero__tooth"),
     // Kinder eines Stagger-Containers mitzählen: sie tragen kein
     // [data-reveal], werden aber genauso erst von GSAP eingeblendet.
-    reveals: [...document.querySelectorAll("[data-reveal], [data-reveal-child]")].filter(
-      (el) => parseFloat(getComputedStyle(el).opacity) > 0.05
+    reveals: [
+      ...document.querySelectorAll("[data-reveal], [data-reveal-child]"),
+    ].filter((el) => parseFloat(getComputedStyle(el).opacity) > 0.05).length,
+    revealsGesamt: document.querySelectorAll(
+      "[data-reveal], [data-reveal-child]",
     ).length,
-    revealsGesamt: document.querySelectorAll("[data-reveal], [data-reveal-child]").length,
-    splits: [...document.querySelectorAll("[data-split], [data-hero-word]")].filter(
-      (el) => getComputedStyle(el).visibility !== "hidden"
-    ).length,
-    splitsGesamt: document.querySelectorAll("[data-split], [data-hero-word]").length,
+    splits: [
+      ...document.querySelectorAll("[data-split], [data-hero-word]"),
+    ].filter((el) => getComputedStyle(el).visibility !== "hidden").length,
+    splitsGesamt: document.querySelectorAll("[data-split], [data-hero-word]")
+      .length,
   };
 });
 
-console.log(`${url}\nBlockierte Skripte: ${[...new Set(blockiert)].join(", ") || "keine"}\n`);
-console.log(`  js-Klasse gesetzt:      ${zustand.js ? "ja" : "NEIN — dann greift keine Startregel"}`);
+console.log(
+  `${url}\nBlockierte Skripte: ${[...new Set(blockiert)].join(", ") || "keine"}\n`,
+);
+console.log(
+  `  js-Klasse gesetzt:      ${zustand.js ? "ja" : "NEIN — dann greift keine Startregel"}`,
+);
 console.log(`  Wortmarke:              ${zustand.wortmarke}`);
 console.log(`  Navigationsleiste:      ${zustand.leiste}`);
 console.log(`  Bewertungsleiste:       ${zustand.bewertung}`);
 console.log(`  Scroll-Knopf:           ${zustand.scrollknopf}`);
 console.log(`  Zahn:                   ${zustand.zahn}`);
-console.log(`  sichtbare [data-reveal]: ${zustand.reveals} von ${zustand.revealsGesamt}`);
-console.log(`  sichtbare [data-split]:  ${zustand.splits} von ${zustand.splitsGesamt}`);
+console.log(
+  `  sichtbare [data-reveal]: ${zustand.reveals} von ${zustand.revealsGesamt}`,
+);
+console.log(
+  `  sichtbare [data-split]:  ${zustand.splits} von ${zustand.splitsGesamt}`,
+);
 
 await page.screenshot({ path: `${OUT}/erstbild.png` });
 console.log(`\n  ${OUT}/erstbild.png`);

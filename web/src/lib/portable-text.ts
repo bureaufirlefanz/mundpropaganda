@@ -36,7 +36,10 @@ interface MarkDef {
 }
 
 /** Eine Zeile in Spans zerlegen — fett und Verweise. */
-function parseLine(line: string, key: string): { children: Span[]; markDefs: MarkDef[] } {
+function parseLine(
+  line: string,
+  key: string,
+): { children: Span[]; markDefs: MarkDef[] } {
   const children: Span[] = [];
   const markDefs: MarkDef[] = [];
   const pattern = /\*\*(.+?)\*\*|\[(.+?)\]\((.+?)\)/;
@@ -47,21 +50,42 @@ function parseLine(line: string, key: string): { children: Span[]; markDefs: Mar
 
   while ((match = pattern.exec(rest))) {
     if (match.index > 0) {
-      children.push({ _type: "span", _key: `${key}s${i++}`, text: rest.slice(0, match.index), marks: [] });
+      children.push({
+        _type: "span",
+        _key: `${key}s${i++}`,
+        text: rest.slice(0, match.index),
+        marks: [],
+      });
     }
 
     if (match[1] !== undefined) {
-      children.push({ _type: "span", _key: `${key}s${i++}`, text: match[1], marks: ["strong"] });
+      children.push({
+        _type: "span",
+        _key: `${key}s${i++}`,
+        text: match[1],
+        marks: ["strong"],
+      });
     } else {
       const defKey = `${key}l${markDefs.length}`;
       markDefs.push({ _type: "link", _key: defKey, href: match[3]! });
-      children.push({ _type: "span", _key: `${key}s${i++}`, text: match[2]!, marks: [defKey] });
+      children.push({
+        _type: "span",
+        _key: `${key}s${i++}`,
+        text: match[2]!,
+        marks: [defKey],
+      });
     }
 
     rest = rest.slice(match.index + match[0].length);
   }
 
-  if (rest) children.push({ _type: "span", _key: `${key}s${i++}`, text: rest, marks: [] });
+  if (rest)
+    children.push({
+      _type: "span",
+      _key: `${key}s${i++}`,
+      text: rest,
+      marks: [],
+    });
   return { children, markDefs };
 }
 

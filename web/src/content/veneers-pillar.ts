@@ -50,8 +50,7 @@ import { blocks } from "../lib/portable-text";
 export const veneersPillar: PillarPage = {
   title: "Veneers in Berlin",
   topline: "Guides",
-  lead:
-    "Veneers sind hauchdünne Keramikschalen, die auf die sichtbare Vorderseite der Frontzähne geklebt werden und Verfärbungen, kleine Lücken, Absplitterungen oder eine unregelmäßige Zahnform korrigieren. In unserer Praxis in Prenzlauer Berg planen wir sie so substanzschonend wie möglich, und sagen dir auch, wenn eine andere Lösung für dich die bessere ist.",
+  lead: "Veneers sind hauchdünne Keramikschalen, die auf die sichtbare Vorderseite der Frontzähne geklebt werden und Verfärbungen, kleine Lücken, Absplitterungen oder eine unregelmäßige Zahnform korrigieren. In unserer Praxis in Prenzlauer Berg planen wir sie so substanzschonend wie möglich, und sagen dir auch, wenn eine andere Lösung für dich die bessere ist.",
   image: "bleaching-beratung-spiegel",
   seoDescription:
     "Veneers in Berlin Prenzlauer Berg: die drei Arten im Vergleich, Ablauf in vier Schritten, Haltbarkeit nach Studienlage, Kosten ab 1.200 EUR und wann wir abraten.",
@@ -133,7 +132,11 @@ export const veneersPillar: PillarPage = {
         },
         {
           name: "Umkehrbar",
-          values: [{ kind: "nein" }, { kind: "pille", text: "bedingt" }, { kind: "ja" }],
+          values: [
+            { kind: "nein" },
+            { kind: "pille", text: "bedingt" },
+            { kind: "ja" },
+          ],
         },
         {
           name: "Haltbarkeit",
@@ -317,15 +320,30 @@ export const veneersPillar: PillarPage = {
         },
         {
           name: "Umkehrbar",
-          values: [{ kind: "nein" }, { kind: "ja" }, { kind: "ja" }, { kind: "ja" }],
+          values: [
+            { kind: "nein" },
+            { kind: "ja" },
+            { kind: "ja" },
+            { kind: "ja" },
+          ],
         },
         {
           name: "Behandelt die Ursache",
-          values: [{ kind: "nein" }, { kind: "nein" }, { kind: "nein" }, { kind: "ja" }],
+          values: [
+            { kind: "nein" },
+            { kind: "nein" },
+            { kind: "nein" },
+            { kind: "ja" },
+          ],
         },
         {
           name: "In einer Sitzung fertig",
-          values: [{ kind: "nein" }, { kind: "ja" }, { kind: "ja" }, { kind: "nein" }],
+          values: [
+            { kind: "nein" },
+            { kind: "ja" },
+            { kind: "ja" },
+            { kind: "nein" },
+          ],
         },
       ],
       note: "Häufig ist die beste Antwort eine Kombination: erst bleichen, dann sechs Monate warten, dann nur die zwei Zähne mit Veneers versorgen, die es wirklich brauchen. Das kostet einen Bruchteil und erhält deine Zahnsubstanz.",
@@ -338,9 +356,24 @@ export const veneersPillar: PillarPage = {
       navLabel: "Kosten",
       headline: "Was Veneers in Berlin kosten",
       pricing: [
-        { name: "Komposit-Veneer", price: "€ 450,-", from: true, unit: "/ Zahn" },
-        { name: "Keramikveneer", price: "€ 1.200,-", from: true, unit: "/ Zahn" },
-        { name: "Non-Prep-Veneer", price: "€ 1.400,-", from: true, unit: "/ Zahn" },
+        {
+          name: "Komposit-Veneer",
+          price: "€ 450,-",
+          from: true,
+          unit: "/ Zahn",
+        },
+        {
+          name: "Keramikveneer",
+          price: "€ 1.200,-",
+          from: true,
+          unit: "/ Zahn",
+        },
+        {
+          name: "Non-Prep-Veneer",
+          price: "€ 1.400,-",
+          from: true,
+          unit: "/ Zahn",
+        },
         { name: "Mock-up", price: "€ 450,-", from: true, unit: "/ Kiefer" },
       ],
       note: "Bei Einzelzahnversorgungen mit hohem ästhetischen Anspruch beginnt das Keramikveneer bei € 1.500,-. Ein einzelner Zahn, der sich neben unveränderten Nachbarn einfügen muss, ist die anspruchsvollste Aufgabe überhaupt.",
@@ -397,7 +430,8 @@ export const veneersPillar: PillarPage = {
         },
         {
           question: "Ab welchem Alter sind Veneers sinnvoll?",
-          answer: "Nach abgeschlossenem Kieferwachstum, in der Regel ab etwa 18 Jahren.",
+          answer:
+            "Nach abgeschlossenem Kieferwachstum, in der Regel ab etwa 18 Jahren.",
         },
         {
           question: "Was passiert, wenn ein Veneer abbricht?",

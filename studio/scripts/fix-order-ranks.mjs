@@ -75,7 +75,7 @@ async function los() {
        erhalten bleiben, bis auf das, was MOVE_TO_TOP sagt. */
     const docs = await client.fetch(
       `*[_type == $typ] | order(orderRank) { _id, title, orderRank }`,
-      { typ }
+      { typ },
     );
     if (!docs.length) continue;
 
@@ -89,7 +89,9 @@ async function los() {
     sorted.forEach((d, i) => {
       const alt = d.orderRank ?? "—";
       const marke = alt === next[i] ? " " : "→";
-      console.log(`  ${marke} ${String(i + 1).padStart(2)}. ${next[i]}  ${d.title ?? d._id}`);
+      console.log(
+        `  ${marke} ${String(i + 1).padStart(2)}. ${next[i]}  ${d.title ?? d._id}`,
+      );
       if (alt !== next[i]) {
         batch.patch(d._id, (p) => p.set({ orderRank: next[i] }));
         changed++;
@@ -103,12 +105,16 @@ async function los() {
   }
 
   if (DRY) {
-    console.log(`\nProbelauf: ${changed} Werte WÜRDEN geändert. Nichts geschrieben.`);
+    console.log(
+      `\nProbelauf: ${changed} Werte WÜRDEN geändert. Nichts geschrieben.`,
+    );
     return;
   }
 
   await batch.commit();
-  console.log(`\n✓ ${changed} Sortierwerte repariert. Ziehen funktioniert wieder.`);
+  console.log(
+    `\n✓ ${changed} Sortierwerte repariert. Ziehen funktioniert wieder.`,
+  );
 }
 
 los().catch((error) => {

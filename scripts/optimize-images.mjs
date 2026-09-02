@@ -67,20 +67,30 @@ for (const file of files) {
     const pipeline = sharp(src).resize({ width: w, withoutEnlargement: true });
 
     const webpPath = join(OUT, `${name}-${w}.webp`);
-    await pipeline.clone().webp({ quality: QUALITY.webp, effort: 5 }).toFile(webpPath);
+    await pipeline
+      .clone()
+      .webp({ quality: QUALITY.webp, effort: 5 })
+      .toFile(webpPath);
     totalOut += (await stat(webpPath)).size;
 
     const avifPath = join(OUT, `${name}-${w}.avif`);
-    await pipeline.clone().avif({ quality: QUALITY.avif, effort: 4 }).toFile(avifPath);
+    await pipeline
+      .clone()
+      .avif({ quality: QUALITY.avif, effort: 4 })
+      .toFile(avifPath);
     totalOut += (await stat(avifPath)).size;
   }
 
   /* Winziges Blur-Placeholder-Bild als Base64 für den LQIP-Effekt. */
-  const lqip = await sharp(src).resize(20).blur(2).webp({ quality: 40 }).toBuffer();
+  const lqip = await sharp(src)
+    .resize(20)
+    .blur(2)
+    .webp({ quality: 40 })
+    .toBuffer();
 
   console.log(
     `${name.padEnd(24)} ${meta.width}×${meta.height}  →  ${widths.join(", ")}  ` +
-      `(LQIP ${lqip.length} B)`
+      `(LQIP ${lqip.length} B)`,
   );
 }
 
@@ -88,10 +98,12 @@ for (const file of files) {
    liest das; ohne diesen Schritt bliebe die stale Liste stehen und das Markup
    forderte Breiten an, die es nicht mehr (oder noch nicht) gibt. */
 const karte = await schreibeBreiten();
-console.log(`\nBreiten-Verzeichnis geschrieben: ${Object.keys(karte).length} Motive.`);
+console.log(
+  `\nBreiten-Verzeichnis geschrieben: ${Object.keys(karte).length} Motive.`,
+);
 
 const mb = (b) => (b / 1024 / 1024).toFixed(1);
 console.log(
   `\nQuelle ${mb(totalIn)} MB → Ausgabe ${mb(totalOut)} MB ` +
-    `über ${files.length} Bilder in allen Größen.`
+    `über ${files.length} Bilder in allen Größen.`,
 );

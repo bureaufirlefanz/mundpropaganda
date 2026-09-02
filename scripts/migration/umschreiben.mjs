@@ -27,7 +27,8 @@ const PRAEFIXE = {
 };
 
 /** Systemdokumente von Sanity. Werden nicht angefasst und nicht exportiert. */
-export const istSystem = (id) => id?.startsWith("_.") || id?.startsWith("system.");
+export const istSystem = (id) =>
+  id?.startsWith("_.") || id?.startsWith("system.");
 
 /** Die neue ID eines Dokuments. Gibt die alte zurück, wenn nichts passt. */
 export function neueId(id) {
@@ -73,7 +74,9 @@ export function umschreiben(wert) {
       continue;
     }
 
-    const neu = GESCHUETZT.has(schluessel) ? schluessel : (FELDER[schluessel] ?? schluessel);
+    const neu = GESCHUETZT.has(schluessel)
+      ? schluessel
+      : (FELDER[schluessel] ?? schluessel);
     raus[neu] = umschreiben(v);
   }
   return raus;
@@ -95,7 +98,12 @@ export function verdaechtig(wert, pfad = "", treffer = new Set()) {
   if (!wert || typeof wert !== "object") return treffer;
 
   for (const [schluessel, v] of Object.entries(wert)) {
-    if (!schluessel.startsWith("_") && /[äöüßÄÖÜ]|(titel|zeile|spalte|bild|eintrag|schritt|frage|antwort|zahl|stimme|marke|wert)/i.test(schluessel)) {
+    if (
+      !schluessel.startsWith("_") &&
+      /[äöüßÄÖÜ]|(titel|zeile|spalte|bild|eintrag|schritt|frage|antwort|zahl|stimme|marke|wert)/i.test(
+        schluessel,
+      )
+    ) {
       treffer.add(schluessel);
     }
     verdaechtig(v, `${pfad}.${schluessel}`, treffer);

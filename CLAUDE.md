@@ -4,13 +4,13 @@
 
 **Astro + Sanity.** Decided 2026-08-04. Everything else is a prototype.
 
-| Folder | What | Status |
-|---|---|---|
-| `web/` | Astro — the website | **product** |
-| `studio/` | Sanity — the CMS | **product** |
-| `prototypen/vite/` | Handlebars build | archive, do not change |
-| `prototypen/webflow/` | Lumos reconstruction | prototype, only on request |
-| `scripts/` | image pipeline, captures, checks | tooling |
+| Folder                | What                             | Status                     |
+| --------------------- | -------------------------------- | -------------------------- |
+| `web/`                | Astro — the website              | **product**                |
+| `studio/`             | Sanity — the CMS                 | **product**                |
+| `prototypen/vite/`    | Handlebars build                 | archive, do not change     |
+| `prototypen/webflow/` | Lumos reconstruction             | prototype, only on request |
+| `scripts/`            | image pipeline, captures, checks | tooling                    |
 
 Anyone landing here without knowing the layout: changes to the website belong
 in `web/` or `studio/`. Touching anything under `prototypen/` changes nothing
@@ -84,7 +84,7 @@ Queries live in `web/src/lib/`.
 
 **A prototype. Work on it only when explicitly asked.**
 
-The site *was* once meant to be reconstructed in Webflow; that intention no
+The site _was_ once meant to be reconstructed in Webflow; that intention no
 longer stands. Everything that would apply if it came back lives in
 `prototypen/webflow/` — site ID, Lumos version, the limits of the MCP, and the
 mapping of BEM classes onto Lumos.

@@ -20,6 +20,12 @@ web/BAUSTEINE.md
 # und die nichts ausliefern.
 prototypen/
 
+# Fremde Dokumentation. `.agents/skills/` kommt aus einem Paket und wird von
+# dort aktualisiert; sie zu formatieren erzeugt beim nächsten Aktualisieren
+# einen Unterschied, den niemand gewollt hat. Dieselbe Überlegung wie bei
+# `prototypen/`.
+.agents/
+
 # Aufnahmen und Rohmaterial
 .shots/
 aufnahmen/

@@ -34,8 +34,14 @@ interface Props extends HTMLAttributes<"img"> {
    Bildausschnitt, `data-*` für die Module. Ohne das musste jede Stelle, die
    ein Attribut braucht, auf `CmsImage` mit festem Pfad ausweichen und verlor
    dabei AVIF und srcset. */
-const { name, alt = "", sizes = "100vw", eager = false, parallax, ...rest } =
-  Astro.props;
+const {
+  name,
+  alt = "",
+  sizes = "100vw",
+  eager = false,
+  parallax,
+  ...rest
+} = Astro.props;
 
 const list = (BREITEN as Record<string, number[]>)[name];
 
@@ -47,13 +53,15 @@ if (!list?.length) {
   throw new Error(
     `Picture: Motiv „${name}" steht nicht in image-widths.json. ` +
       `Entweder ist der Name falsch geschrieben, oder es fehlt ein Lauf von ` +
-      `\`npm run images\` (bzw. \`node scripts/image-widths.mjs\`).`
+      `\`npm run images\` (bzw. \`node scripts/image-widths.mjs\`).`,
   );
 }
 
-const srcset = (ext: string) => list.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
+const srcset = (ext: string) =>
+  list.map((w) => `/img/${name}-${w}.${ext} ${w}w`).join(", ");
 const fallback = `/img/${name}-${list[0]}.webp`;
 ---
+
 <picture>
   <source type="image/avif" srcset={srcset("avif")} sizes={sizes} />
   <source type="image/webp" srcset={srcset("webp")} sizes={sizes} />

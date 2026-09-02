@@ -23,8 +23,8 @@ export function initToc() {
   }
   if (!links.size) return;
 
-  const targets = [...document.querySelectorAll("[data-toc-target]")].filter((el) =>
-    links.has(el.dataset.tocTarget)
+  const targets = [...document.querySelectorAll("[data-toc-target]")].filter(
+    (el) => links.has(el.dataset.tocTarget),
   );
   if (!targets.length) return;
 
@@ -77,7 +77,7 @@ export function initToc() {
       end: targets[i + 1] ? "top 33%" : "bottom 33%",
       onToggle: (self) => self.isActive && setActive(el.dataset.tocTarget),
       onRefresh: (self) => self.isActive && setActive(el.dataset.tocTarget),
-    })
+    }),
   );
 
   /* Über dem ersten Zwischentitel ist keiner active — dann soll auch keiner

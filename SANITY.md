@@ -134,14 +134,14 @@ ausdrücklich geben, und `fixtures.ts` gibt es seit Aufgabe 4 nicht mehr.
 
 Was in Webflow eine **Collection** ist, heißt hier **Dokumenttyp**:
 
-| Webflow | Sanity | Astro |
-| --- | --- | --- |
-| Collection | `defineType({ type: "document" })` | — |
-| Collection Item | ein Dokument | — |
-| Collection Page | — | `[slug].astro` mit `getStaticPaths()` |
-| Collection List | GROQ-Abfrage | `.map()` im Baustein |
-| Reference | Feldtyp `reference` | `->` in der Abfrage |
-| Rich Text | Portable Text | `astro-portabletext` |
+| Webflow         | Sanity                             | Astro                                 |
+| --------------- | ---------------------------------- | ------------------------------------- |
+| Collection      | `defineType({ type: "document" })` | —                                     |
+| Collection Item | ein Dokument                       | —                                     |
+| Collection Page | —                                  | `[slug].astro` mit `getStaticPaths()` |
+| Collection List | GROQ-Abfrage                       | `.map()` im Baustein                  |
+| Reference       | Feldtyp `reference`                | `->` in der Abfrage                   |
+| Rich Text       | Portable Text                      | `astro-portabletext`                  |
 
 Bislang gibt es eine Sammlung und ein Einzeldokument.
 
@@ -218,20 +218,20 @@ Studio löscht, sieht sie auch aus Tabelle, Menü und Fuß verschwinden.
 
 Die Reihenfolge entspricht der Vanilla-Vorlage `leistungen/veneers.html`:
 
-| Abschnitt | Baustein | Inhalt aus |
-| --- | --- | --- |
-| Service-Hero | `[slug].astro` | CMS |
-| Intro | `[slug].astro` | CMS |
-| Benefits | `Benefits.astro` | CMS |
-| Vorher/Nachher | `BeforeAfter.astro` | CMS |
-| Statement | `[slug].astro` | CMS |
-| In vier Schritten | `Steps.astro` | CMS |
-| Transformation Stories | `Stories.astro` | CMS, aus dem Startseiten-Dokument |
-| Kosten | `[slug].astro` | CMS |
-| Feature-Zeilen | `Features.astro` | CMS |
-| Magazin | `Magazine.astro` | Einstieg aus der Seite, Beiträge fest |
-| FAQ | `Faq.astro` | CMS |
-| Kontakt | `Contact.astro` | fest |
+| Abschnitt              | Baustein            | Inhalt aus                            |
+| ---------------------- | ------------------- | ------------------------------------- |
+| Service-Hero           | `[slug].astro`      | CMS                                   |
+| Intro                  | `[slug].astro`      | CMS                                   |
+| Benefits               | `Benefits.astro`    | CMS                                   |
+| Vorher/Nachher         | `BeforeAfter.astro` | CMS                                   |
+| Statement              | `[slug].astro`      | CMS                                   |
+| In vier Schritten      | `Steps.astro`       | CMS                                   |
+| Transformation Stories | `Stories.astro`     | CMS, aus dem Startseiten-Dokument     |
+| Kosten                 | `[slug].astro`      | CMS                                   |
+| Feature-Zeilen         | `Features.astro`    | CMS                                   |
+| Magazin                | `Magazine.astro`    | Einstieg aus der Seite, Beiträge fest |
+| FAQ                    | `Faq.astro`         | CMS                                   |
+| Kontakt                | `Contact.astro`     | fest                                  |
 
 Jeder Abschnitt hängt an seinen eigenen Daten: Was das Dokument nicht trägt,
 erscheint nicht. Die Patientenstimmen stehen im Startseiten-Dokument, weil es
@@ -287,16 +287,16 @@ Lesetoken anlegen — das Verwalten von Webhooks verlangt das Recht
 `sanity.project.webhooks/read` und mehr, ein Viewer-Token hat es nicht. Das
 ist die richtige Grenze und kein Mangel.
 
-**sanity.io/manage** → Projekt `a6bjftwf` → API → Webhooks → *Create webhook*
+**sanity.io/manage** → Projekt `a6bjftwf` → API → Webhooks → _Create webhook_
 
-| Feld | Wert |
-|---|---|
-| Name | `Netlify Build` |
-| URL | die Adresse oben |
-| Dataset | `production` |
-| Trigger on | Create, Update, Delete — alle drei |
-| Filter | leer |
-| HTTP method | POST |
+| Feld        | Wert                               |
+| ----------- | ---------------------------------- |
+| Name        | `Netlify Build`                    |
+| URL         | die Adresse oben                   |
+| Dataset     | `production`                       |
+| Trigger on  | Create, Update, Delete — alle drei |
+| Filter      | leer                               |
+| HTTP method | POST                               |
 
 Danach die Probe: Im Studio etwas ändern und publizieren. Bei Netlify muss
 innerhalb von Sekunden ein Deploy anlaufen. Falls nicht, steht unter dem
@@ -307,13 +307,13 @@ braucht, steht schon (`studio/components/PublishHinweis.tsx`).
 
 ### Umgebungsvariablen
 
-| Name | Wo | Wofür |
-|---|---|---|
-| `PUBLIC_SANITY_PROJECT_ID` | `web/.env`, Netlify | Projekt |
-| `PUBLIC_SANITY_DATASET` | `web/.env`, Netlify | Datensatz |
-| `SANITY_API_READ_TOKEN` | `web/.env`, Netlify | Entwürfe für die Vorschau |
-| `PUBLIC_SANITY_STUDIO_URL` | Netlify | Wohin Stega beim Klick springt |
-| `SANITY_STUDIO_PREVIEW_URL` | Studio-Deploy | Wo die Website läuft |
+| Name                        | Wo                  | Wofür                          |
+| --------------------------- | ------------------- | ------------------------------ |
+| `PUBLIC_SANITY_PROJECT_ID`  | `web/.env`, Netlify | Projekt                        |
+| `PUBLIC_SANITY_DATASET`     | `web/.env`, Netlify | Datensatz                      |
+| `SANITY_API_READ_TOKEN`     | `web/.env`, Netlify | Entwürfe für die Vorschau      |
+| `PUBLIC_SANITY_STUDIO_URL`  | Netlify             | Wohin Stega beim Klick springt |
+| `SANITY_STUDIO_PREVIEW_URL` | Studio-Deploy       | Wo die Website läuft           |
 
 **`SANITY_API_READ_TOKEN` trägt kein `PUBLIC_`.** Mit dem Präfix backte Astro
 ihn ins ausgelieferte JavaScript, und ein Lesetoken für Entwürfe stünde im
@@ -354,8 +354,8 @@ GitHub-Account mit Netlify zu verknüpfen allein auch nicht.
 **Netlify speichert die Sichtbarkeit beim Verbinden.** Stellt man das
 Repository bei GitHub auf öffentlich, merkt Netlify das nicht — im Site-Objekt
 steht weiter `public_repo: false`, und es blockt gegen den alten Stand. Über
-die API lässt sich das Feld nicht setzen. Der einzige Weg ist *Unlink
-repository* und erneut verbinden; dabei liest Netlify sie neu ein.
+die API lässt sich das Feld nicht setzen. Der einzige Weg ist _Unlink
+repository_ und erneut verbinden; dabei liest Netlify sie neu ein.
 
 Wer das Repository wieder auf privat stellt, braucht Netlify Pro — oder muss
 denselben Weg noch einmal gehen.

@@ -22,9 +22,14 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     return new Response("SANITY_API_READ_TOKEN fehlt.", { status: 500 });
   }
 
-  const { isValid, redirectTo = "/" } = await validatePreviewUrl(client, request.url);
+  const { isValid, redirectTo = "/" } = await validatePreviewUrl(
+    client,
+    request.url,
+  );
   if (!isValid) {
-    return new Response("Ungültiges oder abgelaufenes Geheimnis.", { status: 401 });
+    return new Response("Ungültiges oder abgelaufenes Geheimnis.", {
+      status: 401,
+    });
   }
 
   cookies.set(PREVIEW_COOKIE, "an", {

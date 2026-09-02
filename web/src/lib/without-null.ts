@@ -35,9 +35,15 @@ export function withoutNull<T>(value: T): WithoutNull<T> {
 
   /* Nur einfache Objekte. Datumsangaben und alles mit eigener Klasse bleiben
      unangetastet — sie durchzuiterieren würde sie in leere Hüllen verwandeln. */
-  if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
+  if (
+    typeof value === "object" &&
+    Object.getPrototypeOf(value) === Object.prototype
+  ) {
     return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, withoutNull(v)])
+      Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+        k,
+        withoutNull(v),
+      ]),
     ) as WithoutNull<T>;
   }
 

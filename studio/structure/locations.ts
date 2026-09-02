@@ -35,7 +35,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
 
     careers: defineLocations({
       select: {},
-      resolve: () => ({ locations: [{ title: "Karriere", href: "/karriere" }] }),
+      resolve: () => ({
+        locations: [{ title: "Karriere", href: "/karriere" }],
+      }),
     }),
 
     practice: defineLocations({
@@ -49,7 +51,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
         const path = pathFor("person", doc?.slug ?? undefined);
         return {
           locations: [
-            ...(path ? [{ title: doc?.title ?? "Die Person", href: path }] : []),
+            ...(path
+              ? [{ title: doc?.title ?? "Die Person", href: path }]
+              : []),
             /* Und das Raster, in dem sie steht. Wer hier den Namen ändert,
                ändert ihn dort mit — das soll man sehen. */
             { title: "Praxis (Team-Raster)", href: "/praxis" },
@@ -69,7 +73,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
         const path = pathFor("legalPage", doc?.slug ?? undefined);
         return {
           locations: [
-            ...(path ? [{ title: doc?.title ?? "Der Rechtstext", href: path }] : []),
+            ...(path
+              ? [{ title: doc?.title ?? "Der Rechtstext", href: path }]
+              : []),
             /* Und die Zeile im Seitenfuß, die auf ihn verweist — sie steht
                auf jeder Seite. */
             { title: "Footer (überall)", href: "/" },
@@ -86,7 +92,9 @@ export const resolve: PresentationPluginOptions["resolve"] = {
           locations: [
             /* Die eigene Seite zuerst — sie ist gemeint, wenn jemand die
                Leistung bearbeitet. */
-            ...(path ? [{ title: doc?.title ?? "Die Leistung", href: path }] : []),
+            ...(path
+              ? [{ title: doc?.title ?? "Die Leistung", href: path }]
+              : []),
             /* Und die drei Aufzählungen, die denselben Namen tragen. Wer hier
                umbenennt, ändert sie alle mit — das soll man sehen, bevor man
                publiziert. */
@@ -97,18 +105,26 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     post: defineLocations({
-      select: { title: "title", slug: "slug.current", service: "service->slug.current" },
+      select: {
+        title: "title",
+        slug: "slug.current",
+        service: "service->slug.current",
+      },
       resolve: (doc) => {
         const path = pathFor("post", doc?.slug ?? undefined);
         const serviceHref = pathFor("service", doc?.service ?? undefined);
         return {
           locations: [
-            ...(path ? [{ title: doc?.title ?? "Der Beitrag", href: path }] : []),
+            ...(path
+              ? [{ title: doc?.title ?? "Der Beitrag", href: path }]
+              : []),
             { title: "Magazin (Übersicht)", href: "/magazin" },
             { title: "Startseite (Karussell)", href: "/" },
             /* Nur wenn der Beitrag auf eine Leistung verweist: dort steht er
                dann unter „Passend zum Thema". */
-            ...(serviceHref ? [{ title: "Die verknüpfte Leistung", href: serviceHref }] : []),
+            ...(serviceHref
+              ? [{ title: "Die verknüpfte Leistung", href: serviceHref }]
+              : []),
           ],
         };
       },
@@ -118,14 +134,17 @@ export const resolve: PresentationPluginOptions["resolve"] = {
 
     job: defineLocations({
       select: { title: "title" },
-      resolve: () => ({ locations: [{ title: "Karriere (Offene Stellen)", href: "/karriere" }] }),
+      resolve: () => ({
+        locations: [{ title: "Karriere (Offene Stellen)", href: "/karriere" }],
+      }),
     }),
 
     settings: defineLocations({
       select: {},
       resolve: () => ({
         locations: SITEWIDE,
-        message: "Kontakt, Bewertungen, Standorte und die Profile stehen auf jeder Seite.",
+        message:
+          "Kontakt, Bewertungen, Standorte und die Profile stehen auf jeder Seite.",
       }),
     }),
 

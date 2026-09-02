@@ -48,32 +48,91 @@ if (!["sichern", "vergleichen"].includes(befehl)) {
 /* Nur Eigenschaften, die man auch sehen würde. Alle ~340 gerechneten Werte
    aufzunehmen bläht die Ablage auf und bringt Rauschen mit. */
 const EIGENSCHAFTEN = [
-  "display", "position", "inset", "float", "clear",
-  "width", "height", "min-width", "max-width", "min-height", "max-height",
-  "margin", "padding", "box-sizing",
-  "font-family", "font-size", "font-weight", "font-style", "line-height",
-  "letter-spacing", "text-transform", "text-align", "text-decoration-line",
-  "white-space", "word-break", "text-wrap",
-  "color", "background-color", "background-image", "background-size",
-  "background-position", "background-repeat",
-  "border-width", "border-style", "border-color", "border-radius",
-  "opacity", "transform", "transform-origin", "rotate", "scale",
-  "z-index", "overflow-x", "overflow-y", "visibility", "pointer-events",
-  "flex-direction", "flex-wrap", "align-items", "justify-content", "gap",
-  "grid-template-columns", "grid-template-rows", "grid-column", "grid-row",
-  "aspect-ratio", "object-fit", "object-position",
-  "box-shadow", "filter", "backdrop-filter", "mix-blend-mode",
-  "mask-image", "clip-path", "-webkit-mask-image",
-  "writing-mode", "list-style-type",
+  "display",
+  "position",
+  "inset",
+  "float",
+  "clear",
+  "width",
+  "height",
+  "min-width",
+  "max-width",
+  "min-height",
+  "max-height",
+  "margin",
+  "padding",
+  "box-sizing",
+  "font-family",
+  "font-size",
+  "font-weight",
+  "font-style",
+  "line-height",
+  "letter-spacing",
+  "text-transform",
+  "text-align",
+  "text-decoration-line",
+  "white-space",
+  "word-break",
+  "text-wrap",
+  "color",
+  "background-color",
+  "background-image",
+  "background-size",
+  "background-position",
+  "background-repeat",
+  "border-width",
+  "border-style",
+  "border-color",
+  "border-radius",
+  "opacity",
+  "transform",
+  "transform-origin",
+  "rotate",
+  "scale",
+  "z-index",
+  "overflow-x",
+  "overflow-y",
+  "visibility",
+  "pointer-events",
+  "flex-direction",
+  "flex-wrap",
+  "align-items",
+  "justify-content",
+  "gap",
+  "grid-template-columns",
+  "grid-template-rows",
+  "grid-column",
+  "grid-row",
+  "aspect-ratio",
+  "object-fit",
+  "object-position",
+  "box-shadow",
+  "filter",
+  "backdrop-filter",
+  "mix-blend-mode",
+  "mask-image",
+  "clip-path",
+  "-webkit-mask-image",
+  "writing-mode",
+  "list-style-type",
 ];
 
 async function nimmAuf(browser, path, vp) {
   const page = await browser.newPage();
   await page.setJavaScriptEnabled(false);
-  await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 1 });
-  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  await page.setViewport({
+    width: vp.width,
+    height: vp.height,
+    deviceScaleFactor: 1,
+  });
+  await page.emulateMediaFeatures([
+    { name: "prefers-reduced-motion", value: "reduce" },
+  ]);
 
-  await page.goto(`${BASE}${path}?nosmooth`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${BASE}${path}?nosmooth`, {
+    waitUntil: "networkidle2",
+    timeout: 60000,
+  });
   await page.evaluate(() => document.fonts.ready);
   // Bilder verschieben nach dem Laden noch Höhen.
   await new Promise((r) => setTimeout(r, 1500));
@@ -101,7 +160,12 @@ async function nimmAuf(browser, path, vp) {
         return {
           k: schluessel(el),
           // Auf ganze Pixel gerundet: Subpixel schwanken zwischen Durchläufen.
-          rect: [Math.round(r.x), Math.round(r.y + window.scrollY), Math.round(r.width), Math.round(r.height)],
+          rect: [
+            Math.round(r.x),
+            Math.round(r.y + window.scrollY),
+            Math.round(r.width),
+            Math.round(r.height),
+          ],
           werte,
         };
       });
@@ -115,7 +179,9 @@ function vergleiche(alt, next, wo) {
   const findings = [];
 
   if (alt.length !== next.length) {
-    findings.push(`${wo}: ${alt.length} Elemente vorher, ${next.length} jetzt — das Markup hat sich verschoben`);
+    findings.push(
+      `${wo}: ${alt.length} Elemente vorher, ${next.length} jetzt — das Markup hat sich verschoben`,
+    );
   }
 
   const n = Math.min(alt.length, next.length);
@@ -124,7 +190,9 @@ function vergleiche(alt, next, wo) {
     const b = next[i];
 
     if (a.k !== b.k) {
-      findings.push(`${wo}: an Position ${i} stand „${a.k}", jetzt „${b.k}" — ab hier ist der Vergleich wertlos`);
+      findings.push(
+        `${wo}: an Position ${i} stand „${a.k}", jetzt „${b.k}" — ab hier ist der Vergleich wertlos`,
+      );
       break;
     }
 
@@ -132,14 +200,18 @@ function vergleiche(alt, next, wo) {
 
     const felder = ["x", "y", "Breite", "Höhe"];
     a.rect.forEach((v, j) => {
-      if (v !== b.rect[j]) abweichungen.push(`${felder[j]} ${v} → ${b.rect[j]}`);
+      if (v !== b.rect[j])
+        abweichungen.push(`${felder[j]} ${v} → ${b.rect[j]}`);
     });
 
     for (const [p, v] of Object.entries(a.werte)) {
       if (b.werte[p] !== v) abweichungen.push(`${p}: ${v} → ${b.werte[p]}`);
     }
 
-    if (abweichungen.length) findings.push(`${wo} · ${a.k} (#${i})\n      ${abweichungen.join("\n      ")}`);
+    if (abweichungen.length)
+      findings.push(
+        `${wo} · ${a.k} (#${i})\n      ${abweichungen.join("\n      ")}`,
+      );
   }
 
   return findings;
@@ -167,7 +239,9 @@ for (const vp of VIEWPORTS) {
     try {
       vorher = JSON.parse(await readFile(file, "utf8"));
     } catch {
-      console.log(`  – ${path} · ${vp.name} — kein gesicherter Stand, übersprungen`);
+      console.log(
+        `  – ${path} · ${vp.name} — kein gesicherter Stand, übersprungen`,
+      );
       continue;
     }
 
@@ -176,7 +250,9 @@ for (const vp of VIEWPORTS) {
       findings += list.length;
       list.forEach((f) => console.log(`  ✗ ${f}`));
     } else {
-      console.log(`  ✓ ${path} · ${vp.name} — ${jetzt.length} Elemente unverändert`);
+      console.log(
+        `  ✓ ${path} · ${vp.name} — ${jetzt.length} Elemente unverändert`,
+      );
     }
   }
 }
@@ -186,6 +262,8 @@ await browser.close();
 if (befehl === "sichern") {
   console.log(`\nStand liegt in ${ORDNER}/.`);
 } else {
-  console.log(findings ? `\n${findings} Abweichung(en).` : "\nKeine Abweichung.");
+  console.log(
+    findings ? `\n${findings} Abweichung(en).` : "\nKeine Abweichung.",
+  );
   process.exit(findings ? 1 : 0);
 }

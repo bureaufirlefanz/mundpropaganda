@@ -59,12 +59,7 @@ export const SINGLETONS = [
  * und in dieser Liste, damit niemand sie versehentlich über die generische
  * Auflistung wieder hereinholt — sichtbar sind sie nicht.
  */
-export const UNROUTED = [
-  "servicesIndex",
-  "contactPage",
-  "emergency",
-  "pillar",
-];
+export const UNROUTED = ["servicesIndex", "contactPage", "emergency", "pillar"];
 
 /** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
 const EXPLICIT = [
@@ -81,7 +76,7 @@ function singleton(
   S: StructureBuilder,
   type: string,
   title: string,
-  icon: ComponentType
+  icon: ComponentType,
 ) {
   return S.listItem()
     .title(title)
@@ -154,12 +149,14 @@ export const structure: StructureResolver = (S, context) =>
          im Seitenfuß deshalb leer blieb. Mit der Route `/[slug]` ist beides
          aufgelöst. Ganz unten, weil man sie einmal schreibt und dann jahrelang
          nicht mehr anfasst. */
-      S.documentTypeListItem("legalPage").title("Rechtstexte").icon(DocumentTextIcon),
+      S.documentTypeListItem("legalPage")
+        .title("Rechtstexte")
+        .icon(DocumentTextIcon),
 
       /* Was künftig dazukommt, erscheint hier von selbst — ohne dass jemand
          diese Datei anfassen muss. Erst wenn ein Typ eine eigene Ordnung
          braucht, bekommt er oben einen ausgeschriebenen Eintrag. */
       ...S.documentTypeListItems().filter(
-        (entry) => !EXPLICIT.includes(entry.getId() as string)
+        (entry) => !EXPLICIT.includes(entry.getId() as string),
       ),
     ]);

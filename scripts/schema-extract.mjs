@@ -28,11 +28,9 @@ import { readFileSync, statSync } from "node:fs";
 const ZIEL = "schema.json";
 const BEGONNEN = Date.now();
 
-const lauf = spawnSync(
-  "npm",
-  ["--prefix", "studio", "run", "schema:extract"],
-  { stdio: "inherit" }
-);
+const lauf = spawnSync("npm", ["--prefix", "studio", "run", "schema:extract"], {
+  stdio: "inherit",
+});
 
 /* Erwartet werden mindestens die Dokumenttypen, die es sicher gibt. Eine reine
    Existenzprüfung reichte nicht: Eine leere oder halb geschriebene Datei
@@ -43,7 +41,9 @@ let schema;
 try {
   const stand = statSync(ZIEL);
   if (stand.mtimeMs < BEGONNEN - 1000) {
-    throw new Error("schema.json ist älter als dieser Lauf — es wurde nicht next geschrieben.");
+    throw new Error(
+      "schema.json ist älter als dieser Lauf — es wurde nicht next geschrieben.",
+    );
   }
   schema = JSON.parse(readFileSync(ZIEL, "utf8"));
   if (!Array.isArray(schema) || schema.length === 0) {
@@ -62,6 +62,6 @@ try {
 if (lauf.status !== 0) {
   console.error(
     `\n  (Das Sanity-CLI ist mit Code ${lauf.status} abgestürzt, nachdem es das Schema\n` +
-      `   geschrieben hatte. ${schema.length} Typen liegen vollständig vor — weiter.)`
+      `   geschrieben hatte. ${schema.length} Typen liegen vollständig vor — weiter.)`,
   );
 }

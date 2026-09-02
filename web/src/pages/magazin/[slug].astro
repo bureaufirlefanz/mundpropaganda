@@ -9,7 +9,10 @@ import { loadPost, loadPosts, loadRelated } from "../../lib/magazine";
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
   const posts = await loadPosts();
-  return posts.map((b) => ({ params: { slug: b.slug }, props: { title: b.title } }));
+  return posts.map((b) => ({
+    params: { slug: b.slug },
+    props: { title: b.title },
+  }));
 }
 
 const { slug } = Astro.params;

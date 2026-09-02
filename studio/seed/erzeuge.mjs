@@ -81,29 +81,39 @@ const S = (p) => lies(`web/src/components/sections/${p}.astro`);
 /* --- Die elf Leistungen ------------------------------------------------- */
 
 const liste = lies("web/src/lib/service-list.ts");
-const items = [...liste.matchAll(
-  /\{ slug: "([^"]+)", name: "([^"]+)"(?:, title: "([^"]+)")?, placement: "([^"]+)"(?:, group: "([^"]+)")?(?:, tag: "([^"]+)")?/g
-)];
-if (!items.length) throw new Error("Keine Leistungen gefunden — Form von beispielListe geändert?");
+const items = [
+  ...liste.matchAll(
+    /\{ slug: "([^"]+)", name: "([^"]+)"(?:, title: "([^"]+)")?, placement: "([^"]+)"(?:, group: "([^"]+)")?(?:, tag: "([^"]+)")?/g,
+  ),
+];
+if (!items.length)
+  throw new Error(
+    "Keine Leistungen gefunden — Form von beispielListe geändert?",
+  );
 
-const rows = items.map(([, slug, name, titel, platzierung, gruppe, tag], i) => ({
-  _id: `service-${slug}`,
-  _type: "service",
-  titel: titel || name,
-  kurzname: titel ? name : undefined,
-  slug: { _type: "slug", current: slug },
-  topline: `${name} in Berlin`,
-  platzierung,
-  gruppe,
-  tag,
-  /* Die Reihenfolge der Liste ist die Relevanzordnung. orderRank hält sie im
+const rows = items.map(
+  ([, slug, name, titel, platzierung, gruppe, tag], i) => ({
+    _id: `service-${slug}`,
+    _type: "service",
+    titel: titel || name,
+    kurzname: titel ? name : undefined,
+    slug: { _type: "slug", current: slug },
+    topline: `${name} in Berlin`,
+    platzierung,
+    gruppe,
+    tag,
+    /* Die Reihenfolge der Liste ist die Relevanzordnung. orderRank hält sie im
      Studio, wo sie sich ziehen lässt. */
-  orderRank: String(i).padStart(4, "0"),
-}));
+    orderRank: String(i).padStart(4, "0"),
+  }),
+);
 
 /* --- Die Einstellungen -------------------------------------------------- */
 
-const einst = vorgabe(lies("web/src/lib/settings.ts"), "beispielEinstellungen: Einstellungen");
+const einst = vorgabe(
+  lies("web/src/lib/settings.ts"),
+  "beispielEinstellungen: Einstellungen",
+);
 rows.push({
   _id: "settings",
   _type: "settings",
@@ -160,7 +170,8 @@ rows.push({
   magazinText: vorgabe(magazine, "text"),
 
   faqTitel: "Häufige Fragen",
-  faqText: "Nichts dabei? Schreiben Sie uns - wir antworten in der Regel am selben Werktag.",
+  faqText:
+    "Nichts dabei? Schreiben Sie uns - wir antworten in der Regel am selben Werktag.",
   faq: vorgabe(index, "FRAGEN").map(key("frage")),
 });
 
@@ -177,7 +188,9 @@ rows.push({
 import { writeFileSync } from "node:fs";
 
 const alsNdjson = (liste) =>
-  liste.map((z) => JSON.stringify(z, (k, v) => (v === undefined ? undefined : v))).join("\n") + "\n";
+  liste
+    .map((z) => JSON.stringify(z, (k, v) => (v === undefined ? undefined : v)))
+    .join("\n") + "\n";
 
 const services = rows.filter((z) => z._type === "service");
 const pages = rows.filter((z) => z._type !== "service");
@@ -187,5 +200,5 @@ writeFileSync("studio/seed/seiten.ndjson", alsNdjson(pages));
 
 console.error(
   `services.ndjson  ${services.length} Dokumente  (Import mit --missing)\n` +
-    `seiten.ndjson      ${pages.length} Dokumente  (Import mit --replace)`
+    `seiten.ndjson      ${pages.length} Dokumente  (Import mit --replace)`,
 );

@@ -51,8 +51,7 @@ const PAGE = {
   title: "Zwei Praxen, ein Anspruch",
 
   /* ENTWURF */
-  lead:
-    "Wir behandeln in Prenzlauer Berg, an zwei Adressen, mit einem Team, das sich gegenseitig vertritt und gemeinsam entscheidet.",
+  lead: "Wir behandeln in Prenzlauer Berg, an zwei Adressen, mit einem Team, das sich gegenseitig vertritt und gemeinsam entscheidet.",
 
   storyTopline: "Wer wir sind",
   storyHeadline: "Zahnmedizin ohne Eile",
@@ -117,7 +116,7 @@ async function los() {
   /* 2. Die Slugs. Nur wo keiner steht — ein vorhandener Slug ist eine
      Adresse, die vielleicht schon jemand geteilt hat. */
   const people = await client.fetch(
-    `*[_type == "person"] | order(coalesce(orderRank, "zzz")) { _id, name, "slug": slug.current, orderRank }`
+    `*[_type == "person"] | order(coalesce(orderRank, "zzz")) { _id, name, "slug": slug.current, orderRank }`,
   );
 
   let r = LexoRank.min();
@@ -125,7 +124,8 @@ async function los() {
 
   people.forEach((person, i) => {
     const changes = {};
-    if (!person.slug) changes.slug = { _type: "slug", current: slugFrom(person.name) };
+    if (!person.slug)
+      changes.slug = { _type: "slug", current: slugFrom(person.name) };
     /* Auch der Sortierwert fehlt bei den Personen — sie waren nie ziehbar. */
     if (!person.orderRank) changes.orderRank = ranks[i];
 
@@ -133,7 +133,7 @@ async function los() {
       batch.patch(person._id, (p) => p.set(changes));
       report.push(
         `${person.name}: ${changes.slug ? `/praxis/${changes.slug.current}` : ""}` +
-          `${changes.orderRank ? "  (+ Sortierwert)" : ""}`
+          `${changes.orderRank ? "  (+ Sortierwert)" : ""}`,
       );
     }
   });
@@ -148,7 +148,9 @@ async function los() {
   const index = punkte.findIndex((p) => p?.text === "Praxis");
 
   if (index === -1) {
-    report.push('Navigation: kein Punkt „Praxis“ gefunden — bitte im Studio prüfen');
+    report.push(
+      "Navigation: kein Punkt „Praxis“ gefunden — bitte im Studio prüfen",
+    );
   } else if (punkte[index].target?._ref === "practice") {
     report.push("Navigation: zeigt bereits auf die Praxisseite");
   } else {
@@ -164,9 +166,11 @@ async function los() {
            `/praxis#experten` gibt es nicht. Ein Link auf eine Marke, die
            nirgends steht, landet oben auf der Seite — das sieht aus, als
            habe der Klick nicht funktioniert. */
-        .unset([`mainMenu[${index}].anchor`])
+        .unset([`mainMenu[${index}].anchor`]),
     );
-    report.push('Navigation: „Praxis“ zeigt jetzt auf /praxis (Sprungmarke entfernt)');
+    report.push(
+      "Navigation: „Praxis“ zeigt jetzt auf /praxis (Sprungmarke entfernt)",
+    );
   }
 
   /* 4. Die Koordinaten der beiden Praxen. Ohne sie entfällt die Karte auf
@@ -185,7 +189,7 @@ async function los() {
   };
 
   const einstellungen = await client.fetch(
-    `*[_id == "settings"][0]{ locations[]{ street, latitude } }`
+    `*[_id == "settings"][0]{ locations[]{ street, latitude } }`,
   );
 
   (einstellungen?.locations ?? []).forEach((o, i) => {
@@ -202,9 +206,11 @@ async function los() {
       p.set({
         [`locations[${i}].latitude`]: treffer.latitude,
         [`locations[${i}].longitude`]: treffer.longitude,
-      })
+      }),
     );
-    report.push(`Standort „${o.street}“: ${treffer.latitude}, ${treffer.longitude}`);
+    report.push(
+      `Standort „${o.street}“: ${treffer.latitude}, ${treffer.longitude}`,
+    );
   });
 
   console.log(report.map((z) => "  " + z).join("\n"));
@@ -219,7 +225,9 @@ async function los() {
   console.log("\nNoch offen, weil niemand hier die Antwort kennt:");
   console.log("  · Kopfbild, zweites Bild, Bild der Praxis, Teamfoto");
   console.log("  · Porträts, Zitate, Stationen und Sprachen je Person");
-  console.log("  · Koordinaten der beiden Standorte (Einstellungen → Standorte)");
+  console.log(
+    "  · Koordinaten der beiden Standorte (Einstellungen → Standorte)",
+  );
   console.log("  · Alle mit ENTWURF markierten Texte in diesem Skript");
 }
 

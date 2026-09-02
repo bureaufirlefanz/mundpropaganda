@@ -64,7 +64,10 @@ createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://localhost");
   /* `normalize` gegen `..` im Pfad. Ein Prüfserver ist zwar nur lokal
      erreichbar, aber ein Verzeichniswechsel nach oben ist nie beabsichtigt. */
-  const rel = normalize(decodeURIComponent(url.pathname)).replace(/^(\.\.[/\\])+/, "");
+  const rel = normalize(decodeURIComponent(url.pathname)).replace(
+    /^(\.\.[/\\])+/,
+    "",
+  );
   const file = await resolveFile(join(ROOT, rel));
 
   if (!file) {

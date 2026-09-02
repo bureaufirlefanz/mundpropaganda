@@ -94,7 +94,7 @@ Astro appends its scope attribute to **every** part of a selector: `.a .b`
 becomes `.a[data-astro-cid-x] .b[data-astro-cid-x]`. From that follows:
 
 - **Foreign markup needs `:global()`.** An `<img>` from `Picture.astro` or a
-  `.c-btn` from `Button.astro` does not carry the *including* file's attribute.
+  `.c-btn` from `Button.astro` does not carry the _including_ file's attribute.
   `.s-split__media img` therefore matches nothing —
   `.s-split__media :global(img)` matches. The same holds for everything the
   modules create at runtime: `.highlight-marker-line` (marker.js), the slider
@@ -157,11 +157,11 @@ stroke length was built from 900 sample points, each with a
 `getPointAtLength()` and a `matrixTransform()` — and twice over, because
 `ScrollTrigger.refresh()` triggered `onRefresh` again at the end.
 
-| | before | after |
-| --- | --- | --- |
-| `initThread` | 772 ms | 68 ms |
-| `ScrollTrigger.refresh` | 256 ms | 69 ms |
-| everything else | ~11 ms | ~11 ms |
+|                         | before | after  |
+| ----------------------- | ------ | ------ |
+| `initThread`            | 772 ms | 68 ms  |
+| `ScrollTrigger.refresh` | 256 ms | 69 ms  |
+| everything else         | ~11 ms | ~11 ms |
 
 Fixed by three things: 240 instead of 900 sample points (the viewBox does not
 resolve any finer), reading the screen mapping once instead of creating a new
@@ -169,9 +169,9 @@ resolve any finer), reading the screen mapping once instead of creating a new
 
 Wordmark in motion, measured with `npm run takt`:
 
-| | before | after |
-| --- | --- | --- |
-| first visit | 1600 ms | 191 ms |
+|                    | before  | after  |
+| ------------------ | ------- | ------ |
+| first visit        | 1600 ms | 191 ms |
 | reload, warm cache | 1415 ms | 104 ms |
 
 Anyone adding a new block hangs it in phase 2 — unless it visibly belongs to
@@ -186,7 +186,7 @@ to start moving.
 
 Related but its own trap: **`document.fonts.ready` is the wrong marker, and so
 is `document.fonts.load()`** if you call it too late — both wait for the
-*entire* collection to finish. What is wanted is `document.fonts.check()`: "can
+_entire_ collection to finish. What is wanted is `document.fonts.check()`: "can
 I measure with this cut right now?". Measured, the wordmark font was ready
 after 92 ms while `load()` only resolved after 872 ms. The full reasoning is in
 `src/js/lib/fonts.js`.

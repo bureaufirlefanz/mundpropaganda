@@ -122,13 +122,13 @@ er wäre sonst genau die Sorte falscher Begründung, vor der Aufgabe 19 warnt.
   `README.md`, das Site-ID, Lumos-Version und den Stand der Rekonstruktion
   festhält. Das Skill bleibt, wo es ist (`.agents/skills/webflow-lumos/`) —
   Skills gehören nicht in einen Inhaltsordner.
-- In jeden der beiden eine `CLAUDE.md` mit einem Satz: *eingefroren, Prototyp,
-  nicht ändern, wenn nicht ausdrücklich danach gefragt.*
+- In jeden der beiden eine `CLAUDE.md` mit einem Satz: _eingefroren, Prototyp,
+  nicht ändern, wenn nicht ausdrücklich danach gefragt._
 
 **Fertig, wenn** an der Wurzel nur noch `web/`, `studio/`, `prototypen/`,
 `scripts/` und die Doku-Dateien liegen.
 
-*Praktisch:* Läuft ein Datei-Sync über dem Ordner, ihn für die Dauer der
+_Praktisch:_ Läuft ein Datei-Sync über dem Ordner, ihn für die Dauer der
 Verschiebung pausieren — sonst legt er beim Umbenennen unter Umständen
 „conflicted copy"-Dateien an. Mit A1 im Rücken ist das folgenlos, aber
 lästig.
@@ -149,11 +149,11 @@ die ohnehin gelesen wird.
 
 - `CLAUDE.md` bekommt ganz oben, vor allem anderen, die Zuordnung:
 
-  | Ordner | Was | Status |
-  |---|---|---|
-  | `web/` | Astro — die Website | **Produkt** |
-  | `studio/` | Sanity — das CMS | **Produkt** |
-  | `prototypen/vite/` | Handlebars-Stand | Archiv, nicht ändern |
+  | Ordner                | Was                  | Status                   |
+  | --------------------- | -------------------- | ------------------------ |
+  | `web/`                | Astro — die Website  | **Produkt**              |
+  | `studio/`             | Sanity — das CMS     | **Produkt**              |
+  | `prototypen/vite/`    | Handlebars-Stand     | Archiv, nicht ändern     |
   | `prototypen/webflow/` | Lumos-Rekonstruktion | Prototyp, nur auf Ansage |
 
 - Der Abschnitt „Webflow + Lumos" wird umgeschrieben: nicht mehr „die Site soll
@@ -208,7 +208,7 @@ explizit gibt.
   macht es richtig. Diese Regel darf nicht brechen: eine Abfrage, die in eine
   `.astro`-Datei wandert, verschwindet still aus der Typprüfung.
 - Die handgeschriebenen Interfaces in `web/src/lib/fixtures.ts` bleiben
-  vorerst stehen. Sie dienen doppelt (Vertrag *und* Form der Beispieldaten) —
+  vorerst stehen. Sie dienen doppelt (Vertrag _und_ Form der Beispieldaten) —
   aufgelöst wird das in Aufgabe 4, nicht hier.
 
 **Fertig, wenn** ein absichtlich falsch geschriebener Feldname in
@@ -274,11 +274,11 @@ weiter da. Danach glaubt er keinem Feld mehr.
 **Zu tun** — für jedes Feld entscheiden, in welche von drei Klassen es fällt,
 und das im Schema festschreiben:
 
-| Klasse | Schema | Frontend |
-|---|---|---|
-| Trägt die Seite | `validation: (r) => r.required()` | darf sich auf Existenz verlassen |
-| Wahlfrei, Abschnitt kann fehlen | keine Regel | Abschnitt wird **ausgeblendet**, nicht ersetzt |
-| Nie vom Kunden gepflegt | gar kein Feld | fest im Baustein, und das ist ehrlich so |
+| Klasse                          | Schema                            | Frontend                                       |
+| ------------------------------- | --------------------------------- | ---------------------------------------------- |
+| Trägt die Seite                 | `validation: (r) => r.required()` | darf sich auf Existenz verlassen               |
+| Wahlfrei, Abschnitt kann fehlen | keine Regel                       | Abschnitt wird **ausgeblendet**, nicht ersetzt |
+| Nie vom Kunden gepflegt         | gar kein Feld                     | fest im Baustein, und das ist ehrlich so       |
 
 Was heute Rückfall ist, wird eins von diesen dreien. `fixtures.ts` wird
 danach zu reinem Seed-Material für `studio/seed/` — keine Laufzeitrolle mehr.
@@ -366,7 +366,7 @@ Tausch.
       initial: "http://localhost:4321",
       previewMode: { enable: "/api/draft-mode/enable" },
     },
-  })
+  });
   ```
 - `resolve` mit `defineLocations` je Dokumenttyp — auf Basis von
   `studio/lib/pfade.ts`, nicht daneben.
@@ -535,11 +535,11 @@ Lebenslauf und Zeugnisse sind bei einer Bewerbung die Hauptsache.
 
 Zu entscheiden ist beides zusammen:
 
-| Weg | Anhänge | Wo die Daten liegen |
-|---|---|---|
-| Netlify Forms | ja | bei Netlify, Auftragsverarbeitung nötig |
-| Eigene Funktion + Versanddienst | ja | nirgends gespeichert, Konto beim Versender nötig |
-| mailto (heute) | nein | nirgends |
+| Weg                             | Anhänge | Wo die Daten liegen                              |
+| ------------------------------- | ------- | ------------------------------------------------ |
+| Netlify Forms                   | ja      | bei Netlify, Auftragsverarbeitung nötig          |
+| Eigene Funktion + Versanddienst | ja      | nirgends gespeichert, Konto beim Versender nötig |
+| mailto (heute)                  | nein    | nirgends                                         |
 
 Bewerbungsunterlagen sind besondere personenbezogene Daten. Was auch immer
 kommt, es braucht einen Hinweis zur Verarbeitung neben dem Absendeknopf und

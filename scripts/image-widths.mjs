@@ -44,18 +44,21 @@ export async function schreibeBreiten() {
   const missing = [];
   for (const [name, widths] of je) {
     for (const b of widths) {
-      if (!files.includes(`${name}-${b}.webp`)) missing.push(`${name}-${b}.webp`);
+      if (!files.includes(`${name}-${b}.webp`))
+        missing.push(`${name}-${b}.webp`);
     }
   }
   if (missing.length) {
     throw new Error(
       `Zu diesen AVIF-Dateien fehlt die WebP-Fassung: ${missing.join(", ")}.\n` +
-        `Der <source>-Rückfall liefe damit ins Leere. Bitte 'npm run images' laufen lassen.`
+        `Der <source>-Rückfall liefe damit ins Leere. Bitte 'npm run images' laufen lassen.`,
     );
   }
 
   const karte = Object.fromEntries(
-    [...je].sort(([a], [b]) => a.localeCompare(b)).map(([name, b]) => [name, [...b].sort((x, y) => x - y)])
+    [...je]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, b]) => [name, [...b].sort((x, y) => x - y)]),
   );
 
   await writeFile(ZIEL, JSON.stringify(karte, null, 2) + "\n", "utf8");
@@ -66,10 +69,15 @@ export async function schreibeBreiten() {
    enthält Leerzeichen, und `import.meta.url` kodiert die als %20. Ein
    Vergleich mit `file://${process.argv[1]}` schlug deshalb immer fehl, und
    das Skript tat beim Direktaufruf gar nichts. */
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   const karte = await schreibeBreiten();
   for (const [name, widths] of Object.entries(karte)) {
     console.log(`  ${name.padEnd(24)} ${widths.join(", ")}`);
   }
-  console.log(`\n${Object.keys(karte).length} Motive nach ${ZIEL} geschrieben.`);
+  console.log(
+    `\n${Object.keys(karte).length} Motive nach ${ZIEL} geschrieben.`,
+  );
 }

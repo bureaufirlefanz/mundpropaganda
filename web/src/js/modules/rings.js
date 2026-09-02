@@ -41,7 +41,7 @@ export function initToothRings() {
           start: "top 70%",
           once: true,
         },
-      }
+      },
     );
   });
 }

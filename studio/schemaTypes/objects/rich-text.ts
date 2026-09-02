@@ -77,10 +77,13 @@ export const inlineImageMember = defineArrayMember({
     prepare: ({ title, subtitle, media }) => ({
       title: title || "Bild",
       subtitle:
-        ({ column: "In der Spalte", wide: "Über die Spalte hinaus", full: "Volle Breite" } as Record<
-          string,
-          string
-        >)[subtitle] ?? "",
+        (
+          {
+            column: "In der Spalte",
+            wide: "Über die Spalte hinaus",
+            full: "Volle Breite",
+          } as Record<string, string>
+        )[subtitle] ?? "",
       media,
     }),
   },
@@ -112,11 +115,13 @@ export const blockContentMember = defineArrayMember({
             name: "href",
             title: "Adresse",
             type: "url",
-            description: "Vollständig, mit https:// - oder ein Pfad dieser Website, z. B. /leistungen/veneers.",
+            description:
+              "Vollständig, mit https:// - oder ein Pfad dieser Website, z. B. /leistungen/veneers.",
             validation: (r) =>
-              r
-                .required()
-                .uri({ scheme: ["http", "https", "mailto", "tel"], allowRelative: true }),
+              r.required().uri({
+                scheme: ["http", "https", "mailto", "tel"],
+                allowRelative: true,
+              }),
           }),
         ],
       }),

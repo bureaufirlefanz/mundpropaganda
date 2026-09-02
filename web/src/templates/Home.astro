@@ -37,7 +37,8 @@ const { data, posts } = Astro.props;
    Aufgabe 4: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
    Dokument ohne <title> ist kaputt statt leer. Das Schema sagt dem Kunden
    genau das zu — „Leer lassen übernimmt die Überschrift der Seite". */
-const title = data.seo?.title || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
+const title =
+  data.seo?.title || "Mundpropaganda - Zahnarzt Prenzlauer Berg Berlin";
 const description =
   data.seo?.description ||
   "Praxis für ästhetische und allgemeine Zahnmedizin auf höchstem Niveau. Veneers, Keramikimplantate und Prophylaxe in Berlin Prenzlauer Berg.";
@@ -45,7 +46,9 @@ const description =
 /* Das Teilen-Motiv. 1200 breit im Format 1.91:1 — das ist, was Facebook,
    LinkedIn und WhatsApp erwarten; mit `ratio` beschneidet Sanity serverseitig,
    und erst dadurch wirkt der im Studio gesetzte Bildmittelpunkt. */
-const storiesAction = (await resolved([data.storiesAction ?? null], Astro.url.pathname))[0];
+const storiesAction = (
+  await resolved([data.storiesAction ?? null], Astro.url.pathname)
+)[0];
 
 const shareImage = isCmsImage(data.seo?.image)
   ? imageUrl(data.seo.image, 1200, 1.91)
@@ -67,7 +70,11 @@ const shareImage = isCmsImage(data.seo?.image)
   />
   <Services title={data.servicesTitle} />
   <Standards title={data.standardsTitle} items={data.standardsItems} />
-  <Gallery variant="ring" title={data.locationsTitle} images={data.locationsImages} />
+  <Gallery
+    variant="ring"
+    title={data.locationsTitle}
+    images={data.locationsImages}
+  />
   <Experts
     title={data.expertsTitle}
     names={data.expertsNames}
@@ -75,17 +82,20 @@ const shareImage = isCmsImage(data.seo?.image)
     image={data.expertsImage}
   />
   <Stories items={data.storiesItems} action={storiesAction} />
-  {posts.length > 0 && (
-    <Magazine
-      topline={data.magazineTopline}
-      title={data.magazineTitle}
-      text={data.magazineText}
-      posts={posts}
-    />
-  )}
+  {
+    posts.length > 0 && (
+      <Magazine
+        topline={data.magazineTopline}
+        title={data.magazineTitle}
+        text={data.magazineText}
+        posts={posts}
+      />
+    )
+  }
   <Faq title={data.faqTitle} text={data.faqText} questions={data.faq} />
 
-  {/* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
+  {
+    /* Kein Kontaktabschnitt mehr. „Unverbindliches Angebot anfordern" ist die
       Frage nach einem Kostenvoranschlag, nicht der allgemeine Kontaktweg —
       sie steht nur noch dort, wo es etwas zu veranschlagen gibt (Veneers,
       Keramikinlays, Pillar Page).
@@ -93,5 +103,6 @@ const shareImage = isCmsImage(data.seo?.image)
       Die Sprungmarke `#kontakt` bleibt trotzdem erreichbar: Sie sitzt jetzt
       am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
       sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen führen
-      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */}
+      damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */
+  }
 </Base>

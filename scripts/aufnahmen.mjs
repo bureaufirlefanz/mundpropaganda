@@ -52,25 +52,35 @@ await sucher.goto(BASIS + "/", { waitUntil: "networkidle2", timeout: 60000 });
 const gefunden = await sucher.evaluate(() =>
   [...document.querySelectorAll('a[href^="/"]')]
     .map((a) => new URL(a.getAttribute("href"), location.origin).pathname)
-    .filter((p) => !/\.[a-z0-9]+$/i.test(p))
+    .filter((p) => !/\.[a-z0-9]+$/i.test(p)),
 );
 await sucher.close();
 
-const ALLE = [...new Set(["/", ...gefunden, "/design/styleguide", "/design/komponenten"])];
-const PAGES = process.env.MP_NUR ? ALLE.filter((p) => p === process.env.MP_NUR) : ALLE;
+const ALLE = [
+  ...new Set(["/", ...gefunden, "/design/styleguide", "/design/komponenten"]),
+];
+const PAGES = process.env.MP_NUR
+  ? ALLE.filter((p) => p === process.env.MP_NUR)
+  : ALLE;
 
 const name = (path) =>
   (path === "/" ? "startseite" : path.replace(/^\//, "").replace(/\//g, "-")) +
   `-${BREITE}${SKALA > 1 ? `@${SKALA}x` : ""}.png`;
 
-console.log(`${PAGES.length} Seiten, ${BREITE}px breit, ${SKALA}× Auflösung → ${ORDNER}/\n`);
+console.log(
+  `${PAGES.length} Seiten, ${BREITE}px breit, ${SKALA}× Auflösung → ${ORDNER}/\n`,
+);
 
 for (const path of PAGES) {
   await rm(TEMP, { recursive: true, force: true });
   await mkdir(TEMP, { recursive: true });
 
   const seite = await browser.newPage();
-  await seite.setViewport({ width: BREITE, height: FENSTER, deviceScaleFactor: SKALA });
+  await seite.setViewport({
+    width: BREITE,
+    height: FENSTER,
+    deviceScaleFactor: SKALA,
+  });
   await seite.goto(BASIS + path, { waitUntil: "networkidle0", timeout: 60000 });
   await seite.evaluate(() => document.fonts.ready);
   await new Promise((r) => setTimeout(r, 1600));
@@ -80,7 +90,9 @@ for (const path of PAGES) {
      überspränge die meisten Auslöser. */
   await seite.evaluate(async () => {
     const springe = (y) =>
-      window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+      window.__lenis
+        ? window.__lenis.scrollTo(y, { immediate: true })
+        : scrollTo(0, y);
     for (let y = 0; y < document.body.scrollHeight; y += innerHeight * 0.5) {
       springe(y);
       await new Promise((r) => setTimeout(r, 120));
@@ -102,12 +114,15 @@ for (const path of PAGES) {
     document.head.appendChild(stil);
 
     document.querySelectorAll("body *").forEach((el) => {
-      if (getComputedStyle(el).position === "sticky") el.classList.add("mp-nicht-klebend");
+      if (getComputedStyle(el).position === "sticky")
+        el.classList.add("mp-nicht-klebend");
     });
   });
   await new Promise((r) => setTimeout(r, 400));
 
-  const hoehe = await seite.evaluate(() => Math.round(document.documentElement.scrollHeight));
+  const hoehe = await seite.evaluate(() =>
+    Math.round(document.documentElement.scrollHeight),
+  );
   const kacheln = Math.ceil(hoehe / FENSTER);
   const teile = [];
 
@@ -116,7 +131,9 @@ for (const path of PAGES) {
 
     await seite.evaluate(
       (target, ersteKachel) => {
-        window.__lenis ? window.__lenis.scrollTo(target, { immediate: true }) : scrollTo(0, target);
+        window.__lenis
+          ? window.__lenis.scrollTo(target, { immediate: true })
+          : scrollTo(0, target);
 
         /* Ab der zweiten Kachel alles ausblenden, was am Fenster festsitzt —
            sonst stünde die Navigationsleiste in jeder Kachel und damit ein
@@ -132,13 +149,16 @@ for (const path of PAGES) {
            ohnehin aus dem Fluss genommen, das Layout verschiebt sich
            dadurch nicht. */
         document.querySelectorAll("body *").forEach((el) => {
-          if (getComputedStyle(el).position === "fixed" || el.classList.contains("mp-aufnahme-aus")) {
+          if (
+            getComputedStyle(el).position === "fixed" ||
+            el.classList.contains("mp-aufnahme-aus")
+          ) {
             el.classList.toggle("mp-aufnahme-aus", !ersteKachel);
           }
         });
       },
       y,
-      i === 0
+      i === 0,
     );
     await new Promise((r) => setTimeout(r, 260));
 
@@ -174,7 +194,9 @@ for (const path of PAGES) {
     .png()
     .toFile(target);
 
-  console.log(`  ${path.padEnd(34)} ${String(hoehe).padStart(6)}px · ${String(kacheln).padStart(2)} Kacheln  →  ${target}`);
+  console.log(
+    `  ${path.padEnd(34)} ${String(hoehe).padStart(6)}px · ${String(kacheln).padStart(2)} Kacheln  →  ${target}`,
+  );
 }
 
 await rm(TEMP, { recursive: true, force: true });

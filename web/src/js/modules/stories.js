@@ -99,7 +99,7 @@ function initDeck() {
        dadurch standen zwei Zitate übereinander. */
     gsap.set(
       quotes.filter((_, n) => n !== i),
-      { opacity: 0 }
+      { opacity: 0 },
     );
 
     if (!animate || prefersReducedMotion) {
@@ -110,7 +110,13 @@ function initDeck() {
     gsap.fromTo(
       quotes[i],
       { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", overwrite: "auto" }
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power3.out",
+        overwrite: "auto",
+      },
     );
   };
 
@@ -166,7 +172,12 @@ function initDeck() {
     // Rückwärts: die vorherige Karte kommt von der Seite zurück nach vorn.
     const returning = cards[next];
     index = next;
-    gsap.set(returning, { xPercent: 120, rotation: 14, opacity: 0, zIndex: cards.length + 1 });
+    gsap.set(returning, {
+      xPercent: 120,
+      rotation: 14,
+      opacity: 0,
+      zIndex: cards.length + 1,
+    });
     render();
 
     gsap.to(returning, {
@@ -181,8 +192,12 @@ function initDeck() {
     });
   };
 
-  deck.querySelector("[data-deck-next]")?.addEventListener("click", () => advance(1));
-  deck.querySelector("[data-deck-prev]")?.addEventListener("click", () => advance(-1));
+  deck
+    .querySelector("[data-deck-next]")
+    ?.addEventListener("click", () => advance(1));
+  deck
+    .querySelector("[data-deck-prev]")
+    ?.addEventListener("click", () => advance(-1));
 
   /* --- Wischen ---------------------------------------------------------
      Die vorderste Karte folgt dem Finger. Über 25 % der Kartenbreite gilt
@@ -239,7 +254,10 @@ function initDeck() {
   /* --- Tastatur --------------------------------------------------------- */
   stack.setAttribute("tabindex", "0");
   stack.setAttribute("role", "group");
-  stack.setAttribute("aria-label", "Transformation Stories - Karten durchblättern");
+  stack.setAttribute(
+    "aria-label",
+    "Transformation Stories - Karten durchblättern",
+  );
   stack.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") advance(1);
     if (e.key === "ArrowLeft") advance(-1);

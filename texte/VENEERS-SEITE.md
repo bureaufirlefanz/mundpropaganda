@@ -21,7 +21,7 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 >
 > **[Beratungstermin vereinbaren]** **[030 519999580]**
 >
-> *272 Google-Bewertungen · 5,0 von 5*
+> _272 Google-Bewertungen · 5,0 von 5_
 
 ---
 
@@ -83,14 +83,14 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 
 > Nicht jedes Veneer ist gleich. Die drei gängigen Varianten unterscheiden sich vor allem in einem Punkt: wie viel gesunde Zahnsubstanz sie kosten.
 
-| | Keramik (Prep) | Non-Prep | Komposit |
-|---|---|---|---|
-| Material | Lithiumdisilikat, Feldspatkeramik | dünne Hochleistungskeramik | Kunststoff-Komposit |
-| Abschleifen | 0,3–1,0 mm | kein bis minimaler Abtrag | praktisch keiner |
-| Umkehrbar? | nein | bedingt | ja |
-| Haltbarkeit | 10–15 Jahre | 8–12 Jahre | 5–8 Jahre |
-| Stärken | höchste Ästhetik, stabil, verfärbt nicht | maximal zahnschonend | günstig, in einer Sitzung fertig |
-| Grenzen | irreversibel | nicht bei dunklen Zähnen oder engem Platz | verfärbt mit der Zeit, weniger stabil |
+|             | Keramik (Prep)                           | Non-Prep                                  | Komposit                              |
+| ----------- | ---------------------------------------- | ----------------------------------------- | ------------------------------------- |
+| Material    | Lithiumdisilikat, Feldspatkeramik        | dünne Hochleistungskeramik                | Kunststoff-Komposit                   |
+| Abschleifen | 0,3–1,0 mm                               | kein bis minimaler Abtrag                 | praktisch keiner                      |
+| Umkehrbar?  | nein                                     | bedingt                                   | ja                                    |
+| Haltbarkeit | 10–15 Jahre                              | 8–12 Jahre                                | 5–8 Jahre                             |
+| Stärken     | höchste Ästhetik, stabil, verfärbt nicht | maximal zahnschonend                      | günstig, in einer Sitzung fertig      |
+| Grenzen     | irreversibel                             | nicht bei dunklen Zähnen oder engem Platz | verfärbt mit der Zeit, weniger stabil |
 
 > Für uns ist die Reihenfolge klar: Wir prüfen zuerst, ob eine Non-Prep-Lösung möglich ist. Nur wenn die nicht zum gewünschten Ergebnis führt, sprechen wir über klassische Keramikveneers.
 
@@ -215,7 +215,8 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 > Realistisch sollten Sie mit 10 bis 15 Jahren rechnen. Zwanzig Jahre sind erreichbar, aber kein Versprechen. Komposit-Veneers halten mit 5 bis 8 Jahren erkennbar kürzer.
 
 **Quellenkasten:**
-> Beier, Kapferer, Dumfahrt: Langzeitstudie zu vollkeramischen Restaurationen. *International Journal of Prosthodontics*, 2012. Medizinische Universität Innsbruck.
+
+> Beier, Kapferer, Dumfahrt: Langzeitstudie zu vollkeramischen Restaurationen. _International Journal of Prosthodontics_, 2012. Medizinische Universität Innsbruck.
 
 ---
 
@@ -246,14 +247,14 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 **Bild:** nein
 **Im Inhaltsverzeichnis:** ja
 
-| Ihr Anliegen | Passende Lösung |
-|---|---|
-| Zähne sind gesund, aber verfärbt | Bleaching – deutlich günstiger, ohne Substanzverlust |
-| Kleine Absplitterung oder Ecke | Komposit-Restauration, in einer Sitzung |
-| Schiefe oder gedrehte Zähne | Unsichtbare Aligner – korrigiert die Ursache statt sie zu verdecken |
-| Zahn stark geschädigt oder wurzelbehandelt | Krone – ein Veneer trägt hier nicht |
-| Kaufläche betroffen, nicht die Sichtfläche | Keramikinlay |
-| Form, Farbe und Länge sollen sich ändern | Veneers |
+| Ihr Anliegen                               | Passende Lösung                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| Zähne sind gesund, aber verfärbt           | Bleaching – deutlich günstiger, ohne Substanzverlust                |
+| Kleine Absplitterung oder Ecke             | Komposit-Restauration, in einer Sitzung                             |
+| Schiefe oder gedrehte Zähne                | Unsichtbare Aligner – korrigiert die Ursache statt sie zu verdecken |
+| Zahn stark geschädigt oder wurzelbehandelt | Krone – ein Veneer trägt hier nicht                                 |
+| Kaufläche betroffen, nicht die Sichtfläche | Keramikinlay                                                        |
+| Form, Farbe und Länge sollen sich ändern   | Veneers                                                             |
 
 > Häufig ist die beste Antwort eine Kombination: erst bleichen, dann sechs Monate warten, dann nur die zwei Zähne mit Veneers versorgen, die es wirklich brauchen. Das kostet einen Bruchteil und erhält Ihre Zahnsubstanz.
 
@@ -270,14 +271,14 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 
 > Ein Keramikveneer kostet bei uns ab 1.200 Euro pro Zahn. Sie erhalten vor Behandlungsbeginn immer einen schriftlichen Heil- und Kostenplan – ohne diesen beginnen wir nicht.
 
-| Art | Kosten pro Zahn | Zahnabtrag | Haltbarkeit |
-|---|---|---|---|
-| Komposit-Veneer | ab 450 € | praktisch keiner | 5–8 Jahre |
-| Keramikveneer (Prep) | ab 1.200 € | 0,3–1,0 mm | 10–15 Jahre |
-| Non-Prep-Veneer | ab 1.400 € | kein bis minimal | 8–12 Jahre |
-| Mock-up | ab 450 € pro Kiefer | — | — |
+| Art                  | Kosten pro Zahn     | Zahnabtrag       | Haltbarkeit |
+| -------------------- | ------------------- | ---------------- | ----------- |
+| Komposit-Veneer      | ab 450 €            | praktisch keiner | 5–8 Jahre   |
+| Keramikveneer (Prep) | ab 1.200 €          | 0,3–1,0 mm       | 10–15 Jahre |
+| Non-Prep-Veneer      | ab 1.400 €          | kein bis minimal | 8–12 Jahre  |
+| Mock-up              | ab 450 € pro Kiefer | —                | —           |
 
-> *Bei Einzelzahnversorgungen mit hohem ästhetischen Anspruch beginnt das Keramikveneer bei 1.500 Euro – ein einzelner Zahn, der sich neben unveränderten Nachbarn einfügen muss, ist die anspruchsvollste Aufgabe überhaupt.*
+> _Bei Einzelzahnversorgungen mit hohem ästhetischen Anspruch beginnt das Keramikveneer bei 1.500 Euro – ein einzelner Zahn, der sich neben unveränderten Nachbarn einfügen muss, ist die anspruchsvollste Aufgabe überhaupt._
 >
 > **Warum „ab" und kein Festpreis?**
 > Zahnärztliche Leistungen werden nach der Gebührenordnung für Zahnärzte abgerechnet. Was Ihre Behandlung kostet, hängt vom tatsächlichen Aufwand ab – Zahl der Zähne, Ausgangssituation, Material, Laboraufwand. Ein Pauschalpreis, der das ignoriert, wäre entweder für uns oder für Sie der falsche. Deshalb nennen wir Einstiegspreise und rechnen den Rest im Heil- und Kostenplan aus, bevor Sie sich entscheiden.
@@ -306,6 +307,7 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 > **Zahnzusatzversicherung:** Standardtarife schließen Veneers meist aus, Premiumtarife erstatten anteilig – häufig mit Wartezeiten und Summenbegrenzungen in den ersten Jahren. Entscheidend: Der Vertrag muss **vor** Behandlungsbeginn bestehen. Wer erst abschließt, wenn der Termin steht, ist zu spät.
 
 **Hinweiskasten:**
+
 > **Wie Veneers abgerechnet werden**
 > Veneers werden nach der Gebührenordnung für Zahnärzte abgerechnet, im Kern über die GOZ-Ziffer 2220 (Versorgung eines Zahns durch ein Veneer) und 2197 (adhäsive Befestigung), dazu Begleitleistungen für Planung, Abformung, Anästhesie und Provisorien. Liegt keine medizinische Notwendigkeit vor, vereinbaren wir die Behandlung als Verlangensleistung nach § 2 Abs. 3 GOZ – mit schriftlichem Hinweis darauf, dass eine Erstattung durch Kostenträger nicht gesichert ist.
 
@@ -446,7 +448,7 @@ Jeder Abschnitt nennt: Inhaltstyp · Überschrift · Bild · Text
 > **Fachlich geprüft:** [PRÜFEN]
 > **Zuletzt aktualisiert:** [PRÜFEN]
 >
-> **Quellen:** Beier, Kapferer, Dumfahrt (2012), *International Journal of Prosthodontics*, Medizinische Universität Innsbruck · Gebührenordnung für Zahnärzte (GOZ), Ziffern 2220 und 2197 · [PRÜFEN: 1–2 weitere]
+> **Quellen:** Beier, Kapferer, Dumfahrt (2012), _International Journal of Prosthodontics_, Medizinische Universität Innsbruck · Gebührenordnung für Zahnärzte (GOZ), Ziffern 2220 und 2197 · [PRÜFEN: 1–2 weitere]
 
 ---
 
@@ -485,13 +487,13 @@ Der Guide-Block am Seitenanfang zeigt eine kürzere, kuratierte Auswahl (fünf E
 
 ## Was noch geklärt werden muss
 
-| | |
-|---|---|
-| Anrede | Der bestehende Einstieg duzt, alles darunter siezt. Dieser Text siezt durchgehend. |
-| Wartezeit auf Beratungstermine | Abschnitt 19 |
-| Autor:in und fachliche Prüfung | Abschnitt 20 |
-| Vorher-Nachher-Fälle | Abschnitt 10, mit schriftlicher Einwilligung |
-| Zwei weitere Quellen | Abschnitt 20 |
+|                                |                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| Anrede                         | Der bestehende Einstieg duzt, alles darunter siezt. Dieser Text siezt durchgehend. |
+| Wartezeit auf Beratungstermine | Abschnitt 19                                                                       |
+| Autor:in und fachliche Prüfung | Abschnitt 20                                                                       |
+| Vorher-Nachher-Fälle           | Abschnitt 10, mit schriftlicher Einwilligung                                       |
+| Zwei weitere Quellen           | Abschnitt 20                                                                       |
 
 ---
 
@@ -500,6 +502,7 @@ Der Guide-Block am Seitenanfang zeigt eine kürzere, kuratierte Auswahl (fünf E
 Vorhanden: **Veneers aus der Türkei** (Magazin)
 
 Offen:
+
 - Veneers Kosten Berlin
 - Non-Prep Veneers
 - Veneers Nachteile und Risiken

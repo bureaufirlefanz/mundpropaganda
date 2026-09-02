@@ -72,8 +72,20 @@ export const careers = defineType({
   groups: gruppen,
   fields: [
     /* --- Kopf ----------------------------------------------------------- */
-    defineField({ name: "topline", title: "Topline", type: "string", group: "header", validation: (r) => r.required() }),
-    defineField({ name: "title", title: "Überschrift", type: "string", group: "header", validation: (r) => r.required() }),
+    defineField({
+      name: "topline",
+      title: "Topline",
+      type: "string",
+      group: "header",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "title",
+      title: "Überschrift",
+      type: "string",
+      group: "header",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "lead",
       title: "Einleitung",
@@ -82,7 +94,12 @@ export const careers = defineType({
       description: "Der Absatz unter der Überschrift im Kopf der Seite.",
       group: "header",
     }),
-    defineField({ name: "image", title: "Kopfbild", type: "picture", group: "header" }),
+    defineField({
+      name: "image",
+      title: "Kopfbild",
+      type: "picture",
+      group: "header",
+    }),
     defineField({
       name: "action",
       title: "Knopf im Kopf",
@@ -115,11 +132,13 @@ export const careers = defineType({
         "Ein Link zu YouTube, wie er in der Adresszeile steht. Das Video lädt erst, wenn jemand darauf klickt - vorher geht keine Anfrage an YouTube und es wird kein Cookie gesetzt.",
       group: "video",
       validation: (r) =>
-        r.uri({ scheme: ["http", "https"] }).custom((wert) =>
-          !wert || /(?:youtube\.com|youtu\.be)/.test(String(wert))
-            ? true
-            : "Bisher werden nur YouTube-Adressen unterstützt."
-        ),
+        r
+          .uri({ scheme: ["http", "https"] })
+          .custom((wert) =>
+            !wert || /(?:youtube\.com|youtu\.be)/.test(String(wert))
+              ? true
+              : "Bisher werden nur YouTube-Adressen unterstützt.",
+          ),
     }),
     defineField({
       name: "videoTitle",
@@ -151,18 +170,32 @@ export const careers = defineType({
           type: "object",
           name: "figure",
           fields: [
-            defineField({ name: "value", title: "Zahl", type: "number", validation: (r) => r.required() }),
+            defineField({
+              name: "value",
+              title: "Zahl",
+              type: "number",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "unit",
               title: "Einheit",
               type: "string",
-              description: "Steht direkt hinter der Zahl, z. B. „ min“ oder „ %“. Leer lassen für nichts.",
+              description:
+                "Steht direkt hinter der Zahl, z. B. „ min“ oder „ %“. Leer lassen für nichts.",
             }),
-            defineField({ name: "text", title: "Erläuterung", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "text",
+              title: "Erläuterung",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
           ],
           preview: {
             select: { value: "value", unit: "unit", text: "text" },
-            prepare: ({ value, unit, text }) => ({ title: `${value ?? "?"}${unit ?? ""}`, subtitle: text }),
+            prepare: ({ value, unit, text }) => ({
+              title: `${value ?? "?"}${unit ?? ""}`,
+              subtitle: text,
+            }),
           },
         }),
       ],
@@ -193,7 +226,8 @@ export const careers = defineType({
       title: "Punkte",
       type: "array",
       of: [{ type: "string" }],
-      description: "Je Zeile ein Punkt. Kurz halten - eine Liste liest niemand als Fließtext.",
+      description:
+        "Je Zeile ein Punkt. Kurz halten - eine Liste liest niemand als Fließtext.",
       group: "benefits",
       validation: (r) => r.required().min(3),
     }),
@@ -211,7 +245,12 @@ export const careers = defineType({
           type: "object",
           name: "comparisonColumn",
           fields: [
-            defineField({ name: "name", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Überschrift",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "emphasised",
               title: "Hervorgehoben",
@@ -235,7 +274,12 @@ export const careers = defineType({
           type: "object",
           name: "comparisonRow",
           fields: [
-            defineField({ name: "name", title: "Merkmal", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Merkmal",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "values",
               title: "Werte",
@@ -266,13 +310,19 @@ export const careers = defineType({
                       name: "text",
                       title: "Text",
                       type: "string",
-                      hidden: ({ parent }) => parent?.kind === "ja" || parent?.kind === "nein",
+                      hidden: ({ parent }) =>
+                        parent?.kind === "ja" || parent?.kind === "nein",
                     }),
                   ],
                   preview: {
                     select: { kind: "kind", text: "text" },
                     prepare: ({ kind, text }) => ({
-                      title: kind === "ja" ? "✓ enthalten" : kind === "nein" ? "— nicht enthalten" : text || "(leer)",
+                      title:
+                        kind === "ja"
+                          ? "✓ enthalten"
+                          : kind === "nein"
+                            ? "— nicht enthalten"
+                            : text || "(leer)",
                     }),
                   },
                 }),
@@ -358,10 +408,31 @@ export const careers = defineType({
           type: "object",
           name: "voice",
           fields: [
-            defineField({ name: "quote", title: "Zitat", type: "text", rows: 5, validation: (r) => r.required() }),
-            defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "role", title: "Rolle", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "since", title: "Dabei seit", type: "string", description: "Zum Beispiel „seit 2021“." }),
+            defineField({
+              name: "quote",
+              title: "Zitat",
+              type: "text",
+              rows: 5,
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "name",
+              title: "Name",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "role",
+              title: "Rolle",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "since",
+              title: "Dabei seit",
+              type: "string",
+              description: "Zum Beispiel „seit 2021“.",
+            }),
             defineField({ name: "image", title: "Bild", type: "picture" }),
             defineField({
               name: "offset",
@@ -373,7 +444,9 @@ export const careers = defineType({
               validation: (r) => r.min(0).max(1),
             }),
           ],
-          preview: { select: { title: "name", subtitle: "role", media: "image" } },
+          preview: {
+            select: { title: "name", subtitle: "role", media: "image" },
+          },
         }),
       ],
       validation: (r) => r.required().min(1),
@@ -407,8 +480,19 @@ export const careers = defineType({
                Ein Pflichtfeld, dessen Inhalt nirgends erscheint, kostet das
                Vertrauen in jedes andere. Vorhandene Werte bleiben im
                Datensatz liegen und stören nicht. */
-            defineField({ name: "title", title: "Titel", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "text", title: "Text", type: "text", rows: 4, validation: (r) => r.required() }),
+            defineField({
+              name: "title",
+              title: "Titel",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "text",
+              title: "Text",
+              type: "text",
+              rows: 4,
+              validation: (r) => r.required(),
+            }),
           ],
           preview: { select: { title: "title", subtitle: "text" } },
         }),
@@ -417,10 +501,34 @@ export const careers = defineType({
     }),
 
     /* --- Initiativbewerbung --------------------------------------------- */
-    defineField({ name: "speculativeTopline", title: "Topline", type: "string", group: "application", validation: (r) => r.required() }),
-    defineField({ name: "speculativeTitle", title: "Überschrift", type: "string", group: "application", validation: (r) => r.required() }),
-    defineField({ name: "speculativeText", title: "Zusatzzeile", type: "text", rows: 3, group: "application" }),
-    defineField({ name: "speculativeParagraph", title: "Absatz im Panel", type: "text", rows: 4, group: "application" }),
+    defineField({
+      name: "speculativeTopline",
+      title: "Topline",
+      type: "string",
+      group: "application",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "speculativeTitle",
+      title: "Überschrift",
+      type: "string",
+      group: "application",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "speculativeText",
+      title: "Zusatzzeile",
+      type: "text",
+      rows: 3,
+      group: "application",
+    }),
+    defineField({
+      name: "speculativeParagraph",
+      title: "Absatz im Panel",
+      type: "text",
+      rows: 4,
+      group: "application",
+    }),
     defineField({
       name: "applicationEmail",
       title: "Adresse für Bewerbungen",
@@ -432,7 +540,13 @@ export const careers = defineType({
     }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitle", title: "Überschrift der Fragen", type: "string", group: "faq", validation: (r) => r.required() }),
+    defineField({
+      name: "faqTitle",
+      title: "Überschrift der Fragen",
+      type: "string",
+      group: "faq",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "faq",
       title: "Häufige Fragen",
@@ -443,8 +557,18 @@ export const careers = defineType({
           type: "object",
           name: "questionAnswer",
           fields: [
-            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
+            defineField({
+              name: "question",
+              title: "Frage",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "answer",
+              title: "Antwort",
+              type: "text",
+              rows: 4,
+            }),
           ],
           preview: { select: { title: "question" } },
         }),
@@ -452,7 +576,12 @@ export const careers = defineType({
       validation: (r) => r.required().min(1),
     }),
 
-    defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" }),
+    defineField({
+      name: "seo",
+      title: "Suchmaschine",
+      type: "seo",
+      group: "seo",
+    }),
   ],
 
   preview: { prepare: () => ({ title: "Karriere", subtitle: "/karriere" }) },

@@ -52,7 +52,10 @@ const promises = new Map();
 
 function loadFace(face) {
   if (!promises.has(face)) {
-    promises.set(face, document.fonts.load(face).catch(() => {}));
+    promises.set(
+      face,
+      document.fonts.load(face).catch(() => {}),
+    );
   }
   return promises.get(face);
 }
@@ -92,5 +95,8 @@ export function waitForFonts(faces, timeout = TIMEOUT) {
   }
 
   const loaded = Promise.all(list.map(loadFace));
-  return Promise.race([loaded, new Promise((weiter) => setTimeout(weiter, timeout))]);
+  return Promise.race([
+    loaded,
+    new Promise((weiter) => setTimeout(weiter, timeout)),
+  ]);
 }

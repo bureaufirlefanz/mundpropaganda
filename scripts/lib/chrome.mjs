@@ -7,7 +7,8 @@
  */
 import puppeteer from "puppeteer-core";
 
-export const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+export const CHROME =
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 export function starteBrowser(args = []) {
   return puppeteer.launch({
@@ -35,7 +36,9 @@ export async function erwarteServer(base, startbefehl) {
   try {
     await fetch(base, { signal: AbortSignal.timeout(3000) });
   } catch {
-    console.error(`Kein Server auf ${base}.\nBitte in einem zweiten Terminal starten:\n\n  ${startbefehl}\n`);
+    console.error(
+      `Kein Server auf ${base}.\nBitte in einem zweiten Terminal starten:\n\n  ${startbefehl}\n`,
+    );
     process.exit(2);
   }
 }

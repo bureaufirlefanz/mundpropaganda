@@ -55,7 +55,8 @@ export function initHeroZoom() {
      * `offsetWidth` ist die Layoutbreite und von `transform` unberührt. Sie
      * stimmt zu jedem Zeitpunkt, unabhängig davon, wo im Ablauf gefragt
      * wird. */
-    const faktor = () => (media.offsetWidth ? window.innerWidth / media.offsetWidth : 1);
+    const faktor = () =>
+      media.offsetWidth ? window.innerWidth / media.offsetWidth : 1;
 
     /* Alle vier Ecken flachen mit dem Maßstab ab.
      *
@@ -161,7 +162,7 @@ export function initHeroZoom() {
           scrub: true,
           invalidateOnRefresh: true,
         },
-      }
+      },
     );
   });
 }

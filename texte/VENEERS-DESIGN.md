@@ -11,20 +11,20 @@
 
 Diese Abschnitte sind gebaut, gestaltet und im Einsatz. Sie werden auf der Veneers-Seite verwendet, nicht neu entworfen:
 
-| Abschnitt | Baustein |
-|---|---|
-| Hero | `ServiceHero.astro` |
-| Was sind Veneers | `Intro.astro` |
-| Arten (Textteil) | `Benefits.astro` |
-| Ablauf in vier Schritten | `Steps.astro` |
-| Haltung / drei Sätze | `Features.astro` — nur die Nummerierung entfällt |
-| Vorher & Nachher | `BeforeAfter.astro`, mit Schieberegler |
-| Patientenstimmen | `Stories.astro` |
-| Magazin / Türkei-Beitrag | `Magazine.astro` |
-| FAQ | `Faq.astro` + `Accordion.astro` |
-| Warum Mundpropaganda | `Split.astro` oder `Experts.astro` |
-| Kontakt mit Foto-Upload | `Contact.astro` |
-| Zahnerhalt-Statement | `Statement.astro` |
+| Abschnitt                | Baustein                                         |
+| ------------------------ | ------------------------------------------------ |
+| Hero                     | `ServiceHero.astro`                              |
+| Was sind Veneers         | `Intro.astro`                                    |
+| Arten (Textteil)         | `Benefits.astro`                                 |
+| Ablauf in vier Schritten | `Steps.astro`                                    |
+| Haltung / drei Sätze     | `Features.astro` — nur die Nummerierung entfällt |
+| Vorher & Nachher         | `BeforeAfter.astro`, mit Schieberegler           |
+| Patientenstimmen         | `Stories.astro`                                  |
+| Magazin / Türkei-Beitrag | `Magazine.astro`                                 |
+| FAQ                      | `Faq.astro` + `Accordion.astro`                  |
+| Warum Mundpropaganda     | `Split.astro` oder `Experts.astro`               |
+| Kontakt mit Foto-Upload  | `Contact.astro`                                  |
+| Zahnerhalt-Statement     | `Statement.astro`                                |
 
 **Ein Sonderfall, der Zeit spart:** `Compare.astro` ist eine fertige, gestaltete Vergleichstabelle — sie hängt heute nur an der Karriereseite. Wenn ihre Optik auf einer Leistungsseite trägt, brauchst du für **zwei** der geplanten Abschnitte (Arten-Vergleich und Alternativen-Matrix) gar nichts zu entwerfen. **Bitte zuerst anschauen und entscheiden.**
 
@@ -34,7 +34,7 @@ Diese Abschnitte sind gebaut, gestaltet und im Einsatz. Sie werden auf der Venee
 
 `tokens.css` legt die Bewegungssprache fest:
 
-> *„Die Kurven sind bewusst langsam-auslaufend (**kein Bounce**) — passt zum ruhigen, teuren Look."*
+> _„Die Kurven sind bewusst langsam-auslaufend (**kein Bounce**) — passt zum ruhigen, teuren Look."_
 > `--e-out: cubic-bezier(0.22, 1, 0.36, 1)`
 
 Der Osmo Section Dock ist standardmäßig **`motion = "bouncy"`**: `back.out(2.5)`, Überschwinger beim Indikator, Stauchen der Pille beim Labelwechsel.
@@ -60,11 +60,13 @@ Nach Priorität. Jeder Punkt nennt, was der Code daraus braucht.
 Der Entwurf existiert bereits — Überschrift links, Fließtext rechts, Bild optional darüber. Es fehlen nur die Werte.
 
 **Der Code braucht drei Zahlen:**
+
 - Spaltenaufteilung im 12er-Raster: Überschrift / Text / Leerraum
 - Satzbreite der Textspalte in `ch` — sie wirkt schmaler als die 68 ch, die `Post.astro` setzt, eher 55–60. Absicht oder Versehen?
 - Abstand zwischen zwei Abschnitten: `--section-space` oder eigener Wert?
 
 **Dazu:**
+
 - Verhalten unter 1200 px und unter 1000 px (die beiden Schwellen, die `Post.astro` schon nutzt — bitte keine dritte einführen)
 - Bild: Seitenverhältnis, Radius, Einzug gegenüber dem Satzspiegel
 - Wo genau die Überschrift ansetzt: Oberkante des Textblocks oder erste Grundlinie?
@@ -76,6 +78,7 @@ Der Abschnitt kommt **8–10 Mal** auf der Seite vor. Alles, was hier unentschie
 Feste Pille am unteren Bildrand, zeigt den aktuellen Abschnitt, klappt bei Hover (Desktop) oder Tap (Touch) zur Liste auf.
 
 **Zu entwerfen:**
+
 - Geschlossen: Pille mit Nummer + Titel. Höhe, Innenabstand, Radius (`--r-round`?), Fläche
 - Offen: Liste mit bis zu 10 Einträgen, Indikator hinter dem aktiven Eintrag
 - Zustände: Ruhe · Hover · aktiv · ausgeblendet (über dem Footer)
@@ -90,6 +93,7 @@ Feste Pille am unteren Bildrand, zeigt den aktuellen Abschnitt, klappt bei Hover
 Vier Zeilen, vier Spalten: Art · Preis · Zahnabtrag · Haltbarkeit. Darunter zwei Textzeilen (Fußnote und Pflicht-Disclaimer).
 
 **Zu entwerfen:**
+
 - Desktop als Tabelle
 - **Mobil als gestapelte Karten**, nicht horizontal scrollend — eine Preistabelle, die man wegscrollen muss, kostet Conversions
 - Alle Beträge sind „ab"-Preise. Wie wird das gesetzt — „ab 1.200 €" im Wert, oder ein eigenes Label?
@@ -134,7 +138,7 @@ Als SVG anlegen, dann geht sie direkt nach `public/svg/` und braucht keinen Durc
 
 ## 4. Systemgrenzen
 
-Der Code kann nur bauen, was auf Tokens landet. `tokens.css` sagt dazu: *„Alles was hier steht ist die einzige Quelle der Wahrheit"* — und im Kopf: *„1:1 aus Figma-Variablen"*. **Wenn deine Figma-Variablen dieselben Namen tragen, ist der Handoff mechanisch.**
+Der Code kann nur bauen, was auf Tokens landet. `tokens.css` sagt dazu: _„Alles was hier steht ist die einzige Quelle der Wahrheit"_ — und im Kopf: _„1:1 aus Figma-Variablen"_. **Wenn deine Figma-Variablen dieselben Namen tragen, ist der Handoff mechanisch.**
 
 **Abstände** (nur diese): 8 · 12 · 16 · 24 · 32 · 40 · 64 · 80 · 112 · 160
 Abschnittsabstand: `--section-space` `clamp(80, 8.1vw, 140)` · `-sm` `clamp(48, 4.8vw, 84)` · `-lg` `clamp(120, 11.6vw, 200)`
@@ -158,13 +162,13 @@ Abschnittsabstand: `--section-space` `clamp(80, 8.1vw, 140)` · `-sm` `clamp(48,
 
 Falls du parallel etwas anstoßen willst — diese fünf Punkte brauchen keinen einzigen Pixel:
 
-| Aufgabe | Warum unabhängig |
-|---|---|
-| `toc.js` → `getLenis()` | Bugfix, `window.__lenis` ist in Produktion `undefined` |
-| `Compare.astro` an `SERVICE_QUERY` anschließen | Baustein ist fertig gestaltet, es fehlt nur das Schemafeld |
-| Schemafelder anlegen (`textSections`, `consentConfirmed`, `priceDisclaimer`, `author`) | Datenmodell, keine Optik |
-| `StructuredData.astro` + Canonical + `site` | steht im `<head>`, unsichtbar |
-| 301-Weichen in `netlify.toml` | `/praxisleistungen/…` → `/leistungen/…`, blockierend für den Livegang |
+| Aufgabe                                                                                | Warum unabhängig                                                      |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `toc.js` → `getLenis()`                                                                | Bugfix, `window.__lenis` ist in Produktion `undefined`                |
+| `Compare.astro` an `SERVICE_QUERY` anschließen                                         | Baustein ist fertig gestaltet, es fehlt nur das Schemafeld            |
+| Schemafelder anlegen (`textSections`, `consentConfirmed`, `priceDisclaimer`, `author`) | Datenmodell, keine Optik                                              |
+| `StructuredData.astro` + Canonical + `site`                                            | steht im `<head>`, unsichtbar                                         |
+| 301-Weichen in `netlify.toml`                                                          | `/praxisleistungen/…` → `/leistungen/…`, blockierend für den Livegang |
 
 Das ist ungefähr ein Drittel der Umsetzung. **Und es hat einen zweiten Nutzen:** Wenn die Schemafelder stehen, kannst du in Figma gegen echte Datenstrukturen entwerfen statt gegen Blindtext — und die Preistabelle bekommt ihre vier Spalten aus dem Modell, nicht aus einer Annahme.
 

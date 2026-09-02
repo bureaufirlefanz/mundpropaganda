@@ -227,14 +227,21 @@ export const settings = defineType({
                   ],
                   preview: {
                     select: { days: "days", time: "time" },
-                    prepare: ({ days, time }) => ({ title: days, subtitle: time }),
+                    prepare: ({ days, time }) => ({
+                      title: days,
+                      subtitle: time,
+                    }),
                   },
                 },
               ],
             }),
           ],
           preview: {
-            select: { title: "name", subtitle: "street", shortCode: "shortCode" },
+            select: {
+              title: "name",
+              subtitle: "street",
+              shortCode: "shortCode",
+            },
             prepare: ({ title, subtitle, shortCode }) => ({
               title: `${shortCode ? shortCode + " · " : ""}${title ?? ""}`,
               subtitle,
@@ -282,7 +289,8 @@ export const settings = defineType({
       description:
         "Springt ein, wenn eine Seite keine eigene Beschreibung im SEO-Feld hat. 120–155 Zeichen.",
       group: "seo",
-      validation: (rule) => rule.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
+      validation: (rule) =>
+        rule.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
     }),
 
     defineField({

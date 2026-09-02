@@ -14,7 +14,7 @@ npm run check    # tsc --noEmit && sanity schema validate
 From the project root: `npm run studio` and `npm run studio:check`.
 
 **Run `check` before every commit that touches this folder.** `sanity schema
-validate` alone is not enough — it validates the *shape* of the schema and
+validate` alone is not enough — it validates the _shape_ of the schema and
 passes happily while a `prepare()` body reads a variable that does not exist.
 Only `tsc` sees that. Until this script existed, `studio/` had no typecheck at
 all and carried nine such crashes.
@@ -68,7 +68,7 @@ everything Portable Text owns (`children`, `marks`, `markDefs`, `style`,
 the error only shows up in the Studio, not on import.
 
 `image` is a reserved type name in Sanity. Our image object is therefore called
-`picture`, while the *field* inside it is `image`.
+`picture`, while the _field_ inside it is `image`.
 
 The migration also reached `package-lock.json`, and that one hid the longest:
 `orte` → `locations` fired inside the word supp**orte**d and left the

@@ -70,20 +70,17 @@ const REASONS = [
   {
     _key: "anreise",
     title: "Gut zu erreichen, auch von weiter weg",
-    text:
-      "Du wohnst nicht in Praxisnähe? Wir stellen dir eine BVG-Karte und ermöglichen Bikeleasing, damit du ohne Umstände zur Arbeit kommst.",
+    text: "Du wohnst nicht in Praxisnähe? Wir stellen dir eine BVG-Karte und ermöglichen Bikeleasing, damit du ohne Umstände zur Arbeit kommst.",
   },
   {
     _key: "team",
     title: "Ein Team, das zusammenhält",
-    text:
-      "Regelmäßige Team-Events, wöchentliche Meetings, Sommerfest und Weihnachtsfeier. Wir unterstützen uns gegenseitig und ziehen an einem Strang, damit für die Patientinnen und Patienten das bestmögliche Ergebnis herauskommt.",
+    text: "Regelmäßige Team-Events, wöchentliche Meetings, Sommerfest und Weihnachtsfeier. Wir unterstützen uns gegenseitig und ziehen an einem Strang, damit für die Patientinnen und Patienten das bestmögliche Ergebnis herauskommt.",
   },
   {
     _key: "raeume",
     title: "Zwei Praxen in Prenzlauer Berg",
-    text:
-      "Dein Arbeitsplatz liegt in modernen Räumen mitten im Viertel. Wir sind inzwischen zweimal in Prenzlauer Berg vertreten und wachsen weiter.",
+    text: "Dein Arbeitsplatz liegt in modernen Räumen mitten im Viertel. Wir sind inzwischen zweimal in Prenzlauer Berg vertreten und wachsen weiter.",
   },
 ];
 
@@ -161,7 +158,8 @@ const JOBS = [
   },
   {
     _id: "job-endodontologie",
-    title: "Zahnärztin oder Zahnarzt (m/w/d) mit Spezialisierung Endodontologie",
+    title:
+      "Zahnärztin oder Zahnarzt (m/w/d) mit Spezialisierung Endodontologie",
     handle: "endodontologie",
     kind: "Voll- oder Teilzeit, unbefristet",
     fragen: QUESTIONS_LICENSED,
@@ -200,10 +198,9 @@ async function los() {
   batch.patch("careers", (p) => p.set(PAGE));
 
   /* Die alten Prototyp-Stellen abschalten, nicht löschen. */
-  const stale = await client.fetch(
-    `*[_type == "job" && !(_id in $next)]._id`,
-    { next: JOBS.map((s) => s._id) }
-  );
+  const stale = await client.fetch(`*[_type == "job" && !(_id in $next)]._id`, {
+    next: JOBS.map((s) => s._id),
+  });
   for (const id of stale) {
     batch.patch(id, (p) => p.set({ active: false }));
   }
@@ -220,7 +217,7 @@ async function los() {
         active: true,
         applicationQuestions: [WORKLOAD, ...s.fragen],
         orderRank: RAENGE[i],
-      })
+      }),
     );
   });
 
@@ -228,7 +225,9 @@ async function los() {
 
   console.log(`✓ Karriereseite: ${Object.keys(PAGE).length} Felder gesetzt`);
   console.log(`✓ ${JOBS.length} Stellen angelegt oder aktualisiert`);
-  console.log(`✓ ${stale.length} stale Stellen auf „nicht ausgeschrieben" gesetzt`);
+  console.log(
+    `✓ ${stale.length} stale Stellen auf „nicht ausgeschrieben" gesetzt`,
+  );
   console.log("");
   console.log("Offen und bewusst nicht gesetzt:");
   console.log("  · Bewerbungsadresse je Stelle (Studio → Stellen → Bewerbung)");

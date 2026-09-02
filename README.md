@@ -23,29 +23,29 @@ Both run in the foreground, so use two terminals.
 
 ## Commands
 
-| Command | Purpose |
-| --- | --- |
-| `npm run web` | dev server for the website, :4321 |
-| `npm run web:build` | production build into `web/dist/` |
-| `npm run web:preview` | serve the build, :4322 |
-| `npm run web:check` | types, smoke test across three breakpoints, accessibility |
-| `npm run web:styles` | computed-style diff against a saved baseline |
-| `npm run web:deploy` | build and publish to Netlify |
-| `npm run studio` | Sanity Studio, :3333 |
-| `npm run images` | source images → responsive WebP/AVIF into `web/public/img/` |
-| `npm run intro` · `takt` · `erstbild` | tools for the loading animation |
-| `npm run proto:dev` · `proto:build` | the frozen Vite build, :5173 |
+| Command                               | Purpose                                                     |
+| ------------------------------------- | ----------------------------------------------------------- |
+| `npm run web`                         | dev server for the website, :4321                           |
+| `npm run web:build`                   | production build into `web/dist/`                           |
+| `npm run web:preview`                 | serve the build, :4322                                      |
+| `npm run web:check`                   | types, smoke test across three breakpoints, accessibility   |
+| `npm run web:styles`                  | computed-style diff against a saved baseline                |
+| `npm run web:deploy`                  | build and publish to Netlify                                |
+| `npm run studio`                      | Sanity Studio, :3333                                        |
+| `npm run images`                      | source images → responsive WebP/AVIF into `web/public/img/` |
+| `npm run intro` · `takt` · `erstbild` | tools for the loading animation                             |
+| `npm run proto:dev` · `proto:build`   | the frozen Vite build, :5173                                |
 
 ## Where things live
 
-| File | Contents |
-| --- | --- |
-| `CLAUDE.md` | product vs. prototype, ground rules |
-| `CMS-UMBAU.md` | the running rebuild list, by stage |
-| `SANITY.md` | studio, collections, how content reaches the page |
-| `web/STRUKTUR.md` | structure of the Astro app — binding |
-| `web/CLAUDE.md` · `studio/CLAUDE.md` | what applies inside each folder |
-| `ANLEITUNG.md` | one page for the client — **stays German**, they read it |
+| File                                 | Contents                                                 |
+| ------------------------------------ | -------------------------------------------------------- |
+| `CLAUDE.md`                          | product vs. prototype, ground rules                      |
+| `CMS-UMBAU.md`                       | the running rebuild list, by stage                       |
+| `SANITY.md`                          | studio, collections, how content reaches the page        |
+| `web/STRUKTUR.md`                    | structure of the Astro app — binding                     |
+| `web/CLAUDE.md` · `studio/CLAUDE.md` | what applies inside each folder                          |
+| `ANLEITUNG.md`                       | one page for the client — **stays German**, they read it |
 
 ## Language
 

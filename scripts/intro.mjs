@@ -24,7 +24,9 @@ const OUT = process.env.MP_OUT ?? ".shots/intro";
 const [path = "/"] = process.argv.slice(2);
 
 // Dicht gelegt, wo die Choreografie einsetzt, weiter auseinander gegen Ende.
-const MS = [150, 300, 450, 600, 800, 1000, 1200, 1500, 1800, 2200, 2600, 3200, 4000];
+const MS = [
+  150, 300, 450, 600, 800, 1000, 1200, 1500, 1800, 2200, 2600, 3200, 4000,
+];
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
@@ -52,9 +54,12 @@ if (RELOAD) {
    gewartet und der Startzeitpunkt aus der Navigation der Seite selbst
    genommen. */
 await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-const start = Date.now() - (await page.evaluate(() => Math.round(performance.now())));
+const start =
+  Date.now() - (await page.evaluate(() => Math.round(performance.now())));
 
-console.log(`${url}${RELOAD ? "  (zweiter Aufruf, warmer Cache)" : "  (erster Aufruf, kalt)"}\n`);
+console.log(
+  `${url}${RELOAD ? "  (zweiter Aufruf, warmer Cache)" : "  (erster Aufruf, kalt)"}\n`,
+);
 
 for (const [i, ms] of MS.entries()) {
   const warten = start + ms - Date.now();

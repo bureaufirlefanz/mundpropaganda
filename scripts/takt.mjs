@@ -27,7 +27,8 @@ if (RELOAD) {
    gesetzt werden — später ließe sich der Anfang nicht mehr messen. */
 await page.evaluateOnNewDocument(() => {
   window.__takt = {};
-  const marke = (name) => (window.__takt[name] ??= Math.round(performance.now()));
+  const marke = (name) =>
+    (window.__takt[name] ??= Math.round(performance.now()));
 
   marke("erstesSkript");
 
@@ -40,9 +41,15 @@ await page.evaluateOnNewDocument(() => {
   /* Nur die Schrift, die die Wortmarke braucht. Das ist der entscheidende
      Unterschied: `fonts.ready` wartet auf alle vier Schnitte. */
   try {
-    document.fonts.load('500 1em "PP Neue Montreal"').then(() => marke("sans500"));
-    document.fonts.load('400 1em "PP Neue Montreal"').then(() => marke("sans400"));
-    document.fonts.load('300 1em "GT Pressura Mono"').then(() => marke("mono300"));
+    document.fonts
+      .load('500 1em "PP Neue Montreal"')
+      .then(() => marke("sans500"));
+    document.fonts
+      .load('400 1em "PP Neue Montreal"')
+      .then(() => marke("sans400"));
+    document.fonts
+      .load('300 1em "GT Pressura Mono"')
+      .then(() => marke("mono300"));
   } catch {}
 
   /* Ab wann bewegt sich die Wortmarke wirklich? Gesucht ist der erste Moment,
@@ -50,7 +57,8 @@ await page.evaluateOnNewDocument(() => {
   const beobachte = () => {
     const wort = document.querySelector("[data-hero-word]");
     if (wort) {
-      if (getComputedStyle(wort).visibility === "visible") marke("typoSichtbar");
+      if (getComputedStyle(wort).visibility === "visible")
+        marke("typoSichtbar");
       // SplitText verschachtelt Maske und Zeichen; die Transform sitzt am
       // inneren Element. Deshalb alle Nachfahren prüfen, nicht das erste.
       const bewegt = [...wort.querySelectorAll("div")].some((el) => {
@@ -59,7 +67,8 @@ await page.evaluateOnNewDocument(() => {
       });
       if (bewegt) marke("typoStartet");
     }
-    if (!window.__takt.typoStartet || !window.__takt.typoSichtbar) requestAnimationFrame(beobachte);
+    if (!window.__takt.typoStartet || !window.__takt.typoSichtbar)
+      requestAnimationFrame(beobachte);
   };
   requestAnimationFrame(beobachte);
 });

@@ -20,7 +20,8 @@ export const seo = defineType({
       type: "string",
       description:
         "Steht im Browser-Tab und als blaue Zeile im Suchergebnis. 50–60 Zeichen, sonst schneidet Google ab. Leer lassen übernimmt die Überschrift der Seite.",
-      validation: (r) => r.max(65).warning("Über 65 Zeichen wird meist abgeschnitten."),
+      validation: (r) =>
+        r.max(65).warning("Über 65 Zeichen wird meist abgeschnitten."),
     }),
     defineField({
       name: "description",
@@ -29,7 +30,8 @@ export const seo = defineType({
       rows: 3,
       description:
         "Der graue Text unter dem Titel im Suchergebnis. 120–155 Zeichen. Kein Keyword-Stapel - er wird gelesen, nicht gezählt.",
-      validation: (r) => r.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
+      validation: (r) =>
+        r.max(170).warning("Über 170 Zeichen wird meist abgeschnitten."),
     }),
     /* Bewusst ein ROHES `image` und nicht der `picture`-Typ: Das Open-Graph-Motiv
        wird nie vorgelesen. Es erscheint als Vorschau in Messengern und

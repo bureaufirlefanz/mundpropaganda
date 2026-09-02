@@ -39,7 +39,10 @@ const BREAKPOINTS = [600, 700, 900, 1000];
    Grund — eine Ausnahmeliste ohne Gründe ist nach einem halben Jahr nur noch
    eine zweite Skala. */
 const BREAKPOINT_AUSNAHMEN = new Map([
-  [701, "Gegenstück zu 700: min-width, damit sich die beiden nicht überlappen."],
+  [
+    701,
+    "Gegenstück zu 700: min-width, damit sich die beiden nicht überlappen.",
+  ],
   [1024, "Die Navigation klappt früher um als der Rest der Seite."],
   [520, "Sehr schmale Geräte, nur wo eine Zeile sonst bricht."],
   [560, "Zwei Anschriften im Fuß nebeneinander, darunter gestapelt."],
@@ -48,7 +51,10 @@ const BREAKPOINT_AUSNAHMEN = new Map([
   [800, "Karussell der Geschichten, eigene Mechanik."],
   [1100, "Breite Medienblöcke."],
   [1200, "Der Faden läuft breiter als der Inhalt."],
-  [767, "Aus der Stripe-Vorlage übernommen, siehe Kopf von Compare.astro. Kandidat für 700px — die Änderung verschiebt aber das Verhalten zwischen 701px und 767px und gehört deshalb bewusst entschieden, nicht nebenbei."],
+  [
+    767,
+    "Aus der Stripe-Vorlage übernommen, siehe Kopf von Compare.astro. Kandidat für 700px — die Änderung verschiebt aber das Verhalten zwischen 701px und 767px und gehört deshalb bewusst entschieden, nicht nebenbei.",
+  ],
 ]);
 
 /* ---------------------------------------------------------------------------
@@ -146,13 +152,16 @@ function pruefeThemeColor() {
       if (!ist) continue;
       geprueft++;
       if (ist[1].toLowerCase() !== soll) {
-        console.log(`  ✗ ${kurz(pfad)}: theme-color ${ist[1]}, ${name} ist ${soll}`);
+        console.log(
+          `  ✗ ${kurz(pfad)}: theme-color ${ist[1]}, ${name} ist ${soll}`,
+        );
         schief++;
       }
     }
   }
 
-  if (!schief) console.log(`  ✓ ${geprueft}x theme-color entspricht ${name} (${soll})`);
+  if (!schief)
+    console.log(`  ✓ ${geprueft}x theme-color entspricht ${name} (${soll})`);
   return schief;
 }
 
@@ -164,7 +173,9 @@ function pruefeBreakpoints() {
 
   for (const pfad of ALLE) {
     const text = ohneKommentare(readFileSync(pfad, "utf8"));
-    for (const m of text.matchAll(/@media[^{]*?\(\s*(?:min|max)-width:\s*(\d+)px/g)) {
+    for (const m of text.matchAll(
+      /@media[^{]*?\(\s*(?:min|max)-width:\s*(\d+)px/g,
+    )) {
       const wert = Number(m[1]);
       if (!gefunden.has(wert)) gefunden.set(wert, new Set());
       gefunden.get(wert).add(kurz(pfad));
@@ -178,7 +189,9 @@ function pruefeBreakpoints() {
   const summe = [...gefunden.values()].reduce((n, s) => n + s.size, 0);
 
   if (!unbekannt.length) {
-    console.log(`  ✓ ${gefunden.size} Breakpoint-Werte, alle bekannt (${summe} Stellen)`);
+    console.log(
+      `  ✓ ${gefunden.size} Breakpoint-Werte, alle bekannt (${summe} Stellen)`,
+    );
     return 0;
   }
 
@@ -219,7 +232,9 @@ function pruefeBreiten() {
   }
   for (const [datei, wert] of treffer) {
     console.log(`  ✗ ${datei}: max-width: ${wert}px`);
-    console.log(`      als Token ablegen, oder mit clamp() an die Seite binden`);
+    console.log(
+      `      als Token ablegen, oder mit clamp() an die Seite binden`,
+    );
   }
   return treffer.length;
 }

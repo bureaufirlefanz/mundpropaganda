@@ -89,17 +89,21 @@ const numberOf = () => marked + 1;
 const showDock = anchors.length >= 4;
 ---
 
-{/* Ob die Seite einen Kontaktabschnitt zeigt, steht im Inhalt — die Pillar
+{
+  /* Ob die Seite einen Kontaktabschnitt zeigt, steht im Inhalt — die Pillar
     Page setzt ihre Abschnitte aus dem Baukasten zusammen. Trägt sie keinen,
-    wandert `#kontakt` in den Fuß. */}
+    wandert `#kontakt` in den Fuß. */
+}
 <Base
   title={`${page.title} - Mundpropaganda`}
   description={page.seoDescription ?? page.lead}
   contactSection={page.sections.some((s) => s._type === "contact")}
 >
-  {/* Eigener Kopf, kein `ServiceHero`: Der Entwurf legt hier eine helle
+  {
+    /* Eigener Kopf, kein `ServiceHero`: Der Entwurf legt hier eine helle
       Fläche über ein randabfallendes Bild, während die Leistungsseite Text
-      links und Bild rechts stellt. Zwei verschiedene Bauten, zwei Bausteine. */}
+      links und Bild rechts stellt. Zwei verschiedene Bauten, zwei Bausteine. */
+  }
   <PillarHero
     title={page.title}
     eyebrow={page.topline}
@@ -135,7 +139,12 @@ const showDock = anchors.length >= 4;
         case "intro":
           return (
             <div class="s-pillar__anchor" id={id} data-toc-target={id}>
-              {id && <SectionHeading number={numberOf()} headline={section.headline!} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.headline!}
+                />
+              )}
               <Intro
                 topline={section.topline}
                 headline={id ? undefined : section.headline}
@@ -153,7 +162,12 @@ const showDock = anchors.length >= 4;
               {/* `title=""` und nicht `undefined`: Die Voreinstellung
                   „Kosten" im Baustein griffe sonst wieder, und die
                   Überschrift stünde zweimal da. */}
-              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.headline}
+                />
+              )}
               <Prices
                 id={id}
                 title={id ? "" : section.headline}
@@ -167,7 +181,12 @@ const showDock = anchors.length >= 4;
         case "compare":
           return (
             <div class="s-pillar__anchor" id={id} data-toc-target={id}>
-              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.headline}
+                />
+              )}
               <Compare
                 topline={section.topline}
                 headline={id ? undefined : section.headline}
@@ -181,7 +200,12 @@ const showDock = anchors.length >= 4;
         case "prose":
           return (
             <>
-              {id && <SectionHeading number={numberOf()} headline={section.heading} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.heading}
+                />
+              )}
               <Prose
                 id={id!}
                 body={section.body}
@@ -196,7 +220,12 @@ const showDock = anchors.length >= 4;
         case "steps":
           return (
             <div class="s-pillar__anchor" id={id} data-toc-target={id}>
-              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.headline}
+                />
+              )}
               <Steps steps={section.steps} />
             </div>
           );
@@ -204,7 +233,12 @@ const showDock = anchors.length >= 4;
         case "faq":
           return (
             <div class="s-pillar__anchor" id={id} data-toc-target={id}>
-              {id && <SectionHeading number={numberOf()} headline={section.headline} />}
+              {id && (
+                <SectionHeading
+                  number={numberOf()}
+                  headline={section.headline}
+                />
+              )}
               <Faq
                 title={id ? "" : section.headline}
                 text={section.text}
@@ -226,7 +260,9 @@ const showDock = anchors.length >= 4;
           return stories.length ? <Stories items={stories} /> : null;
 
         case "contact":
-          return <Contact service={section.service} extended={section.extended} />;
+          return (
+            <Contact service={section.service} extended={section.extended} />
+          );
 
         case "ctaBand":
           return (
@@ -243,7 +279,11 @@ const showDock = anchors.length >= 4;
     })
   }
 
-  {showDock && <SectionDock headings={anchors} label="Abschnitte auf dieser Seite" />}
+  {
+    showDock && (
+      <SectionDock headings={anchors} label="Abschnitte auf dieser Seite" />
+    )
+  }
 </Base>
 
 <style>

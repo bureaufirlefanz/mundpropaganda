@@ -13,11 +13,7 @@ export const VIEWPORTS = [
 
 /* Meldungen, die nichts über die Seite sagen: Vite und der Astro-Router
    schreiben im Dev-Modus ins Log, ohne dass etwas kaputt ist. */
-const RAUSCHEN = [
-  /\[vite\]/i,
-  /Download the React DevTools/i,
-  /favicon/i,
-];
+const RAUSCHEN = [/\[vite\]/i, /Download the React DevTools/i, /favicon/i];
 
 const istRauschen = (text) => RAUSCHEN.some((r) => r.test(text));
 
@@ -56,7 +52,9 @@ export async function scrolleDurch(page) {
   await page.evaluate(async () => {
     const schritt = window.innerHeight * 0.8;
     for (let y = 0; y < document.body.scrollHeight; y += schritt) {
-      window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : window.scrollTo(0, y);
+      window.__lenis
+        ? window.__lenis.scrollTo(y, { immediate: true })
+        : window.scrollTo(0, y);
       await new Promise((r) => setTimeout(r, 120));
     }
   });
@@ -77,7 +75,11 @@ export function messe(page) {
     // Reveals, die nach dem Durchscrollen unsichtbar geblieben sind: das
     // Element ist im Layout, aber durchsichtig — meist ein Modul, das nach
     // einem Seitenwechsel nicht wieder angelaufen ist.
-    const toteReveals = [...document.querySelectorAll("[data-reveal], [data-split], [data-reveal-child]")]
+    const toteReveals = [
+      ...document.querySelectorAll(
+        "[data-reveal], [data-split], [data-reveal-child]",
+      ),
+    ]
       .filter((el) => {
         const r = el.getBoundingClientRect();
         if (!r.height) return false;
@@ -91,22 +93,33 @@ export function messe(page) {
     const ueberlaeufer = [...document.querySelectorAll("body *")]
       .filter((el) => {
         const r = el.getBoundingClientRect();
-        return r.width > 0 && r.right > grenze + 1 && getComputedStyle(el).position !== "fixed";
+        return (
+          r.width > 0 &&
+          r.right > grenze + 1 &&
+          getComputedStyle(el).position !== "fixed"
+        );
       })
-      .map((el) => ({ el: bezeichne(el), rechts: Math.round(el.getBoundingClientRect().right) }))
+      .map((el) => ({
+        el: bezeichne(el),
+        rechts: Math.round(el.getBoundingClientRect().right),
+      }))
       .sort((a, b) => b.rechts - a.rechts)
       .slice(0, 3);
 
     return {
       toteReveals,
-      ueberlaufX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ueberlaufX:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
       ueberlaeufer,
       kaputteBilder: [...document.querySelectorAll("img")]
         .filter((i) => i.complete && i.naturalWidth === 0)
         .map((i) => i.currentSrc || i.src),
       // Leere Bildquellen fallen sonst durch: das Bild lädt nie, gilt damit
       // nicht als „complete" und bleibt unbemerkt.
-      leereBilder: [...document.querySelectorAll("img")].filter((i) => !i.getAttribute("src")).length,
+      leereBilder: [...document.querySelectorAll("img")].filter(
+        (i) => !i.getAttribute("src"),
+      ).length,
     };
   });
 }
@@ -115,15 +128,24 @@ export function messe(page) {
 export function befunde({ error, requests }, report) {
   const list = [];
   if (error.length) list.push(`${error.length} Konsolenfehler: ${error[0]}`);
-  if (requests.length) list.push(`${requests.length} fehlgeschlagene Requests: ${requests[0]}`);
+  if (requests.length)
+    list.push(`${requests.length} fehlgeschlagene Requests: ${requests[0]}`);
   if (report.toteReveals.length)
-    list.push(`${report.toteReveals.length} unsichtbare Reveals: ${report.toteReveals[0]}`);
+    list.push(
+      `${report.toteReveals.length} unsichtbare Reveals: ${report.toteReveals[0]}`,
+    );
   if (report.ueberlaufX > 1) {
-    const wer = report.ueberlaeufer.map((u) => `${u.el} bis ${u.rechts}px`).join(", ");
-    list.push(`horizontaler Überlauf: ${report.ueberlaufX}px${wer ? ` — ${wer}` : ""}`);
+    const wer = report.ueberlaeufer
+      .map((u) => `${u.el} bis ${u.rechts}px`)
+      .join(", ");
+    list.push(
+      `horizontaler Überlauf: ${report.ueberlaufX}px${wer ? ` — ${wer}` : ""}`,
+    );
   }
   if (report.kaputteBilder.length)
-    list.push(`${report.kaputteBilder.length} kaputte Bilder: ${report.kaputteBilder[0]}`);
+    list.push(
+      `${report.kaputteBilder.length} kaputte Bilder: ${report.kaputteBilder[0]}`,
+    );
   if (report.leereBilder) list.push(`${report.leereBilder} Bilder ohne src`);
   return list;
 }

@@ -41,12 +41,29 @@ export function initSectionDock() {
     const labelWrap = dock.querySelector("[data-section-dock-label-wrap]");
     const list = dock.querySelector("[data-section-dock-list]");
     const indicator = dock.querySelector("[data-section-dock-indicator]");
-    const links = list ? Array.from(list.querySelectorAll("[data-section-dock-link]")) : [];
-    const sections = links.map((link) => document.querySelector(link.getAttribute("href")));
+    const links = list
+      ? Array.from(list.querySelectorAll("[data-section-dock-link]"))
+      : [];
+    const sections = links.map((link) =>
+      document.querySelector(link.getAttribute("href")),
+    );
     const labelTemplate = labelWrap ? labelWrap.firstElementChild : null;
-    if (!pill || !toggle || !labelWrap || !labelTemplate || !list || !indicator || links.length < 2 || sections.some((s) => !s)) return;
+    if (
+      !pill ||
+      !toggle ||
+      !labelWrap ||
+      !labelTemplate ||
+      !list ||
+      !indicator ||
+      links.length < 2 ||
+      sections.some((s) => !s)
+    )
+      return;
 
-    let activeIndex = Math.max(0, links.findIndex((l) => l.hasAttribute("data-active")));
+    let activeIndex = Math.max(
+      0,
+      links.findIndex((l) => l.hasAttribute("data-active")),
+    );
     let open = false;
     let dockTl = null;
     const rect = { x: 0, y: 0, w: 0, h: 0 };
@@ -147,7 +164,11 @@ export function initSectionDock() {
       gsap.fromTo(
         labelWrap,
         { width: startWidth },
-        { width: targetWidth, duration: dur(0.45), ease: ease("back.out(1.1)", "power3.out") }
+        {
+          width: targetWidth,
+          duration: dur(0.45),
+          ease: ease("back.out(1.1)", "power3.out"),
+        },
       );
       gsap.fromTo(
         next,
@@ -161,23 +182,34 @@ export function initSectionDock() {
              Beschriftung nicht auf halbem Weg stehen. Der nächste Durchgang
              nimmt sie dann als sichtbares Element mit hinaus. */
           onInterrupt: () => gsap.set(next, { yPercent: 0, autoAlpha: 1 }),
-        }
+        },
       );
 
       if (!smooth()) {
         gsap.killTweensOf(pill, "scaleY");
-        gsap.timeline()
+        gsap
+          .timeline()
           .to(pill, { scaleY: 0.94, duration: 0.15, ease: "power2.out" })
           .to(pill, { scaleY: 1, duration: 0.5, ease: "back.out(1.3)" });
       }
     }
 
     function rectFor(link) {
-      return { x: link.offsetLeft, y: link.offsetTop, w: link.offsetWidth, h: link.offsetHeight };
+      return {
+        x: link.offsetLeft,
+        y: link.offsetTop,
+        w: link.offsetWidth,
+        h: link.offsetHeight,
+      };
     }
 
     function render() {
-      gsap.set(indicator, { x: rect.x, y: rect.y, width: rect.w, height: rect.h });
+      gsap.set(indicator, {
+        x: rect.x,
+        y: rect.y,
+        width: rect.w,
+        height: rect.h,
+      });
     }
 
     function placeIndicator(index) {
@@ -210,10 +242,15 @@ export function initSectionDock() {
       const delta = target.y - rect.y;
       const sign = delta === 0 ? 1 : Math.sign(delta);
       const overshoot = gsap.utils.clamp(3, 6, Math.abs(delta) * 0.04) * sign;
-      const apexY = gsap.utils.clamp(0, list.clientHeight - target.h, target.y + overshoot);
+      const apexY = gsap.utils.clamp(
+        0,
+        list.clientHeight - target.h,
+        target.y + overshoot,
+      );
 
       gsap.set(indicator, { transformOrigin: "50% 50%" });
-      gsap.timeline()
+      gsap
+        .timeline()
         .to(rect, {
           x: target.x,
           y: apexY,
@@ -223,10 +260,21 @@ export function initSectionDock() {
           ease: "power3.out",
           onUpdate: render,
         })
-        .to(rect, { y: target.y, duration: 0.25, ease: "power2.inOut", onUpdate: render });
-      gsap.timeline()
+        .to(rect, {
+          y: target.y,
+          duration: 0.25,
+          ease: "power2.inOut",
+          onUpdate: render,
+        });
+      gsap
+        .timeline()
         .to(indicator, { scaleX: 0.9, duration: 0.15, ease: "power2.out" })
-        .to(indicator, { scaleY: 1, scaleX: 1, duration: 0.5, ease: "back.out(1.3)" });
+        .to(indicator, {
+          scaleY: 1,
+          scaleX: 1,
+          duration: 0.5,
+          ease: "back.out(1.3)",
+        });
     }
 
     /* Letzte Sicherung. Die Aufräumlogik oben deckt die Überlagerung ab, die
@@ -238,7 +286,9 @@ export function initSectionDock() {
       clearTimeout(healTimer);
       healTimer = setTimeout(() => {
         const visible = Array.from(labelWrap.children).some(
-          (c) => c.dataset.leaving !== "true" && Number(getComputedStyle(c).opacity) > 0.5
+          (c) =>
+            c.dataset.leaving !== "true" &&
+            Number(getComputedStyle(c).opacity) > 0.5,
         );
         if (!visible) setLabel(activeIndex);
       }, 700);
@@ -273,18 +323,31 @@ export function initSectionDock() {
       gsap.set(pill, { width: fromW, height: fromH });
       gsap.set(links[activeIndex], { yPercent: 0, opacity: 1 });
 
-      dockTl = gsap.timeline()
+      dockTl = gsap
+        .timeline()
         /* Langsamer als zuvor (0.45): Die Karte wächst über zwei Drittel
            mehr Zeit auf, die Einträge laufen darin gestaffelt auf. Das Öffnen
            ist die tragende Bewegung, nicht das Auflaufen der Zeilen. */
-        .to(pill, {
-          width: list.offsetWidth,
-          height: list.offsetHeight,
-          duration: dur(0.75),
-          ease: ease("back.out(1.05)", "power3.out"),
-        }, 0)
-        .to(toggle, { autoAlpha: 0, duration: dur(0.15), ease: "power1.out" }, 0)
-        .to(list, { opacity: 1, duration: dur(0.5), ease: "power1.out" }, dur(0.08))
+        .to(
+          pill,
+          {
+            width: list.offsetWidth,
+            height: list.offsetHeight,
+            duration: dur(0.75),
+            ease: ease("back.out(1.05)", "power3.out"),
+          },
+          0,
+        )
+        .to(
+          toggle,
+          { autoAlpha: 0, duration: dur(0.15), ease: "power1.out" },
+          0,
+        )
+        .to(
+          list,
+          { opacity: 1, duration: dur(0.5), ease: "power1.out" },
+          dur(0.08),
+        )
         /* Die Einträge laufen von unten nach oben auf — dort sitzt der Knopf,
            aus dem sich die Karte öffnet, und die Bewegung folgt derselben
            Richtung.
@@ -305,7 +368,7 @@ export function initSectionDock() {
             ease: "power2.out",
             stagger: { each: dur(0.025), from: "end" },
           },
-          dur(0.12)
+          dur(0.12),
         );
     }
 
@@ -316,21 +379,30 @@ export function initSectionDock() {
 
       if (dockTl) dockTl.kill();
 
-      dockTl = gsap.timeline({
-        onComplete: () => {
-          gsap.set(pill, { clearProps: "width,height" });
-          gsap.set(list, { visibility: "hidden" });
-          gsap.set(links, { yPercent: 0, opacity: 1 });
-        },
-      })
-        .to(pill, {
-          width: toggle.offsetWidth,
-          height: toggle.offsetHeight,
-          duration: dur(0.3),
-          ease: "power3.out",
-        }, 0)
+      dockTl = gsap
+        .timeline({
+          onComplete: () => {
+            gsap.set(pill, { clearProps: "width,height" });
+            gsap.set(list, { visibility: "hidden" });
+            gsap.set(links, { yPercent: 0, opacity: 1 });
+          },
+        })
+        .to(
+          pill,
+          {
+            width: toggle.offsetWidth,
+            height: toggle.offsetHeight,
+            duration: dur(0.3),
+            ease: "power3.out",
+          },
+          0,
+        )
         .to(list, { opacity: 0, duration: dur(0.15), ease: "power1.out" }, 0)
-        .to(toggle, { autoAlpha: 1, duration: dur(0.25), ease: "power1.out" }, dur(0.1));
+        .to(
+          toggle,
+          { autoAlpha: 1, duration: dur(0.25), ease: "power1.out" },
+          dur(0.1),
+        );
     }
 
     /* Der Wechsel greift an der Kante, an der der Abschnitt ins Bild kommt —
@@ -419,7 +491,8 @@ export function initSectionDock() {
 
     hideTriggers = zones.map((zone) => {
       const offset = parseFloat(zone.getAttribute("data-section-dock-hide"));
-      const line = 100 - gsap.utils.clamp(0, 100, Number.isNaN(offset) ? 10 : offset);
+      const line =
+        100 - gsap.utils.clamp(0, 100, Number.isNaN(offset) ? 10 : offset);
       return ScrollTrigger.create({
         trigger: zone,
         start: "top " + line + "%",
@@ -467,11 +540,13 @@ export function initSectionDock() {
     function refreshLayout() {
       setLabel(activeIndex);
       placeIndicator(activeIndex);
-      if (open) gsap.set(pill, { width: list.offsetWidth, height: list.offsetHeight });
+      if (open)
+        gsap.set(pill, { width: list.offsetWidth, height: list.offsetHeight });
     }
     window.addEventListener("resize", refreshLayout);
     removers.push(() => window.removeEventListener("resize", refreshLayout));
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refreshLayout);
+    if (document.fonts && document.fonts.ready)
+      document.fonts.ready.then(refreshLayout);
 
     syncLinkState();
     refreshLayout();

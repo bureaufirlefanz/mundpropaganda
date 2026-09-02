@@ -66,13 +66,14 @@ export const link = defineType({
         { type: "careers" },
         { type: "legalPage" },
       ],
-      description: "Nur Seiten, die es wirklich gibt - die Liste kommt aus dem Datensatz.",
+      description:
+        "Nur Seiten, die es wirklich gibt - die Liste kommt aus dem Datensatz.",
       hidden: ({ parent }) => parent?.kind !== "internal",
       validation: (r) =>
         r.custom((wert, ctx) =>
           (ctx.parent as { kind?: string })?.kind === "internal" && !wert
             ? "Bitte eine Seite auswählen."
-            : true
+            : true,
         ),
     }),
 
@@ -94,7 +95,7 @@ export const link = defineType({
         r.custom((wert, ctx) =>
           (ctx.parent as { kind?: string })?.kind === "external" && !wert
             ? "Bitte eine Adresse eintragen."
-            : true
+            : true,
         ),
     }),
 
@@ -103,7 +104,13 @@ export const link = defineType({
   ],
 
   preview: {
-    select: { title: "text", kind: "kind", target: "target.title", url: "url", anchor: "anchor" },
+    select: {
+      title: "text",
+      kind: "kind",
+      target: "target.title",
+      url: "url",
+      anchor: "anchor",
+    },
     prepare: ({ title, kind, target, url, anchor }) => {
       const wohin =
         kind === "external"

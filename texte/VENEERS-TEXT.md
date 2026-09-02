@@ -23,14 +23,14 @@ Veneers sind hauchdünne Keramikschalen, die auf die sichtbare Vorderseite der F
 
 ## [MODUL: Infobox „Veneers auf einen Blick"]
 
-| | |
-|---|---|
-| **Kosten** | Keramik ab 1.200 € pro Zahn, Komposit ab 450 € |
-| **Behandlungsdauer** | 2–4 Termine über etwa 2–4 Wochen |
-| **Haltbarkeit** | Keramik 10–15 Jahre, im günstigen Fall deutlich länger |
-| **Krankenkasse** | Bei rein ästhetischer Indikation keine Erstattung |
+|                               |                                                             |
+| ----------------------------- | ----------------------------------------------------------- |
+| **Kosten**                    | Keramik ab 1.200 € pro Zahn, Komposit ab 450 €              |
+| **Behandlungsdauer**          | 2–4 Termine über etwa 2–4 Wochen                            |
+| **Haltbarkeit**               | Keramik 10–15 Jahre, im günstigen Fall deutlich länger      |
+| **Krankenkasse**              | Bei rein ästhetischer Indikation keine Erstattung           |
 | **Ohne Abschleifen möglich?** | Ja – mit Non-Prep-Veneers, wenn die Voraussetzungen stimmen |
-| **Besonderheit bei uns** | Digitale Planung und Fertigung im eigenen Praxislabor |
+| **Besonderheit bei uns**      | Digitale Planung und Fertigung im eigenen Praxislabor       |
 
 ---
 
@@ -54,14 +54,14 @@ Ein Keramikveneer kostet bei uns ab 1.200 Euro pro Zahn. Sie erhalten vor Behand
 
 [MODUL: Preistabelle]
 
-| Art | Kosten pro Zahn | Zahnabtrag | Haltbarkeit |
-|---|---|---|---|
-| Komposit-Veneer | ab 450 € | praktisch keiner | 5–8 Jahre |
-| Keramikveneer (Prep) | ab 1.200 € | 0,3–1,0 mm | 10–15 Jahre |
-| Non-Prep-Veneer | ab 1.400 € | kein bis minimal | 8–12 Jahre |
-| Mock-up | ab 450 € pro Kiefer | — | — |
+| Art                  | Kosten pro Zahn     | Zahnabtrag       | Haltbarkeit |
+| -------------------- | ------------------- | ---------------- | ----------- |
+| Komposit-Veneer      | ab 450 €            | praktisch keiner | 5–8 Jahre   |
+| Keramikveneer (Prep) | ab 1.200 €          | 0,3–1,0 mm       | 10–15 Jahre |
+| Non-Prep-Veneer      | ab 1.400 €          | kein bis minimal | 8–12 Jahre  |
+| Mock-up              | ab 450 € pro Kiefer | —                | —           |
 
-*Bei Einzelzahnversorgungen mit hohem ästhetischen Anspruch beginnt das Keramikveneer bei 1.500 Euro – ein einzelner Zahn, der sich neben unveränderten Nachbarn einfügen muss, ist die anspruchsvollste Aufgabe überhaupt.*
+_Bei Einzelzahnversorgungen mit hohem ästhetischen Anspruch beginnt das Keramikveneer bei 1.500 Euro – ein einzelner Zahn, der sich neben unveränderten Nachbarn einfügen muss, ist die anspruchsvollste Aufgabe überhaupt._
 
 **Warum „ab" und kein Festpreis?** Zahnärztliche Leistungen werden nach der Gebührenordnung für Zahnärzte abgerechnet. Was Ihre Behandlung kostet, hängt vom tatsächlichen Aufwand ab – Zahl der Zähne, Ausgangssituation, Material, Laboraufwand. Ein Pauschalpreis, der das ignoriert, wäre entweder für uns oder für Sie der falsche. Deshalb nennen wir Einstiegspreise und rechnen den Rest im Heil- und Kostenplan aus, bevor Sie sich entscheiden.
 
@@ -77,14 +77,14 @@ Diese Summe sollte niemanden überraschen, der sich zum ersten Mal informiert �
 
 Nicht jedes Veneer ist gleich. Die drei gängigen Varianten unterscheiden sich vor allem in einem Punkt: wie viel gesunde Zahnsubstanz sie kosten.
 
-| | Keramik (klassisch) | Non-Prep | Komposit |
-|---|---|---|---|
-| **Material** | Lithiumdisilikat, Feldspatkeramik | dünne Hochleistungskeramik | Kunststoff-Komposit |
-| **Abschleifen** | 0,3–1,0 mm | kein bis minimaler Abtrag | praktisch keiner |
-| **Umkehrbar?** | nein | bedingt | ja |
-| **Haltbarkeit** | 10–15 Jahre | 8–12 Jahre | 5–8 Jahre |
-| **Stärken** | höchste Ästhetik, stabil, verfärbt nicht | maximal zahnschonend | günstig, in einer Sitzung fertig |
-| **Grenzen** | irreversibel | nicht bei dunklen Zähnen oder engem Platz | verfärbt mit der Zeit, weniger stabil |
+|                 | Keramik (klassisch)                      | Non-Prep                                  | Komposit                              |
+| --------------- | ---------------------------------------- | ----------------------------------------- | ------------------------------------- |
+| **Material**    | Lithiumdisilikat, Feldspatkeramik        | dünne Hochleistungskeramik                | Kunststoff-Komposit                   |
+| **Abschleifen** | 0,3–1,0 mm                               | kein bis minimaler Abtrag                 | praktisch keiner                      |
+| **Umkehrbar?**  | nein                                     | bedingt                                   | ja                                    |
+| **Haltbarkeit** | 10–15 Jahre                              | 8–12 Jahre                                | 5–8 Jahre                             |
+| **Stärken**     | höchste Ästhetik, stabil, verfärbt nicht | maximal zahnschonend                      | günstig, in einer Sitzung fertig      |
+| **Grenzen**     | irreversibel                             | nicht bei dunklen Zähnen oder engem Platz | verfärbt mit der Zeit, weniger stabil |
 
 Für unsere Praxis ist die Reihenfolge klar: Wir prüfen zuerst, ob eine Non-Prep-Lösung möglich ist. Nur wenn die nicht zum gewünschten Ergebnis führt, sprechen wir über klassische Keramik-Veneers. Was Non-Prep-Veneers leisten und wo ihre Grenzen liegen, lesen Sie unter [SPOKE: Non-Prep Veneers Berlin].
 
@@ -132,7 +132,7 @@ Insgesamt sind das zwei bis vier Termine über etwa zwei bis vier Wochen.
 
 ## Wie lange halten Veneers?
 
-Für Keramik-Veneers ist das gut untersucht. Eine Langzeitstudie der Medizinischen Universität Innsbruck (Beier, Kapferer, Dumfahrt, *International Journal of Prosthodontics* 2012) wertete 1.335 vollkeramische Restaurationen bei 302 Patientinnen und Patienten über einen Zeitraum von bis zu 22 Jahren aus. Die Überlebensraten:
+Für Keramik-Veneers ist das gut untersucht. Eine Langzeitstudie der Medizinischen Universität Innsbruck (Beier, Kapferer, Dumfahrt, _International Journal of Prosthodontics_ 2012) wertete 1.335 vollkeramische Restaurationen bei 302 Patientinnen und Patienten über einen Zeitraum von bis zu 22 Jahren aus. Die Überlebensraten:
 
 - **97,3 %** nach 5 Jahren
 - **93,5 %** nach 10 Jahren
@@ -185,13 +185,13 @@ Ausführlich mit allen Zahlen in unserem Magazinbeitrag [LINK: Veneers aus der T
 
 ## Veneers, Bleaching, Bonding oder Aligner – was ist das Richtige?
 
-| Ihr Anliegen | Passende Lösung |
-|---|---|
-| Zähne sind gesund, aber verfärbt | [LINK: Bleaching] – deutlich günstiger, ohne Substanzverlust |
-| Kleine Absplitterung oder Ecke | Komposit-Restauration, in einer Sitzung |
-| Schiefe oder gedrehte Zähne | [LINK: unsichtbare Aligner] – korrigiert die Ursache statt sie zu verdecken |
-| Zahn stark geschädigt oder wurzelbehandelt | [LINK: Krone] – ein Veneer trägt hier nicht |
-| Form, Farbe und Länge sollen sich ändern | Veneers |
+| Ihr Anliegen                               | Passende Lösung                                                             |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| Zähne sind gesund, aber verfärbt           | [LINK: Bleaching] – deutlich günstiger, ohne Substanzverlust                |
+| Kleine Absplitterung oder Ecke             | Komposit-Restauration, in einer Sitzung                                     |
+| Schiefe oder gedrehte Zähne                | [LINK: unsichtbare Aligner] – korrigiert die Ursache statt sie zu verdecken |
+| Zahn stark geschädigt oder wurzelbehandelt | [LINK: Krone] – ein Veneer trägt hier nicht                                 |
+| Form, Farbe und Länge sollen sich ändern   | Veneers                                                                     |
 
 Häufig ist die beste Antwort eine Kombination: erst bleichen, dann sechs Monate warten, dann nur die zwei Zähne mit Veneers versorgen, die es wirklich brauchen. Das kostet einen Bruchteil und erhält Ihre Zahnsubstanz. Der Vergleich im Detail: [SPOKE: Veneers oder Bleaching].
 
@@ -199,7 +199,7 @@ Häufig ist die beste Antwort eine Kombination: erst bleichen, dann sechs Monate
 
 ## [MODUL: Vorher-Nachher-Galerie]
 
-*Nur mit schriftlicher Patienteneinwilligung und nach rechtlicher Freigabe. Siehe Briefing §7.*
+_Nur mit schriftlicher Patienteneinwilligung und nach rechtlicher Freigabe. Siehe Briefing §7._
 
 ---
 
@@ -285,8 +285,8 @@ In einem Beratungstermin klären wir, ob Veneers für Sie das Richtige sind – 
 **Zuletzt aktualisiert:** [PRÜFEN: Datum]
 
 **Verwendete Quellen:**
-Beier, Kapferer, Dumfahrt (2012), *International Journal of Prosthodontics* – Langzeitstudie zu Keramikveneers, Medizinische Universität Innsbruck · Gebührenordnung für Zahnärzte (GOZ), Ziffern 2220 und 2197 · [PRÜFEN: 1–2 weitere, z. B. DGZMK-Leitlinie oder Bundeszahnärztekammer]
+Beier, Kapferer, Dumfahrt (2012), _International Journal of Prosthodontics_ – Langzeitstudie zu Keramikveneers, Medizinische Universität Innsbruck · Gebührenordnung für Zahnärzte (GOZ), Ziffern 2220 und 2197 · [PRÜFEN: 1–2 weitere, z. B. DGZMK-Leitlinie oder Bundeszahnärztekammer]
 
 ---
 
-*Wortzahl: ca. 2.000 Wörter Fließtext, zzgl. Tabelleninhalte. 19 H2-Abschnitte, 12 FAQ, 14 kontextuelle interne Links (8 bestehende Seiten, 6 Cluster-Artikel).*
+_Wortzahl: ca. 2.000 Wörter Fließtext, zzgl. Tabelleninhalte. 19 H2-Abschnitte, 12 FAQ, 14 kontextuelle interne Links (8 bestehende Seiten, 6 Cluster-Artikel)._

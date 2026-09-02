@@ -13,12 +13,12 @@ Praxisraum mit Licht.
 
 ## Kopf
 
-| Feld | Wert |
-|---|---|
-| `topline` | Praxis |
-| `title` | siehe unten |
-| `lead` | siehe unten |
-| `image` | **fehlt, bitte hochladen** |
+| Feld      | Wert                       |
+| --------- | -------------------------- |
+| `topline` | Praxis                     |
+| `title`   | siehe unten                |
+| `lead`    | siehe unten                |
+| `image`   | **fehlt, bitte hochladen** |
 
 ### Headline, drei Vorschläge
 
@@ -48,9 +48,9 @@ Meine Empfehlung ist **1**.
 
 ## Wer wir sind
 
-| Feld | Wert |
-|---|---|
-| `storyTopline` | Wer wir sind |
+| Feld            | Wert                          |
+| --------------- | ----------------------------- |
+| `storyTopline`  | Wer wir sind                  |
 | `storyHeadline` | Aus einem Ärgernis entstanden |
 
 ### `storyColumns`
@@ -73,11 +73,11 @@ Meine Empfehlung ist **1**.
 
 ## Wofür wir stehen
 
-| Feld | Wert |
-|---|---|
-| `valuesTopline` | Haltung |
-| `valuesHeadline` | Vier Dinge, auf die du dich verlassen kannst |
-| `valuesText` | Nichts davon ist besonders. Besonders ist nur, dass es nicht selbstverständlich ist. |
+| Feld             | Wert                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| `valuesTopline`  | Haltung                                                                              |
+| `valuesHeadline` | Vier Dinge, auf die du dich verlassen kannst                                         |
+| `valuesText`     | Nichts davon ist besonders. Besonders ist nur, dass es nicht selbstverständlich ist. |
 
 ### `valuesItems`
 
@@ -102,11 +102,11 @@ sitzt. Vertretung heißt hier nicht, dass jemand Fremdes deine Akte aufschlägt.
 
 ## Team
 
-| Feld | Wert |
-|---|---|
-| `teamTopline` | Team |
+| Feld           | Wert                   |
+| -------------- | ---------------------- |
+| `teamTopline`  | Team                   |
 | `teamHeadline` | Die Gesichter dahinter |
-| `teamText` | siehe unten |
+| `teamText`     | siehe unten            |
 
 > Behandeln, assistieren, planen, im eigenen Labor schichten. Die Einzelnen
 > stellen wir dir vor, sobald die Porträts stehen.
@@ -121,11 +121,11 @@ sagt, was zu tun ist.
 
 ## Standorte
 
-| Feld | Wert |
-|---|---|
-| `locationsTopline` | Standorte |
-| `locationsHeadline` | Zweimal Prenzlauer Berg |
-| `locationsText` | Beide Häuser liegen zehn Gehminuten auseinander. P25 ist barrierefrei zugänglich. Anschriften und Zeiten stehen unten im Fuß. |
+| Feld                | Wert                                                                                                                          |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `locationsTopline`  | Standorte                                                                                                                     |
+| `locationsHeadline` | Zweimal Prenzlauer Berg                                                                                                       |
+| `locationsText`     | Beide Häuser liegen zehn Gehminuten auseinander. P25 ist barrierefrei zugänglich. Anschriften und Zeiten stehen unten im Fuß. |
 
 **Hinweis zum Code:** Die Standorte zeigt jetzt derselbe Bildring wie auf der
 Startseite. Er holt Anschriften und Zeiten selbst aus den Einstellungen, die

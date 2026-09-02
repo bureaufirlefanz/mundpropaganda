@@ -30,17 +30,19 @@ async function los() {
 
   /* 1. Die verwaisten Marker. `unset` je Index — die Etappen selbst bleiben
      unangetastet. */
-  const etappen = await client.fetch(`*[_id == "careers"][0].processStages[]{ marker }`);
+  const etappen = await client.fetch(
+    `*[_id == "careers"][0].processStages[]{ marker }`,
+  );
   const mitMarker = (etappen ?? [])
     .map((e, i) => ({ i, marker: e?.marker }))
     .filter((e) => e.marker != null);
 
   if (mitMarker.length) {
     batch.patch("careers", (p) =>
-      p.unset(mitMarker.map((e) => `processStages[${e.i}].marker`))
+      p.unset(mitMarker.map((e) => `processStages[${e.i}].marker`)),
     );
     report.push(
-      `careers: ${mitMarker.length} verwaiste marker entfernt (${mitMarker.map((e) => `„${e.marker}“`).join(", ")})`
+      `careers: ${mitMarker.length} verwaiste marker entfernt (${mitMarker.map((e) => `„${e.marker}“`).join(", ")})`,
     );
   } else {
     report.push("careers: keine verwaisten marker");
@@ -51,7 +53,7 @@ async function los() {
   const name = await client.fetch(`*[_id == "settings"][0].siteName`);
   if (!name) {
     batch.patch("settings", (p) => p.set({ siteName: "Mundpropaganda" }));
-    report.push('settings: siteName auf „Mundpropaganda“ gesetzt');
+    report.push("settings: siteName auf „Mundpropaganda“ gesetzt");
   } else {
     report.push(`settings: siteName ist bereits „${name}“`);
   }

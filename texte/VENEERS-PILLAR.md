@@ -16,7 +16,7 @@
 **Lies zuerst `STRUKTUR.md`.** Es ist keine Zierde, es sind die Hausregeln, und dieses Briefing setzt sie voraus. Die vier, die hier am häufigsten scharf werden:
 
 1. **Seiten komponieren, sie gestalten nicht.** Ein `<style>` unter `pages/` heißt: ein Baustein fehlt.
-2. **Fremdes Markup braucht `:global()`.** Astro hängt sein Scope-Attribut an *jeden* Selektorteil. Alles aus `PortableText`, `Picture.astro`, `Button.astro` oder zur Laufzeit Erzeugtes trägt es nicht. Stiller Fehler, keine Warnung.
+2. **Fremdes Markup braucht `:global()`.** Astro hängt sein Scope-Attribut an _jeden_ Selektorteil. Alles aus `PortableText`, `Picture.astro`, `Button.astro` oder zur Laufzeit Erzeugtes trägt es nicht. Stiller Fehler, keine Warnung.
 3. **`html.js`, nie ein nacktes `.js`.** Sonst wird daraus `.js[data-astro-cid-…]` und trifft `<html>` nie.
 4. **Verborgene Startzustände gehören ins CSS, nicht in GSAP.** Ein `gsap.set` im Modul läuft nach dem ersten Bild — das Element blitzt auf. CSS versteckt, das Modul löst.
 
@@ -30,24 +30,24 @@ Und: **keine eigenen Farb- oder Abstandswerte in Komponenten.** Nur Tokens. Fehl
 
 `js/modules/toc.js:94` liest `window.__lenis`. `js/modules/scroll.js:37` setzt das aber nur unter `if (import.meta.env.DEV)`.
 
-In der Auslieferung steigt der Klick-Handler damit sofort aus: kein `setActive(id)`, kein `history.replaceState`, kein `offset: -120`. Es *funktioniert* trotzdem, weil `initAnchors()` alle `a[href^="#"]` global abfängt — nur mit `offset: -100` und ohne sofortige Hervorhebung.
+In der Auslieferung steigt der Klick-Handler damit sofort aus: kein `setActive(id)`, kein `history.replaceState`, kein `offset: -120`. Es _funktioniert_ trotzdem, weil `initAnchors()` alle `a[href^="#"]` global abfängt — nur mit `offset: -100` und ohne sofortige Hervorhebung.
 
 `scroll.js` exportiert `getLenis()` genau dafür. **Bitte `toc.js` darauf umstellen** und im neuen Dock von vornherein `getLenis()` verwenden. Fünf Minuten, unabhängig vom Rest.
 
 ### 1.2 Platzhalter-FAQ im Build
 
-Im gebauten HTML steht: *„Wie funktioniert das alles?" — „Alles funktioniert immer sehr gut"*. Das ist Redaktionsarbeit im Studio, kein Code — bitte nur melden.
+Im gebauten HTML steht: _„Wie funktioniert das alles?" — „Alles funktioniert immer sehr gut"_. Das ist Redaktionsarbeit im Studio, kein Code — bitte nur melden.
 
 ### 1.3 Falsche Preise in Sanity
 
 Sanity hält aktuell 890 € / 950 € / 190 €. **Richtig sind die Werte der Live-Seite, und zwar als „ab"-Preise:**
 
-| Art | Preis |
-|---|---|
-| Komposit-Veneer | ab 450 € pro Zahn |
+| Art                  | Preis                                                                        |
+| -------------------- | ---------------------------------------------------------------------------- |
+| Komposit-Veneer      | ab 450 € pro Zahn                                                            |
 | Keramikveneer (Prep) | ab 1.200 € pro Zahn (Einzelzahn mit hohem ästhetischen Anspruch: ab 1.500 €) |
-| Non-Prep-Veneer | ab 1.400 € pro Zahn |
-| Mock-up | ab 450 € pro Kiefer |
+| Non-Prep-Veneer      | ab 1.400 € pro Zahn                                                          |
+| Mock-up              | ab 450 € pro Kiefer                                                          |
 
 Auch das ist Redaktionsarbeit — aber es betrifft das Datenmodell: **`pricing` braucht ein `from`-Flag oder die Preise tragen das „ab" im Feld.** Siehe §5.7.
 
@@ -59,18 +59,18 @@ Steht zweimal im Build. Erfolgsversprechen sind nach HWG unzulässig, und fachli
 
 ## 2. Was gebaut wird
 
-| # | Baustein | Art | Aufwand | Blockiert durch |
-|---|---|---|---|---|
-| 1 | `ui/SectionDock.astro` + `js/modules/section-dock.js` | neu | mittel | **nichts** |
-| 2 | `toc.js` → `getLenis()` | Fix | 5 min | nichts |
-| 3 | `sections/Compare.astro` an `SERVICE_QUERY` anschließen | Anschluss | sehr klein | Schemafeld |
-| 4 | `sections/Prose.astro` | neu | mittel | Figma-Werte + Schema |
-| 5 | `sections/QuickFacts.astro` | neu | klein | prüfen ob `Facts.astro` reicht |
-| 6 | `ui/SourceNote.astro` | neu | klein | — |
-| 7 | `ui/AuthorNote.astro` | neu | klein | `person`-Referenz im Schema |
-| 8 | `sections/CtaBand.astro` | neu | klein | — |
-| 9 | `sections/Prices.astro` erweitern | Erweiterung | klein | Schemafelder |
-| 10 | `ui/StructuredData.astro` + Canonical | neu | mittel | `site` in `astro.config.mjs` |
+| #   | Baustein                                                | Art         | Aufwand    | Blockiert durch                |
+| --- | ------------------------------------------------------- | ----------- | ---------- | ------------------------------ |
+| 1   | `ui/SectionDock.astro` + `js/modules/section-dock.js`   | neu         | mittel     | **nichts**                     |
+| 2   | `toc.js` → `getLenis()`                                 | Fix         | 5 min      | nichts                         |
+| 3   | `sections/Compare.astro` an `SERVICE_QUERY` anschließen | Anschluss   | sehr klein | Schemafeld                     |
+| 4   | `sections/Prose.astro`                                  | neu         | mittel     | Figma-Werte + Schema           |
+| 5   | `sections/QuickFacts.astro`                             | neu         | klein      | prüfen ob `Facts.astro` reicht |
+| 6   | `ui/SourceNote.astro`                                   | neu         | klein      | —                              |
+| 7   | `ui/AuthorNote.astro`                                   | neu         | klein      | `person`-Referenz im Schema    |
+| 8   | `sections/CtaBand.astro`                                | neu         | klein      | —                              |
+| 9   | `sections/Prices.astro` erweitern                       | Erweiterung | klein      | Schemafelder                   |
+| 10  | `ui/StructuredData.astro` + Canonical                   | neu         | mittel     | `site` in `astro.config.mjs`   |
 
 **Reihenfolge: 1 → 2 → 3 → (Schemaentscheidung) → 4 → 5–8 → 9 → 10.**
 Nach **1** und nach der Schemaentscheidung bitte innehalten.
@@ -90,23 +90,24 @@ Genauso hier: **`data-`-Attribute, Timeline-Struktur, Eases, `rect`-Objekt, `hop
 ### 3.2 Die sieben Anpassungen
 
 1. **Keine CDN-Skripte.** GSAP liegt als Abhängigkeit vor, gleiche Version (`^3.15.0`). → `import { gsap, ScrollTrigger } from "../lib/gsap.js"`
-2. **`gsap.registerPlugin(ScrollTrigger)` streichen.** `js/lib/gsap.js` registriert zentral — *„sonst registriert jedes Modul erneut und wir bezahlen das mit Bundle-Größe und doppelten Tickern."*
+2. **`gsap.registerPlugin(ScrollTrigger)` streichen.** `js/lib/gsap.js` registriert zentral — _„sonst registriert jedes Modul erneut und wir bezahlen das mit Bundle-Größe und doppelten Tickern."_
 3. **Farben → Tokens:**
 
-   | Osmo | → |
-   |---|---|
-   | `#161c33` | `var(--c-dark)` |
-   | `#e9ecf6` | `var(--c-grey)` oder `var(--c-neutral-200)` — Designentscheidung |
-   | `#161c338c` | `var(--c-text-muted)` |
-   | `#fff` (aktiver Link) | `var(--c-grey)` oder `var(--c-white)` |
-   | `rgba(255,255,255,0.6)` | `color-mix(in srgb, var(--c-grey) 65%, transparent)` |
-   | `1.5em` / `100em` Radius | `var(--r-round)` |
-   | `z-index: 100` | `var(--z-sticky)` — **nicht** `--z-nav`, der Dock darf die Navigation nicht überlagern |
-   | `bottom: 2em` | `var(--sp-4)` + `env(safe-area-inset-bottom)` |
+   | Osmo                     | →                                                                                      |
+   | ------------------------ | -------------------------------------------------------------------------------------- |
+   | `#161c33`                | `var(--c-dark)`                                                                        |
+   | `#e9ecf6`                | `var(--c-grey)` oder `var(--c-neutral-200)` — Designentscheidung                       |
+   | `#161c338c`              | `var(--c-text-muted)`                                                                  |
+   | `#fff` (aktiver Link)    | `var(--c-grey)` oder `var(--c-white)`                                                  |
+   | `rgba(255,255,255,0.6)`  | `color-mix(in srgb, var(--c-grey) 65%, transparent)`                                   |
+   | `1.5em` / `100em` Radius | `var(--r-round)`                                                                       |
+   | `z-index: 100`           | `var(--z-sticky)` — **nicht** `--z-nav`, der Dock darf die Navigation nicht überlagern |
+   | `bottom: 2em`            | `var(--sp-4)` + `env(safe-area-inset-bottom)`                                          |
 
    Die `em`-Innenabstände darf die Vorlage behalten — sie skalieren die Pille an ihrer eigenen Schriftgröße, das ist Teil der Mechanik.
+
 4. **Klick über Lenis**, via `getLenis()` (nicht `window.__lenis`, s. §1.1).
-5. **Phase 2 in `init.js`**, neben `initToc()`. `STRUKTUR.md`: *„Wer einen neuen Baustein hinzufügt, hängt ihn in Phase 2."*
+5. **Phase 2 in `init.js`**, neben `initToc()`. `STRUKTUR.md`: _„Wer einen neuen Baustein hinzufügt, hängt ihn in Phase 2."_
 6. **Aufräumen.** Die Vorlage hängt `resize`, `keydown` und `click` an und entfernt sie nie. `init()` läuft bei **jedem** Seitenwechsel über `astro:page-load` erneut → die Listener stapeln sich. `toc.js` macht es vor: Aufräumfunktion zurückgeben. Die ScrollTrigger deckt `astro:before-swap` in `Base.astro` schon ab, die `document`-Listener nicht.
 7. **`DOMContentLoaded`-Selbststart am Dateiende streichen.** Widerspricht dem Modulmuster.
 
@@ -116,17 +117,22 @@ Genauso hier: **`data-`-Attribute, Timeline-Struktur, Eases, `rect`-Objekt, `hop
 
 ```ts
 interface Props {
-  headings: Heading[];        // aus lib/table-of-contents.ts
-  label?: string;             // aria-label, Vorgabe "Auf dieser Seite"
+  headings: Heading[]; // aus lib/table-of-contents.ts
+  label?: string; // aria-label, Vorgabe "Auf dieser Seite"
 }
 ```
 
 Die Nummer (`01`, `02`) entsteht aus dem Index, sie steht nicht in den Daten.
 
 **Verborgener Startzustand ins CSS**, nicht in GSAP:
+
 ```css
-html.js .c-section-dock { opacity: 0; transform: translateY(40%); }
+html.js .c-section-dock {
+  opacity: 0;
+  transform: translateY(40%);
+}
 ```
+
 Das Modul löst ihn. Ohne JavaScript bleibt eine gewöhnliche Sprungmarkenliste stehen, die vollständig funktioniert — genau wie `.c-toc`. Deshalb hängt der Startzustand an `html.js`.
 
 **`:global()`** für alles, was `swapLabel()` zur Laufzeit klont.
@@ -166,7 +172,7 @@ textSections: [{
 
 Damit steckt die Gruppierung im Modell statt in einer Render-Heuristik, der Reichtext bleibt Reichtext (die internen Links brauchen Portable-Text-Annotationen), und die Redaktion sieht im Studio dieselbe Einheit wie auf der Seite.
 
-**Anbindung an Dock/TOC:** eine `headingsFromSections()` neben `headingsFrom()` in `lib/table-of-contents.ts`, gleiche `Heading[]`-Schnittstelle, **gleiche `idFrom()`**. Der Kopfkommentar dort schützt genau das: *„Die Kennung entsteht an genau einer Stelle."* `withHeadingIds()` entfällt hier — die Kennung wandert als Prop an die Komponente, was einfacher ist als der `_tocId`-Umweg.
+**Anbindung an Dock/TOC:** eine `headingsFromSections()` neben `headingsFrom()` in `lib/table-of-contents.ts`, gleiche `Heading[]`-Schnittstelle, **gleiche `idFrom()`**. Der Kopfkommentar dort schützt genau das: _„Die Kennung entsteht an genau einer Stelle."_ `withHeadingIds()` entfällt hier — die Kennung wandert als Prop an die Komponente, was einfacher ist als der `_tocId`-Umweg.
 
 **Das ist eine Entscheidung für Flo, und `studio/` ist nicht freigegeben. Bitte nachfragen, bevor du Schema anfasst.**
 
@@ -180,11 +186,11 @@ Damit steckt die Gruppierung im Modell statt in einer Render-Heuristik, der Reic
 
 ```ts
 interface Props {
-  id: string;              // Sprungmarke aus idFrom()
+  id: string; // Sprungmarke aus idFrom()
   heading: string;
   body: PortableTextBlock[];
   image?: CmsImage;
-  level?: 2 | 3;           // Vorgabe 2
+  level?: 2 | 3; // Vorgabe 2
 }
 ```
 
@@ -210,41 +216,52 @@ interface Props {
 ⚠️ **Noch nicht anfangen.** Spaltenaufteilung im 12er-Raster und Satzbreite der Textspalte stehen nicht fest — sie wirkt schmaler als die 68 ch aus `Post.astro`, eher 55–60. Kommt aus Figma. **Nicht schätzen.**
 
 ### 5.2 `sections/QuickFacts.astro`
+
 `quickFacts[]{ label, value }`, 4–6 Zeilen, kein Bild. Erst prüfen, ob `sections/Facts.astro` + `js/modules/facts.js` die Form tragen.
 
 ### 5.3 `ui/SourceNote.astro`
+
 Quellen-/Hinweiskasten für Studienbeleg und GOZ-Erklärung. `variant: "source" | "info" | "warning"`, Titel, Text, optional Link.
 
 ### 5.4 `ui/AuthorNote.astro`
+
 Autor:in, fachliche Prüfung, Datum der letzten Aktualisierung, Quellenliste. **`Post.astro` ab Zeile 115 hat das Porträt-Muster fertig** (48 px, rund, `CmsImage`) — übernehmen. Braucht `author`/`reviewedBy` als `person`-Referenz und `lastReviewed` im `service`-Schema.
 
 > Größter ungenutzter Hebel der Seite: auf keiner der 22 analysierten deutschen Veneer-Seiten gibt es eine vollständige Autorenbox. Veneers sind YMYL-Content.
 
 ### 5.5 `sections/CtaBand.astro`
+
 Schmaler Zwischen-CTA. `headline`, `text`, `action`. Das `LINK`-Fragment in `queries.ts` und `lib/navigation.ts#linkZiel()` existieren — verwenden, keine Pfade als Text.
 Doctolib-Button + `tel:`-Link, auf Desktop ebenfalls sichtbar.
 
 ### 5.6 `Compare.astro` anschließen — **bester Aufwand-Ertrag**
+
 Der Baustein ist fertig und generisch (`--columns-in-view`), hängt aber nur an `CAREERS_QUERY`. Es fehlen nur die Felder in `SERVICE_QUERY`:
+
 ```
 comparisonColumns[]{ name, emphasised }
 comparisonRows[]{ name, values[]{ kind, text } }
 comparisonNote
 ```
+
 Die Veneers-Seite braucht **zwei** Instanzen (Arten-Vergleich, Alternativen-Matrix) — also ein Array von Vergleichen, nicht ein einzelnes Feld.
 
 ### 5.7 `Prices.astro` erweitern
+
 Heute `pricing[]{ name, price }`. Nötig:
+
 ```
 pricing[]{ name, price, reduction, durability }
 priceNote          // "Einzelzahn mit hohem ästhetischen Anspruch: ab 1.500 €"
 priceDisclaimer    // PFLICHTFELD — Validation-Error wenn leer
 ```
+
 - Mobil **gestapelte Karten**, nicht horizontal scrollend.
 - `font-variant-numeric: tabular-nums` auf die Beträge.
 - Alle Preise sind **„ab"-Preise** — entweder ein `from: boolean` je Zeile oder das „ab" steht im Wert. Das ist keine Kosmetik: Festpreise, die den GOZ-Steigerungsfaktor aushebeln, sind für Zahnärzte unzulässig, und der Disclaimer trägt das ab.
 
 ### 5.8 `ui/StructuredData.astro`
+
 `Base.astro` liefert heute **kein JSON-LD und kein Canonical.** Beides fehlt sitewide.
 
 ```
@@ -258,11 +275,13 @@ Person                   ← Autor:in
 Baumuster: so wie `Base.astro` die Website-Angaben über `loadSettings()` selbst holt.
 
 **Ausdrücklich nicht bauen:**
-- **`FAQPage`** — Google hat FAQ-Rich-Results am 07.05.2026 abgeschaltet, im Juni aus dem Rich Results Test entfernt, im August den API-Support beendet. Der FAQ-*Inhalt* bleibt und ist das wertvollste Modul für KI-Extraktion; nur das Markup entfällt.
+
+- **`FAQPage`** — Google hat FAQ-Rich-Results am 07.05.2026 abgeschaltet, im Juni aus dem Rich Results Test entfernt, im August den API-Support beendet. Der FAQ-_Inhalt_ bleibt und ist das wertvollste Modul für KI-Extraktion; nur das Markup entfällt.
 - **`Review`/`AggregateRating`** — wer die Bewertungen über sich selbst kontrolliert, ist für Sterne-Snippets nicht qualifiziert. `settings.reviewsAverage/-Count` sichtbar auszugeben ist richtig, sie zu markupen nicht.
 - **`llms.txt`** — Serverlog-Studie über 900 Domains (Sept 2025 – Apr 2026): 1.227 Abrufe, davon null von GPTBot, ClaudeBot, PerplexityBot oder Google-Extended. Google ignoriert die Datei.
 
 **Zusätzlich melden (nicht ungefragt umsetzen):**
+
 - `site` fehlt in `astro.config.mjs` — solange, gibt es kein `og:url` und kein absolutes Canonical. Der Kommentar in `Base.astro` nennt das als bewusste Zwischenlösung.
 - 301-Weichen in `netlify.toml`: der Relaunch ändert `/praxisleistungen/veneers-berlin/` → `/leistungen/veneers`. Gilt für alle Leistungsseiten und die 18 Kiez-Seiten der alten Site. Eigener Task, aber **blockierend für den Livegang**.
 
@@ -272,12 +291,12 @@ Baumuster: so wie `Base.astro` die Website-Angaben über `loadSettings()` selbst
 
 **Zwei Wege, nicht austauschbar:**
 
-| | `Picture.astro` | `CmsImage.astro` |
-|---|---|---|
-| Quelle | `public/img/`, lokale Pipeline | Sanity CDN |
-| Aufruf | `name="lab-veneers"` | `source={feld}` |
-| Breiten | aus `lib/image-widths.json` | `widths={[…]}` |
-| Wofür | gestaltete Motive, Platzhalter, Rückfälle | alles Redaktionelle |
+|         | `Picture.astro`                           | `CmsImage.astro`    |
+| ------- | ----------------------------------------- | ------------------- |
+| Quelle  | `public/img/`, lokale Pipeline            | Sanity CDN          |
+| Aufruf  | `name="lab-veneers"`                      | `source={feld}`     |
+| Breiten | aus `lib/image-widths.json`               | `widths={[…]}`      |
+| Wofür   | gestaltete Motive, Platzhalter, Rückfälle | alles Redaktionelle |
 
 ⚠️ **`Picture.astro` wirft einen Build-Fehler bei unbekanntem Namen** — bewusst, mit Begründung im Kopfkommentar (ein `srcset` bot eine Breite an, die die Pipeline nie erzeugt hatte; 404, leere Stelle, ausgerechnet auf der Veneers-Seite).
 
@@ -288,16 +307,16 @@ Baumuster: so wie `Base.astro` die Website-Angaben über `loadSettings()` selbst
 
 **Belegung der neun Bildplätze:**
 
-| Abschnitt | Platzhalter | Anmerkung |
-|---|---|---|
-| Hero | CMS, Rückfall `portrait-hero` | `eager`, **LCP-Element** |
-| Abschleifen | `teeth-macro` | Ziel: Querschnittsgrafik als SVG in `public/svg/` — dann kein Pipeline-Lauf nötig |
-| Mock-up | `treatment-01` | Ziel: eigene Aufnahme |
-| Ablauf ×4 | `treatment-01/02/03`, `lab-veneers` | s. Warnung oben |
-| Vorher/Nachher | `teeth-macro` / `teeth-macro-after` | CMS, mit `consentConfirmed` |
-| Stimmen | `story-portrait-01/02` | vorhanden |
-| Warum wir | `lab-veneers`, `experten`, `praxis-03` | vorhanden |
-| Autorenbox | `person.image` | 48–64 px, rund |
+| Abschnitt      | Platzhalter                            | Anmerkung                                                                         |
+| -------------- | -------------------------------------- | --------------------------------------------------------------------------------- |
+| Hero           | CMS, Rückfall `portrait-hero`          | `eager`, **LCP-Element**                                                          |
+| Abschleifen    | `teeth-macro`                          | Ziel: Querschnittsgrafik als SVG in `public/svg/` — dann kein Pipeline-Lauf nötig |
+| Mock-up        | `treatment-01`                         | Ziel: eigene Aufnahme                                                             |
+| Ablauf ×4      | `treatment-01/02/03`, `lab-veneers`    | s. Warnung oben                                                                   |
+| Vorher/Nachher | `teeth-macro` / `teeth-macro-after`    | CMS, mit `consentConfirmed`                                                       |
+| Stimmen        | `story-portrait-01/02`                 | vorhanden                                                                         |
+| Warum wir      | `lab-veneers`, `experten`, `praxis-03` | vorhanden                                                                         |
+| Autorenbox     | `person.image`                         | 48–64 px, rund                                                                    |
 
 Alles unterhalb des Hero: `loading="lazy"`, `decoding="async"`.
 
@@ -307,30 +326,30 @@ Alles unterhalb des Hero: `loading="lazy"`, `decoding="async"`.
 
 Die Reihenfolge der Abschnitte in `Service.astro`. **B** = Baustein, ⚓ = im Dock.
 
-| # | Abschnitt | B | ⚓ |
-|---|---|---|---|
-| 00 | Hero | `ServiceHero` ✓ | |
-| 01 | Auf einen Blick | `QuickFacts` **neu** | |
-| 02 | Was sind Veneers | `Intro` ✓ | ⚓ |
-| 03 | Was Veneers kosten | `Prices` ✳ erweitern | ⚓ |
-| 04 | Arten im Vergleich | `Compare` ✳ anschließen | ⚓ |
-| 05 | Müssen Zähne abgeschliffen werden | `Prose` **neu** | ⚓ |
-| 06 | Das Mock-up | `Prose` **neu** | ⚓ |
-| 07 | Ablauf in vier Schritten | `Steps` ✓ | ⚓ |
-| 08 | CTA I | `CtaBand` **neu** | |
-| 09 | Haltung: wie hier gearbeitet wird | `Features` ✓ *Nummerierung raus* | |
-| 10 | Vorher & Nachher | `BeforeAfter` ✓ | ⚓ |
-| 11 | Haltbarkeit | `Prose` + `SourceNote` | ⚓ |
-| 12 | Nachteile, wann wir abraten | `Prose` | |
-| 13 | Krankenkasse, GOZ | `Prose` + `SourceNote` | ⚓ |
-| 14 | Veneers aus der Türkei | `Magazine` ✓ *funktioniert schon* | |
-| 15 | Alternativen-Matrix | `Compare` (2. Instanz) | ⚓ |
-| 16 | Patientenstimmen | `Stories` ✓ | |
-| 17 | Pflege im Alltag | `Prose` | |
-| 18 | Warum Mundpropaganda | `Split`/`Experts` ✓ prüfen | |
-| 19 | FAQ | `Faq` ✓ 4 → 12 Fragen | ⚓ |
-| 20 | Autorenbox | `AuthorNote` **neu** | |
-| 21 | Kontakt | `Contact` ✓ | |
+| #   | Abschnitt                         | B                                 | ⚓  |
+| --- | --------------------------------- | --------------------------------- | --- |
+| 00  | Hero                              | `ServiceHero` ✓                   |     |
+| 01  | Auf einen Blick                   | `QuickFacts` **neu**              |     |
+| 02  | Was sind Veneers                  | `Intro` ✓                         | ⚓  |
+| 03  | Was Veneers kosten                | `Prices` ✳ erweitern              | ⚓  |
+| 04  | Arten im Vergleich                | `Compare` ✳ anschließen           | ⚓  |
+| 05  | Müssen Zähne abgeschliffen werden | `Prose` **neu**                   | ⚓  |
+| 06  | Das Mock-up                       | `Prose` **neu**                   | ⚓  |
+| 07  | Ablauf in vier Schritten          | `Steps` ✓                         | ⚓  |
+| 08  | CTA I                             | `CtaBand` **neu**                 |     |
+| 09  | Haltung: wie hier gearbeitet wird | `Features` ✓ _Nummerierung raus_  |     |
+| 10  | Vorher & Nachher                  | `BeforeAfter` ✓                   | ⚓  |
+| 11  | Haltbarkeit                       | `Prose` + `SourceNote`            | ⚓  |
+| 12  | Nachteile, wann wir abraten       | `Prose`                           |     |
+| 13  | Krankenkasse, GOZ                 | `Prose` + `SourceNote`            | ⚓  |
+| 14  | Veneers aus der Türkei            | `Magazine` ✓ _funktioniert schon_ |     |
+| 15  | Alternativen-Matrix               | `Compare` (2. Instanz)            | ⚓  |
+| 16  | Patientenstimmen                  | `Stories` ✓                       |     |
+| 17  | Pflege im Alltag                  | `Prose`                           |     |
+| 18  | Warum Mundpropaganda              | `Split`/`Experts` ✓ prüfen        |     |
+| 19  | FAQ                               | `Faq` ✓ 4 → 12 Fragen             | ⚓  |
+| 20  | Autorenbox                        | `AuthorNote` **neu**              |     |
+| 21  | Kontakt                           | `Contact` ✓                       |     |
 
 **Zwölf bestehende Abschnitte, neun neue.** Zu 09: `steps` und `features` tragen heute beide eine nummerierte Schrittfolge — der Nutzer liest denselben Ablauf zweimal. `steps` bleibt der Ablauf, `features` verliert die Nummerierung und wird zu drei Haltungssätzen.
 
@@ -351,6 +370,7 @@ Drei Dinge lassen sich technisch erzwingen und sollten es:
 ## 9. Fertig ist es, wenn
 
 **Funktional**
+
 - [ ] Der Dock zeigt den aktuellen Abschnitt, klappt auf Hover (Desktop) und Tap (Touch) auf, schließt auf Escape, Klick außerhalb, Fokusverlust und Linkwahl
 - [ ] Ohne JavaScript bleibt eine funktionierende Sprungmarkenliste stehen
 - [ ] Der Dock blendet über dem Footer aus
@@ -360,26 +380,31 @@ Drei Dinge lassen sich technisch erzwingen und sollten es:
 - [ ] Redaktion kann in Sanity eine vollständige Seite anlegen, ohne Entwickler
 
 **Performance**
+
 - [ ] LCP < 2,5 s (Hero)
 - [ ] CLS < 0,1 — Dock und Bilder verschieben nichts
 - [ ] Kein JS-Bundle für nicht-interaktive Module
 - [ ] Nichts blitzt beim Laden auf (verborgene Startzustände in CSS)
 
 **A11y**
+
 - [ ] Tabellen mit `<th scope>` und `<caption>`
 - [ ] FAQ tastaturbedienbar, Antworten im initialen HTML auch zugeklappt
 - [ ] Dock mit ausreichendem Kontrast, blockiert keinen Fokus
 - [ ] `alt` als Pflichtfeld in Sanity
 
 **SEO**
+
 - [ ] JSON-LD validiert ohne Errors
 - [ ] Canonical vorhanden
 - [ ] Kein `FAQPage`, kein `AggregateRating`
 
 **Wiederverwendbarkeit**
+
 - [ ] Eine zweite Leistungsseite lässt sich ohne neuen Code anlegen. **Das ist der eigentliche Test.**
 
 **Prüfen mit**
+
 ```bash
 npm run web:check    # Typen + drei Breakpoints, und ob jede Bildadresse existiert
 npm run web:styles   # Computed-Style-Diff gegen Baseline

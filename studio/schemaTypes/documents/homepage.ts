@@ -101,14 +101,20 @@ export const homepage = defineType({
       group: "split",
       validation: (r) => r.required(),
     }),
-    defineField({ name: "splitImage", title: "Bild", type: "picture", group: "split" }),
+    defineField({
+      name: "splitImage",
+      title: "Bild",
+      type: "picture",
+      group: "split",
+    }),
 
     /* --- Leistungen ----------------------------------------------------- */
     defineField({
       name: "servicesTitle",
       title: "Überschrift",
       type: "string",
-      description: "Die Leistungen selbst kommen aus der Collection „Leistungen“ - hier steht nur der Rahmen.",
+      description:
+        "Die Leistungen selbst kommen aus der Collection „Leistungen“ - hier steht nur der Rahmen.",
       group: "services",
       validation: (r) => r.required(),
     }),
@@ -135,7 +141,12 @@ export const homepage = defineType({
           type: "object",
           name: "standard",
           fields: [
-            defineField({ name: "name", title: "Titel", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Titel",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
             /* Das Motiv gehört an den PUNKT, nicht an den Abschnitt: Die
                Zahnmaske rechts zeigt zu jedem Punkt ein anderes Bild und
@@ -144,9 +155,15 @@ export const homepage = defineType({
                Abschnitt. Das konnte der Baustein nicht bedienen — fünf Motive
                lassen sich nicht aus einem Feld speisen, und deshalb tat es
                nichts. Hier hängt es richtig. */
-            defineField({ name: "image", title: "Bild in der Zahnmaske", type: "picture" }),
+            defineField({
+              name: "image",
+              title: "Bild in der Zahnmaske",
+              type: "picture",
+            }),
           ],
-          preview: { select: { title: "name", subtitle: "text", media: "image" } },
+          preview: {
+            select: { title: "name", subtitle: "text", media: "image" },
+          },
         }),
       ],
       /* Klasse 1: Die Punkte SIND der Abschnitt. Ohne sie bliebe eine
@@ -159,7 +176,8 @@ export const homepage = defineType({
       name: "locationsTitle",
       title: "Überschrift",
       type: "string",
-      description: "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Footer.",
+      description:
+        "Die Adressen selbst stehen in den Einstellungen - sie gelten auch im Footer.",
       group: "locations",
       validation: (r) => r.required(),
     }),
@@ -175,17 +193,26 @@ export const homepage = defineType({
           type: "object",
           name: "ringBild",
           fields: [
-            defineField({ name: "image", title: "Bild", type: "picture", validation: (r) => r.required() }),
+            defineField({
+              name: "image",
+              title: "Bild",
+              type: "picture",
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: "caption",
               title: "Beschriftung",
               type: "string",
-              description: "Die Pille im Bild, z. B. der Standortname. Leer lassen für keine.",
+              description:
+                "Die Pille im Bild, z. B. der Standortname. Leer lassen für keine.",
             }),
           ],
           preview: {
             select: { title: "caption", media: "image" },
-            prepare: ({ title, media }) => ({ title: title || "ohne Beschriftung", media }),
+            prepare: ({ title, media }) => ({
+              title: title || "ohne Beschriftung",
+              media,
+            }),
           },
         }),
       ],
@@ -193,7 +220,13 @@ export const homepage = defineType({
 
     /* --- Team ----------------------------------------------------------- */
     ...heading("experts", false),
-    defineField({ name: "expertsNames", title: "Namenszeile", type: "string", group: "experts", validation: (r) => r.required() }),
+    defineField({
+      name: "expertsNames",
+      title: "Namenszeile",
+      type: "string",
+      group: "experts",
+      validation: (r) => r.required(),
+    }),
     /* Vorher `expertenText`, ein einzelnes Textfeld — und ebenfalls tot: Die
        Seite reichte es nie durch, `Experts.astro` erwartet ZWEI Absätze und
        hatte sie als Vorgabe im Frontmatter stehen. Jetzt als Array wie
@@ -207,25 +240,43 @@ export const homepage = defineType({
       group: "experts",
       validation: (r) => r.required(),
     }),
-    defineField({ name: "expertsImage", title: "Bild", type: "picture", group: "experts" }),
+    defineField({
+      name: "expertsImage",
+      title: "Bild",
+      type: "picture",
+      group: "experts",
+    }),
 
     /* --- Geschichten ---------------------------------------------------- */
     defineField({
       name: "storiesItems",
       title: "Geschichten",
       type: "array",
-      description: "Bild, Name und Zitat gehören zusammen - sie wechseln gemeinsam.",
+      description:
+        "Bild, Name und Zitat gehören zusammen - sie wechseln gemeinsam.",
       group: "stories",
       of: [
         defineArrayMember({
           type: "object",
           name: "story",
           fields: [
-            defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
+            defineField({
+              name: "name",
+              title: "Name",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
             defineField({ name: "image", title: "Bild", type: "picture" }),
-            defineField({ name: "quote", title: "Zitat", type: "text", rows: 6 }),
+            defineField({
+              name: "quote",
+              title: "Zitat",
+              type: "text",
+              rows: 6,
+            }),
           ],
-          preview: { select: { title: "name", subtitle: "quote", media: "image" } },
+          preview: {
+            select: { title: "name", subtitle: "quote", media: "image" },
+          },
         }),
       ],
       /* Klasse 1. Der Abschnitt ist ein Kartenfächer mit gekoppeltem
@@ -243,20 +294,40 @@ export const homepage = defineType({
       name: "storiesAction",
       title: "Knopf unter den Geschichten",
       type: "link",
-      description: "Leer lassen, wenn es nichts weiterzulesen gibt - dann steht dort kein Knopf.",
+      description:
+        "Leer lassen, wenn es nichts weiterzulesen gibt - dann steht dort kein Knopf.",
       group: "stories",
     }),
 
     /* --- Magazin -------------------------------------------------------- */
     ...heading("magazine"),
-    defineField({ name: "magazineText", title: "Zusatzzeile", type: "text", rows: 3, group: "magazine", validation: (r) => r.required() }),
+    defineField({
+      name: "magazineText",
+      title: "Zusatzzeile",
+      type: "text",
+      rows: 3,
+      group: "magazine",
+      validation: (r) => r.required(),
+    }),
 
     /* --- Fragen --------------------------------------------------------- */
-    defineField({ name: "faqTitle", title: "Überschrift", type: "string", group: "faq", validation: (r) => r.required() }),
+    defineField({
+      name: "faqTitle",
+      title: "Überschrift",
+      type: "string",
+      group: "faq",
+      validation: (r) => r.required(),
+    }),
     /* Klasse 2: Die Zusatzzeile unter der Überschrift darf fehlen. Dann steht
        sie nicht da — `Panel.astro` rendert den Absatz nur, wenn Text kommt.
        Kein Ersatztext. */
-    defineField({ name: "faqText", title: "Zusatzzeile", type: "text", rows: 2, group: "faq" }),
+    defineField({
+      name: "faqText",
+      title: "Zusatzzeile",
+      type: "text",
+      rows: 2,
+      group: "faq",
+    }),
     defineField({
       name: "faq",
       title: "Fragen",
@@ -270,15 +341,30 @@ export const homepage = defineType({
           type: "object",
           name: "questionAnswer",
           fields: [
-            defineField({ name: "question", title: "Frage", type: "string", validation: (r) => r.required() }),
-            defineField({ name: "answer", title: "Antwort", type: "text", rows: 4 }),
+            defineField({
+              name: "question",
+              title: "Frage",
+              type: "string",
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "answer",
+              title: "Antwort",
+              type: "text",
+              rows: 4,
+            }),
           ],
           preview: { select: { title: "question" } },
         }),
       ],
     }),
 
-    defineField({ name: "seo", title: "Suchmaschine", type: "seo", group: "seo" }),
+    defineField({
+      name: "seo",
+      title: "Suchmaschine",
+      type: "seo",
+      group: "seo",
+    }),
   ],
 
   preview: { prepare: () => ({ title: "Startseite", subtitle: "/" }) },

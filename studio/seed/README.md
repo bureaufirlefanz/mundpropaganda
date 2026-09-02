@@ -25,14 +25,14 @@ Single pages first, then the collections, the frame last.
 
 ## Why they are split
 
-| File | Contents | Import | Reason |
-|---|---|---|---|
-| `services.ndjson` | 11 services, base data only | `--missing` | `service-veneers` is fully edited. `--replace` would overwrite its content with title and slug, without asking. |
-| `magazine.ndjson` | magazine intro and 6 posts | `--missing` | Once someone edits a post, a re-import should not reset it. |
-| `legal.ndjson` | imprint, privacy, accessibility | `--missing` | Once someone completes the legally binding details, a re-import must not put "Noch zu ergänzen" back. |
-| `careers.ndjson` | careers page and 4 jobs | `--replace` | The page is a singleton; the jobs should hold exactly this state as long as nobody has edited them. |
-| `chrome.ndjson` | navigation and footer | `--replace` | Two singletons that should hold exactly this state. |
-| `pages.ndjson` | settings, homepage | `--replace` | Both should hold exactly this state. |
+| File              | Contents                        | Import      | Reason                                                                                                          |
+| ----------------- | ------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `services.ndjson` | 11 services, base data only     | `--missing` | `service-veneers` is fully edited. `--replace` would overwrite its content with title and slug, without asking. |
+| `magazine.ndjson` | magazine intro and 6 posts      | `--missing` | Once someone edits a post, a re-import should not reset it.                                                     |
+| `legal.ndjson`    | imprint, privacy, accessibility | `--missing` | Once someone completes the legally binding details, a re-import must not put "Noch zu ergänzen" back.           |
+| `careers.ndjson`  | careers page and 4 jobs         | `--replace` | The page is a singleton; the jobs should hold exactly this state as long as nobody has edited them.             |
+| `chrome.ndjson`   | navigation and footer           | `--replace` | Two singletons that should hold exactly this state.                                                             |
+| `pages.ndjson`    | settings, homepage              | `--replace` | Both should hold exactly this state.                                                                            |
 
 The IDs are fixed (`service-<slug>`, `settings`, `homepage`), so the operation
 is repeatable. Without fixed IDs Sanity would assign random ones and every

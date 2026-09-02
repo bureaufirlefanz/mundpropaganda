@@ -16,7 +16,10 @@ import { loadLegalPage, loadLegalPages } from "../lib/legal-pages";
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
 export async function getStaticPaths() {
   const pages = await loadLegalPages();
-  return pages.map((t) => ({ params: { slug: t.slug }, props: { title: t.title } }));
+  return pages.map((t) => ({
+    params: { slug: t.slug },
+    props: { title: t.title },
+  }));
 }
 
 const { slug } = Astro.params;

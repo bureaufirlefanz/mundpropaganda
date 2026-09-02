@@ -25,7 +25,9 @@ const { posts } = Astro.props;
    in der sie zuerst auftauchen, also nach Datum. Eine feste Reihenfolge aus
    dem Schema abzuschreiben wäre die zweite Stelle, an der dieselbe Liste
    steht. */
-const categories = [...new Set(posts.map((b) => b.category).filter(Boolean))] as string[];
+const categories = [
+  ...new Set(posts.map((b) => b.category).filter(Boolean)),
+] as string[];
 ---
 
 <section class="container s-postlist">
@@ -34,15 +36,17 @@ const categories = [...new Set(posts.map((b) => b.category).filter(Boolean))] as
   </div>
 
   <div class="s-postlist__grid" data-reveal-stagger="0.06">
-    {posts.map((p, i) => (
-      <PostKarte
-        post={p}
-        sizes="(max-width: 700px) 100vw, 30vw"
-        withButton
-        headingLevel="h2"
-        data-reveal-child
-      />
-    ))}
+    {
+      posts.map((p, i) => (
+        <PostKarte
+          post={p}
+          sizes="(max-width: 700px) 100vw, 30vw"
+          withButton
+          headingLevel="h2"
+          data-reveal-child
+        />
+      ))
+    }
   </div>
 </section>
 

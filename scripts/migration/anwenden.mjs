@@ -19,7 +19,15 @@ const ENDUNGEN = new Set([".ts", ".tsx", ".astro", ".js", ".mjs", ".json"]);
    Skript hat seine eigene Zuordnungsdatei umgeschrieben — aus
    `"lib/magazin.ts": "lib/magazin.ts"` wurde
    `"lib/magazin.ts": "lib/magazin.ts"`. */
-const AUS = ["node_modules", "dist", ".astro/", ".netlify", ".git/", "sanity.types.ts", "scripts/migration"];
+const AUS = [
+  "node_modules",
+  "dist",
+  ".astro/",
+  ".netlify",
+  ".git/",
+  "sanity.types.ts",
+  "scripts/migration",
+];
 
 async function alle(o) {
   const r = [];
@@ -35,19 +43,45 @@ async function alle(o) {
 /** Zerlegt Quelltext in Code- und Nicht-Code-Stücke. */
 function stuecke(s) {
   const out = [];
-  let i = 0, start = 0;
-  const schiebe = (bis, code) => { if (bis > start) out.push([s.slice(start, bis), code]); };
+  let i = 0,
+    start = 0;
+  const schiebe = (bis, code) => {
+    if (bis > start) out.push([s.slice(start, bis), code]);
+  };
   while (i < s.length) {
-    const c = s[i], n = s[i + 1];
-    if (c === "/" && n === "/") { schiebe(i, true); const e = s.indexOf("\n", i); const bis = e === -1 ? s.length : e; out.push([s.slice(i, bis), false]); i = start = bis; continue; }
-    if (c === "/" && n === "*") { schiebe(i, true); const e = s.indexOf("*/", i + 2); const bis = e === -1 ? s.length : e + 2; out.push([s.slice(i, bis), false]); i = start = bis; continue; }
+    const c = s[i],
+      n = s[i + 1];
+    if (c === "/" && n === "/") {
+      schiebe(i, true);
+      const e = s.indexOf("\n", i);
+      const bis = e === -1 ? s.length : e;
+      out.push([s.slice(i, bis), false]);
+      i = start = bis;
+      continue;
+    }
+    if (c === "/" && n === "*") {
+      schiebe(i, true);
+      const e = s.indexOf("*/", i + 2);
+      const bis = e === -1 ? s.length : e + 2;
+      out.push([s.slice(i, bis), false]);
+      i = start = bis;
+      continue;
+    }
     if (c === '"' || c === "'" || c === "`") {
       schiebe(i, true);
       let j = i + 1;
-      while (j < s.length) { if (s[j] === "\\") { j += 2; continue; } if (s[j] === c) break; j++; }
+      while (j < s.length) {
+        if (s[j] === "\\") {
+          j += 2;
+          continue;
+        }
+        if (s[j] === c) break;
+        j++;
+      }
       const bis = Math.min(j + 1, s.length);
       out.push([s.slice(i, bis), false]);
-      i = start = bis; continue;
+      i = start = bis;
+      continue;
     }
     i++;
   }
@@ -77,7 +111,9 @@ for (const [alt, neu] of Object.entries(DATEIEN)) {
   const nurName = (p) => {
     const base = p.split("/").pop();
     const ext = extname(base);
-    return ext === ".astro" || ext === ".json" ? base : base.slice(0, -ext.length);
+    return ext === ".astro" || ext === ".json"
+      ? base
+      : base.slice(0, -ext.length);
   };
   /* Nur als relativer Import (`./name`, `../name`), nicht als beliebiges
      Pfadstück. Ohne diese Einschränkung traf `magazin` auch die ADRESSE
@@ -90,10 +126,16 @@ for (const [alt, neu] of Object.entries(DATEIEN)) {
 PFADE.sort((a, b) => b[0].length - a[0].length);
 RELATIV.sort((a, b) => b[0].length - a[0].length);
 
-const WORTE = Object.entries(BEZEICHNER).sort((a, b) => b[0].length - a[0].length);
+const WORTE = Object.entries(BEZEICHNER).sort(
+  (a, b) => b[0].length - a[0].length,
+);
 
 let dateienGeaendert = 0;
-for (const file of [...(await alle("web/src")), ...(await alle("studio")), ...(await alle("scripts"))]) {
+for (const file of [
+  ...(await alle("web/src")),
+  ...(await alle("studio")),
+  ...(await alle("scripts")),
+]) {
   const vor = await readFile(file, "utf8");
   let s = "";
   for (const [teil, istCode] of stuecke(vor)) {
@@ -105,10 +147,16 @@ for (const file of [...(await alle("web/src")), ...(await alle("studio")), ...(a
          `magazinee` daraus, beim dritten `magazineee`. Ein Migrationsschritt
          muss man zweimal laufen lassen können. */
       for (const [a, b] of PFADE) {
-        t = t.replace(new RegExp(`(^|[./"'\`])${esc(a)}(?![\\w-])`, "g"), `$1${b}`);
+        t = t.replace(
+          new RegExp(`(^|[./"'\`])${esc(a)}(?![\\w-])`, "g"),
+          `$1${b}`,
+        );
       }
       for (const [a, b] of RELATIV) {
-        t = t.replace(new RegExp(`(\\.{1,2}/)${esc(a)}(?![\\w-])`, "g"), `$1${b}`);
+        t = t.replace(
+          new RegExp(`(\\.{1,2}/)${esc(a)}(?![\\w-])`, "g"),
+          `$1${b}`,
+        );
       }
 
       /* `${…}` in einem Template-Literal ist Code, keine Zeichenkette. Ohne
@@ -117,7 +165,8 @@ for (const file of [...(await alle("web/src")), ...(await alle("studio")), ...(a
       if (teil.startsWith("`")) {
         t = t.replace(/\$\{([^{}]*)\}/g, (ganz, inneres) => {
           let k = inneres;
-          for (const [a, b] of WORTE) k = k.replace(new RegExp(`\\b${esc(a)}\\b`, "g"), b);
+          for (const [a, b] of WORTE)
+            k = k.replace(new RegExp(`\\b${esc(a)}\\b`, "g"), b);
           return "${" + k + "}";
         });
       }
@@ -125,9 +174,13 @@ for (const file of [...(await alle("web/src")), ...(await alle("studio")), ...(a
       continue;
     }
     let t = teil;
-    for (const [a, b] of WORTE) t = t.replace(new RegExp(`\\b${esc(a)}\\b`, "g"), b);
+    for (const [a, b] of WORTE)
+      t = t.replace(new RegExp(`\\b${esc(a)}\\b`, "g"), b);
     s += t;
   }
-  if (s !== vor) { await writeFile(file, s, "utf8"); dateienGeaendert++; }
+  if (s !== vor) {
+    await writeFile(file, s, "utf8");
+    dateienGeaendert++;
+  }
 }
 console.log(`${dateienGeaendert} Dateien inhaltlich angepasst`);

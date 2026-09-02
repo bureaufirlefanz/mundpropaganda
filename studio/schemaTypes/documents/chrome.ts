@@ -21,7 +21,12 @@ const spalte = defineArrayMember({
   type: "object",
   name: "column",
   fields: [
-    defineField({ name: "title", title: "Überschrift", type: "string", validation: (r) => r.required() }),
+    defineField({
+      name: "title",
+      title: "Überschrift",
+      type: "string",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "links",
       title: "Verweise",
@@ -73,7 +78,12 @@ export const navigation = defineType({
     }),
   ],
 
-  preview: { prepare: () => ({ title: "Navigation", subtitle: "Leiste und großes Menü" }) },
+  preview: {
+    prepare: () => ({
+      title: "Navigation",
+      subtitle: "Leiste und großes Menü",
+    }),
+  },
 });
 
 export const footer = defineType({
@@ -117,9 +127,12 @@ export const footer = defineType({
       name: "copyright",
       title: "Zeile neben der Jahreszahl",
       type: "string",
-      description: "Die Jahreszahl setzt die Seite selbst - sie ist immer das laufende Jahr.",
+      description:
+        "Die Jahreszahl setzt die Seite selbst - sie ist immer das laufende Jahr.",
     }),
   ],
 
-  preview: { prepare: () => ({ title: "Footer", subtitle: "Spalten und Rechtliches" }) },
+  preview: {
+    prepare: () => ({ title: "Footer", subtitle: "Spalten und Rechtliches" }),
+  },
 });

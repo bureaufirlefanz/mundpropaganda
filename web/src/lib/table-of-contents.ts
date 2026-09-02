@@ -121,13 +121,15 @@ function uniqueId(text: string, taken: Map<string, number>): string {
  * von Sanity, weil die Abschnitte nicht alle aus einem Array kommen.
  */
 export function headingsFromSections(
-  sections: (string | { heading?: string | null } | null | undefined)[]
+  sections: (string | { heading?: string | null } | null | undefined)[],
 ): Heading[] {
   const taken = new Map<string, number>();
   const headings: Heading[] = [];
 
   for (const [i, entry] of sections.entries()) {
-    const text = (typeof entry === "string" ? entry : entry?.heading ?? "").trim();
+    const text = (
+      typeof entry === "string" ? entry : (entry?.heading ?? "")
+    ).trim();
     if (!text) continue;
 
     headings.push({
@@ -153,7 +155,10 @@ export function headingsFromSections(
  * gelesen, und ein Feld, das beim Rendern hineinwächst, ist die Sorte
  * Nebenwirkung, die man drei Bausteine später sucht.
  */
-export function withHeadingIds(blocks: unknown, headings: Heading[]): PortableTextBlock[] {
+export function withHeadingIds(
+  blocks: unknown,
+  headings: Heading[],
+): PortableTextBlock[] {
   if (!Array.isArray(blocks)) return [];
   const karte = new Map(headings.map((m) => [m.key, m.id]));
   return blocks.map((block) => {

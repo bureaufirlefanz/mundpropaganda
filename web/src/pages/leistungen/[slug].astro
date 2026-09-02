@@ -36,4 +36,10 @@ const { storiesItems } = await loadHomepage();
 const posts = await loadPosts(slug!);
 ---
 
-<Service data={data} title={title} slug={slug!} stories={storiesItems} posts={posts} />
+<Service
+  data={data}
+  title={title}
+  slug={slug!}
+  stories={storiesItems}
+  posts={posts}
+/>

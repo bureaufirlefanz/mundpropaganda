@@ -22,7 +22,8 @@ import { starteBrowser, erwarteServer } from "./lib/chrome.mjs";
 import { mkdir } from "node:fs/promises";
 
 const BASIS = process.env.MP_BASIS || "http://localhost:4321";
-const [path = "/", wahl = "body", breite = "1728", ...rest] = process.argv.slice(2);
+const [path = "/", wahl = "body", breite = "1728", ...rest] =
+  process.argv.slice(2);
 const VOLL = rest.includes("--voll");
 const ORDNER = "/tmp/blick";
 
@@ -50,7 +51,9 @@ await seite.evaluate(() => document.fonts.ready);
    der gesuchte Abschnitt noch auf Opazität 0 und die Aufnahme ist leer. */
 await seite.evaluate(async () => {
   const springe = (y) =>
-    window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+    window.__lenis
+      ? window.__lenis.scrollTo(y, { immediate: true })
+      : scrollTo(0, y);
   for (let y = 0; y < document.body.scrollHeight; y += innerHeight * 0.5) {
     springe(y);
     await new Promise((r) => setTimeout(r, 90));
@@ -64,7 +67,8 @@ await new Promise((r) => setTimeout(r, 900));
    Übergangsvorhang, der nach dem Laden liegenbleibt. */
 await seite.evaluate(() => {
   const stil = document.createElement("style");
-  stil.textContent = ".c-nav, .c-transition, astro-dev-toolbar { display: none !important; }";
+  stil.textContent =
+    ".c-nav, .c-transition, astro-dev-toolbar { display: none !important; }";
   document.head.appendChild(stil);
 });
 
@@ -87,10 +91,17 @@ if (VOLL) {
 } else {
   await seite.screenshot({
     path: file,
-    clip: { x: kasten.x, y: kasten.y, width: kasten.width, height: Math.min(kasten.height, 2400) },
+    clip: {
+      x: kasten.x,
+      y: kasten.y,
+      width: kasten.width,
+      height: Math.min(kasten.height, 2400),
+    },
   });
 }
 
-console.log(`${file}  (${Math.round(kasten.width)}×${Math.round(kasten.height)} CSS-px)`);
+console.log(
+  `${file}  (${Math.round(kasten.width)}×${Math.round(kasten.height)} CSS-px)`,
+);
 await browser.close();
 process.exit(0);
