@@ -20,6 +20,7 @@ import Backdrop from "../components/ui/Backdrop.astro";
 import Transition from "../components/ui/Transition.astro";
 import Nav from "../components/ui/Nav.astro";
 import Footer from "../components/ui/Footer.astro";
+import StructuredData from "../components/ui/StructuredData.astro";
 import { ClientRouter } from "astro:transitions";
 import { loadSettings } from "../lib/settings";
 
@@ -76,6 +77,13 @@ const shareImage = image || website.shareImageUrl;
    Website, das SEO-Feld sperrt eine einzelne Seite. Beides zusammen mit ODER,
    weil „nicht indexieren" die stärkere Aussage ist. */
 const blockIndexing = noIndex || !website.searchEngines;
+
+/* Startseite und Praxisseite beschreiben die Praxis, alle anderen eine
+   Behandlung, einen Beitrag oder eine Stelle. Am Pfad festgemacht und nicht
+   über eine Prop: Sonst müsste jede der elf Vorlagen daran denken, und zehn
+   könnten es vergessen. */
+const pfad = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const zeigtPraxisdaten = pfad === "/" || pfad === "/praxis";
 ---
 
 <!doctype html>
@@ -214,6 +222,14 @@ const blockIndexing = noIndex || !website.searchEngines;
          Dokuments aus, statt die Seite neu zu laden. */
     }
     <ClientRouter />
+
+    {
+      /* Die Praxis als strukturierte Daten — nur dort, wo die Seite von ihr
+         handelt. Auf jeder Leistungsseite dieselbe Anschrift zu wiederholen
+         bringt nichts und macht jede Seite größer. Die Begründung im Einzelnen
+         steht im Baustein. */
+      zeigtPraxisdaten && <StructuredData />
+    }
   </head>
 
   <body>

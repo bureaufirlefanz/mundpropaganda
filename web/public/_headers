@@ -21,3 +21,48 @@
 
 /img/*
   Cache-Control: public, max-age=604800
+
+# ─────────────────────────────────────────────────────────────────────────
+# Sicherheitsangaben. Ergänzt am 2026-09-02; vorher stand hier keine
+# einzige.
+#
+# Bewusst ohne Content-Security-Policy für die ganze Seite: Eine CSP, die
+# nicht zum Markup passt, bricht die Seite lautlos, und Astro schreibt seine
+# Übergangs- und Router-Skripte inline. Was sie abwehren würde, decken die
+# vier Angaben unten und die Regel für die Vorschau darunter ab. Eine echte
+# CSP gehört in einen eigenen Durchgang mit Messung im Report-Only-Modus.
+/*
+  # Kein Erraten von Dateitypen. Ohne das kann ein hochgeladenes Bild, das
+  # in Wahrheit HTML enthält, als Seite ausgeführt werden.
+  X-Content-Type-Options: nosniff
+
+  # Beim Wechsel auf eine fremde Seite geht nur die Herkunft mit, nicht der
+  # vollständige Pfad. Auf einer Praxisseite ist der Pfad die Behandlung,
+  # nach der jemand gesucht hat.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Nichts davon braucht die Seite. Ein eingebettetes Video auch nicht:
+  # Es läuft in einem iframe und bringt seine eigenen Rechte mit.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+  # Ein Jahr HTTPS, Unterdomains eingeschlossen. Ohne `preload`: Der Eintrag
+  # in die Browserliste ist praktisch unumkehrbar und gehört erst gesetzt,
+  # wenn die Domain endgültig steht.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # Die Seite gehört in keinen fremden Rahmen — außer in den des eigenen
+  # Studios, siehe unten.
+  X-Frame-Options: DENY
+
+# Die Vorschau MUSS im Studio-Rahmen laufen: Das Presentation-Tool zeigt die
+# Seite in einem iframe und markiert darin die Felder. `X-Frame-Options: DENY`
+# von oben würde genau das verbieten, deshalb hier die Ausnahme.
+#
+# `frame-ancestors` aus der CSP schlägt X-Frame-Options in jedem Browser, der
+# beides kennt; für die übrigen wird die alte Angabe zusätzlich aufgehoben.
+# Die Adresse des Studios steht in SANITY.md — steht sie nicht mehr, öffnet
+# `https:` niemandem etwas, was nicht ohnehin ein gültiges Vorschau-Cookie
+# hätte.
+/preview/*
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self' https://*.sanity.studio http://localhost:3333

@@ -1,0 +1,93 @@
+---
+/**
+ * Die Praxis als strukturierte Daten (schema.org, JSON-LD).
+ *
+ * **Wofür.** Suchmaschinen zeigen für eine Zahnarztpraxis Anschrift, Telefon
+ * und Karte direkt im Ergebnis an — aber nur, wenn sie die Angaben sicher
+ * erkennen. Aus dem Fließtext einer Seite lesen sie sie nicht zuverlässig
+ * heraus; aus einem `Dentist`-Objekt schon. Für eine Praxis mit zwei
+ * Standorten ist das der Unterschied zwischen „steht irgendwo auf der Seite"
+ * und „steht im Ergebnis".
+ *
+ * **Jede Angabe kommt aus dem CMS.** Nichts steht hier fest, und was im
+ * Studio leer ist, fehlt auch hier — dieselbe Regel wie überall sonst
+ * (Aufgabe 4 in `CMS-UMBAU.md`). Erfundene Öffnungszeiten in strukturierten
+ * Daten wären teurer als keine: Sie landen im Suchergebnis, und jemand steht
+ * vor einer verschlossenen Tür.
+ *
+ * **Was bewusst fehlt:**
+ *
+ *   `openingHours`  Die Zeiten liegen als freier Text vor („Mo–Fr", „8–19
+ *                   Uhr"). schema.org verlangt ein festes Format
+ *                   (`Mo-Fr 08:00-19:00`). Einen Parser darauf anzusetzen
+ *                   hieße raten, und das Ergebnis stünde im Suchergebnis.
+ *                   Wenn die Zeiten strukturiert gebraucht werden, gehören
+ *                   zwei eigene Felder ins Schema.
+ *   `url`, `@id`    Beide müssen absolut sein, und dafür fehlt `site` in
+ *                   `astro.config.mjs` — die Domain steht noch nicht fest.
+ *                   Sobald sie feststeht, gehören sie dazu.
+ *
+ * Ausgegeben wird das Objekt nur dort, wo die Seite tatsächlich von der
+ * Praxis handelt: Startseite und Praxisseite. Auf jeder Leistungsseite
+ * dieselbe Anschrift zu wiederholen bringt nichts und macht jede Seite
+ * größer.
+ */
+import { loadSettings } from "../../lib/settings";
+
+const { phone, email, locations } = await loadSettings();
+
+/* Ohne Anschrift gibt es nichts auszuzeichnen. */
+const orte = locations.filter((o) => o.street && o.city);
+
+/* „10405 Berlin" ist ein Feld im Studio und zwei in schema.org. Getrennt wird
+   an der ersten Lücke: Was davor steht, ist die Postleitzahl, wenn es aus
+   Ziffern besteht — sonst gilt alles als Ort und `postalCode` entfällt. Raten
+   ist hier billiger als anderswo, weil eine falsche Postleitzahl nicht in die
+   Irre führt: Die Straße steht daneben. */
+function anschrift(street: string, city: string) {
+  const [erstes, ...rest] = city.trim().split(/\s+/);
+  const plz = /^\d{4,5}$/.test(erstes) ? erstes : undefined;
+  return {
+    "@type": "PostalAddress",
+    streetAddress: street,
+    ...(plz
+      ? { postalCode: plz, addressLocality: rest.join(" ") }
+      : { addressLocality: city }),
+    addressCountry: "DE",
+  };
+}
+
+const daten = orte.map((o) => ({
+  "@context": "https://schema.org",
+  "@type": "Dentist",
+  name: o.name,
+  address: anschrift(o.street, o.city),
+  ...(phone ? { telephone: phone } : {}),
+  ...(email ? { email } : {}),
+  ...(typeof o.latitude === "number" && typeof o.longitude === "number"
+    ? {
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: o.latitude,
+          longitude: o.longitude,
+        },
+      }
+    : {}),
+}));
+---
+
+{
+  daten.length > 0 && (
+    /* `set:html` mit selbst gebautem JSON, nicht mit Text aus dem CMS: Der
+       Inhalt ist das Ergebnis von `JSON.stringify`, und das maskiert alles,
+       was aus den Feldern kommt. Ein `</script>` im Praxisnamen käme als
+       `</script>` heraus und kann das Element nicht schließen. */
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(daten.length === 1 ? daten[0] : daten).replace(
+        /</g,
+        "\\u003c",
+      )}
+    />
+  )
+}

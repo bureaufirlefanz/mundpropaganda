@@ -1,0 +1,131 @@
+---
+/**
+ * Die Seite, die es nicht gibt.
+ *
+ * **Warum es sie braucht.** `praxis/[slug].astro` ruft `Astro.rewrite("/404")`
+ * für den Fall auf, dass zu einem Slug kein Dokument existiert — und diese
+ * Route gab es nicht. Der Aufruf lief also ins Leere, und Netlify lieferte
+ * seine eigene Standardseite aus: weiße Fläche, englischer Text, kein Weg
+ * zurück. Wer einen alten Link aus einer Mail anklickt, landet dort und
+ * schließt den Tab.
+ *
+ * **Was sie zeigt.** Einen Satz und Wege weiter. Keine Entschuldigung, keine
+ * Zeichnung, kein Witz: Die Adresse stimmt nicht, das ist alles — und die
+ * Frage, die jetzt zählt, ist „wo finde ich, was ich gesucht habe".
+ *
+ * Die Leistungen kommen aus der Collection und nicht aus einer Liste hier.
+ * Sonst wäre dies die fünfte Stelle mit denselben elf Namen, und die
+ * vergisst man beim Umbenennen.
+ *
+ * `noIndex`: Eine Fehlerseite gehört nicht in den Suchindex. Netlify liefert
+ * sie mit Status 404 aus, aber ein Crawler, der sie über einen Link findet,
+ * soll sie auch dann nicht aufnehmen.
+ */
+import Base from "../layouts/Base.astro";
+import Button from "../components/ui/Button.astro";
+import { loadServiceList, forTable } from "../lib/service-list";
+
+const services = forTable(await loadServiceList()).slice(0, 6);
+---
+
+<Base
+  title="Seite nicht gefunden - Mundpropaganda"
+  description="Diese Adresse gibt es nicht. Hier geht es zurück zur Startseite und zu den Leistungen."
+  noIndex
+>
+  <section class="s-notfound container">
+    <p class="c-topline">Fehler 404</p>
+    <h1 class="s-notfound__title" data-split="lines">
+      Diese Seite gibt es nicht
+    </h1>
+    <p class="s-notfound__text" data-reveal="up">
+      Vielleicht hat sich die Adresse geändert, vielleicht ein Tippfehler.
+      Beides ist schnell behoben.
+    </p>
+
+    <div class="s-notfound__actions" data-reveal="up" data-reveal-delay="0.1">
+      <Button label="Zur Startseite" href="/" />
+    </div>
+
+    {
+      services.length > 0 && (
+        <nav class="s-notfound__services" aria-label="Leistungen">
+          <p class="s-notfound__label">Häufig gesucht</p>
+          <ul class="s-notfound__list">
+            {services.map((s) => (
+              <li>
+                <a class="s-notfound__link" href={`/leistungen/${s.slug}`}>
+                  {s.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  /* Reichlich Luft oben: Die Seite hat keinen Kopfbereich, und ohne den
+     Abstand klebte die Überschrift unter der Navigationsleiste. */
+  .s-notfound {
+    padding-block: calc(var(--nav-height) + var(--flow-lg)) var(--section-space);
+  }
+
+  .s-notfound__title {
+    max-width: 20ch;
+    margin-top: var(--sp-4);
+    font-size: var(--fs-h1);
+    font-weight: 400;
+    line-height: var(--lh-title);
+    letter-spacing: var(--tracking-snug);
+  }
+
+  .s-notfound__text {
+    max-width: 46ch;
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: var(--lh-text);
+    color: var(--c-text-muted);
+  }
+
+  .s-notfound__actions {
+    margin-top: var(--flow-sm);
+  }
+
+  .s-notfound__services {
+    margin-top: var(--flow-lg);
+    padding-top: var(--sp-5);
+    border-top: var(--bw) solid var(--c-line);
+  }
+
+  .s-notfound__label {
+    font-family: var(--f-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+
+  .s-notfound__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3) var(--sp-5);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .s-notfound__link {
+    font-size: var(--fs-text-main);
+    color: inherit;
+  }
+
+  @media (max-width: 700px) {
+    .s-notfound {
+      padding-block: calc(var(--nav-height) + var(--flow-sm))
+        var(--section-space-sm);
+    }
+  }
+</style>
