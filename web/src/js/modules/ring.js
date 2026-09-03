@@ -248,9 +248,9 @@ function buildRing(root) {
   stage.addEventListener("pointerenter", () => rampSpeed(0, 0.7));
   stage.addEventListener("pointerleave", () => rampSpeed(1, 1.1));
 
-  /* --- Tasten und Knöpfe ------------------------------------------------
+  /* --- Tasten und Buttons ------------------------------------------------
      Ziehen ist eine Zugabe für die Maus. Bedienbar muss der Ring auch mit
-     der Tastatur sein — dafür die beiden Knöpfe und die Pfeiltasten. */
+     der Tastatur sein — dafür die beiden Buttons und die Pfeiltasten. */
 
   const turn = (direction) => {
     momentum = 0;

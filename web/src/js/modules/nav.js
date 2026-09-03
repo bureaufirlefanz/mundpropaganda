@@ -115,9 +115,9 @@ export function initNav() {
 
   /**
    * Das mobile Panel auf oder zu — an einer Stelle, weil es drei Auslöser
-   * gibt: der Knopf, die Escape-Taste und ein Klick auf einen Verweis darin.
+   * gibt: der Button, die Escape-Taste und ein Klick auf einen Verweis darin.
    *
-   * Die Aufschrift wechselt mit. Ein Knopf, der im offenen Zustand weiterhin
+   * Die Aufschrift wechselt mit. Ein Button, der im offenen Zustand weiterhin
    * „Menü öffnen" heißt, ist für ein Vorlesegerät schlicht falsch
    * beschriftet — `aria-expanded` allein sagt den Zustand, aber nicht, was
    * der nächste Druck tut.
@@ -164,7 +164,7 @@ export function initNav() {
        das Panel offen, und wer es mit der Tastatur geöffnet hatte, kam nur
        durch das ganze Menü hindurch wieder heraus.
 
-       Der Fokus geht zurück auf den Knopf: Er ist die Stelle, an der man war,
+       Der Fokus geht zurück auf den Button: Er ist die Stelle, an der man war,
        bevor das Panel aufging. Ohne das steht der Fokus auf einem Element,
        das gerade unsichtbar geworden ist. */
       if (mobilIstOffen()) {

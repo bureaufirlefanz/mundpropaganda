@@ -27,7 +27,7 @@ export function initHero() {
   const hero = document.querySelector("[data-hero]");
 
   /* Die Astro-App verbirgt Leiste, Wortmarke, Bewertungsleiste und
-     Scroll-Knopf per CSS (`html.js …`), damit sie nicht schon im ersten Bild
+     Scroll-Button per CSS (`html.js …`), damit sie nicht schon im ersten Bild
      in ihrer Endlage stehen. Freigegeben werden sie hier — also muss auch
      der Fall abgedeckt sein, dass es auf einer Seite gar keinen Hero gibt:
      sonst bliebe die Leiste dort dauerhaft unsichtbar. */
@@ -68,7 +68,7 @@ export function initHero() {
 
   /* Startwerte sofort setzen, nicht erst wenn die Timeline entsteht.
      Die läuft erst nach Schriften und Freigabe an — bis dahin standen Nav,
-     Fußzeile und Scroll-Knopf in ihrer Ruhelage und waren im Moment der
+     Fußzeile und Scroll-Button in ihrer Ruhelage und waren im Moment der
      Freigabe voll zu sehen. Dann legte `from` seine Startwerte an und riss
      sie zurück: sichtbar erschienen, weggesprungen, nochmal hereingefahren. */
   /* `visibility` mit im selben Aufruf: solange nur das CSS greift, sind die
@@ -243,7 +243,7 @@ export function initHero() {
       // fromTo statt from: der Endwert steht ausgeschrieben da. Bei `from`
       // ermittelt GSAP ihn aus dem Zustand zum Anlegezeitpunkt — der hier
       // bereits vom gesetzten Startwert überschrieben war, wodurch der
-      // Knopf auf scale 0 stehenblieb.
+      // Button auf scale 0 stehenblieb.
       tl.fromTo(
         scroll,
         { scale: 0, opacity: 0 },

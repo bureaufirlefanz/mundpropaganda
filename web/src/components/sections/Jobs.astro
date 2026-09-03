@@ -50,7 +50,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
           data-reveal-child
           id={`stelle-${s.handle}`}
         >
-          {/* Die Überschrift steckt IM Knopf, nicht daneben: Vorlesegeräte
+          {/* Die Überschrift steckt IM Button, nicht daneben: Vorlesegeräte
             geben dann beim Ansteuern der Zeile den Stellentitel aus und
             nicht nur „Schaltfläche". */}
           <h3 class="s-jobs__row-title">
@@ -153,7 +153,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   /* Die Überschrift trägt keine eigene Gestalt — sie ist nur die Ebene, die
-     Vorlesegeräten die Gliederung gibt. Ausgesehen wird der Knopf darin. */
+     Vorlesegeräten die Gliederung gibt. Ausgesehen wird der Button darin. */
   .s-jobs__row-title {
     margin: 0;
     font: inherit;

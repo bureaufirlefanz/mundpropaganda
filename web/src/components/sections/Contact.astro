@@ -278,7 +278,7 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
 
     {
       /* WCAG 2.2, 4.1.3 Statusmeldungen. Bis hierher war die einzige Rückmeldung
-        nach dem Absenden die geänderte Aufschrift des Knopfes. Wer nicht
+        nach dem Absenden die geänderte Aufschrift des Buttons. Wer nicht
         hinsieht, erfährt davon nichts: Ein Textwechsel irgendwo im Dokument
         wird nicht angesagt.
 
@@ -366,7 +366,7 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
   }
 
   /* --- Datei-Upload ------------------------------------------------------
-     Der native Datei-Knopf lässt sich nicht gestalten, also wird er versteckt
+     Der native Datei-Button lässt sich nicht gestalten, also wird er versteckt
      und ein Label übernimmt die Darstellung. */
 
   .c-file input {

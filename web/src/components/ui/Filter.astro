@@ -1,9 +1,9 @@
 ---
 /**
- * Filter für die Magazin-Übersicht: ein Knopf, der die Kategorien ausklappt.
+ * Filter für die Magazin-Übersicht: ein Button, der die Kategorien ausklappt.
  *
  * Ausgeklappt statt dauerhaft sichtbar, weil die Liste bei sechs Beiträgen
- * mehr Platz nähme als sie einspart. Ein Knopf sagt „hier lässt sich etwas
+ * mehr Platz nähme als sie einspart. Ein Button sagt „hier lässt sich etwas
  * einschränken", ohne die Übersicht vorwegzunehmen.
  *
  * **Nur die Kategorien, die tatsächlich belegt sind.** Eine Option, die zu
@@ -46,8 +46,8 @@ const { categories, total } = Astro.props;
       <div class="c-filter" data-filter>
         {/* Nur das Zeichen. Ein Wort daneben erklärte nichts, was das Zeichen
         nicht schon sagt, und stünde bei jeder Kategorie in anderer Länge da —
-        der Knopf änderte seine Breite bei jeder Auswahl. Was gewählt ist,
-        steht im Panel und am Zustand des Knopfes.
+        der Button änderte seine Breite bei jeder Auswahl. Was gewählt ist,
+        steht im Panel und am Zustand des Buttons.
         `aria-label`, weil es keine sichtbare Beschriftung gibt: Ohne das
         liest ein Vorlesegerät nur „Schaltfläche". */}
         <button
@@ -61,7 +61,7 @@ const { categories, total } = Astro.props;
           <svg class="c-filter__icon" aria-hidden="true">
             <use href="#i-filter" />
           </svg>
-          {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Knopf
+          {/* Der Punkt zeigt, dass ein Filter active ist — sonst sähe der Button
           zugeklappt genauso aus wie ohne Auswahl. */}
           <span class="c-filter__dot" data-filter-dot hidden />
         </button>
@@ -136,7 +136,7 @@ const { categories, total } = Astro.props;
   }
 
   /* Der Punkt sitzt auf dem Rand, nicht daneben — sonst verschöbe er den
-     Knopf, sobald er auftaucht. */
+     Button, sobald er auftaucht. */
   .c-filter__dot {
     position: absolute;
     top: 6px;
@@ -157,7 +157,7 @@ const { categories, total } = Astro.props;
     }
   }
 
-  /* Aufgeklappt bleibt der Knopf sichtbar gedrückt — sonst sieht man beim
+  /* Aufgeklappt bleibt der Button sichtbar gedrückt — sonst sieht man beim
      Blick auf das Panel nicht mehr, wozu es gehört. */
   .c-filter__button[aria-expanded="true"] {
     background: var(--c-dark);
@@ -171,15 +171,15 @@ const { categories, total } = Astro.props;
     flex: 0 0 auto;
   }
 
-  /* Fährt seitlich aus dem Knopf heraus, nicht nach unten.
+  /* Fährt seitlich aus dem Button heraus, nicht nach unten.
 
-     Der Knopf steht am rechten Rand, und darunter beginnt unmittelbar das
+     Der Button steht am rechten Rand, und darunter beginnt unmittelbar das
      Raster: Ein Panel, das dort aufklappt, deckt die erste Karte ab. Nach
      links liegt dagegen die ganze leere Leiste, und die Tags stehen in der
      Zeile, in der man sie erwartet.
 
      `right: calc(100% + …)` heißt: rechte Kante an der linken Kante des
-     Knopfes. `translate` zentriert es auf dessen Mitte. */
+     Buttons. `translate` zentriert es auf dessen Mitte. */
   .c-filter__panel {
     position: absolute;
     top: 50%;
@@ -195,12 +195,12 @@ const { categories, total } = Astro.props;
     display: none;
   }
 
-  /* Ein Tag, kein Knopf. Der Knopf der Seite ist zweiteilig, hat einen Pfeil
+  /* Ein Tag, kein Button. Der Button der Seite ist zweiteilig, hat einen Pfeil
      und ein großzügiges Polster — als Filteroption wirkte er wie eine
      Handlung („los") statt wie eine Eigenschaft („Vorsorge").
 
      `--r-sm` statt `--r-round`: Der volle Radius gehört den Bedienelementen
-     (Knopf, Pille, Punkt). Ein leicht gerundetes Rechteck liest sich als
+     (Button, Pille, Punkt). Ein leicht gerundetes Rechteck liest sich als
      Etikett, und genau das ist es. */
   .c-filter__tag {
     padding: 4px var(--sp-2) 5px;

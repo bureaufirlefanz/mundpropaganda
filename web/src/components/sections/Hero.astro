@@ -268,7 +268,7 @@ const { lines } = Astro.props;
     white-space: nowrap;
   }
 
-  /* Wortmarke, Bewertungsleiste und Scroll-Knopf starten verborgen. Die Regel
+  /* Wortmarke, Bewertungsleiste und Scroll-Button starten verborgen. Die Regel
      dafür steht in styles/shared.css und hängt an den data-Attributen, weil
      die Leistungsseiten dieselbe Choreografie mit anderen Klassen fahren. */
 
@@ -417,7 +417,7 @@ const { lines } = Astro.props;
       );
   }
 
-  /* Scroll-Hinweis unten links — im Entwurf der Pfeil-Knopf des Buttons,
+  /* Scroll-Hinweis unten links — im Entwurf der Pfeil-Button des Buttons,
      nach unten gedreht. */
   .s-hero__scroll {
     position: absolute;
@@ -514,18 +514,18 @@ const { lines } = Astro.props;
       padding-bottom: var(--sp-4);
     }
 
-    /* Nur zwei Elemente im Fluss: die Gruppe und der Knopf.
+    /* Nur zwei Elemente im Fluss: die Gruppe und der Button.
 
        Der untere Innenabstand hält der Bewertungsleiste ihren Platz frei. Sie
        ist absolut gesetzt und zählt nicht mit — ohne diese Reserve stieße der
-       Knopf direkt an sie. */
+       Button direkt an sie. */
     .s-hero__inner {
       display: flex;
       flex: 1;
       flex-direction: column;
       align-items: flex-start;
       justify-content: flex-start;
-      /* Klein: Der Knopf gehört unmittelbar unter den Text, nicht in eine
+      /* Klein: Der Button gehört unmittelbar unter den Text, nicht in eine
          eigene Zone dazwischen. */
       gap: var(--sp-5);
       padding-bottom: calc(44px + var(--sp-5));
@@ -651,7 +651,7 @@ const { lines } = Astro.props;
     }
 
     /* Auf dem Telefon scrollt man ohnehin — der Pfeil dafür ist Fläche
-       ohne Nutzen, und der Knopf darüber sagt mehr. */
+       ohne Nutzen, und der Button darüber sagt mehr. */
     .s-hero__scroll {
       display: none;
     }

@@ -9,7 +9,7 @@
  * Einwilligungsbanner, und die Seite hat keines. Dieselbe Überlegung wie bei
  * Plausible in den Einstellungen.
  *
- * Deshalb liegt hier zunächst nur ein Standbild mit einem Abspielknopf. Erst
+ * Deshalb liegt hier zunächst nur ein Standbild mit einem Abspielbutton. Erst
  * der Klick tauscht es gegen das iframe. Bis dahin geht keine einzige
  * Anfrage nach außen.
  *
@@ -59,7 +59,7 @@ function videoId(url: string): string | null {
 const id = videoId(url);
 
 /* `rel=0` hält die Vorschläge am Ende bei diesem Kanal, `autoplay=1` startet
-   sofort — der Klick auf den Knopf war schon die Aufforderung, ein zweiter
+   sofort — der Klick auf den Button war schon die Aufforderung, ein zweiter
    auf den Abspielpfeil im iframe wäre einer zu viel. */
 const embedUrl = id
   ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`
@@ -154,7 +154,7 @@ const embedUrl = id
     letter-spacing: var(--tracking-snug);
   }
 
-  /* Ein Knopf, der wie eine Fläche aussieht: Der Browser gibt <button> einen
+  /* Ein Button, der wie eine Fläche aussieht: Der Browser gibt <button> einen
      eigenen Rahmen, eine Grundfarbe und mittigen Text — alles drei muss hier
      weg, sonst sitzt das Bild in einem grauen Kasten. */
   .s-video__frame {
@@ -183,7 +183,7 @@ const embedUrl = id
     transform: scale(1.02);
   }
 
-  /* Der Abspielknopf. Markenfarbe auf Dunkel misst über 8:1 — er muss auf
+  /* Der Abspielbutton. Markenfarbe auf Dunkel misst über 8:1 — er muss auf
      jedem Standbild lesbar bleiben, auch auf einem hellen. */
   .s-video__play {
     position: absolute;

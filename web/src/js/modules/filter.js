@@ -29,7 +29,7 @@ export function initFilter() {
      das Filtern selbst hängt nicht daran. */
   const status = document.querySelector("[data-filter-status]");
 
-  /* Der Klartext einer Kategorie steht bereits auf ihrem Knopf. Ihn dort
+  /* Der Klartext einer Kategorie steht bereits auf ihrem Button. Ihn dort
      abzulesen ist verlässlicher, als die Zuordnung ein zweites Mal zu pflegen:
      `data-category` trägt den Rohwert aus dem Schema („technik"), angesagt
      werden soll aber, was auch auf dem Bildschirm steht. */
@@ -50,8 +50,8 @@ export function initFilter() {
    * sonst verschwände das Panel, bevor es sich bewegt hat.
    *
    * Die Tags laufen von rechts heraus, in der Richtung, in der sie stehen —
-   * also vom Knopf weg. Rückwärts gestaffelt, damit das erste, das
-   * auftaucht, das dem Knopf nächste ist.
+   * also vom Button weg. Rückwärts gestaffelt, damit das erste, das
+   * auftaucht, das dem Button nächste ist.
    */
   function toggle(open) {
     button.setAttribute("aria-expanded", String(open));
@@ -195,7 +195,7 @@ export function initFilter() {
       toggle(false);
       button.focus();
 
-      /* `replaceState`, nicht `pushState`: Sonst sammelt der Zurück-Knopf
+      /* `replaceState`, nicht `pushState`: Sonst sammelt der Zurück-Button
          jede einzelne Filterauswahl, und wer dreimal geklickt hat, muss
          dreimal zurück, um die Seite zu verlassen. */
       const url = new URL(location.href);

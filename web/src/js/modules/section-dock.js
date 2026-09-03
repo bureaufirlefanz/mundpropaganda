@@ -101,7 +101,7 @@ export function initSectionDock() {
     }
 
     /* Erst den laufenden Breiten-Tween abräumen, dann neu aufbauen.
-       Ohne das lief er nach dem Austausch weiter und zog den Knopf auf die
+       Ohne das lief er nach dem Austausch weiter und zog den Button auf die
        Breite der vorigen Beschriftung — bei einem Wechsel kurz nach dem
        anderen blieb davon eine schmale Pille übrig, in der nichts mehr Platz
        hatte. `clearProps` nimmt die Inline-Breite ganz weg, damit wieder das
@@ -119,7 +119,7 @@ export function initSectionDock() {
        Beschriftung wird im nächsten Durchgang zur „alten" — `killTweensOf`
        bricht ihr Einblenden ab, das `onComplete` des Auslaufens feuert nie,
        und sie bleibt unsichtbar im DOM stehen. Nach zwei, drei solchen
-       Überlagerungen war im Knopf gar nichts mehr zu sehen. */
+       Überlagerungen war im Button gar nichts mehr zu sehen. */
     function swapLabel(index, movingDown) {
       const olds = Array.from(labelWrap.children);
       const startWidth = labelWrap.offsetWidth;
@@ -152,7 +152,7 @@ export function initSectionDock() {
       gsap.set(labelWrap, { width: "auto" });
       const targetWidth = next.offsetWidth;
 
-      /* Kommt hier eine 0 heraus, war der Knopf einen Lidschlag lang eine
+      /* Kommt hier eine 0 heraus, war der Button einen Lidschlag lang eine
          schmale Pille. Dann lieber ohne Breiten-Animation: `auto` ist immer
          richtig, nur eben ohne Übergang. */
       if (!targetWidth) {
@@ -278,7 +278,7 @@ export function initSectionDock() {
     }
 
     /* Letzte Sicherung. Die Aufräumlogik oben deckt die Überlagerung ab, die
-       wir kennen; dies deckt die ab, die wir nicht kennen. Ein leerer Knopf
+       wir kennen; dies deckt die ab, die wir nicht kennen. Ein leerer Button
        ist der einzige Zustand, in dem die Navigation nichts mehr aussagt —
        lieber ohne Animation richtig als animiert leer. */
     let healTimer = null;
@@ -348,7 +348,7 @@ export function initSectionDock() {
           { opacity: 1, duration: dur(0.5), ease: "power1.out" },
           dur(0.08),
         )
-        /* Die Einträge laufen von unten nach oben auf — dort sitzt der Knopf,
+        /* Die Einträge laufen von unten nach oben auf — dort sitzt der Button,
            aus dem sich die Karte öffnet, und die Bewegung folgt derselben
            Richtung.
 

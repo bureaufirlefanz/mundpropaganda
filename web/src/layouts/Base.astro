@@ -36,7 +36,7 @@ interface Props {
    *
    * Entscheidet, wo die Sprungmarke `#kontakt` liegt. Das Angebotsformular
    * steht nur noch auf wenigen Seiten; überall sonst führen die vier bis
-   * sieben Verweise aus Menü, Fuß und den „Termin buchen"-Knöpfen in den
+   * sieben Verweise aus Menü, Fuß und den „Termin buchen"-Buttons in den
    * Fuß, wo Telefon, E-Mail, Standorte und Zeiten ohnehin stehen.
    *
    * Die Angabe ist nötig, weil es die id sonst zweimal gäbe: einmal am Panel,
@@ -253,7 +253,7 @@ const zeigtPraxisdaten = pfad === "/" || pfad === "/praxis";
 
         Sie hier wirksam zu machen hieße, sie in die beiden Komponenten an
         ihr Wurzelelement zu setzen — und zugleich jeden Listener, den `nav.js`
-        an Knöpfe und Verweise hängt, an das Abbruchsignal zu binden. Sonst
+        an Buttons und Verweise hängt, an das Abbruchsignal zu binden. Sonst
         sammelten sich die an den überlebenden Elementen an, und aus einem
         stillen Nichtstun würde ein echtes Leck. Die beiden neu zu rendern
         kostet nichts; der Fall ist gemessen und nicht vermutet. */

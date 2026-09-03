@@ -150,7 +150,7 @@ Auf jeder Seite gleich.
 |---|---|---|---|---|---|
 | `Nav` | UI | Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie Services-Tabelle und Footer. Alles Übrige (Hauptmenü, | — | **nirgends** | — |
 | `Footer` | UI | — | `id?: string` | **nirgends** | — |
-| `Filter` | UI | Filter für die Magazin-Übersicht: ein Knopf, der die Kategorien ausklappt. | `categories: string[]` `total: number` | design/komponenten, sections/PostList | ✓ |
+| `Filter` | UI | Filter für die Magazin-Übersicht: ein Button, der die Kategorien ausklappt. | `categories: string[]` `total: number` | design/komponenten, sections/PostList | ✓ |
 | `Panel` | UI | Panel-Rahmen: schmaler Kopf links, der beim Scrollen stehen bleibt, breiter Inhalt rechts. Was rechts steht, gibt der Aufrufer übe | `id?: string` `topline: string` `title?: string` `text?: string` | Careers, design/komponenten, sections/Application, sections/Contact, sections/Faq | ✓ |
 | `Backdrop` | UI | Seitengrund: nur ein feines Korn. Farbige Lichtfelder standen hier schon — sie haben der Fläche nicht gutgetan und sind wieder rau | — | **nirgends** | — |
 
@@ -270,7 +270,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`ServiceHero`**
 
 - `slug?: string` — Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`.
-- `action?: string` — Beschriftung des Knopfs.
+- `action?: string` — Beschriftung des Buttons.
 
 **`Steps`**
 
@@ -278,7 +278,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 **`Stories`**
 
-- `action?: { text: string; href: string }` — Der Knopf unter dem Zitat. Ohne Verweis steht dort keiner.
+- `action?: { text: string; href: string }` — Der Button unter dem Zitat. Ohne Verweis steht dort keiner.
 
 **`VideoBlock`**
 
@@ -319,7 +319,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`PostCard`**
 
 - `parallax?: string` — Tiefe des Parallax auf dem Bild. Ohne Wert steht es still.
-- `withButton?: boolean` — Der Knopf trägt das Karussell, nicht die Übersicht.
+- `withButton?: boolean` — Der Button trägt das Karussell, nicht die Übersicht.
 - `headingLevel?: "h2" | "h3"` — Die Ebene der Überschrift. Nicht fest verdrahtet, weil sie von der Seite abhängt: Im Karussell steht darüber ein h2 („Mund zu Mund"), also ist h3 richtig. Auf /magazin ist der Seitentitel das h1 und es gibt kein h2 dazwischen — dort wäre h3 eine übersprungene Ebene. Der Test in `web:check` hat genau das gemeldet: „h1 → h3 bei Zahngesundheit & Fitness". /
 
 **`SectionDock`**

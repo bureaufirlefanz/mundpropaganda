@@ -251,11 +251,11 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
             <p class="c-field__message" id="a-text-message" hidden />
           </div>
 
-          {/* Ehrlich sein, statt zu überraschen: Der Knopf öffnet das
+          {/* Ehrlich sein, statt zu überraschen: Der Button öffnet das
             E-Mail-Programm. Wer das nicht erwartet, hält es für einen
             Fehler und bewirbt sich nicht. */}
           <p class="c-apply__note">
-            Der Knopf öffnet dein E-Mail-Programm mit allem, was du hier
+            Der Button öffnet dein E-Mail-Programm mit allem, was du hier
             eingetragen hast. Lebenslauf und Zeugnisse hängst du dort an und
             schickst die Mail ab.
           </p>
@@ -266,11 +266,11 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
           <button class="c-apply__back" type="button" data-apply-back hidden>
             Zurück
           </button>
-          {/* Die Hülle trägt das Steuer-Attribut, der Knopf kommt aus der
+          {/* Die Hülle trägt das Steuer-Attribut, der Button kommt aus der
             Komponente. Ein von Hand geschriebenes `class="c-btn"` bliebe
             nackt: Die Optik liegt scoped in Button.astro, und dieses Markup
             bekäme eine andere Scope-Kennung. Klicks steigen zur Hülle auf,
-            `hidden` an ihr versteckt den Knopf mit. */}
+            `hidden` an ihr versteckt den Button mit. */}
           <span class="c-apply__next" data-apply-next>
             <Button label="Weiter" type="button" />
           </span>
@@ -478,7 +478,7 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     color: var(--c-dark);
   }
 
-  /* Der Weiter-Knopf steht rechts vom Zurück-Link, aber vor dem Absenden —
+  /* Der Weiter-Button steht rechts vom Zurück-Link, aber vor dem Absenden —
      `margin-inline-start: auto` schiebt beide ans Ende der Reihe. */
   .c-apply__next,
   .c-apply__submit {

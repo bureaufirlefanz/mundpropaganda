@@ -253,12 +253,12 @@ export interface PillarPage {
   imageAlt?: string;
   seoDescription?: string;
   /**
-   * Der Knopf im Kopf.
+   * Der Button im Kopf.
    *
    * Steht hier und nicht als Voreinstellung im Hero: Der Hero der
    * Leistungsseiten springt auf `#kontakt`, weil dort unten ein
    * Kontaktabschnitt steht. Eine Pillar Page hat den nicht zwingend — und
-   * ein Knopf, der ins Leere zeigt, sieht aus wie ein kaputter Klick.
+   * ein Button, der ins Leere zeigt, sieht aus wie ein kaputter Klick.
    * `npm run web:check` hat genau das gemeldet.
    */
   action?: { label: string; href: string };

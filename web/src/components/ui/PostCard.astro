@@ -31,7 +31,7 @@ interface Props {
   sizes: string;
   /** Tiefe des Parallax auf dem Bild. Ohne Wert steht es still. */
   parallax?: string;
-  /** Der Knopf trägt das Karussell, nicht die Übersicht. */
+  /** Der Button trägt das Karussell, nicht die Übersicht. */
   withButton?: boolean;
   /**
    * Die Ebene der Überschrift.
@@ -112,17 +112,17 @@ const motif = motifFor(p.slug);
      Nichts ragt aus dem Kasten heraus; die Karte ist im Raster so brauchbar
      wie in der Spur. */
   .c-post {
-    /* Die ganze Karte ist der Verweis — Bild, weiße Fläche und Knopf.
+    /* Die ganze Karte ist der Verweis — Bild, weiße Fläche und Button.
 
        Vorher trug den Link der Titel, und eine Überlagerung
        (`.c-post__link::after`, inset 0) sollte ihn über die Karte ziehen.
        Das konnte nicht aufgehen: Die Überlagerung richtet sich am nächsten
        positionierten Vorfahren aus, und das ist `.c-post__surface` mit
        `position: absolute`, nicht die Karte. Gemessen im Browser lag die
-       Klickfläche deshalb genau auf der weißen Fläche — Bild und Knopf
+       Klickfläche deshalb genau auf der weißen Fläche — Bild und Button
        waren tot.
 
-       Dasselbe Muster wie in `NavPromo.astro`: Der Knopf darin ist keiner,
+       Dasselbe Muster wie in `NavPromo.astro`: Der Button darin ist keiner,
        er steht auf `static` und rendert ein <span>. Ein <a> in einem <a>
        lässt der Parser nicht zu, er schlösse das äußere vorzeitig.
 
@@ -174,12 +174,12 @@ const motif = motifFor(p.slug);
 
      `bottom: 0` statt `min-height: 62%`: Mit der Mindesthöhe endete die
      Fläche dort, wo ihr Inhalt aufhörte, gemessen 50px über der Unterkante
-     des Knopfes und damit zufällig fast bündig mit dem Bild. Die untere
+     des Buttons und damit zufällig fast bündig mit dem Bild. Die untere
      Kante der Karte ist aber die Linie, an der die Komposition steht — sie
-     soll mit dem Knopf abschließen, nicht mit dem Text darin. */
+     soll mit dem Button abschließen, nicht mit dem Text darin. */
   .c-post__surface {
     position: absolute;
-    /* Die Unterkante steht fest (bündig mit dem Knopf), die Oberkante nicht:
+    /* Die Unterkante steht fest (bündig mit dem Button), die Oberkante nicht:
        Im Karussell ist die Karte schmal und der Text füllt die Fläche, in der
        Übersicht ist sie breiter, derselbe Text braucht weniger Zeilen und die
        Fläche stünde halb leer. Deshalb rückt der Ansatz dort nach unten. */
@@ -198,7 +198,7 @@ const motif = motifFor(p.slug);
   /* Die Kategorie als Zeile, nicht als Pille. Sie steht in der weißen
      Fläche über dem Titel und ist dort schon durch Schnitt und Laufweite
      abgesetzt; eine gefüllte Form daneben nähme dem Titel den Vorrang und
-     machte aus dem Hinweis einen Knopf, der keiner ist. */
+     machte aus dem Hinweis einen Button, der keiner ist. */
   .c-post__tag {
     align-self: flex-start;
     color: var(--c-dark);
@@ -227,12 +227,12 @@ const motif = motifFor(p.slug);
     color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
   }
 
-  /* :global(.c-btn), weil der Knopf aus Button.astro kommt. */
+  /* :global(.c-btn), weil der Button aus Button.astro kommt. */
   .c-post :global(.c-btn) {
     margin-top: var(--sp-4);
   }
 
-  /* Der Knopf reagiert mit, egal wo auf der Karte der Zeiger steht.
+  /* Der Button reagiert mit, egal wo auf der Karte der Zeiger steht.
      Er kann es nicht selbst: Über ihm liegt die Klickfläche des Titellinks
      (`.c-post__link::after`, inset 0), er bekommt also nie einen eigenen
      Hover. Und da er in dieser Karte ein <span> ist und kein <a>, wäre das

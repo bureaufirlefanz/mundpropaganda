@@ -71,9 +71,9 @@ export const navigation = defineType({
 
     defineField({
       name: "action",
-      title: "Knopf in der Leiste",
+      title: "Button in der Leiste",
       type: "link",
-      description: "Der pinke Knopf rechts oben.",
+      description: "Der pinke Button rechts oben.",
       validation: (r) => r.required(),
     }),
   ],
@@ -109,7 +109,7 @@ export const footer = defineType({
 
     defineField({
       name: "action",
-      title: "Knopf",
+      title: "Button",
       type: "link",
       validation: (r) => r.required(),
     }),

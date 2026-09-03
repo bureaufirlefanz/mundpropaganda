@@ -124,7 +124,7 @@ html.js [data-hero-scroll] {
   gap: 0;
 }
 
-/* Der Knopf ist die Zielfläche, der Punkt darin ist die Anzeige.
+/* Der Button ist die Zielfläche, der Punkt darin ist die Anzeige.
 
    Vorher war beides dasselbe Element: 7 × 7 Pixel groß, und damit ein Ziel,
    das man mit dem Daumen nur zufällig trifft. WCAG 2.2, 2.5.8 verlangt
@@ -167,7 +167,7 @@ html.js [data-hero-scroll] {
    wirkungslos.
 
    In Contact.astro verbleiben nur seine Eigenheiten: das zweispaltige
-   Raster (.c-form), --full/--tall und der Datei-Knopf (.c-file).
+   Raster (.c-form), --full/--tall und der Datei-Button (.c-file).
    -------------------------------------------------------------------- */
 
 .c-field {

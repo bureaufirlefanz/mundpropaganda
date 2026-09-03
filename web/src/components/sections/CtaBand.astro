@@ -3,13 +3,13 @@
  * Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314).
  *
  * Randabfallendes Bild über die volle Fensterbreite, darauf links eine helle
- * Karte: Überschrift, darunter ein kurzer Text und der Knopf nebeneinander.
+ * Karte: Überschrift, darunter ein kurzer Text und der Button nebeneinander.
  *
  * Aus dem Entwurf, gegen Tokens gelegt:
  *
  *   - Karte in `--c-grey`, Rundung `--r-md`
  *   - Überschrift 40px → `--fs-h3`
- *   - Text klein und gedämpft, Knopf in Markenfarbe (`ui/Button.astro`)
+ *   - Text klein und gedämpft, Button in Markenfarbe (`ui/Button.astro`)
  *
  * ── Was dieser Baustein nicht tut ────────────────────────────────────────
  *
@@ -18,7 +18,7 @@
  * Stelle, die URLs zusammensetzt, liefe davon irgendwann ab.
  *
  * Die Telefonnummer ist entfallen: Im Entwurf trägt die Karte genau einen
- * Knopf. Zwei Handlungswege nebeneinander teilen die Aufmerksamkeit, und der
+ * Button. Zwei Handlungswege nebeneinander teilen die Aufmerksamkeit, und der
  * Anruf steht ohnehin dauerhaft in der Kopfzeile.
  */
 import Button from "../ui/Button.astro";
@@ -132,8 +132,8 @@ const {
     text-wrap: balance;
   }
 
-  /* Text und Knopf nebeneinander, unten in der Karte. Der Text bekommt die
-     verfügbare Breite, der Knopf nur seine eigene. */
+  /* Text und Button nebeneinander, unten in der Karte. Der Text bekommt die
+     verfügbare Breite, der Button nur seine eigene. */
   .s-ctaband__foot {
     display: flex;
     align-items: end;
@@ -150,7 +150,7 @@ const {
   }
 
   /* Schmaler wird die Karte breiter, sonst bleibt vom Text eine Spalte aus
-     Einzelwörtern. Unter 700px steht der Knopf unter dem Text. */
+     Einzelwörtern. Unter 700px steht der Button unter dem Text. */
   @media (max-width: 1100px) {
     .s-ctaband__card {
       width: min(58%, calc(100% - 2 * var(--site-gutter)));

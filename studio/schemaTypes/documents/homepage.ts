@@ -285,17 +285,17 @@ export const homepage = defineType({
          Leistungsseiten; sie werden EINMAL hier gepflegt. */
       validation: (r) => r.required(),
     }),
-    /* Klasse 2. Unter dem Zitat stand ein Knopf „Ganze Story lesen" mit
+    /* Klasse 2. Unter dem Zitat stand ein Button „Ganze Story lesen" mit
        `href="#"` — er sah aus wie ein Angebot und ließ den Browser nach oben
        springen. Es gibt keine ganze Story: Die Stimmen sind Zitate, keine
-       Beiträge. Wohin der Knopf führt, entscheidet jetzt die Redaktion; ohne
+       Beiträge. Wohin der Button führt, entscheidet jetzt die Redaktion; ohne
        Verweis erscheint er nicht. */
     defineField({
       name: "storiesAction",
-      title: "Knopf unter den Geschichten",
+      title: "Button unter den Geschichten",
       type: "link",
       description:
-        "Leer lassen, wenn es nichts weiterzulesen gibt - dann steht dort kein Knopf.",
+        "Leer lassen, wenn es nichts weiterzulesen gibt - dann steht dort kein Button.",
       group: "stories",
     }),
 

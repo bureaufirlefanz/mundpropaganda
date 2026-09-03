@@ -7,6 +7,13 @@ dist/
 .shots/
 studio/dist/
 
+# Von `sanity dev` und `sanity build` erzeugt: der Einstiegspunkt, aus dem das
+# Studio im Browser startet. Er lag versioniert im Repository und änderte sich
+# bei jedem Lauf — 577 Zeilen Unterschied, die niemand geschrieben hat und
+# niemand liest. Dieselbe Überlegung wie bei `schema.json` und
+# `sanity.types.ts`: eine Ableitung gehört nicht in die Versionsgeschichte.
+studio/.sanity/
+
 # Ganzseiten-Aufnahmen. 373 MB in 15 Dateien, erzeugt von
 # scripts/aufnahmen.mjs — eine Aufnahme der Startseite misst allein
 # 3456 × 25228 Pixel. Wiederherstellbar mit `node scripts/aufnahmen.mjs`,

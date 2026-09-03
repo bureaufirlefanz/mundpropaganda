@@ -38,7 +38,7 @@ export function initAccordion() {
        * `height: 0` mit `overflow: hidden` versteckt den Inhalt für das Auge,
        * nimmt ihn aber NICHT aus dem Tabulatorlauf. Auf der Karriereseite lief
        * der Fokus dadurch in jedes zugeklappte Stellenpanel und landete auf
-       * „Auf diese Stelle bewerben" — einem Knopf, den niemand sehen konnte.
+       * „Auf diese Stelle bewerben" — einem Button, den niemand sehen konnte.
        * Gemessen im Tastaturlauf: fünf solcher Stationen hintereinander.
        *
        * `inert` und nicht `hidden`: `hidden` setzt `display: none`, und dann
@@ -327,7 +327,7 @@ export function initForm() {
          Anfrage ein zweites Mal, und die Praxis sähe zwei Einsendungen. */
       if (button) button.disabled = true;
       if (label) label.textContent = "Wird gesendet";
-      /* WCAG 2.2, 4.1.3: Die geänderte Aufschrift des Knopfes ist eine
+      /* WCAG 2.2, 4.1.3: Die geänderte Aufschrift des Buttons ist eine
          Änderung im Dokument, keine Meldung. Ohne diese Zeile erfährt niemand
          davon, der nicht gerade hinsieht. */
       if (status) status.textContent = "Deine Anfrage wird gesendet.";
@@ -349,7 +349,7 @@ export function initForm() {
             "Danke, deine Anfrage ist eingegangen. Wir melden uns in Kürze.";
         }
       } catch {
-        /* Der Knopf wird wieder freigegeben: Der Versuch soll wiederholbar
+        /* Der Button wird wieder freigegeben: Der Versuch soll wiederholbar
            sein. Nur die Aufschrift bleibt nicht auf „Wird gesendet" stehen. */
         if (button) button.disabled = false;
         if (label && beschriftung) label.textContent = beschriftung;

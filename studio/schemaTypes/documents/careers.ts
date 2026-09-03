@@ -102,7 +102,7 @@ export const careers = defineType({
     }),
     defineField({
       name: "action",
-      title: "Knopf im Kopf",
+      title: "Button im Kopf",
       type: "link",
       description:
         "Führt üblicherweise zu den offenen Stellen weiter unten - dafür diese Seite als Ziel wählen und als Sprungmarke „stellen“ eintragen.",
@@ -123,7 +123,7 @@ export const careers = defineType({
 
     /* --- Video -----------------------------------------------------------
        Wahlfrei und als Ganzes: Ohne Adresse entfällt der Abschnitt. Ein
-       Standbild ohne Video wäre ein Knopf, der nichts tut. */
+       Standbild ohne Video wäre ein Button, der nichts tut. */
     defineField({
       name: "videoUrl",
       title: "Adresse des Videos",

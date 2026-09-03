@@ -2,7 +2,7 @@
 /**
  * Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie
  * Services-Tabelle und Footer. Alles Übrige (Hauptmenü, Zusatzspalten, der
- * Knopf) steht seit Aufgabe 8 im Dokument „Navigation".
+ * Button) steht seit Aufgabe 8 im Dokument „Navigation".
  *
  * Desktop und Telefon zeigen jetzt dieselben Zusatzspalten. Vorher waren es
  * zwei verschiedene Sätze — „Direkt" am Schreibtisch, „Praxis" am Telefon —
@@ -92,7 +92,7 @@ const action = (await resolved([nav?.action ?? null], here))[0];
       {action && <Button label={action.text} href={action.href} />}
 
       {
-        /* `aria-controls` nennt das Panel, das der Knopf öffnet, und die
+        /* `aria-controls` nennt das Panel, das der Button öffnet, und die
           Aufschrift wechselt mit dem Zustand — beides setzt `nav.js`. Ohne
           das sagte ein Vorlesegerät dauerhaft „Menü öffnen", auch wenn das
           Menü offen war, und nannte nie, was da eigentlich aufgeht. */

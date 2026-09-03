@@ -75,7 +75,7 @@ const classes = ["c-btn", variant && `c-btn--${variant}`]
 }
 
 <style>
-  /* Figma: zweiteilig — Pille mit Label plus separater runder Pfeil-Knopf,
+  /* Figma: zweiteilig — Pille mit Label plus separater runder Pfeil-Button,
      getrennt durch 1px Lücke. */
   .c-btn {
     display: inline-flex;
@@ -126,7 +126,7 @@ const classes = ["c-btn", variant && `c-btn--${variant}`]
   }
 
   /* Beim Überfahren löst sich der Kreis vom Rechteck und rückt ein Stück ab —
-     der Knopf „öffnet" sich in Leserichtung. Das ersetzt den früheren
+     der Button „öffnet" sich in Leserichtung. Das ersetzt den früheren
      Magneteffekt: die Bewegung gehört zum Element, nicht zum Zeiger.
      Der Pfeil im Kreis bleibt dabei ruhig — sonst rutschen zwei Dinge
      gegeneinander und die Geste wird unklar.
@@ -135,8 +135,8 @@ const classes = ["c-btn", variant && `c-btn--${variant}`]
      Farbe um, braune Fläche mit pinkem Zeichen — zwei Signale für einen
      Vorgang, und das kräftigere übertönte das feinere: Man sah den Farbsprung
      und nicht mehr, dass der Kreis abrückt. Mit der Farbe fallen auch die
-     beiden Regler `--knopf-hover-grund` und `--knopf-hover-schrift` weg; sie
-     gab es nur, damit der umgekehrte Knopf auf dunklen Sections nicht im
+     beiden Regler `--button-hover-grund` und `--button-hover-schrift` weg; sie
+     gab es nur, damit der umgekehrte Button auf dunklen Sections nicht im
      Grund verschwand. Ohne Umkehrung gibt es das Problem nicht mehr. */
   @media (hover: hover) {
     .c-btn:hover .c-btn__icon {
@@ -160,8 +160,8 @@ const classes = ["c-btn", variant && `c-btn--${variant}`]
     color: var(--c-grey);
   }
 
-  /* Variante volle Breite, für den Absenden-Knopf im Formular. Ein
-     durchgehender Balken — der abgesetzte Pfeil-Knopf entfällt hier. */
+  /* Variante volle Breite, für den Absenden-Button im Formular. Ein
+     durchgehender Balken — der abgesetzte Pfeil-Button entfällt hier. */
   .c-btn--block {
     display: flex;
     width: 100%;

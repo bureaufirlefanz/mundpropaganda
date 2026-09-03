@@ -160,7 +160,7 @@ p {
    Ausnahme weiter unten.
 
    Kein `border-radius` mehr an dieser Stelle: Der alte Wert von 2px zwang
-   jeden runden Knopf im Fokus in eine fast eckige Form. Ohne die Zeile folgt
+   jeden runden Button im Fokus in eine fast eckige Form. Ohne die Zeile folgt
    der Umriss der Form, die das Element ohnehin hat. */
 :focus-visible {
   outline: 2px solid var(--c-dark);
@@ -172,7 +172,7 @@ p {
 .c-footer :focus-visible,
 .c-navpromo:focus-visible,
 /* `.s-cta` stand hier und trifft nichts: Der Baustein heißt `.s-ctaband`.
-   Der Fokusring auf seinem Knopf war damit der dunkle auf dunklem Grund. */
+   Der Fokusring auf seinem Button war damit der dunkle auf dunklem Grund. */
 .s-ctaband :focus-visible,
 /* Nach innen, wo außen kein Platz ist.
 
@@ -500,7 +500,7 @@ label.c-file {
   --press-scale: 0.98;
 }
 
-/* Runde Symbolknöpfe sind klein — sie brauchen mehr, um überhaupt zu wirken. */
+/* Runde Symbolbuttons sind klein — sie brauchen mehr, um überhaupt zu wirken. */
 .s-gallery__arrow,
 .s-stories__nav {
   --press-scale: 0.88;

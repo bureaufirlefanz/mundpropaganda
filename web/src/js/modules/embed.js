@@ -3,7 +3,7 @@
  *
  * Der ganze Zweck ist, dass VORHER nichts passiert: keine Anfrage an
  * YouTube oder OpenStreetMap, keine Kennung, kein Einwilligungsbanner nötig.
- * Bis zum Klick steht dort ein Standbild mit einem Knopf; die Adresse liegt
+ * Bis zum Klick steht dort ein Standbild mit einem Button; die Adresse liegt
  * im Attribut `data-embed`, das `<iframe>` entsteht erst hier.
  *
  * Ein Modul für beide Fälle und nicht zwei: Der Unterschied zwischen einem
@@ -31,15 +31,15 @@ export function initEmbeds() {
           "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
         frame.allowFullscreen = true;
 
-        /* Aus dem Knopf wird ein Rahmen.
+        /* Aus dem Button wird ein Rahmen.
 
            Vorher blieb der `<button>` stehen, bekam das iframe als Kind und
            `disabled`. Zwei Dinge stimmten daran nicht: Ein `<button>` darf
            keinen eigenständig bedienbaren Inhalt enthalten, und in Firefox
-           schluckt ein abgeschalteter Knopf die Zeigerereignisse seiner
+           schluckt ein abgeschalteter Button die Zeigerereignisse seiner
            Kinder — das Video war da und ließ sich nicht bedienen.
 
-           Der Ersatz übernimmt Klasse und Astro-Kennung des Knopfes: Rundung,
+           Der Ersatz übernimmt Klasse und Astro-Kennung des Buttons: Rundung,
            Seitenverhältnis und Überlauf hängen daran, und die
            Bereichskennung (`data-astro-cid-…`) entscheidet, ob die
            komponenteneigenen Regeln überhaupt greifen. Ein von Hand

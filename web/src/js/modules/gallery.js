@@ -112,7 +112,7 @@ function initCarousel(cfg) {
      *
      * Gemessen war die Grenze dadurch 80px zu kurz (2066 statt 2146), und die
      * Folge betraf nicht nur die Tastatur: Die letzte Karte ließ sich auch
-     * über den Pfeilknopf nie vollständig ins Bild holen — sie stand immer
+     * über den Pfeilbutton nie vollständig ins Bild holen — sie stand immer
      * 40px über den rechten Rand hinaus. */
     const fenster = track.parentElement;
     const fensterStil = getComputedStyle(fenster);

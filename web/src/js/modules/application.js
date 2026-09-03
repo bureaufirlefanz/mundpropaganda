@@ -8,7 +8,7 @@
  * 1. **Versteckte Pflichtfelder.** Im Markup stehen die Fragen ALLER Rollen,
  *    weil die Seite statisch ist und nichts nachladen kann. Ein `required`
  *    in einem ausgeblendeten Block ließe `checkValidity()` fehlschlagen,
- *    ohne dass irgendwo etwas Rotes zu sehen wäre — der Knopf täte dann
+ *    ohne dass irgendwo etwas Rotes zu sehen wäre — der Button täte dann
  *    einfach nichts. Alles, was nicht zur gewählten Rolle gehört, wird
  *    deshalb `disabled`; abgeschaltete Felder prüft der Browser nicht und
  *    sendet sie nicht.
@@ -81,7 +81,7 @@ export function initApplication() {
      * Der Index wird abgeklemmt, nicht bloß erwartet: Ein Aufruf über das
      * letzte Element hinaus versteckte sonst ALLE Schritte — das Formular
      * stünde leer da, ohne Fehler und ohne Weg zurück. Aufgefallen beim
-     * Durchklicken, als der Weiter-Knopf im letzten Schritt noch ein
+     * Durchklicken, als der Weiter-Button im letzten Schritt noch ein
      * `click()` bekam.
      */
     function show(index) {
@@ -110,7 +110,7 @@ export function initApplication() {
 
       let firstInvalid = null;
       let offen = 0;
-      /* Eine Gruppe von Radio-Knöpfen ist EINE Angabe, nicht fünf. Ohne das
+      /* Eine Gruppe von Radio-Buttons ist EINE Angabe, nicht fünf. Ohne das
          meldete der erste Schritt „5 Felder brauchen noch eine Angabe", wo
          nur eine Stelle zu wählen war. */
       const gezaehlt = new Set();

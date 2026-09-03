@@ -59,7 +59,7 @@ const zustand = await page.evaluate(() => {
     wortmarke: sicht(".s-hero__word"),
     leiste: sicht("[data-nav] .c-nav__inner"),
     bewertung: sicht(".s-hero__foot"),
-    scrollknopf: sicht(".s-hero__scroll"),
+    scrollbutton: sicht(".s-hero__scroll"),
     zahn: sicht(".s-hero__tooth"),
     // Kinder eines Stagger-Containers mitzählen: sie tragen kein
     // [data-reveal], werden aber genauso erst von GSAP eingeblendet.
@@ -86,7 +86,7 @@ console.log(
 console.log(`  Wortmarke:              ${zustand.wortmarke}`);
 console.log(`  Navigationsleiste:      ${zustand.leiste}`);
 console.log(`  Bewertungsleiste:       ${zustand.bewertung}`);
-console.log(`  Scroll-Knopf:           ${zustand.scrollknopf}`);
+console.log(`  Scroll-Button:           ${zustand.scrollbutton}`);
 console.log(`  Zahn:                   ${zustand.zahn}`);
 console.log(
   `  sichtbare [data-reveal]: ${zustand.reveals} von ${zustand.revealsGesamt}`,
