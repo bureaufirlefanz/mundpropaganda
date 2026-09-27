@@ -25,10 +25,10 @@ Der erste Bildschirm eines Seitentyps. Sie unterscheiden sich im Bau, nicht nur 
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Hero` | Abschnitt | — | `lines: string[]` | Home | — |
-| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `claim?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service | — |
-| `PillarHero` | Abschnitt | Der Kopf einer Pillar Page (Figma 177:1734). | `title: string` `eyebrow?: string` `image?: ImageSource` `alt?: string` | Pillar | — |
-| `CareersHero` | Abschnitt | Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` `fallback?: string` `zoom?: boolean` | Careers, Practice | — |
+| `Hero` | Abschnitt | — | `lines: string[]` | Home, design/komponenten | ✓ |
+| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `claim?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service, design/komponenten | ✓ |
+| `PillarHero` | Abschnitt | Der Kopf einer Pillar Page (Figma 177:1734). | `title: string` `eyebrow?: string` `image?: ImageSource` `alt?: string` | Pillar, design/komponenten | ✓ |
+| `CareersHero` | Abschnitt | Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` `fallback?: string` `zoom?: boolean` | Careers, Practice, design/komponenten | ✓ |
 
 ## Text und Einstieg
 
@@ -148,11 +148,11 @@ Auf jeder Seite gleich.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Nav` | UI | Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie Services-Tabelle und Footer. Alles Übrige (Hauptmenü, | — | **nirgends** | — |
-| `Footer` | UI | — | `id?: string` | **nirgends** | — |
+| `Nav` | UI | Die Leistungsspalten im Menü kommen aus der Collection — dieselbe Quelle wie Services-Tabelle und Footer. Alles Übrige (Hauptmenü, | — | layouts/Base | — |
+| `Footer` | UI | — | `id?: string` | layouts/Base | — |
 | `Filter` | UI | Filter für die Magazin-Übersicht: ein Button, der die Kategorien ausklappt. | `categories: string[]` `total: number` | design/komponenten, sections/PostList | ✓ |
 | `Panel` | UI | Panel-Rahmen: schmaler Kopf links, der beim Scrollen stehen bleibt, breiter Inhalt rechts. Was rechts steht, gibt der Aufrufer übe | `id?: string` `topline: string` `title?: string` `text?: string` | Careers, design/komponenten, sections/Application, sections/Contact, sections/Faq | ✓ |
-| `Backdrop` | UI | Seitengrund: nur ein feines Korn. Farbige Lichtfelder standen hier schon — sie haben der Fläche nicht gutgetan und sind wieder rau | — | **nirgends** | — |
+| `Backdrop` | UI | Seitengrund: nur ein feines Korn. Farbige Lichtfelder standen hier schon — sie haben der Fläche nicht gutgetan und sind wieder rau | — | layouts/Base | — |
 
 ## Technik und Zierde
 
@@ -160,10 +160,10 @@ Kein eigener Inhalt — Sprites, Übergänge, Motive, Angaben für Suchmaschinen
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Icons` | UI | — | — | **nirgends** | — |
-| `Transition` | UI | Spaltenvorhang für den Seitenwechsel. | — | **nirgends** | — |
+| `Icons` | UI | — | — | layouts/Base, layouts/Design | — |
+| `Transition` | UI | Spaltenvorhang für den Seitenwechsel. | — | layouts/Base | — |
 | `VisualEditing` | UI | Klick-zum-Bearbeiten in der Vorschau. | — | preview/[...path] | — |
-| `StructuredData` | UI | Die Praxis als strukturierte Daten (schema.org, JSON-LD). | — | **nirgends** | — |
+| `StructuredData` | UI | Die Praxis als strukturierte Daten (schema.org, JSON-LD). | — | layouts/Base | — |
 | `Thread` | UI | — | — | sections/Standards | — |
 | `ToothLines` | UI | — | — | Person, sections/CareersHero, sections/Hero, sections/ServiceHero | — |
 | `ToothRings` | UI | — | — | design/komponenten, sections/Standards | ✓ |
@@ -174,15 +174,11 @@ Es fehlt keiner.
 
 Bewusst nicht im Katalog:
 
-- `CareersHero` — Seitenkopf, nur im Zusammenhang sinnvoll
-- `Hero` — Seitenkopf, nur im Zusammenhang sinnvoll
-- `PillarHero` — Seitenkopf, nur im Zusammenhang sinnvoll
-- `ServiceHero` — Seitenkopf, nur im Zusammenhang sinnvoll
-- `Backdrop` — Verdunkelung hinter dem Menü
+- `Backdrop` — Papierkörnung über der ganzen Seite, aus layouts/Base.astro; auf dem Styleguide unter Körnung
 - `CmsImage` — Bildhülle ohne eigene Gestalt
-- `Footer` — steht auf jeder Seite, auch auf dieser
+- `Footer` — Seitenfuß aus layouts/Base.astro, schließt eine Seite ab; mitten im Katalog ergäbe er keinen Sinn
 - `Icons` — SVG-Sprite, unsichtbar
-- `Nav` — steht auf jeder Seite, auch auf dieser
+- `Nav` — fixierte Leiste aus layouts/Base.astro, läge über jedem Beispiel
 - `StructuredData` — JSON-LD im Kopf der Seite, unsichtbar
 - `Thread` — Verbindungslinie, gehört zu einem Abschnitt
 - `ToothLines` — Zierlinien im Hintergrund
@@ -274,7 +270,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`ServiceHero`**
 
 - `slug?: string` — Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`.
-- `claim?: string` — Die Zeile unter dem Leistungsnamen: wofür die Praxis bei dieser Behandlung steht. Sie ist bewusst kein zweites `h1`. Die Überschrift der Seite ist der Name der Behandlung — daran hängt `sizeCap` oben, und ein ganzer Satz liefe in derselben Größe ins Bild rechts daneben. Der Anspruch steht deshalb als eigener Absatz darunter, kleiner gesetzt. /
+- `claim?: string` — Wofür die Praxis bei dieser Behandlung steht. Steht anstelle des Leistungsnamens in der Überschrift — siehe `heading` unten. Wahlfrei: Ohne Anspruch trägt die Überschrift weiter den Namen, und alle übrigen Leistungsseiten bleiben unverändert. /
 - `action?: string` — Beschriftung des Buttons.
 
 **`Steps`**
@@ -361,7 +357,7 @@ Inhalte und Entwürfe.
 **layouts/**
 
 - `Base` — Dokumentchrome. Entspricht head.hbs plus body-Gerüst.
-- `Design` — Rahmen für die beiden Design-Seiten (Styleguide und Komponenten).
+- `Design` — Frame for the two design pages (styleguide and component catalogue).
 
 ## Module
 

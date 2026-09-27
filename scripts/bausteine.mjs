@@ -153,23 +153,27 @@ const FOLDERS = ["components/sections", "components/ui"];
  * nichts zu zeigen hat. Eine Mängelliste, die zu einem Drittel aus
  * Nicht-Mängeln besteht, liest nach zwei Wochen niemand mehr.
  */
+/* The reasons were checked against the files on 2026-09-27. Two were wrong:
+   Nav and Footer were "on every page, also this one", but the design pages
+   use layouts/Design.astro, which includes neither; Backdrop was described
+   as the dimming behind the menu, but it is the paper grain over the page.
+   The four heroes left this list when the catalogue started showing them
+   on stages of their own. */
 const EXEMPT = {
   Icons: "SVG-Sprite, unsichtbar",
   Transition: "Seitenübergang, kein Markup",
   VisualEditing: "nur im Vorschaumodus",
   StructuredData: "JSON-LD im Kopf der Seite, unsichtbar",
-  Backdrop: "Verdunkelung hinter dem Menü",
-  Nav: "steht auf jeder Seite, auch auf dieser",
-  Footer: "steht auf jeder Seite, auch auf dieser",
+  Backdrop:
+    "Papierkörnung über der ganzen Seite, aus layouts/Base.astro; auf dem Styleguide unter Körnung",
+  Nav: "fixierte Leiste aus layouts/Base.astro, läge über jedem Beispiel",
+  Footer:
+    "Seitenfuß aus layouts/Base.astro, schließt eine Seite ab; mitten im Katalog ergäbe er keinen Sinn",
   CmsImage: "Bildhülle ohne eigene Gestalt",
   Picture: "Bildhülle ohne eigene Gestalt",
   ToothLines: "Zierlinien im Hintergrund",
   ToothRings: "Zierringe im Hintergrund",
   Thread: "Verbindungslinie, gehört zu einem Abschnitt",
-  PillarHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
-  ServiceHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
-  CareersHero: "Seitenkopf, nur im Zusammenhang sinnvoll",
-  Hero: "Seitenkopf, nur im Zusammenhang sinnvoll",
 };
 
 /** Alle Dateien, in denen ein Baustein aufgerufen werden könnte. */
@@ -184,7 +188,10 @@ function callers() {
       }
     }
   };
-  for (const d of ["pages", "templates", "components"]) walk(d);
+  /* `layouts` belongs here: Nav, Footer, Backdrop, Icons, Transition and
+     StructuredData are only called from layouts/Base.astro, and without it
+     they were listed as used "nirgends". */
+  for (const d of ["pages", "templates", "components", "layouts"]) walk(d);
   return files;
 }
 

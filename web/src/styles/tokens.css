@@ -252,9 +252,9 @@
   --c-on-dark-line: color-mix(in srgb, var(--c-grey) 22%, transparent);
   --c-on-dark-line-strong: color-mix(
     in srgb,
-    var(--c-grey) 45%,
+    var(--c-grey) 47%,
     transparent
-  ); /* 3.0:1 */
+  ); /* 3.13:1 */
   --c-on-brand-muted: color-mix(
     in srgb,
     var(--c-dark) 90%,
@@ -353,6 +353,8 @@
 
 [data-surface="brand"] {
   --c-text-muted: var(--c-on-brand-muted);
+  /* 3.18:1 on pink; the page value (62 %) would drop to 2.74:1 here. */
+  --c-line-strong: color-mix(in srgb, var(--c-dark) 70%, transparent);
 }
 
 [data-surface="taupe"] {

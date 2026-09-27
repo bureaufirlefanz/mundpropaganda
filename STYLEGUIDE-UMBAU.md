@@ -156,6 +156,8 @@ Everything below is on subpages. Sizes are at a 1728px window unless noted.
 - **Steps** card text 80 % → 72 %, duration 70 % → 72 %.
 - **Voices** role and "seit" 70 % → 72 %; divider line 15 % → 28 % (stronger).
 - **Prices** fact labels 62 % → 72 %.
+- **Strong lines on dark** (Benefits control borders, Location map button)
+  45 % / 40 % → 47 %: 45 % measured 2.996:1, just under 1.4.11's 3:1.
 - **Filter** tags on mobile: border 20 % → 28 %; dropdown shadow → `--shadow-panel`.
 - **Jobs** badge tint 10 % → 8 %; **PillarHero** image ground 12 % → 8 %;
   **Application** selected role 14 % → 16 %.
@@ -199,6 +201,25 @@ Application, Jobs, Values, Team, Locations, Magazine intro, Person, Prose) ·
   of the palette (same colours).
 
 ---
+
+### Styleguide and catalogue
+
+- **`/design/styleguide`** is rebuilt around the three layers: base values,
+  roles (a specimen for every `--font-*` style, colour roles with measured
+  contrast), surfaces (one tile per `data-surface` with text, muted text,
+  lines and a visible focus ring, contrast computed from tokens.css) and the
+  small building blocks. It reads `tokens.css` at build time, and every token
+  shows where it is used, counted from the source — the hand-written
+  "Galeriekopf, Geschichte" notes are gone. Tokens nothing uses are flagged
+  at the top: today `--fs-display` (Hero writes its own ramps) and `--sp-16`.
+- **`/design/komponenten`** now shows the four page heroes (Hero,
+  ServiceHero with and without claim, CareersHero, PillarHero) on framed
+  stages, plus Intro `bleed` and Benefits `footnote`. The stages are
+  `aria-hidden` and `inert` — pictures of a page head, not part of the
+  catalogue's outline; `scripts/lib/wcag.mjs` now skips headings there.
+  Iframes were not an option: `_headers` sends `X-Frame-Options: DENY`.
+- **`scripts/bausteine.mjs`** scans `layouts/` too, so Nav, Footer, Backdrop,
+  Icons, Transition and StructuredData are no longer listed as unused.
 
 ## 3. The homepage
 

@@ -1,19 +1,19 @@
 ---
 /**
- * Rahmen für die beiden Design-Seiten (Styleguide und Komponenten).
+ * Frame for the two design pages (styleguide and component catalogue).
  *
- * Bewusst nicht Base.astro: dort stecken Navigation, Fuß, Übergangsschicht
- * und Hintergrundebenen. Auf einer Dokumentationsseite wären das drei
- * Bausteine, die man zeigen will, gleichzeitig aber als Rahmen um alles
- * andere liegen hätte — Nav ist fixiert und läge über jedem Beispiel.
+ * Deliberately not Base.astro: that one brings the navigation, footer,
+ * transition layer and backdrop. On a documentation page those would be
+ * blocks you want to show and at the same time a frame around everything
+ * else; the navigation is fixed and would sit on top of every sample. So
+ * neither Nav nor Footer nor Backdrop appears on these pages.
  *
- * Dieselben Grundlagen wie überall (tokens.css, base.css, shared.css), damit
- * hier nichts zu sehen ist, was auf der Seite selbst anders aussähe. Das ist
- * der ganze Zweck: Wer hier etwas ändert sieht, hat es nicht dokumentiert,
- * sondern zwei Wahrheiten geschaffen.
+ * The same foundations as everywhere (tokens.css, base.css, shared.css), so
+ * nothing here looks different from the site itself. A change that only
+ * shows here has not been documented; it has created a second truth.
  *
- * Das Skriptbündel läuft mit — die Beispiele sollen sich bewegen wie im
- * Einsatz, nicht als tote Bilder dastehen.
+ * The script bundle runs too: the samples should move as they do in use,
+ * not stand there as dead pictures.
  */
 import "../styles/tokens.css";
 import "../styles/base.css";
@@ -28,14 +28,16 @@ const { title, active } = Astro.props;
 
 const PAGES = [
   {
+    key: "styleguide",
     path: "/design/styleguide",
     name: "Styleguide",
-    note: "Farben, Typografie, Abstände, Bausteine",
+    note: "Grundwerte, Rollen, Flächen",
   },
   {
+    key: "komponenten",
     path: "/design/komponenten",
     name: "Komponenten",
-    note: "Jeder Baustein mit Beschreibung",
+    note: "Jeder Baustein mit Beschreibung und Beispiel",
   },
 ] as const;
 ---
@@ -47,7 +49,7 @@ const PAGES = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#d6d6d6" />
     <title>{title} - Mundpropaganda Design</title>
-    {/* Interne Seite: gehört nicht in den Index einer Suchmaschine. */}
+    {/* Internal page: not for a search engine's index. */}
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/svg/logo-mark.svg" type="image/svg+xml" />
     <link
@@ -71,9 +73,8 @@ const PAGES = [
 
   <body class="d-body">
     {
-      /* WCAG 2.2, 2.4.1 — wie in Base.astro. Muss das erste
-        fokussierbare Element sein, sonst ist der Sprung nicht zu
-        erreichen, bevor die Navigation kommt. */
+      /* WCAG 2.2, 2.4.1, as in Base.astro. Must be the first focusable
+        element, or the jump cannot be reached before the navigation. */
     }
     <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
 
@@ -86,11 +87,8 @@ const PAGES = [
           PAGES.map((s) => (
             <a
               href={s.path}
-              aria-current={
-                s.name.toLowerCase().startsWith(active.slice(0, 4))
-                  ? "page"
-                  : undefined
-              }
+              title={s.note}
+              aria-current={s.key === active ? "page" : undefined}
             >
               {s.name}
             </a>
@@ -107,11 +105,11 @@ const PAGES = [
     </script>
 
     <style is:global>
-      /* --- Rahmen der Dokumentationsseiten -----------------------------
-         Alles hier trägt das Präfix `d-` und beschreibt ausschließlich das
-         Drumherum: Kopfzeile, Abschnitte, Beschriftungen. Kein `d-`-Stil darf
-         je in ein Beispiel hineinwirken — sonst zeigte die Seite etwas
-         anderes, als sie behauptet.
+      /* --- Frame of the documentation pages ----------------------------
+         Everything here carries the `d-` prefix and styles only the
+         surroundings: header, chapters, captions. No `d-` rule may ever
+         reach into a sample, or the page would show something other than
+         what it claims.
          ---------------------------------------------------------------- */
 
       .d-body {
@@ -145,9 +143,8 @@ const PAGES = [
         gap: var(--sp-5);
       }
 
-      /* Der aktuelle Eintrag ist unterstrichen, nicht nur farbig — Farbe
-         allein wäre kein Unterschied für alle, die sie nicht sehen (WCAG
-         1.4.1). */
+      /* The current entry is underlined, not only coloured: colour alone is
+         no difference for anyone who cannot see it (WCAG 1.4.1). */
       .d-header__nav a[aria-current="page"] {
         text-decoration: underline;
         text-underline-offset: 4px;
@@ -157,11 +154,10 @@ const PAGES = [
         padding-bottom: var(--sp-16);
       }
 
-      /* Ein Kapitel. Die Beispiele darin laufen über die volle Breite, der
-         beschreibende Text bleibt schmal — lange Zeilen liest niemand. */
-      /* Enger als auf der Seite selbst. --section-space ist für eine Seite
-         gedacht, die man durchscrollt; hier stünde pro Bildschirm eine
-         Überschrift und sonst nichts. */
+      /* A chapter. Its samples run full width, the describing text stays
+         narrow; nobody reads long lines. Tighter than on the site itself:
+         --section-space is meant for a page you scroll through, here it
+         would leave one heading per screen and nothing else. */
       .d-section {
         padding-block: var(--sp-10);
         border-top: var(--bw) solid var(--c-line);
@@ -172,7 +168,7 @@ const PAGES = [
       }
 
       .d-section__header {
-        max-width: 62ch;
+        max-width: calc(var(--measure-text) + 2 * var(--site-margin));
         margin-bottom: var(--sp-6);
         padding-inline: var(--site-margin);
       }
@@ -199,7 +195,7 @@ const PAGES = [
         color: var(--c-text-muted);
       }
 
-      /* Eine einzelne Probe: Beschriftung darüber, Beispiel darunter. */
+      /* A single sample: caption above, example below. */
       .d-sample {
         padding-inline: var(--site-margin);
         margin-bottom: var(--sp-8);
@@ -222,8 +218,8 @@ const PAGES = [
         text-transform: uppercase;
       }
 
-      /* Der Quellpfad. Damit findet man die Datei, ohne suchen zu müssen —
-         der häufigste Grund, eine solche Seite überhaupt aufzuschlagen. */
+      /* The source path: it finds the file without searching, the most
+         common reason to open a page like this at all. */
       .d-sample__path {
         font-family: var(--f-mono);
         font-size: var(--fs-label);
@@ -232,15 +228,15 @@ const PAGES = [
       }
 
       .d-sample__text {
-        max-width: 68ch;
+        max-width: var(--measure-long);
         margin-bottom: var(--sp-4);
         font-size: var(--fs-text-main);
         line-height: var(--lh-body);
         color: var(--c-text-muted);
       }
 
-      /* Die Bühne, auf der ein Beispiel steht. Heller Grund, damit man die
-         Kante des Bausteins sieht — auf dem Seitengrau verschwämme sie. */
+      /* The stage a sample stands on. A light ground so the edge of the
+         block shows; on the page grey it would blur. */
       .d-stage {
         padding: var(--sp-5);
         border: var(--bw) solid var(--c-line);
@@ -248,23 +244,25 @@ const PAGES = [
         background: var(--c-surface);
       }
 
-      /* Auf der Bühne zeichnet der Fokusring nach innen.
+      /* On a stage the focus ring is drawn inside.
 
-         Einige Bühnen beschneiden absichtlich (`overflow: hidden`), damit ein
-         Beispiel nicht über seinen Kasten hinausläuft — und schnitten damit
-         auch den Ring der Bedienelemente darin weg. Gemessen im Tastaturlauf
-         über /design/komponenten: die Karussellpfeile, Luft 1 Pixel.
+         Some stages clip on purpose (`overflow: hidden`) so a sample does not
+         run out of its box, and with it they cut off the ring of the
+         controls inside. Measured in a keyboard run over /design/komponenten:
+         the carousel arrows, 1 pixel of air.
 
-         Die Regel steht hier und nicht an den Komponenten: Auf den echten
-         Seiten sitzen dieselben Pfeile frei und bekommen ihren Ring wie
-         vorgesehen außen. Das Problem gehört der Bühne. */
+         The rule lives here and not in the components: on the real pages the
+         same arrows sit free and get their ring outside as intended. The
+         problem belongs to the stage. */
       .d-stage :focus-visible {
-        outline-offset: -2px;
+        outline-offset: calc(var(--focus-width) * -1);
       }
 
+      /* A dark stage. Put `data-surface="dark"` on it as well where the
+         sample inside reads the colour roles. */
       .d-stage--dark {
         background: var(--c-dark);
-        color: var(--c-bg);
+        color: var(--c-on-dark);
       }
 
       .d-stage--borderless {
@@ -279,7 +277,7 @@ const PAGES = [
         gap: var(--sp-4);
       }
 
-      /* Raster für Farb- und Wertkacheln. */
+      /* Grid for colour and value tiles. */
       .d-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -300,17 +298,16 @@ const PAGES = [
         font-size: 0.9em;
       }
 
-      /* Links im beschreibenden Text. Die Klasse .c-link gibt es hier nicht:
-         sie ist in den Komponenten abgegrenzt, die sie benutzen, und wirkt
-         außerhalb davon nicht. Deshalb über die Textklassen — und niemals
-         über einen allgemeinen a-Selektor, der auch in die eingebetteten
-         Beispiele hineinschlüge. */
+      /* Links in the describing text. The class .c-link does not exist here:
+         it is scoped inside the components that use it. Hence the text
+         classes, and never a bare `a` selector that would reach into the
+         embedded samples. */
       .d-section__text a,
       .d-sample__text a,
       .d-note a {
         text-decoration: underline;
         text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
+        text-decoration-thickness: var(--bw);
       }
 
       .d-section__text a:hover,

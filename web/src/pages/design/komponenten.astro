@@ -19,12 +19,31 @@
  * Portable-Text-Knoten für TextHeading) und das Prüfdatum der Autorenbox.
  *
  * Nicht eingebettet sind die Bausteine, die den Seitenchrome bilden
- * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen) und die beiden
- * Heroes. Sie sind auf ihre Seite als Ganzes bezogen: die Navigation ist
- * fixiert und läge über jedem Beispiel, die Heroes füllen ein ganzes Fenster
- * und bringen eine Auftrittschoreografie mit, die genau einmal je Dokument
- * laufen kann. Ein Beispiel davon wäre kein Beispiel, sondern ein zweiter,
- * kaputter Seitenkopf. Sie stehen deshalb mit Beschreibung und Verweis da.
+ * (Navigation, Fuß, Übergangsschicht, Hintergrundebenen). Sie sind auf ihre
+ * Seite als Ganzes bezogen: die Navigation ist fixiert und läge über jedem
+ * Beispiel. Sie stehen deshalb mit Beschreibung und Verweis da.
+ *
+ * The four heroes are rendered here, each on a stage of fixed height
+ * (`.d-hero-stage`), with the page's real data. Two things make that work:
+ *
+ *   - Choreography. `hero.js` animates the FIRST `[data-hero]` of a
+ *     document only; the others keep the hidden start state from
+ *     shared.css (`html.js [data-hero-word]` & co.). Hero comes first and
+ *     runs its entrance as on the homepage; the ServiceHero stages carry
+ *     `d-hero-stage--static`, which releases that start state, so they show
+ *     their end state. CareersHero and PillarHero hang off the general
+ *     modules (`data-split`, `data-reveal`) and animate anywhere.
+ *   - Document structure. Every hero brings the h1 of its page. The stages
+ *     are `aria-hidden` and `inert`: a picture of a page head, not part of
+ *     this page's outline, and nothing in them to tab to.
+ *
+ * An <iframe> of the real page would have been the cleaner stage, and was
+ * tried first: `public/_headers` sends `X-Frame-Options: DENY` for every
+ * path, same origin included, so the frames stay empty (dev server and
+ * Netlify alike). That header is a deliberate security setting and stays.
+ * CareersHero is shown without `zoom`: the zoom pins the image to the
+ * scroll position of the whole document, which on a catalogue page is
+ * somewhere else entirely; it is described and linked instead.
  */
 import Design from "../../layouts/Design.astro";
 import { loadHomepage } from "../../lib/homepage";
@@ -32,8 +51,9 @@ import { loadService } from "../../lib/services";
 import { loadPosts } from "../../lib/magazine";
 import { loadCareers, loadJobs } from "../../lib/careers";
 import { loadPractice, loadTeam } from "../../lib/practice";
-import { loadSettings, telLink } from "../../lib/settings";
+import { loadSettings } from "../../lib/settings";
 import { veneersPillar } from "../../content/veneers-pillar";
+import { benefitsFootnote } from "../../content/service-crosslinks";
 import type { PillarSection } from "../../lib/pillar-sections";
 import type { Heading } from "../../lib/table-of-contents";
 import type { Block } from "astro-portabletext/types";
@@ -55,6 +75,10 @@ import AuthorNote from "../../components/ui/AuthorNote.astro";
 import SourceNote from "../../components/ui/SourceNote.astro";
 
 import Intro from "../../components/sections/Intro.astro";
+import Hero from "../../components/sections/Hero.astro";
+import ServiceHero from "../../components/sections/ServiceHero.astro";
+import CareersHero from "../../components/sections/CareersHero.astro";
+import PillarHero from "../../components/sections/PillarHero.astro";
 import Statement from "../../components/sections/Statement.astro";
 import Benefits from "../../components/sections/Benefits.astro";
 import BeforeAfter from "../../components/sections/BeforeAfter.astro";
@@ -169,6 +193,7 @@ const POST_CATEGORIES = [
  * einblendet.
  */
 const PAGE_HEADINGS: Heading[] = [
+  { key: "heroes", id: "seitenkoepfe", text: "Seitenköpfe", level: 2 },
   { key: "controls", id: "bedienelemente", text: "Bedienelemente", level: 2 },
   {
     key: "surfaces",
@@ -212,23 +237,15 @@ const HEADING_NODE: Block & { _tocId: string } = {
    das Beispiel zeigte den halben Baustein. */
 const REVIEW_DATE = "2026-06-30";
 
+/* The ServiceHero pair shows `claim`: the same Veneers data once with
+   the claim from the CMS and once without it, which is what every service
+   without a claim shows. If Veneers loses its claim, the first sample says
+   so instead of claiming a variant it does not show. */
+const claim = service?.hero?.claim;
+
 /* Bausteine, die sich nicht einbetten lassen — mit dem Grund, warum nicht.
    Der Grund gehört dazu: ohne ihn liest es sich wie eine Lücke. */
 const CHROME = [
-  {
-    name: "Hero",
-    path: "components/sections/Hero.astro",
-    text: "Der Seitenkopf der Startseite: Wortmarke über zwei Zeilen, der Zahn dazwischen - „MUND“ liegt dahinter, „PROPAGANDA“ davor. Die Wortmarke ist zugleich die h1 der Seite. Trägt die Auftrittschoreografie: Maske über der Schrift, Nav von oben, Bewertungsleiste und Scroll-Button zuletzt.",
-    reason: "Füllt ein ganzes Fenster und läuft genau einmal je Dokument an.",
-    viewAt: "/",
-  },
-  {
-    name: "ServiceHero",
-    path: "components/sections/ServiceHero.astro",
-    text: "Derselbe Auftritt für die Leistungsseiten, aber mit Titel statt Wortmarke und einem Bild rechts. Hängt an denselben data-Attributen wie der große Hero, deshalb greift dieselbe Choreografie ohne eigenen Code.",
-    reason: "Wie oben - ein zweiter Seitenkopf im Dokument.",
-    viewAt: "/leistungen/veneers",
-  },
   {
     name: "Nav",
     path: "components/ui/Nav.astro",
@@ -315,20 +332,200 @@ const RING_IMAGES = [
     </div>
   </section>
 
-  {/* ================= Bedienelemente ================= */}
+  {/* ================= Seitenköpfe ================= */}
   {
     /* Die `id` an jedem Kapitel ist das Ziel der Verzeichnis-Beispiele weiter
       unten; `data-toc-target` ist zusätzlich das, woran `toc.js` erkennt, in
       welchem Kapitel gerade gelesen wird. Beides steht hier, damit die drei
       Verzeichnisbausteine mit echten Sprungmarken laufen. */
   }
+  <section class="d-section" id="seitenkoepfe" data-toc-target="seitenkoepfe">
+    <div class="d-section__header">
+      <span class="d-section__number">01</span>
+      <h2 class="d-section__title">Seitenköpfe</h2>
+      <p class="d-section__text">
+        Der erste Bildschirm eines Seitentyps, jeder auf einer Bühne mit fester
+        Höhe, die für ein Browserfenster steht. Ein Kopf misst sich am Fenster,
+        deshalb schneidet die Bühne ab, was darunter käme. Die Bühnen sind ein
+        Bild der Seite und nicht bedienbar; zum Ausprobieren die Seite darunter
+        öffnen.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">Hero</span>
+        <span class="d-sample__path">components/sections/Hero.astro</span>
+      </div>
+      <p class="d-sample__text">
+        Der Seitenkopf der Startseite: Wortmarke über zwei Zeilen, der Zahn
+        dazwischen, „MUND“ liegt dahinter, „PROPAGANDA“ davor. Die Wortmarke ist
+        zugleich die h1 der Seite. Trägt die Auftrittschoreografie: Maske über
+        der Schrift, der Zahn von unten, Bewertungsleiste und Scroll-Button
+        zuletzt. Hier läuft sie, weil dieser Kopf der erste auf der Seite ist;
+        die Navigation, die auf der Startseite von oben einfährt, gibt es auf
+        dieser Seite nicht.
+      </p>
+      <div class="d-hero-stage" aria-hidden="true" inert>
+        <Hero lines={content.heroLines} />
+      </div>
+      <p class="d-sample__text d-hero-caption">
+        Im Einsatz: <a href="/">Startseite</a>
+      </p>
+    </div>
+
+    {
+      service ? (
+        <>
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">ServiceHero · mit claim</span>
+              <span class="d-sample__path">
+                components/sections/ServiceHero.astro
+              </span>
+            </div>
+            <p class="d-sample__text">
+              Derselbe Auftritt für die Leistungsseiten, mit Text links und
+              randabfallendem Bild rechts.{" "}
+              {claim ? (
+                <>
+                  Trägt die Leistung einen Anspruch (<code>claim</code>), steht
+                  er anstelle des Namens in der Überschrift: hier „{claim}“
+                  statt „{service.title}“. Die Topline darüber nennt die
+                  Behandlung weiter beim Namen, und der längere Satz steigt
+                  schneller auf.
+                </>
+              ) : (
+                <>
+                  Trägt die Leistung einen Anspruch (<code>claim</code>), steht
+                  er anstelle des Namens in der Überschrift. {service.title}{" "}
+                  trägt im CMS derzeit keinen, deshalb zeigt auch dieses
+                  Beispiel den Namen.
+                </>
+              )}{" "}
+              Auf dieser Seite ohne Auftritt: Die Choreografie gehört dem ersten
+              Kopf eines Dokuments.
+            </p>
+            <div
+              class="d-hero-stage d-hero-stage--static"
+              aria-hidden="true"
+              inert
+            >
+              <ServiceHero
+                topline={service.topline ?? undefined}
+                title={service.title}
+                slug="veneers"
+                claim={claim ?? undefined}
+                text={service.hero?.text ?? undefined}
+                action={service.hero?.actionLabel || undefined}
+                image={service.hero?.image}
+                alt={service.hero?.image?.alt ?? ""}
+              />
+            </div>
+            <p class="d-sample__text d-hero-caption">
+              Im Einsatz: <a href="/leistungen/veneers">/leistungen/veneers</a>
+            </p>
+          </div>
+
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">ServiceHero · ohne claim</span>
+              <span class="d-sample__path">
+                components/sections/ServiceHero.astro
+              </span>
+            </div>
+            <p class="d-sample__text">
+              Der Regelfall, mit denselben Daten ohne Anspruch: Der
+              Leistungsname steht groß in der Überschrift. Sein Grad richtet
+              sich nach dem längsten Wort, damit es nicht ins Bild läuft.
+            </p>
+            <div
+              class="d-hero-stage d-hero-stage--static"
+              aria-hidden="true"
+              inert
+            >
+              <ServiceHero
+                topline={service.topline ?? undefined}
+                title={service.title}
+                slug="veneers"
+                text={service.hero?.text ?? undefined}
+                action={service.hero?.actionLabel || undefined}
+                image={service.hero?.image}
+                alt={service.hero?.image?.alt ?? ""}
+              />
+            </div>
+            <p class="d-sample__text d-hero-caption">
+              Im Einsatz auf jeder Leistungsseite ohne Anspruch, etwa{" "}
+              <a href="/leistungen/bleaching">/leistungen/bleaching</a>
+            </p>
+          </div>
+        </>
+      ) : null
+    }
+
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">CareersHero</span>
+        <span class="d-sample__path">components/sections/CareersHero.astro</span
+        >
+      </div>
+      <p class="d-sample__text">
+        Der Kopf der Karriere- und der Praxisseite: ein Wort, groß und mittig,
+        darunter das Bild, oben stärker gerundet als unten, damit es in den
+        Bögen der Hintergrundlinien sitzt. Der Einstiegstext steht nicht hier,
+        sondern im Abschnitt darunter. Auf der Praxisseite trägt er zusätzlich{
+          " "
+        }
+        <code>zoom</code>: Beim Scrollen zieht das Bild auf Vollbild auf. Das
+        hängt an der Scrollposition des ganzen Dokuments und steht deshalb nur
+        dort, auf <a href="/praxis">/praxis</a>.
+      </p>
+      <div class="d-hero-stage" aria-hidden="true" inert>
+        <CareersHero
+          title={careers?.title ?? "Karriere"}
+          topline={careers?.topline ?? undefined}
+          image={careers?.image}
+          alt={careers?.image?.alt ?? ""}
+        />
+      </div>
+      <p class="d-sample__text d-hero-caption">
+        Im Einsatz: <a href="/karriere">/karriere</a>
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-sample__header">
+        <span class="d-sample__name">PillarHero</span>
+        <span class="d-sample__path">components/sections/PillarHero.astro</span>
+      </div>
+      <p class="d-sample__text">
+        Der Kopf einer Pillar Page: Das Bild läuft randabfallend über die volle
+        Breite, eine helle Fläche schiebt sich von unten darüber, und die
+        Überschrift ragt aus ihr ins Bild. Ein anderer Bau als ServiceHero,
+        deshalb ein eigener Baustein.
+      </p>
+      <div class="d-hero-stage" aria-hidden="true" inert>
+        <PillarHero
+          title={veneersPillar.title}
+          eyebrow={veneersPillar.topline}
+          image={veneersPillar.image}
+          alt={veneersPillar.imageAlt ?? ""}
+        />
+      </div>
+      <p class="d-sample__text d-hero-caption">
+        Im Einsatz: <a href="/veneers-berlin">/veneers-berlin</a>
+      </p>
+    </div>
+  </section>
+
+  {/* ================= Bedienelemente ================= */}
   <section
     class="d-section"
     id="bedienelemente"
     data-toc-target="bedienelemente"
   >
     <div class="d-section__header">
-      <span class="d-section__number">01</span>
+      <span class="d-section__number">02</span>
       <h2 class="d-section__title">Bedienelemente</h2>
     </div>
 
@@ -417,7 +614,7 @@ const RING_IMAGES = [
   {/* ================= Flächen und Bilder ================= */}
   <section class="d-section" id="flaechen" data-toc-target="flaechen">
     <div class="d-section__header">
-      <span class="d-section__number">02</span>
+      <span class="d-section__number">03</span>
       <h2 class="d-section__title">Flächen, Bilder, Zierrat</h2>
     </div>
 
@@ -571,7 +768,7 @@ const RING_IMAGES = [
   {/* ================= Sections ================= */}
   <section class="d-section" id="sections" data-toc-target="sections">
     <div class="d-section__header">
-      <span class="d-section__number">03</span>
+      <span class="d-section__number">04</span>
       <h2 class="d-section__title">Sections</h2>
       <p class="d-section__text">
         Die großen Bausteine, aus denen eine Seite zusammengesteckt wird. Jeder
@@ -642,6 +839,14 @@ const RING_IMAGES = [
         hat eine feste Höhe - mit Mindesthöhe trug der längste Eintrag sie über
         das Maß hinaus und das ganze Band sprang beim Durchlaufen.
       </p>
+      <p class="d-sample__text d-indented">
+        Hier mit <code>footnote</code>: dem Satz unter der Liste, der auf die
+        Seite weiterführt, die es genauer erklärt. Die Verweise darin stehen im
+        Repository und nicht im Studio (<code
+          >content/service-crosslinks.ts</code
+        >), weil ihr Ziel die Pillar Page ist und kein Dokument im CMS. Ohne
+        <code>footnote</code> entfällt die Zeile, alles andere bleibt gleich.
+      </p>
       <div class="d-live">
         {
           service?.benefits?.topline &&
@@ -651,6 +856,7 @@ const RING_IMAGES = [
               topline={service.benefits.topline}
               headline={service.benefits.headline}
               items={service.benefits.items}
+              footnote={benefitsFootnote.veneers}
             />
           ) : null
         }
@@ -729,6 +935,45 @@ const RING_IMAGES = [
               columns={service.intro.columns}
             />
           ) : null
+        }
+      </div>
+    </div>
+
+    <div class="d-example">
+      <div class="d-sample__header d-sample__header--wide">
+        <span class="d-sample__name">Intro · bleed</span>
+        <span class="d-sample__path">components/sections/Intro.astro</span>
+      </div>
+      <p class="d-sample__text d-indented">
+        Dieselbe Section mit einem randlosen Bild darüber: <code>bleed</code>
+        nimmt einen Motivnamen aus der Bildpipeline und bricht über die volle Fensterbreite
+        aus, ohne Rundung, denn eine gerundete Ecke am Fensterrand sieht aus wie ein
+        Fehler beim Zuschneiden. Hier das Erklärstück der Veneers-Seite, Text aus
+        dem CMS. <code>bleed</code> und das mittige <code>image</code> der Pillar
+        Pages schließen sich aus.
+      </p>
+      <div class="d-live">
+        {
+          /* Motif and alt text as `templates/Service.astro` sets them for
+            Veneers (ERKLAERSTUECK_MOTIV / _ALT). They are frontmatter
+            constants there and cannot be imported, so they are repeated
+            here as sample data. */
+          service?.explainer?.headline && service.explainer.columns?.length ? (
+            <Intro
+              bleed="veneers-anprobe"
+              alt="Ein Farbmuster wird zum Vergleich an die Frontzähne gehalten."
+              topline={service.explainer.topline ?? undefined}
+              headline={service.explainer.headline}
+              columns={service.explainer.columns}
+              action={service.explainer.actionLabel || undefined}
+              actionHref="#kontakt"
+            />
+          ) : (
+            <p class="d-note d-indented">
+              Veneers trägt im CMS derzeit kein Erklärstück, deshalb steht hier
+              kein Beispiel.
+            </p>
+          )
         }
       </div>
     </div>
@@ -1347,7 +1592,7 @@ const RING_IMAGES = [
   {/* ================= Verzeichnis und Belege ================= */}
   <section class="d-section" id="lesehilfen" data-toc-target="lesehilfen">
     <div class="d-section__header">
-      <span class="d-section__number">04</span>
+      <span class="d-section__number">05</span>
       <h2 class="d-section__title">Verzeichnis und Belege</h2>
       <p class="d-section__text">
         Kleinteile langer Seiten: Orientierung im Text und die Kästen, die
@@ -1525,7 +1770,7 @@ const RING_IMAGES = [
   {/* ================= Seitenchrome ================= */}
   <section class="d-section" id="rahmen" data-toc-target="rahmen">
     <div class="d-section__header">
-      <span class="d-section__number">05</span>
+      <span class="d-section__number">06</span>
       <h2 class="d-section__title">Seitenrahmen und Einzelstücke</h2>
       <p class="d-section__text">
         Diese Bausteine lassen sich nicht als Beispiel einbetten - jeder von
@@ -1620,6 +1865,35 @@ const RING_IMAGES = [
 
     .d-note p {
       line-height: var(--lh-body);
+    }
+
+    /* The stage for a hero. A hero measures itself against the window
+       (min-height: 100svh), so the stage is one window high, capped, and
+       clips what would follow. `transform` makes it the containing block
+       for anything fixed inside; `isolation` keeps the hero's layers (tooth,
+       lines, grain) from mixing with the page around it. */
+    .d-hero-stage {
+      position: relative;
+      height: min(100svh, 900px);
+      overflow: hidden;
+      border: var(--bw) solid var(--c-line-strong);
+      border-radius: var(--r-md);
+      background: var(--c-bg);
+      transform: translate(0);
+      isolation: isolate;
+    }
+
+    /* Only the first `[data-hero]` of a document is released by hero.js.
+       On the other stages the start state from shared.css is lifted here,
+       so they show the head as it stands once the entrance is over. */
+    html.js .d-hero-stage--static [data-hero-word],
+    html.js .d-hero-stage--static [data-hero-foot],
+    html.js .d-hero-stage--static [data-hero-scroll] {
+      visibility: visible;
+    }
+
+    .d-hero-caption {
+      margin-top: var(--sp-2);
     }
   </style>
 </Design>

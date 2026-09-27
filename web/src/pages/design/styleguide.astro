@@ -1,31 +1,46 @@
 ---
 /**
- * Styleguide — die Grundlagen: Farben, Typografie, Abstände, Radien,
- * Bewegung und die kleinen Bausteine, aus denen alles Übrige besteht.
+ * Styleguide: the foundations of the site in the three layers of
+ * `src/styles/tokens.css` (base values, roles, surfaces), followed by the
+ * small building blocks everything else is made of.
  *
- * Alle Werte kommen aus tokens.css und werden hier NICHT wiederholt, sondern
- * über die Custom Property gezogen. Eine Seite, die Farben als Hex-Werte
- * abschreibt, ist nach der ersten Änderung eine Lüge.
+ * Nothing on this page is copied from tokens.css by hand. The frontmatter
+ * reads the file at build time: which tokens exist, their raw values, what
+ * the roles and surfaces are made of, and from that the contrast ratios and
+ * the pixel values at 1728px. A token added there shows up here; a token
+ * removed there disappears. The German purpose next to each token is the only
+ * hand-kept text, and a token without one says so.
  *
- * Die Kontrastwerte daneben sind gerechnet, nicht abgetippt: dieselbe Formel
- * wie in scripts/lib/wcag.mjs, damit hier nichts als „AA“ dasteht, was der
- * Prüflauf beanstanden würde.
+ * "Used in" is generated as well. The frontmatter scans the source files
+ * under web/src (components, templates, layouts, pages, styles, js; not the
+ * design pages and not tokens.css itself) and counts, per token, which file
+ * references it and how often. It replaced hand-written notes such as
+ * "Galeriekopf, Geschichte", which went stale the moment a block moved to
+ * another step of the scale. A token nothing references is marked.
+ *
+ * The one hand-kept list of values is `HEX` below: the swatches show the
+ * literal colours, and `checkStyleguideColours()` in scripts/check-web.mjs
+ * compares every entry with its `--c-*` in tokens.css.
  */
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import Design from "../../layouts/Design.astro";
 import Button from "../../components/ui/Button.astro";
 import Accordion from "../../components/ui/Accordion.astro";
 
-/* --- Kontrast ---------------------------------------------------------
-   Zur Bauzeit gerechnet. Die Farben stehen hier als Hex, weil sich clamp()
-   und color-mix() nicht in Node auswerten lassen — sie sind aus tokens.css
-   übernommen, nicht frei gewählt.
+/* --- Source -------------------------------------------------------------
+   `npm run web` runs Astro inside web/, so the working directory is web/.
+   The second candidate covers a run started from the project root. */
+const SRC = [
+  join(process.cwd(), "src"),
+  join(process.cwd(), "web", "src"),
+].find((dir) => existsSync(join(dir, "styles", "tokens.css")));
+if (!SRC) {
+  throw new Error(`Styleguide: tokens.css not found from ${process.cwd()}`);
+}
+const TOKENS_FILE = readFileSync(join(SRC, "styles", "tokens.css"), "utf8");
 
-   Abgesichert ist das seit dem 15.08.2026 durch `checkStyleguideColours()`
-   in `scripts/check-web.mjs`: Die Prüfung vergleicht jeden Wert hier mit dem
-   zugehörigen `--c-*` in tokens.css. Vorher stand an dieser Stelle, das sei
-   „über den Prüflauf abgesichert" — das war es nicht, kein Skript hat die
-   beiden Listen je verglichen. Ein geänderter Farbton in tokens.css hätte
-   die Tafel lautlos falsch werden lassen. */
+/* --- Base colours, checked against tokens.css by check-web.mjs ----------- */
 const HEX = {
   brand: "#ff84c8",
   dark: "#403229",
@@ -36,23 +51,822 @@ const HEX = {
   white: "#ffffff",
 } as const;
 
-const channels = (h: string) =>
-  [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+/* --- Parsing tokens.css -------------------------------------------------- */
 
-function luminance(hex: string) {
-  const k = channels(hex).map((v) => {
+type Decls = Map<string, string>;
+
+const withoutComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+const blocks = [
+  ...withoutComments(TOKENS_FILE).matchAll(/([^{}]+)\{([^{}]*)\}/g),
+].map((match) => ({
+  selector: (match[1] ?? "").trim(),
+  decls: new Map(
+    [...(match[2] ?? "").matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map(
+      (d) =>
+        [
+          d[1] ?? "",
+          /* Prettier breaks long color-mix() calls over lines; one line,
+             without padding inside the parentheses, keeps the readers below
+             simple. */
+          (d[2] ?? "")
+            .replace(/\s+/g, " ")
+            .replace(/\(\s/g, "(")
+            .replace(/\s\)/g, ")")
+            .trim(),
+        ] as const,
+    ),
+  ) as Decls,
+}));
+
+/* The first `:root` holds base values and roles; a later `:root` holds the
+   legacy aliases for the archived prototype. */
+const rootBlocks = blocks.filter((b) => b.selector === ":root");
+const ROOT: Decls = rootBlocks[0]?.decls ?? new Map();
+const LEGACY: Decls = new Map(rootBlocks.slice(1).flatMap((b) => [...b.decls]));
+
+const SURFACE_DECLS = new Map<string, Decls>();
+for (const b of blocks) {
+  const m = b.selector.match(/^\[data-surface="([\w-]+)"\]$/);
+  if (m?.[1]) SURFACE_DECLS.set(m[1], b.decls);
+}
+
+/* Base values and roles live in the same block; the "2. ROLES" banner
+   divides them: the line that says nothing else, because the file header
+   also starts a line with "2. ROLES". Definitions are matched at the start of a line so a token
+   mentioned inside a comment does not count as its definition. */
+const rolesStart = TOKENS_FILE.search(/^\s*2\. ROLES\s*$/m);
+const definedAt = (name: string) =>
+  TOKENS_FILE.search(new RegExp(`^\\s*${name}\\s*:`, "m"));
+const isRole = (name: string) =>
+  rolesStart >= 0 && definedAt(name) > rolesStart;
+
+const TOKENS = [...ROOT.keys()];
+const BASE = TOKENS.filter((t) => !isRole(t));
+const ROLES = TOKENS.filter(isRole);
+
+/* --- Colour maths (same formula as scripts/lib/wcag.mjs) ----------------- */
+
+type Rgb = [number, number, number];
+type Colour = { rgb: Rgb; alpha: number };
+
+const channels = (hex: string): Rgb =>
+  [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)) as Rgb;
+
+function luminance(rgb: Rgb) {
+  const k = rgb.map((v) => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
   });
-  return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+  return 0.2126 * k[0]! + 0.7152 * k[1]! + 0.0722 * k[2]!;
 }
 
-function contrast(a: string, b: string) {
+function contrast(a: Rgb, b: Rgb) {
   const [x, y] = [luminance(a), luminance(b)];
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
-/* Jede Farbe gegen den Grund, auf dem sie tatsächlich vorkommt. */
+/** A colour with coverage below 100 %, painted onto its ground. */
+const over = (fg: Colour, ground: Rgb): Rgb =>
+  fg.rgb.map((v, i) => v * fg.alpha + ground[i]! * (1 - fg.alpha)) as Rgb;
+
+/**
+ * Resolves a colour expression from tokens.css: a hex value, `var()` and
+ * `color-mix(in srgb, X N%, transparent)`. `scope` holds the declarations of
+ * a surface; they win over :root, as they do in the browser. A value that
+ * comes from :root is resolved in :root, because a custom property is
+ * computed where it is declared.
+ */
+function colour(expr: string, scope?: Decls, depth = 0): Colour | null {
+  const e = expr.trim();
+  if (depth > 12) return null;
+  if (/^#[0-9a-f]{6}$/i.test(e)) return { rgb: channels(e), alpha: 1 };
+
+  const ref = e.match(/^var\(\s*(--[\w-]+)\s*\)$/);
+  if (ref?.[1]) {
+    const local = scope?.get(ref[1]);
+    if (local !== undefined) return colour(local, scope, depth + 1);
+    const global = ROOT.get(ref[1]);
+    return global === undefined ? null : colour(global, undefined, depth + 1);
+  }
+
+  const mix = e.match(
+    /^color-mix\(\s*in srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*transparent\s*\)$/,
+  );
+  if (mix?.[1] && mix[2]) {
+    const c = colour(mix[1], scope, depth + 1);
+    return c && { rgb: c.rgb, alpha: (c.alpha * Number(mix[2])) / 100 };
+  }
+  return null;
+}
+
+const tokenColour = (name: string, scope?: Decls) =>
+  colour(`var(${name})`, scope);
+
+/** Contrast of a colour role against a ground role, both from tokens.css. */
+function roleContrast(role: string, ground: string, scope?: Decls) {
+  const g = tokenColour(ground);
+  const c = tokenColour(role, scope);
+  return g && c ? contrast(over(c, g.rgb), g.rgb) : null;
+}
+
+/** "--c-dark · 75 %" for a color-mix, the referenced token for a var(). */
+function describeColour(value: string) {
+  const mix = value.match(/var\((--[\w-]+)\)\s+([\d.]+)%/);
+  if (mix) return `${mix[1]} · ${mix[2]} %`;
+  const ref = value.match(/^var\((--[\w-]+)\)$/);
+  return ref?.[1] ?? value;
+}
+
+type Kind = "text" | "control" | "decoration";
+
+/* Labelled, not only coloured: a traffic light alone says nothing to someone
+   who cannot tell the colours apart (WCAG 1.4.1). */
+function rating(v: number, kind: Kind) {
+  if (kind === "decoration") return { cls: "weak", label: "Schmuck" };
+  if (kind === "control") {
+    return v >= 3
+      ? { cls: "good", label: "Bedienelement" }
+      : { cls: "weak", label: "zu schwach" };
+  }
+  return v >= 4.5
+    ? { cls: "good", label: "Fließtext" }
+    : v >= 3
+      ? { cls: "partial", label: "nur groß" }
+      : { cls: "weak", label: "zu schwach" };
+}
+
+/* --- Lengths ------------------------------------------------------------- */
+
+/** The viewport the Figma values are drawn at. */
+const VIEWPORT = 1728;
+
+function splitArgs(s: string) {
+  const out: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of s) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === "," && depth === 0) {
+      out.push(current.trim());
+      current = "";
+    } else current += ch;
+  }
+  out.push(current.trim());
+  return out;
+}
+
+/** px at the given viewport width, or null where it cannot be known (vh, calc). */
+function px(expr: string, vw = VIEWPORT, depth = 0): number | null {
+  const e = expr.trim();
+  if (depth > 12) return null;
+
+  const ref = e.match(/^var\(\s*(--[\w-]+)\s*\)$/);
+  if (ref?.[1]) {
+    const v = ROOT.get(ref[1]);
+    return v === undefined ? null : px(v, vw, depth + 1);
+  }
+
+  const unit = e.match(/^(-?[\d.]+)(px|rem|vw)?$/);
+  if (unit) {
+    const n = Number(unit[1]);
+    if (unit[2] === "rem") return n * 16;
+    if (unit[2] === "vw") return (n * vw) / 100;
+    return unit[2] === "px" || n === 0 ? n : null;
+  }
+
+  const clamp = e.match(/^clamp\((.*)\)$/);
+  if (clamp?.[1]) {
+    const [a, b, c] = splitArgs(clamp[1]).map((p) => px(p, vw, depth + 1));
+    if (a == null || b == null || c == null) return null;
+    return Math.min(Math.max(a, b), c);
+  }
+  return null;
+}
+
+function pxRange(expr: string): [number, number] | null {
+  const clamp = expr.trim().match(/^clamp\((.*)\)$/);
+  if (!clamp?.[1]) return null;
+  const args = splitArgs(clamp[1]);
+  const lo = args[0] ? px(args[0]) : null;
+  const hi = args[2] ? px(args[2]) : null;
+  return lo == null || hi == null ? null : [lo, hi];
+}
+
+const fmt = (n: number, digits = 0) =>
+  n.toLocaleString("de-DE", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+/* Cut, not rounded: 2.995 is below 3:1 and must not read "3,00". */
+const ratio = (n: number) => `${fmt(Math.floor(n * 100) / 100, 2)}:1`;
+
+/** "16–48 px, 48 px bei 1728" for a clamp, "24 px" for a fixed length. */
+function sizeOf(name: string) {
+  const value = ROOT.get(name) ?? "";
+  const range = pxRange(value);
+  const at = px(value);
+  if (range) {
+    const span = `${fmt(range[0])}–${fmt(range[1])} px`;
+    return at == null ? span : `${span}, ${fmt(at)} px bei 1728`;
+  }
+  return at == null ? "" : `${fmt(at)} px`;
+}
+
+/** The raw value as written, with `var(` noise removed for reading. Long
+    values (the grain image is a whole SVG) are cut; tokens.css has them. */
+const readable = (value: string) => {
+  const v = value.replace(/var\((--[\w-]+)\)/g, "$1").replace(/\s+/g, " ");
+  return v.length > 72 ? `${v.slice(0, 71)}…` : v;
+};
+
+/* --- Usage: where each token is referenced ------------------------------- */
+
+const SCAN_DIRS = [
+  "components",
+  "templates",
+  "layouts",
+  "pages",
+  "styles",
+  "js",
+];
+/* The design pages and their frame document the tokens; counting them would
+   make every token look used. tokens.css is the definition, see `via`. */
+const SKIP = new Set([
+  join("pages", "design"),
+  join("layouts", "Design.astro"),
+  join("styles", "tokens.css"),
+]);
+
+/** Short label for a source file: the component name, or kind plus name. */
+function labelFor(path: string) {
+  const [dir = "", ...rest] = path.split(/[\\/]/);
+  const file = rest.join("/");
+  const name = file.replace(/\.(astro|ts|js|mjs)$/, "");
+  switch (dir) {
+    case "components":
+      return name.split("/").pop() ?? name;
+    case "templates":
+      return `Vorlage ${name}`;
+    case "layouts":
+      return `Layout ${name}`;
+    case "pages":
+      return `Seite /${name.replace(/(^|\/)index$/, "")}`;
+    default:
+      return file.split("/").pop() ?? file;
+  }
+}
+
+/* Comments are stripped before counting: base.css mentions tokens in its
+   prose, and a sentence about a token is not a use of it. The `//` rule
+   leaves URLs alone (a colon or quote in front). */
+const stripComments = (text: string) =>
+  text
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, "$1");
+
+/* A reference, not a definition: `var(--x)` or "--x" in a script, never
+   `--x:`. The look-behind keeps BEM modifiers (`c-btn--dark`) out. */
+const REFERENCE = /(?<![\w-])--[a-z][a-z0-9-]*(?![\w-])(?!\s*:)/g;
+
+const uses = new Map<string, Map<string, number>>();
+const surfaceUses = new Map<string, Map<string, number>>();
+const bump = (
+  map: Map<string, Map<string, number>>,
+  key: string,
+  label: string,
+) => {
+  const inner = map.get(key) ?? new Map<string, number>();
+  inner.set(label, (inner.get(label) ?? 0) + 1);
+  map.set(key, inner);
+};
+
+let scannedFiles = 0;
+function walk(dir: string) {
+  for (const entry of readdirSync(join(SRC!, dir), { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (SKIP.has(path)) continue;
+    if (entry.isDirectory()) {
+      walk(path);
+      continue;
+    }
+    if (!/\.(astro|css|ts|js|mjs)$/.test(entry.name)) continue;
+    scannedFiles++;
+    const text = stripComments(readFileSync(join(SRC!, path), "utf8"));
+    const label = labelFor(path);
+    for (const m of text.matchAll(REFERENCE)) {
+      if (ROOT.has(m[0]) || LEGACY.has(m[0])) bump(uses, m[0], label);
+    }
+    for (const m of text.matchAll(/data-surface="([\w-]+)"/g)) {
+      if (m[1]) bump(surfaceUses, m[1], label);
+    }
+  }
+}
+for (const dir of SCAN_DIRS) if (existsSync(join(SRC, dir))) walk(dir);
+
+/* Inside tokens.css: which role or surface a base value is part of. */
+const via = new Map<string, string[]>();
+const addVia = (target: string, owner: string) =>
+  via.set(target, [...new Set([...(via.get(target) ?? []), owner])]);
+for (const [name, value] of ROOT) {
+  for (const m of value.matchAll(/var\((--[\w-]+)\)/g)) {
+    if (m[1]) addVia(m[1], name);
+  }
+}
+for (const [surface, decls] of SURFACE_DECLS) {
+  for (const value of decls.values()) {
+    for (const m of value.matchAll(/var\((--[\w-]+)\)/g)) {
+      if (m[1]) addVia(m[1], `Fläche ${surface}`);
+    }
+  }
+}
+
+const directUses = (name: string) =>
+  [...(uses.get(name) ?? new Map<string, number>())].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "de"),
+  );
+
+const isUnused = (name: string) =>
+  !directUses(name).length && !(via.get(name) ?? []).length;
+
+const esc = (s: string) =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const SHOWN = 6;
+const listFiles = (files: [string, number][]) =>
+  files.map(([f, n]) => esc(f) + (n > 1 ? ` (${n})` : "")).join(", ");
+
+/**
+ * The compact usage line, as HTML: "Verwendet in Features, Panel (2)".
+ * `subject` names the token in the label where two lines stand together.
+ */
+function usageHtml(
+  name: string,
+  map = uses,
+  owners = via.get(name) ?? [],
+  subject = "",
+) {
+  const lead = subject ? `<code>${esc(subject)}</code> ` : "";
+  const files =
+    map === uses
+      ? directUses(name)
+      : [...(map.get(name) ?? new Map<string, number>())].sort(
+          (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "de"),
+        );
+  const lines: string[] = [];
+  if (files.length) {
+    const rest = files.slice(SHOWN);
+    lines.push(
+      `${lead}<span class="d-usage__label">Verwendet in</span> ${listFiles(files.slice(0, SHOWN))}` +
+        (rest.length
+          ? ` <details class="d-usage__more"><summary>und ${rest.length} weitere</summary>${listFiles(rest)}</details>`
+          : ""),
+    );
+  }
+  if (owners.length) {
+    lines.push(
+      `<span class="d-usage__label">Steckt in</span> ${owners
+        .map((o) => (o.startsWith("--") ? `<code>${esc(o)}</code>` : esc(o)))
+        .join(", ")}`,
+    );
+  }
+  return lines.length
+    ? lines.map((l) => `<span class="d-usage__line">${l}</span>`).join("")
+    : `${lead}<span class="d-usage__none">Nirgends verwendet</span>`;
+}
+
+/* --- Purposes: the only hand-kept text ----------------------------------- */
+
+const PURPOSE: Record<string, string> = {
+  "--f-sans": "PP Neue Montreal: alles Gesetzte",
+  "--f-mono": "GT Pressura Mono: alles Beschriftende",
+  "--fw-light": "300, nur die Mono",
+  "--fw-regular": "400, Fließtext und ruhige Titel",
+  "--fw-medium": "500, Überschriften und Display",
+
+  "--fs-display-xl": "Konturschrift im Ring",
+  "--fs-display": "Wortmarke im Hero",
+  "--fs-display-lg": "Wortmarke des Magazins",
+  "--fs-display-md": "Große Namen und Geschichten",
+  "--fs-display-2": "Seitenköpfe",
+  "--fs-display-sm": "Kennzahlen",
+  "--fs-title-page": "Seitentitel",
+  "--fs-title-xl": "Große Überschrift",
+  "--fs-title-lg": "Überschrift",
+  "--fs-title-md": "Kleine Überschrift",
+  "--fs-title": "Titel einer Section",
+  "--fs-title-sm": "Kartentitel",
+  "--fs-title-xs": "Kleiner Titel",
+  "--fs-text-large": "Einleitung",
+  "--fs-text-main": "Fließtext",
+  "--fs-text-small": "Kleiner Text, Toplines",
+  "--fs-label-lg": "Buttonbeschriftung",
+  "--fs-label-md": "Navigation, Meta-Zeilen",
+  "--fs-label": "Kleingedrucktes",
+  "--fs-micro": "Badges",
+
+  "--lh-display": "Wortmarken, die Zeilen berühren sich",
+  "--lh-tight": "Große Überschriften, Ziffern",
+  "--lh-headline": "Seitentitel, kleine Überschriften",
+  "--lh-heading": "Grundregel für h1 bis h6",
+  "--lh-title": "Section- und Kartentitel",
+  "--lh-snug": "Kurze Zeilen: Kachelnamen, Spaltenköpfe, Labels",
+  "--lh-compact": "Dichter Kleintext: Bildunterschriften, Meta, Tabellenzellen",
+  "--lh-text": "Fließtext in Bausteinen",
+  "--lh-body": "Längere Textstrecken",
+  "--lh-loose": "Rechtstexte, Beiträge",
+
+  "--tracking-tighter": "Display",
+  "--tracking-tight": "Große Überschriften",
+  "--tracking-snug": "Titel",
+  "--tracking-mono": "Mono in gemischter Schreibung",
+  "--tracking-wide": "Mono-Beschriftungen",
+  "--tracking-wider": "Mono in Versalien",
+  "--tracking-widest": "Die weitesten Versalien",
+
+  "--sp-1": "Kleinste Lücke: Symbol zu Text",
+  "--sp-2": "Enge Lücken in einer Zeile",
+  "--sp-3": "Innenabstand kleiner Elemente",
+  "--sp-4": "Regelabstand im Baustein",
+  "--sp-5": "Innenabstand von Karten und Bühnen",
+  "--sp-6": "Großer Abstand im Baustein",
+  "--sp-8": "Abstand zwischen Gruppen",
+  "--sp-10": "Großer Absatz im Baustein",
+  "--sp-12": "Sehr großer Absatz",
+  "--sp-16": "Größter fester Abstand",
+
+  "--flow-sm": "Enge Reihen, Fußzeilen",
+  "--flow-md": "Spalten nebeneinander",
+  "--flow-lg": "Kartenraster",
+  "--flow-xl": "Kopf einer Section zum Inhalt",
+  "--flow-2xl": "Der große Absatz innerhalb einer Section",
+  "--section-space": "Regelfall zwischen zwei Sections",
+  "--section-space-sm": "Kurzer Abschluss, wenn direkt ein Farbband folgt",
+  "--section-space-lg": "Der große Absatz zwischen Sections",
+
+  "--site-margin": "Seitenrand links und rechts",
+  "--site-gutter": "Spaltenabstand im Raster",
+  "--site-max": "Größte Satzbreite, danach wächst nichts mehr",
+  "--grid-cols": "Spalten des Rasters",
+  "--nav-height": "So weit reicht die fixierte Navigation in die Seite",
+  "--mw-wide": "Breite Medienblöcke, mittig",
+  "--mw-panel": "Textmaß in der dunklen Panel-Spalte",
+  "--measure-narrow": "Kurze Notizen, Kartentext",
+  "--measure-medium": "Einleitungen, Spaltentext",
+  "--measure-text": "Absätze",
+  "--measure-long": "Beiträge, Rechtstexte",
+
+  "--icon-sm": "Kleines Symbol",
+  "--icon-md": "Symbol im Regelfall",
+  "--icon-lg": "Großes Symbol, zugleich das Mindestziel nach WCAG 2.5.8",
+  "--control-lg": "Runde Buttons, Griffe, Avatare",
+
+  "--r-sm": "Kleine Ecken: Marker, Felder",
+  "--r-md": "Karten und Bühnen",
+  "--r-lg": "Große Flächen",
+  "--r-xl": "Das Panel der Pillar Page",
+  "--r-round": "Pillen und Kreise",
+  "--r-dock":
+    "Abschnitts-Dock: feste Rundung, wächst beim Aufklappen nicht mit",
+  "--bw": "Rahmen und Linien",
+  "--focus-width": "Stärke des Fokusrings",
+  "--focus-offset": "Abstand des Fokusrings zur Kante",
+
+  "--grain-image": "Das Korn als eingebettetes SVG",
+  "--grain-opacity": "Auflage über dem Seitengrund",
+  "--grain-opacity-surface": "Flächen mit eigenem deckendem Grund",
+  "--shadow-bar": "Die schwebende Leiste",
+  "--shadow-panel": "Panel über der Seite",
+  "--shadow-card": "Karten im Raster",
+  "--shadow-handle": "Griff im Vorher/Nachher-Regler",
+  "--shadow-handle-active": "Derselbe Griff, angefasst",
+
+  "--e-out": "Standard: schnell los, lange auslaufend",
+  "--e-swift": "Kurze Zustandswechsel: Farbe, Deckkraft",
+  "--e-ambient": "Endlose Dauerschleife, fast linear",
+  "--d-fast": "Farbwechsel beim Überfahren",
+  "--d-base": "Standard für Bewegung",
+  "--d-slow": "Aufklappen, Umblenden",
+
+  "--z-sticky": "Mitlaufende Elemente",
+  "--z-nav": "Navigation",
+  "--z-overlay": "Menü, Overlays",
+  "--z-skiplink": "Sprung zum Inhalt, über allem",
+
+  "--c-bg": "Grund der Seite",
+  "--c-text": "Schrift",
+  "--c-text-muted": "Nebentext",
+  "--c-line": "Trennlinien, Schmuck",
+  "--c-line-strong":
+    "Linien, die gesehen werden müssen: Grenzen von Bedienelementen, Nebensymbole",
+  "--c-surface": "Heller Grund für Karten und Felder",
+  "--c-tint": "Stiller Grund unter einem Bild, bis es geladen ist",
+  "--c-tint-brand": "Zarter Markenton als Fläche",
+  "--c-focus": "Fokusring",
+  "--c-on-dark": "Schrift auf Dunkel",
+  "--c-on-dark-muted": "Nebentext auf Dunkel",
+  "--c-on-dark-line": "Trennlinie auf Dunkel",
+  "--c-on-dark-line-strong": "Starke Linie auf Dunkel",
+  "--c-on-brand-muted": "Nebentext auf Pink",
+  "--c-on-taupe-muted": "Nebentext auf Taupe",
+  "--c-on-card": "Schrift auf Karten",
+  "--c-on-card-muted": "Nebentext auf Karten",
+  "--c-placeholder": "Platzhalter in Eingabefeldern",
+  "--c-glass": "Glas über Bildern",
+
+  "--font-title-page": "Der Titel einer Unterseite, einmal je Seite",
+  "--font-headline-xl": "Große Überschrift einer Section mit viel Raum",
+  "--font-headline": "Überschrift einer Section, der Regelfall für große Köpfe",
+  "--font-headline-md": "Kleine Überschrift in dichteren Abschnitten",
+  "--font-section-title": "Titel einer Section im ruhigen Schnitt",
+  "--font-card-title": "Titel von Karten, Einträgen und Listenpunkten",
+  "--font-lead": "Einleitungstext unter einer Überschrift",
+  "--font-body": "Fließtext in Bausteinen",
+  "--font-body-long": "Lange Textstrecken: Beiträge, Rechtstexte",
+  "--font-small": "Kleiner Text: Anmerkungen, Meta",
+  "--font-topline": "Die Rubrik über einer Überschrift",
+  "--font-label": "Kleinstbeschriftung",
+
+  "--page-top": "Wo eine Seite ohne Hero beginnt: unterhalb der Navigation",
+  "--page-top-sm":
+    "Dasselbe auf schmalen Fenstern, mit dem kurzen Section-Abstand",
+  "--hero-offset": "Oberer Abstand der Textheroes",
+};
+const purpose = (name: string) => PURPOSE[name] ?? "Noch ohne Beschreibung";
+
+/* --- Groups, derived from the token names -------------------------------- */
+
+const starts =
+  (...prefixes: string[]) =>
+  (t: string) =>
+    prefixes.some((p) => t === p || t.startsWith(p));
+const covered = new Set<string>();
+const take = (list: string[], test: (t: string) => boolean) => {
+  const picked = list.filter(test);
+  picked.forEach((t) => covered.add(t));
+  return picked;
+};
+
+const baseColours = take(BASE, starts("--c-"));
+const fonts = take(BASE, starts("--f-", "--fw-"));
+const typeScale = take(BASE, starts("--fs-"));
+const lineHeights = take(BASE, starts("--lh-"));
+const trackings = take(BASE, starts("--tracking-"));
+const fixedSpace = take(BASE, starts("--sp-"));
+const flowSpace = take(BASE, starts("--flow-"));
+const sectionSpace = take(BASE, starts("--section-space"));
+const layout = take(BASE, starts("--site-", "--grid-", "--nav-", "--mw-"));
+const measures = take(BASE, starts("--measure-"));
+const sizes = take(BASE, starts("--icon-", "--control-"));
+const radii = take(BASE, starts("--r-"));
+const borders = take(BASE, starts("--bw", "--focus-"));
+const grain = take(BASE, starts("--grain-"));
+const shadows = take(BASE, starts("--shadow-"));
+const curves = take(BASE, starts("--e-"));
+const durations = take(BASE, starts("--d-"));
+const layers = take(BASE, starts("--z-"));
+
+const colourRoles = take(ROLES, starts("--c-"));
+const textStyleNames = take(ROLES, starts("--font-"));
+const roleTrackings = take(ROLES, starts("--tracking-"));
+/* Whatever role is left once colours, text styles and their tracking are
+   taken: today that is spacing. */
+const spacingRoles = take(ROLES, (t) => !covered.has(t));
+const uncovered = TOKENS.filter((t) => !covered.has(t));
+
+/* --- Type ladder --------------------------------------------------------- */
+
+const SPECIMEN: Record<string, string> = {
+  "--fs-display-xl": "Berlin",
+  "--fs-display": "Mund",
+  "--fs-display-lg": "Magazin",
+  "--fs-display-md": "Anna",
+  "--fs-display-2": "Veneers",
+  "--fs-display-sm": "24",
+  "--fs-title-page": "Veneers in Berlin",
+  "--fs-title-xl": "Unsere Experten",
+  "--fs-title-lg": "Unsere Standorte",
+  "--fs-title-md": "Vier Tage Woche",
+  "--fs-title": "Eine volle Stunde",
+  "--fs-title-sm": "Zahnreinigung",
+  "--fs-title-xs": "Zahnarzt Prenzlauer Berg",
+  "--fs-text-large": "Wir nehmen uns eine volle Stunde.",
+  "--fs-text-main": "Sechs Behandlungsräume, eigenes Meisterlabor im Haus.",
+  "--fs-text-small": "Prenzlauer Berg",
+  "--fs-label-lg": "Termin buchen",
+  "--fs-label-md": "Leistungen",
+  "--fs-label": "Ab 690 € je Zahn",
+  "--fs-micro": "4,9 von 5",
+};
+
+const TYPE_GROUPS = [
+  {
+    name: "Display",
+    text: "Ausdrucksstarke Einzelstücke: Wortmarken, Konturziffern, Seitenköpfe.",
+    test: starts("--fs-display"),
+  },
+  {
+    name: "Title",
+    text: "Jede Überschrift, die eine Seite gliedert.",
+    test: starts("--fs-title"),
+  },
+  { name: "Text", text: "Fließtext.", test: starts("--fs-text") },
+  {
+    name: "Label",
+    text: "Kleingedrucktes, Buttons, Navigation.",
+    test: starts("--fs-label", "--fs-micro"),
+  },
+];
+const typeGroups = [
+  ...TYPE_GROUPS.map((g) => ({
+    ...g,
+    tokens: typeScale.filter(g.test),
+  })),
+  {
+    name: "Weitere",
+    text: "In keiner der vier Gruppen: Name prüfen.",
+    tokens: typeScale.filter((t) => !TYPE_GROUPS.some((g) => g.test(t))),
+  },
+].filter((g) => g.tokens.length);
+
+/* --- Generic token tables ------------------------------------------------ */
+
+type Probe =
+  | "bar"
+  | "lh"
+  | "tracking"
+  | "radius"
+  | "shadow"
+  | "icon"
+  | "line"
+  | "focus"
+  | "curve"
+  | "duration"
+  | "none";
+
+type Row = {
+  name: string;
+  value: string;
+  size: string;
+  purpose: string;
+  probe: Probe;
+};
+
+const rows = (names: string[], probe: Probe | ((name: string) => Probe)) =>
+  names.map((name): Row => ({
+    name,
+    value: readable(ROOT.get(name) ?? ""),
+    /* "112px" needs no "112 px" underneath. */
+    size:
+      sizeOf(name).replace(/\s/g, "") ===
+      (ROOT.get(name) ?? "").replace(/\s/g, "")
+        ? ""
+        : sizeOf(name),
+    purpose: purpose(name),
+    probe: typeof probe === "function" ? probe(name) : probe,
+  }));
+
+type Chapter = {
+  id: string;
+  number: string;
+  title: string;
+  text: string;
+  special?: "colours" | "fonts" | "ladder" | "measures" | "grain" | "motion";
+  samples: { name: string; text?: string; rows: Row[] }[];
+};
+
+/* The chapter texts are HTML (for <code>), written here, never user input. */
+const BASE_CHAPTERS: Chapter[] = [
+  {
+    id: "farben",
+    number: "1.1",
+    title: "Farben",
+    text: "Sechs Farben tragen die Gestaltung, dazu Weiß als Werkzeug. Daneben steht das gemessene Kontrastverhältnis gegen den Grund, auf dem die Farbe tatsächlich vorkommt. WCAG&nbsp;AA verlangt 4,5:1 für Fließtext, 3:1 für große Schrift und für Bedienelemente. Bausteine greifen nicht zu diesen Farben, sondern zu den <a href='#farbrollen'>Farbrollen</a>.",
+    special: "colours",
+    samples: [],
+  },
+  {
+    id: "schriften",
+    number: "1.2",
+    title: "Schriften und Schnitte",
+    text: "Zwei Schriften. PP Neue Montreal trägt alles Gesetzte, GT Pressura Mono alles Beschriftende: Toplines, Preise, Kleinstangaben. Geladen sind nur drei Schnitte, Neue Montreal 400 und 500 und Pressura Mono 300. Jedes andere Gewicht rundet der Browser auf den nächsten vorhandenen Schnitt.",
+    special: "fonts",
+    samples: [{ name: "Token", rows: rows(fonts, "none") }],
+  },
+  {
+    id: "schriftgrade",
+    number: "1.3",
+    title: "Schriftgrade",
+    text: "Die Leiter in vier Gruppen. Die Figma-Werte gelten bei 1728&nbsp;px Fensterbreite, darunter und darüber rechnet <code>clamp()</code> weiter. Der Wert bei 1728 ist aus dem Token gerechnet, nicht abgeschrieben. Eine Überschrift nimmt ihren Grad meist nicht direkt, sondern über einen <a href='#textstile'>Textstil</a>.",
+    special: "ladder",
+    samples: [],
+  },
+  {
+    id: "zeilenhoehe",
+    number: "1.4",
+    title: "Zeilenhöhe",
+    text: "Von den Wortmarken, deren Zeilen sich berühren, bis zu den Rechtstexten. <code>--lh-heading</code> (1,1) und <code>--lh-title</code> (1,15) sind noch zwei Werte: Sie zusammenzulegen verschöbe jede Überschrift der Seite um ein bis drei Pixel, die Startseite eingeschlossen. Das ist eine Gestaltungsentscheidung und keine Aufräumarbeit, deshalb bleibt es offen.",
+    samples: [{ name: "Token", rows: rows(lineHeights, "lh") }],
+  },
+  {
+    id: "laufweite",
+    number: "1.5",
+    title: "Laufweite",
+    text: "Große Grade laufen enger, sonst zerfallen sie. Mono in Versalien läuft weiter, sonst kleben die Zeichen aneinander.",
+    samples: [{ name: "Token", rows: rows(trackings, "tracking") }],
+  },
+  {
+    id: "abstaende",
+    number: "1.6",
+    title: "Abstände",
+    text: "Drei Arten, jede mit einer Regel. <code>--sp-*</code> ist fest und gilt innerhalb eines Bausteins: Lücken, Innenabstand, Platz für Symbole. <code>--flow-*</code> wächst mit dem Fenster und gilt innerhalb einer Section: vom Kopf zum Inhalt, zwischen Spalten. <code>--section-space-*</code> wächst ebenfalls und gilt zwischen Sections. Die Zahlen hinter <code>--sp-</code> sind Namen, keine Faktoren: <code>--sp-12</code> sind 112&nbsp;px. Die Balken zeigen den Wert bei deiner aktuellen Fensterbreite.",
+    samples: [
+      {
+        name: "Fest, im Baustein: --sp-*",
+        rows: rows(fixedSpace, "bar"),
+      },
+      {
+        name: "Fluid, in der Section: --flow-*",
+        text: "Bis zum 02.09.2026 brachte fast jeder Baustein dafür seine eigene <code>clamp()</code>-Rampe mit, rund 78 Stück, ohne dass der Unterschied etwas bedeutet hätte. Die Werte stammen von der Startseite, damit dort nichts verrutscht.",
+        rows: rows(flowSpace, "bar"),
+      },
+      {
+        name: "Zwischen Sections: --section-space-*",
+        rows: rows(sectionSpace, "bar"),
+      },
+    ],
+  },
+  {
+    id: "layout",
+    number: "1.7",
+    title: "Layout und Textmaße",
+    text: "Die Maße der Seite selbst und die Satzbreiten. Die Textmaße rechnen in <code>ch</code> und folgen damit dem Schriftgrad; sie sind für Fließtext gedacht. Überschriften behalten ihr eigenes Maß, wo sie gewollt umbrechen.",
+    special: "measures",
+    samples: [
+      { name: "Seite", rows: rows(layout, "none") },
+      { name: "Textmaße", rows: rows(measures, "none") },
+    ],
+  },
+  {
+    id: "groessen",
+    number: "1.8",
+    title: "Größen",
+    text: "Symbole und runde Bedienelemente. <code>--icon-lg</code> ist zugleich das Mindestmaß eines Ziels nach WCAG&nbsp;2.5.8.",
+    samples: [{ name: "Token", rows: rows(sizes, "icon") }],
+  },
+  {
+    id: "radien",
+    number: "1.9",
+    title: "Radien, Rahmen, Fokus",
+    text: "Rahmen und Linien sind <code>--bw</code> stark. Weicht ein Baustein davon ab, ist das Gestaltung und steht in seinem Kommentar. Der Fokusring ist <code>--focus-width</code> stark und steht <code>--focus-offset</code> von der Kante ab. Seine Farbe ist eine Rolle, <code>--c-focus</code>, und kommt von der <a href='#flaechen'>Fläche</a>, auf der er steht.",
+    samples: [
+      { name: "Radien", rows: rows(radii, "radius") },
+      {
+        name: "Rahmen und Fokus",
+        rows: rows(borders, (n) => (n === "--bw" ? "line" : "focus")),
+      },
+    ],
+  },
+  {
+    id: "schatten",
+    number: "1.10",
+    title: "Schatten und Körnung",
+    text: "Die einzigen Stellen, an denen eine Fläche über einer anderen liegt, und die Papierstruktur, die <code>ui/Backdrop.astro</code> über die Seite legt. Die Schattenfarbe ist immer <code>--c-dark</code>, nie reines Schwarz.",
+    special: "grain",
+    samples: [
+      { name: "Schatten", rows: rows(shadows, "shadow") },
+      { name: "Körnung", rows: rows(grain, "none") },
+    ],
+  },
+  {
+    id: "bewegung",
+    number: "1.11",
+    title: "Bewegung",
+    text: "Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus und federn nie zurück. Zum Ausprobieren die Zeile überfahren.",
+    special: "motion",
+    samples: [
+      { name: "Kurven", rows: rows(curves, "curve") },
+      { name: "Dauern", rows: rows(durations, "duration") },
+    ],
+  },
+  {
+    id: "ebenen",
+    number: "1.12",
+    title: "Ebenen",
+    text: "Der Sprung zum Inhalt liegt bewusst über der Navigation. Bei Gleichstand gewinnt das später gezeichnete Element: Er stand einmal auf derselben Ebene wie die Leiste und war dadurch halb verdeckt.",
+    samples: [{ name: "Token", rows: rows(layers, "none") }],
+  },
+];
+
+/* --- Base colours -------------------------------------------------------- */
+
+/* Each colour against the ground it actually appears on. */
 const COLORS = [
   {
     name: "--c-brand",
@@ -64,14 +878,14 @@ const COLORS = [
   {
     name: "--c-dark",
     hex: HEX.dark,
-    role: "Schrift, dunkle Bänder, Buttonfüllung",
+    role: "Schrift, dunkle Flächen, Buttonfüllung",
     against: HEX.grey,
     againstName: "--c-grey",
   },
   {
     name: "--c-taupe",
     hex: HEX.taupe,
-    role: "Grund der Leistungs- und Geschichten-Section",
+    role: "Der zweite, warme Farbgrund",
     against: HEX.dark,
     againstName: "--c-dark",
   },
@@ -85,386 +899,193 @@ const COLORS = [
   {
     name: "--c-neutral-800",
     hex: HEX["neutral-800"],
-    role: "Schrift auf hellen Flächen (Formular, Magazin)",
+    role: "Schrift auf hellen Karten und Feldern",
     against: HEX["neutral-200"],
     againstName: "--c-neutral-200",
   },
   {
     name: "--c-neutral-200",
     hex: HEX["neutral-200"],
-    role: "Flächen: Karten, Eingabefelder",
+    role: "Helle Flächen: Karten, Eingabefelder",
     against: HEX["neutral-800"],
     againstName: "--c-neutral-800",
   },
-];
+  {
+    name: "--c-white",
+    hex: HEX.white,
+    role: "Werkzeug: Glas über Bildern, Verläufe",
+    against: HEX.dark,
+    againstName: "--c-dark",
+  },
+].map((c) => {
+  const v = contrast(channels(c.hex), channels(c.against));
+  return { ...c, value: v, rating: rating(v, "text") };
+});
+const missingColours = baseColours.filter(
+  (t) => !COLORS.some((c) => c.name === t),
+);
 
-/* Abgeleitete Töne.
+/* --- Roles --------------------------------------------------------------- */
 
-   Die Kontrastwerte hier waren bis zum 02.09.2026 feste Zahlen im Quelltext,
-   obwohl der Seitenkopf verspricht, sie seien gerechnet. Genau das ging schief:
-   Der Taupe-Wert stand auf 4,55:1, weil das Token einmal auf 81 % gestanden
-   hatte. Bei den heutigen 82 % sind es 4,68:1. Jetzt rechnet dieselbe Formel
-   wie oben, und die Deckung steht nur noch an einer Stelle. */
-const mix = (fg: string, bg: string, p: number) => {
-  const [F, B] = [channels(fg), channels(bg)];
-  return (
-    "#" +
-    [0, 1, 2]
-      .map((i) =>
-        Math.round(F[i] * p + B[i] * (1 - p))
-          .toString(16)
-          .padStart(2, "0"),
-      )
-      .join("")
-  );
+const TRACKING_FOR: Record<string, string> = {
+  /* shared.css pairs the topline with the label tracking. */
+  topline: "--tracking-label",
+};
+function trackingFor(key: string) {
+  if (TRACKING_FOR[key]) return TRACKING_FOR[key];
+  const segments = key.split("-");
+  while (segments.length) {
+    const candidate = `--tracking-${segments.join("-")}`;
+    if (ROOT.has(candidate)) return candidate;
+    segments.pop();
+  }
+  return undefined;
+}
+
+const STYLE_SPECIMEN: Record<string, string> = {
+  "--font-title-page": "Veneers in Berlin",
+  "--font-headline-xl": "Unsere Experten",
+  "--font-headline": "Wir feilen am Lächeln",
+  "--font-headline-md": "Vier Tage Woche",
+  "--font-section-title": "Eine volle Stunde für dich",
+  "--font-card-title": "Zahnreinigung",
+  "--font-lead":
+    "Wir nehmen uns eine volle Stunde und erklären, bevor wir behandeln.",
+  "--font-body":
+    "Sechs Behandlungsräume, eigenes Meisterlabor im Haus, zwei Praxen in Prenzlauer Berg.",
+  "--font-body-long":
+    "Veneers sind hauchdünne Schalen aus Keramik, die auf die Vorderseite der Zähne geklebt werden. Wie viel dafür abgetragen werden muss, hängt vom Ausgangszustand ab, und genau das besprechen wir, bevor irgendetwas passiert.",
+  "--font-small": "Die Regelleistungen rechnen wir über die Kasse ab.",
+  "--font-topline": "Vorher & Nachher",
+  "--font-label": "Ab 690 € je Zahn",
 };
 
-const DERIVED = [
-  {
-    name: "--c-text-muted",
-    cover: 0.75,
-    on: HEX.grey,
-    onName: "--c-grey",
-    ink: HEX.dark,
-    purpose: "Nebentext auf Grau",
-  },
-  {
-    name: "--c-text-muted (Taupe)",
-    cover: 0.82,
-    on: HEX.taupe,
-    onName: "--c-taupe",
-    ink: HEX.dark,
-    purpose: "Nebentext auf Taupe",
-  },
-  {
-    name: "--c-text-muted (dunkel)",
-    cover: 0.65,
-    on: HEX.dark,
-    onName: "--c-dark",
-    ink: HEX.grey,
-    purpose: "Nebentext auf Braun",
-  },
-  {
-    name: "--c-line",
-    cover: 0.28,
-    on: HEX.grey,
-    onName: "--c-grey",
-    ink: HEX.dark,
-    purpose: "Trennlinien - Schmuck, kein Bedienelement",
-    decoration: true,
-  },
-].map((a) => ({ ...a, value: contrast(mix(a.ink, a.on, a.cover), a.on) }));
+const textStyles = textStyleNames.map((name) => {
+  const value = ROOT.get(name) ?? "";
+  const refs = [...value.matchAll(/var\((--[\w-]+)\)/g)].map((m) => m[1]!);
+  const size = refs.find((r) => r.startsWith("--fs-"));
+  const tracking = trackingFor(name.slice("--font-".length));
+  return {
+    name,
+    value: readable(value),
+    tracking,
+    mono: refs.includes("--f-mono"),
+    sizeAt: size ? px(`var(${size})`) : null,
+    purpose: purpose(name),
+    specimen: STYLE_SPECIMEN[name] ?? "Mundpropaganda",
+  };
+});
 
-/* Die vollständige Leiter, lückenlos von 283 px bis 11 px. Bis zum 02.09.2026
-   standen hier neun Stufen, während die Seiten 26 verschiedene Grade
-   rendersten - 16 davon auf keiner Skala, verteilt auf 48 eigene
-   font-size-Regeln. Die Zwischenstufen sind nicht neu erfunden: Jede
-   übernimmt den Wert, den die Homepage an dieser Stelle schon hatte. */
-const SIZES = [
+/* Where a colour role is read, and what kind of contrast it owes. */
+const ROLE_GROUND: Record<string, string> = {
+  "--c-on-dark": "--c-dark",
+  "--c-on-dark-muted": "--c-dark",
+  "--c-on-dark-line": "--c-dark",
+  "--c-on-dark-line-strong": "--c-dark",
+  "--c-on-brand-muted": "--c-brand",
+  "--c-on-taupe-muted": "--c-taupe",
+  "--c-on-card": "--c-surface",
+  "--c-on-card-muted": "--c-surface",
+  "--c-placeholder": "--c-surface",
+};
+const ROLE_KIND: Record<string, Kind | "ground" | "fill"> = {
+  "--c-bg": "ground",
+  "--c-surface": "ground",
+  "--c-line": "decoration",
+  "--c-on-dark-line": "decoration",
+  "--c-line-strong": "control",
+  "--c-on-dark-line-strong": "control",
+  "--c-focus": "control",
+  "--c-tint": "fill",
+  "--c-tint-brand": "fill",
+  "--c-glass": "fill",
+};
+
+const colourRoleRows = colourRoles.map((name) => {
+  const kind = ROLE_KIND[name] ?? "text";
+  const ground = ROLE_GROUND[name] ?? "--c-bg";
+  const v =
+    kind === "ground" || kind === "fill" ? null : roleContrast(name, ground);
+  return {
+    name,
+    rule: describeColour(ROOT.get(name) ?? ""),
+    ground,
+    purpose: purpose(name),
+    value: v,
+    rating: v == null ? null : rating(v, kind as Kind),
+  };
+});
+
+/* --- Surfaces ------------------------------------------------------------ */
+
+const SURFACES = [
   {
-    token: "--fs-display-xl",
-    figma: "283 px",
-    purpose: "Konturschrift im Standort-Ring",
-    text: "Berlin",
+    key: "page",
+    attr: undefined,
+    name: "Seitengrund",
+    ground: "--c-bg",
+    text: "Ohne Attribut. Der Normalfall: Grau, darüber die Körnung.",
   },
   {
-    token: "--fs-display",
-    figma: "250 px",
-    purpose: "Wortmarke im Hero",
-    text: "Mund",
+    key: "dark",
+    attr: "dark",
+    name: "Dunkel",
+    ground: "--c-dark",
+    text: "Schaltet Schrift, Nebentext, Linien und Fokusring auf hell.",
   },
   {
-    token: "--fs-display-lg",
-    figma: "200 px",
-    purpose: "Wortmarke des Magazins",
-    text: "Magazin",
+    key: "brand",
+    attr: "brand",
+    name: "Pink",
+    ground: "--c-brand",
+    text: "Die Schrift bleibt dunkel, nur der Nebentext wird dichter.",
   },
   {
-    token: "--fs-display-md",
-    figma: "144 px",
-    purpose: "Geschichten, Personenseite",
-    text: "Anna",
+    key: "taupe",
+    attr: "taupe",
+    name: "Taupe",
+    ground: "--c-taupe",
+    text: "Wie Pink: dunkle Schrift, dichterer Nebentext.",
   },
   {
-    token: "--fs-display-2",
-    figma: "125 px",
-    purpose: "Konturzahlen der Standorte",
-    text: "P25",
-  },
-  {
-    token: "--fs-display-sm",
-    figma: "90 px",
-    purpose: "Magazinkopf, Team, Praxis, Kennzahlen",
-    text: "24",
-  },
-  {
-    token: "--fs-title-page",
-    figma: "70 px",
-    purpose: "Seitentitel der Leistungsseiten",
-    text: "Veneers",
-  },
-  {
-    token: "--fs-title-xl",
-    figma: "64 px",
-    purpose: "Experten, Preise, Ablauf",
-    text: "Unsere Experten",
-  },
-  {
-    token: "--fs-title-lg",
-    figma: "55 px",
-    purpose: "Galeriekopf, Geschichte",
-    text: "Unsere Standorte",
-  },
-  {
-    token: "--fs-title-lg",
-    figma: "48 px",
-    purpose: "Panel, Merkmale",
-    text: "Vier Tage Woche",
-  },
-  {
-    token: "--fs-title",
-    figma: "40 px",
-    purpose: "Überschrift einer Section",
-    text: "Unsere Standorte",
-  },
-  {
-    token: "--fs-title",
-    figma: "36 px",
-    purpose: "Einleitung, Statement",
-    text: "Eine volle Stunde",
-  },
-  {
-    token: "--fs-title-sm",
-    figma: "32 px",
-    purpose: "Inhaltsverzeichnis, Stellen, Preise",
-    text: "Zahnreinigung",
-  },
-  {
-    token: "--fs-title-sm",
-    figma: "28 px",
-    purpose: "Vorteile, Zeitleiste, Werte",
-    text: "Eigenes Meisterlabor",
-  },
-  {
-    token: "--fs-title-xs",
-    figma: "24 px",
-    purpose: "Meta-Zeilen im Hero",
-    text: "Zahnarzt Prenzlauer Berg",
-  },
-  {
-    token: "--fs-text-large",
-    figma: "20 px",
-    purpose: "Einleitungstexte",
-    text: "Wir nehmen uns eine volle Stunde.",
-  },
-  {
-    token: "--fs-text-main",
-    figma: "18 px",
-    purpose: "Fließtext",
-    text: "Sechs Behandlungsräume, eigenes Meisterlabor im Haus.",
-  },
-  {
-    token: "--fs-text-small",
-    figma: "16 px",
-    purpose: "Toplines, Beschriftungen",
-    text: "Prenzlauer Berg",
-  },
-  {
-    token: "--fs-label-lg",
-    figma: "14 px",
-    purpose: "Buttonbeschriftung",
-    text: "Termin buchen",
-  },
-  {
-    token: "--fs-label-md",
-    figma: "13 px",
-    purpose: "Navigation, Meta-Zeilen",
-    text: "Leistungen",
-  },
-  {
-    token: "--fs-label",
-    figma: "12 px",
-    purpose: "Kleinstbeschriftungen",
-    text: "Ab 690 € je Zahn",
-  },
-  {
-    token: "--fs-micro",
-    figma: "11 px",
-    purpose: "Fehlerzeichen, Badge auf Schmalgerät",
-    text: "4,9 von 5",
+    key: "card",
+    attr: "card",
+    name: "Karte",
+    ground: "--c-surface",
+    text: "Helle Karten: Die Schrift wird fast schwarz.",
   },
 ];
 
-/* `--fs-title` ist ein Alias auf `--fs-title` und steht deshalb nicht als eigene
-   Stufe in der Leiter. */
+const surfaces = SURFACES.map((s) => {
+  const scope = s.attr ? SURFACE_DECLS.get(s.attr) : undefined;
+  const measure = (role: string, kind: Kind) => {
+    const v = roleContrast(role, s.ground, scope);
+    return v == null ? null : { value: v, rating: rating(v, kind) };
+  };
+  return {
+    ...s,
+    ratios: [
+      { label: "Schrift", ...measure("--c-text", "text") },
+      { label: "Nebentext", ...measure("--c-text-muted", "text") },
+      { label: "Starke Linie", ...measure("--c-line-strong", "control") },
+      { label: "Fokusring", ...measure("--c-focus", "control") },
+    ],
+    overrides: [...(scope?.keys() ?? [])],
+    used: s.attr ? usageHtml(s.attr, surfaceUses, []) : "",
+  };
+});
+const unlistedSurfaces = [...SURFACE_DECLS.keys()].filter(
+  (k) => !SURFACES.some((s) => s.attr === k),
+);
 
-const LINE_HEIGHTS = [
-  {
-    token: "--lh-display",
-    value: "0.92",
-    purpose: "Wortmarken - die Zeilen sollen sich berühren",
-  },
-  { token: "--lh-tight", value: "1", purpose: "Einzeilige Konturzahlen" },
-  { token: "--lh-heading", value: "1.1", purpose: "Grundregel für h1 bis h6" },
-  {
-    token: "--lh-title",
-    value: "1.15",
-    purpose: "Abschnittsüberschriften in den Bausteinen",
-  },
-  {
-    token: "--lh-snug",
-    value: "1.2",
-    purpose: "Kurze Zeilen: Kachelnamen, Spaltenköpfe",
-  },
-  { token: "--lh-text", value: "1.45", purpose: "Fließtext in Bausteinen" },
-  { token: "--lh-body", value: "1.5", purpose: "Fließtext in langen Strecken" },
-  { token: "--lh-loose", value: "1.6", purpose: "Rechtstexte, Magazinsatz" },
-];
-
-const TRACKING = [
-  { token: "--tracking-tighter", value: "-0.03em", purpose: "Display" },
-  {
-    token: "--tracking-tight",
-    value: "-0.02em",
-    purpose: "Große Grade laufen enger, sonst zerfallen sie",
-  },
-  {
-    token: "--tracking-snug",
-    value: "-0.01em",
-    purpose: "Überschriften, Auszeichnung im Fließtext",
-  },
-  { token: "--tracking-wide", value: "0.06em", purpose: "Mono-Labels" },
-  {
-    token: "--tracking-wider",
-    value: "0.08em",
-    purpose: "Micro-Labels in Versalien",
-  },
-  {
-    token: "--tracking-widest",
-    value: "0.1em",
-    purpose: "die weitesten Versalien",
-  },
-  {
-    token: "--tracking-mono",
-    value: "0.04em",
-    purpose: "Gesperrte Mono-Beschriftungen",
-  },
-];
-
-const SPACING = [
-  "--sp-1",
-  "--sp-2",
-  "--sp-3",
-  "--sp-4",
-  "--sp-5",
-  "--sp-6",
-  "--sp-8",
-  "--sp-10",
-  "--sp-12",
-  "--sp-16",
-];
-const FLOW = [
-  {
-    token: "--flow-sm",
-    value: "24 - 56 px",
-    purpose: "Enge Reihen, Fußzeilen",
-  },
-  { token: "--flow-md", value: "32 - 72 px", purpose: "Spalten nebeneinander" },
-  { token: "--flow-lg", value: "40 - 96 px", purpose: "Kartenraster" },
-  {
-    token: "--flow-xl",
-    value: "56 - 120 px",
-    purpose: "Kopf einer Section zum Inhalt",
-  },
-  {
-    token: "--flow-2xl",
-    value: "64 - 150 px",
-    purpose: "Der große Absatz innerhalb einer Section",
-  },
-];
-
-const LAYOUT = [
-  {
-    token: "--site-margin",
-    value: "16 - 48 px",
-    purpose: "Seitenrand links und rechts",
-  },
-  {
-    token: "--site-gutter",
-    value: "16 - 32 px",
-    purpose: "Spaltenabstand im Raster",
-  },
-  {
-    token: "--site-max",
-    value: "1728 px",
-    purpose: "Größte Satzbreite, danach wächst nichts mehr",
-  },
-  { token: "--grid-cols", value: "12", purpose: "Spalten des Rasters" },
-  {
-    token: "--mw-wide",
-    value: "1100 px",
-    purpose: "Breite Medienblöcke: Vorher/Nachher, Bühne",
-  },
-  {
-    token: "--mw-panel",
-    value: "353 px",
-    purpose: "Textmaß in der dunklen Panel-Spalte",
-  },
-];
-
-const SHADOWS = [
-  { token: "--shadow-bar", purpose: "Die schwebende Leiste" },
-  { token: "--shadow-panel", purpose: "Panel über der Seite" },
-  { token: "--shadow-card", purpose: "Karten im Raster" },
-  { token: "--shadow-handle", purpose: "Griff im Vorher/Nachher-Regler" },
-  { token: "--shadow-handle-active", purpose: "Derselbe Griff, angefasst" },
-];
-
-const LAYERS = [
-  { token: "--z-base", value: "1", purpose: "Grundebene" },
-  { token: "--z-sticky", value: "50", purpose: "Mitlaufende Elemente" },
-  { token: "--z-nav", value: "100", purpose: "Navigation" },
-  { token: "--z-overlay", value: "200", purpose: "Menü, Overlays" },
-  { token: "--z-cursor", value: "300", purpose: "Zeiger" },
-  {
-    token: "--z-skiplink",
-    value: "400",
-    purpose: "Sprung zum Inhalt - muss über allem liegen",
-  },
-];
-
-const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-dock", "--r-round"];
-const CURVES = [
-  { token: "--e-out", purpose: "Standard. Schnell los, lange auslaufend." },
-  { token: "--e-swift", purpose: "Kurze Zustandswechsel: Farbe, Deckkraft." },
-  {
-    token: "--e-ambient",
-    purpose: "Endlose Dauerschleife - Faden, Zahnlinien.",
-  },
-];
-const DURATIONS = [
-  {
-    token: "--d-fast",
-    value: "0.25 s",
-    purpose: "Farbwechsel beim Überfahren",
-  },
-  { token: "--d-base", value: "0.45 s", purpose: "Standard für Bewegung" },
-  { token: "--d-slow", value: "0.8 s", purpose: "Aufklappen, Umblenden" },
-];
+/* --- Small building blocks ----------------------------------------------- */
 
 const SYMBOLS = [
-  "i-arrow",
-  "i-chevron",
-  "i-filter",
-  "i-star",
-  "i-upload",
-  "i-instagram",
-  "i-facebook",
-  "i-linkedin",
-  "i-youtube",
-  "i-x",
-  "i-logo",
-];
+  ...readFileSync(
+    join(SRC, "components", "ui", "Icons.astro"),
+    "utf8",
+  ).matchAll(/<symbol[^>]*\sid="(i-[\w-]+)"/g),
+].map((m) => m[1]!);
 
 const SAMPLE_QUESTIONS = [
   {
@@ -473,16 +1094,44 @@ const SAMPLE_QUESTIONS = [
       "Über das Formular, telefonisch oder per Mail. Für Erstberatungen planen wir eine volle Stunde ein.",
   },
   {
-    question: "Behandeln Sie gesetzlich Versicherte?",
+    question: "Behandelt ihr auch gesetzlich Versicherte?",
     answer: "Ja. Die Regelleistungen rechnen wir über die Kasse ab.",
   },
 ];
 
-const formatNumber = (n: number) =>
-  n.toLocaleString("de-DE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+const unused = TOKENS.filter(isUnused);
+const legacy = [...LEGACY];
+
+const CONTENTS = [
+  {
+    id: "grundwerte",
+    title: "Grundwerte",
+    children: BASE_CHAPTERS.map((c) => ({ id: c.id, title: c.title })),
+  },
+  {
+    id: "rollen",
+    title: "Rollen",
+    children: [
+      { id: "textstile", title: "Textstile" },
+      { id: "farbrollen", title: "Farbrollen" },
+      { id: "abstandsrollen", title: "Abstandsrollen" },
+    ],
+  },
+  {
+    id: "teil-flaechen",
+    title: "Flächen",
+    children: [{ id: "flaechen", title: "Die fünf Gründe" }],
+  },
+  {
+    id: "bausteine",
+    title: "Kleine Bausteine",
+    children: [
+      { id: "buttons", title: "Buttons und Links" },
+      { id: "formular", title: "Akkordeon und Eingabefelder" },
+      { id: "symbole", title: "Symbole" },
+    ],
+  },
+];
 ---
 
 <Design title="Styleguide" active="styleguide">
@@ -491,418 +1140,742 @@ const formatNumber = (n: number) =>
       <span class="d-section__number">00</span>
       <h1 class="d-section__title">Styleguide</h1>
       <p class="d-section__text">
-        Die Grundlagen der Seite: Farben, Typografie, Abstände, Radien und
-        Bewegung - dazu die kleinen Bausteine, aus denen alles Übrige
-        zusammengesetzt ist. Jeder Wert kommt aus <code
+        Die Grundlagen der Seite in drei Schichten, genau wie in <code
           >src/styles/tokens.css</code
-        >
-        und wird hier gezogen, nicht abgeschrieben. Die zusammengesetzten Bausteine
-        stehen auf der <a class="c-link" href="/design/komponenten"
-          >Komponenten-Seite</a
+        >: <strong>Grundwerte</strong>, woraus die Gestaltung besteht. <strong
+          >Rollen</strong
+        >, wofür ein Wert da ist. <strong>Flächen</strong>, ein Attribut, das
+        die Farbrollen für alles darin umstellt. Bausteine greifen zu Rollen;
+        die Grundwerte stehen hier, damit man sieht, woraus die Rollen gemacht
+        sind. Die zusammengesetzten Bausteine stehen auf der <a
+          href="/design/komponenten">Komponenten-Seite</a
+        >.
+      </p>
+      <p class="d-section__text">
+        Nichts auf dieser Seite ist abgeschrieben. Sie liest tokens.css beim
+        Bauen: Werte, Rollen, Flächen und die Kontraste daraus. Auch „Verwendet
+        in" ist gezählt und nicht gepflegt, über {scannedFiles} Quelldateien unter
+        <code>web/src</code>, ohne die Design-Seiten selbst. „Steckt in" nennt
+        die Rollen und Flächen, die einen Grundwert weitertragen.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <nav class="d-contents" aria-label="Inhalt des Styleguides">
+        {
+          CONTENTS.map((part, i) => (
+            <div class="d-contents__part">
+              <a class="d-contents__head" href={`#${part.id}`}>
+                {i + 1} · {part.title}
+              </a>
+              <ul class="d-contents__list">
+                {part.children.map((c) => (
+                  <li>
+                    <a href={`#${c.id}`}>{c.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    {
+      unused.length || uncovered.length ? (
+        <div class="d-sample">
+          {unused.length ? (
+            <div class="d-note">
+              <p>
+                <strong>
+                  {unused.length === 1
+                    ? "Ein Token wird"
+                    : `${unused.length} Token werden`}{" "}
+                  nirgends verwendet:
+                </strong>{" "}
+                {unused.map((t, i) => (
+                  <>
+                    {i > 0 && ", "}
+                    <code>{t}</code>
+                  </>
+                ))}
+                . Weder ein Baustein noch eine Rolle greift darauf zu.
+              </p>
+            </div>
+          ) : null}
+          {uncovered.length ? (
+            <div class="d-note">
+              <p>
+                <strong>Auf dieser Seite nicht einsortiert:</strong>{" "}
+                {uncovered.map((t, i) => (
+                  <>
+                    {i > 0 && ", "}
+                    <code>{t}</code>
+                  </>
+                ))}
+                . Der Name passt in keine Gruppe; entweder die Gruppe in
+                <code>pages/design/styleguide.astro</code> ergänzen oder den
+                Namen prüfen.
+              </p>
+            </div>
+          ) : null}
+        </div>
+      ) : null
+    }
+  </section>
+
+  {/* ================= 1. Base values ================= */}
+  <section class="d-section d-part" id="grundwerte" data-surface="dark">
+    <div class="d-section__header">
+      <span class="d-section__number">Teil 1</span>
+      <h2 class="d-section__title">Grundwerte</h2>
+      <p class="d-section__text">
+        Woraus die Gestaltung besteht: Farben, Schriftgrade, Abstände, Radien,
+        Bewegung. Diese Werte ändern sich selten, und ein Baustein greift
+        möglichst nicht direkt zu ihnen, sondern zu einer Rolle.
+      </p>
+    </div>
+  </section>
+
+  {
+    BASE_CHAPTERS.map((chapter) => (
+      <section class="d-section" id={chapter.id}>
+        <div class="d-section__header">
+          <span class="d-section__number">{chapter.number}</span>
+          <h3 class="d-section__title">{chapter.title}</h3>
+          <p class="d-section__text" set:html={chapter.text} />
+        </div>
+
+        {chapter.special === "colours" && (
+          <div class="d-sample">
+            <div class="d-grid">
+              {COLORS.map((f) => (
+                <div class="d-color">
+                  <div
+                    class="d-color__swatch"
+                    style={`background: var(${f.name})`}
+                  />
+                  <p class="d-color__name">{f.name}</p>
+                  <p class="d-color__hex">{f.hex}</p>
+                  <p class="d-color__role">{f.role}</p>
+                  <p class="d-color__value">
+                    {ratio(f.value)} auf <code>{f.againstName}</code>{" "}
+                    <span class={`d-marker d-marker--${f.rating.cls}`}>
+                      {f.rating.cls === "weak" ? "nur Fläche" : f.rating.label}
+                    </span>
+                  </p>
+                  <div class="d-usage" set:html={usageHtml(f.name)} />
+                </div>
+              ))}
+            </div>
+            {missingColours.length ? (
+              <p class="d-sample__text d-gap-top">
+                In tokens.css, aber noch ohne Kachel:{" "}
+                {missingColours.join(", ")}. Den Wert in <code>HEX</code> und{" "}
+                <code>COLORS</code> nachtragen.
+              </p>
+            ) : null}
+          </div>
+        )}
+
+        {chapter.special === "fonts" && (
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">Schriften</span>
+            </div>
+            <div class="d-grid">
+              <div class="d-stage">
+                <p class="d-font-name">--f-sans · PP Neue Montreal</p>
+                <p class="d-font-sample d-font-sample--sans">AaBbCc 0123</p>
+                <p class="d-font-sample d-font-sample--sans d-font-sample--medium">
+                  Medium 500
+                </p>
+              </div>
+              <div class="d-stage">
+                <p class="d-font-name">--f-mono · GT Pressura Mono</p>
+                <p class="d-font-sample d-font-sample--mono">AaBbCc 0123</p>
+                <p class="d-font-sample d-font-sample--mono d-font-sample--caps">
+                  Light 300 gesperrt
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {chapter.special === "ladder" && (
+          <>
+            {typeGroups.map((group) => (
+              <div class="d-sample">
+                <div class="d-sample__header">
+                  <span class="d-sample__name">{group.name}</span>
+                  <span class="d-sample__path">{group.text}</span>
+                </div>
+                {group.tokens.map((t) => (
+                  <div class="d-size">
+                    <div class="d-size__meta">
+                      <code>{t}</code>
+                      <span>{sizeOf(t)}</span>
+                      <span class="d-size__purpose">{purpose(t)}</span>
+                    </div>
+                    <p
+                      class={`d-size__sample${group.name === "Display" || group.name === "Title" ? " d-size__sample--heavy" : ""}`}
+                      style={`font-size: var(${t})`}
+                    >
+                      {SPECIMEN[t] ?? "Mundpropaganda"}
+                    </p>
+                    <div class="d-usage" set:html={usageHtml(t)} />
+                  </div>
+                ))}
+              </div>
+            ))}
+            {legacy.length ? (
+              <div class="d-sample">
+                <div class="d-note">
+                  <p>
+                    <strong>Altlast, nur für den Prototyp.</strong> Die früheren
+                    Namen stehen noch am Ende von tokens.css, weil der
+                    archivierte Prototyp unter <code>prototypen/vite</code> sie
+                    liest. Sie gehören nicht zur Leiter, und{" "}
+                    <code>npm run check:css</code> lehnt sie in{" "}
+                    <code>web/</code> ab.
+                  </p>
+                  <p class="d-legacy">
+                    {legacy.map(([name, value]) => (
+                      <span>
+                        <code>{name}</code> → <code>{readable(value)}</code>
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </>
+        )}
+
+        {chapter.samples.map((sample) => (
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">{sample.name}</span>
+              <span class="d-sample__path">src/styles/tokens.css</span>
+            </div>
+            {sample.text && <p class="d-sample__text" set:html={sample.text} />}
+            <table class="d-table">
+              <thead>
+                <tr>
+                  <th scope="col">Token</th>
+                  <th scope="col">Wert</th>
+                  <th scope="col">Probe</th>
+                  <th scope="col">Zweck</th>
+                  <th scope="col">Verwendung</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sample.rows.map((row) => (
+                  <tr
+                    class={
+                      row.probe === "curve" || row.probe === "duration"
+                        ? "d-motion-row"
+                        : undefined
+                    }
+                  >
+                    <td>
+                      <code>{row.name}</code>
+                    </td>
+                    <td>
+                      <code class="d-table__value">{row.value}</code>
+                      {row.size && row.size !== row.value && (
+                        <span class="d-table__size">{row.size}</span>
+                      )}
+                    </td>
+                    <td class="d-table__probe">
+                      {row.probe === "bar" && (
+                        <span
+                          class="d-probe-bar"
+                          style={`width: var(${row.name})`}
+                        />
+                      )}
+                      {row.probe === "lh" && (
+                        <span
+                          class="d-probe-lh"
+                          style={`line-height: var(${row.name})`}
+                        >
+                          Zwei Zeilen
+                          <br />
+                          übereinander
+                        </span>
+                      )}
+                      {row.probe === "tracking" && (
+                        <span
+                          class={`d-probe-tracking${row.name.includes("mono") || row.name.includes("wide") ? " d-probe-tracking--mono" : ""}`}
+                          style={`letter-spacing: var(${row.name})`}
+                        >
+                          Mundpropaganda
+                        </span>
+                      )}
+                      {row.probe === "radius" && (
+                        <span
+                          class="d-probe-radius"
+                          style={`border-radius: var(${row.name})`}
+                        />
+                      )}
+                      {row.probe === "shadow" && (
+                        <span
+                          class="d-probe-shadow"
+                          style={`box-shadow: var(${row.name})`}
+                        />
+                      )}
+                      {row.probe === "icon" && (
+                        <span
+                          class="d-probe-icon"
+                          style={`width: var(${row.name}); height: var(${row.name})`}
+                        >
+                          <svg aria-hidden="true">
+                            <use href="#i-arrow" />
+                          </svg>
+                        </span>
+                      )}
+                      {row.probe === "line" && <span class="d-probe-line" />}
+                      {row.probe === "focus" && <span class="d-probe-focus" />}
+                      {(row.probe === "curve" || row.probe === "duration") && (
+                        <span class="d-curve__track">
+                          <span
+                            class="d-curve__ball"
+                            style={
+                              row.probe === "curve"
+                                ? `transition-timing-function: var(${row.name})`
+                                : `transition-duration: var(${row.name})`
+                            }
+                          />
+                        </span>
+                      )}
+                    </td>
+                    <td>{row.purpose}</td>
+                    <td>
+                      <div class="d-usage" set:html={usageHtml(row.name)} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+
+        {chapter.special === "measures" && (
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">Textmaße im Fließtext</span>
+            </div>
+            {measures.map((m) => (
+              <div class="d-measure">
+                <code>{m}</code>
+                <p class="d-measure__text" style={`max-width: var(${m})`}>
+                  Wir nehmen uns für jede Erstberatung eine volle Stunde. Du
+                  siehst, was wir sehen, und entscheidest danach in Ruhe, ob und
+                  wie behandelt wird.
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {chapter.special === "grain" && (
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">Körnung im Vergleich</span>
+            </div>
+            <p class="d-sample__text">
+              Zwei Deckkraftwerte, weil eine Fläche mit eigenem deckendem Grund
+              die Körnung anders trifft als der Seitengrund: Backdrop legt sie
+              über eine durchsichtige Ebene und landet schwächer als dieselbe
+              Deckkraft auf einer vollen Farbe.
+            </p>
+            <div class="d-stage d-stage--row">
+              <div class="d-grain d-grain--page" data-surface="dark">
+                <span>--grain-opacity</span>
+              </div>
+              <div class="d-grain d-grain--surface" data-surface="dark">
+                <span>--grain-opacity-surface</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {chapter.special === "motion" && (
+          <div class="d-sample">
+            <div class="d-sample__header">
+              <span class="d-sample__name">Bewegung im Markup</span>
+              <span class="d-sample__path">src/js/modules</span>
+            </div>
+            <p class="d-sample__text">
+              Die Module finden ihr Markup über <code>data-</code>-Attribute.
+              Verbindlich ist, welches Attribut wofür steht:
+            </p>
+            <ul class="d-list">
+              <li>
+                <code>data-split="lines"</code>: nur Überschriften und
+                Display-Schrift
+              </li>
+              <li>
+                <code>data-reveal="up"</code>: Fließtext, Karten, Listen
+              </li>
+              <li>
+                <code>data-reveal="left|right"</code>: nur Flächen und Bilder
+              </li>
+              <li>
+                <code>data-highlight-marker-reveal</code>: die Meta-Zeilen im
+                Hero, sonst nichts
+              </li>
+            </ul>
+          </div>
+        )}
+      </section>
+    ))
+  }
+
+  {/* ================= 2. Roles ================= */}
+  <section class="d-section d-part" id="rollen" data-surface="dark">
+    <div class="d-section__header">
+      <span class="d-section__number">Teil 2</span>
+      <h2 class="d-section__title">Rollen</h2>
+      <p class="d-section__text">
+        Wofür ein Wert da ist: Nebentext, der Titel einer Section, der Abstand
+        unter der Navigation. Eine neue Section wird auf die vorhandenen Rollen
+        gesetzt. Passt keine, kommt eine neue in tokens.css dazu, mit einem
+        Namen, der sagt, was sie tut, und nicht, wo sie steht.
+      </p>
+    </div>
+  </section>
+
+  <section class="d-section" id="textstile">
+    <div class="d-section__header">
+      <span class="d-section__number">2.1</span>
+      <h3 class="d-section__title">Textstile</h3>
+      <p class="d-section__text">
+        Eine ganze Satzeinstellung in einem Wert, für <code>font:</code>. Die
+        Laufweite gehört nicht zur Kurzschreibweise und hat deshalb ihr eigenes
+        Token daneben. <code>font:</code> gehört an den Anfang einer Regel: Die Kurzschreibweise
+        setzt <code>font-variant</code> und Verwandte zurück, was darüber steht, geht
+        verloren. Mono-Stile stehen in Versalien, <code
+          >text-transform: uppercase</code
+        > kommt von Hand dazu.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <pre
+        class="d-code">font: var(--font-section-title);
+letter-spacing: var(--tracking-section-title);</pre>
+    </div>
+
+    <div class="d-sample">
+      {
+        textStyles.map((s) => (
+          <div class="d-style">
+            <div class="d-style__meta">
+              <code>{s.name}</code>
+              {s.tracking ? (
+                <code>+ {s.tracking}</code>
+              ) : (
+                <span>ohne eigene Laufweite</span>
+              )}
+              <span class="d-size__purpose">{s.purpose}</span>
+            </div>
+            <p
+              class={`d-style__sample${s.mono ? " d-style__sample--caps" : ""}`}
+              style={`font: var(${s.name});${s.tracking ? ` letter-spacing: var(${s.tracking});` : ""}`}
+            >
+              {s.specimen}
+            </p>
+            <p class="d-style__parts">
+              <code>{s.value}</code>
+              {s.sizeAt != null && <span>{fmt(s.sizeAt)} px bei 1728</span>}
+            </p>
+            <div
+              class="d-usage"
+              set:html={usageHtml(s.name, uses, [], s.name)}
+            />
+            {s.tracking && (
+              <div
+                class="d-usage"
+                set:html={usageHtml(s.tracking, uses, [], s.tracking)}
+              />
+            )}
+          </div>
+        ))
+      }
+      {
+        roleTrackings.filter((t) => !textStyles.some((s) => s.tracking === t))
+          .length ? (
+          <p class="d-sample__text d-gap-top">
+            Laufweiten ohne Textstil:{" "}
+            {roleTrackings
+              .filter((t) => !textStyles.some((s) => s.tracking === t))
+              .join(", ")}
+            .
+          </p>
+        ) : null
+      }
+    </div>
+  </section>
+
+  <section class="d-section" id="farbrollen">
+    <div class="d-section__header">
+      <span class="d-section__number">2.2</span>
+      <h3 class="d-section__title">Farbrollen</h3>
+      <p class="d-section__text">
+        Was Bausteine statt der Grundfarben benutzen. Die Rollen ohne <code
+          >on-</code
+        > gelten auf dem Seitengrund und werden von den <a href="#flaechen"
+          >Flächen</a
+        > umgestellt. Die <code>on-</code>-Rollen sind für die Fälle, in denen
+        ein Zustand dunkel wird und nicht ein ganzer Block, etwa ein gedrückter
+        Filter oder der dunkle Button. Der Kontrast ist gegen den Grund
+        gerechnet, auf dem die Rolle gilt.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <table class="d-table">
+        <thead>
+          <tr>
+            <th scope="col">Token</th>
+            <th scope="col">Muster</th>
+            <th scope="col">Regel</th>
+            <th scope="col">Zweck</th>
+            <th scope="col">Kontrast</th>
+            <th scope="col">Verwendung</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            colourRoleRows.map((r) => (
+              <tr>
+                <td>
+                  <code>{r.name}</code>
+                </td>
+                <td class="d-table__probe">
+                  <span
+                    class="d-role-chip"
+                    style={`background: var(${r.ground})`}
+                  >
+                    <span style={`background: var(${r.name})`} />
+                  </span>
+                </td>
+                <td>
+                  <code>{r.rule}</code>
+                </td>
+                <td>{r.purpose}</td>
+                <td>
+                  {r.value != null && r.rating ? (
+                    <>
+                      {ratio(r.value)} auf <code>{r.ground}</code>{" "}
+                      <span class={`d-marker d-marker--${r.rating.cls}`}>
+                        {r.rating.label}
+                      </span>
+                    </>
+                  ) : (
+                    "Fläche"
+                  )}
+                </td>
+                <td>
+                  <div class="d-usage" set:html={usageHtml(r.name)} />
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="d-section" id="abstandsrollen">
+    <div class="d-section__header">
+      <span class="d-section__number">2.3</span>
+      <h3 class="d-section__title">Abstandsrollen</h3>
+      <p class="d-section__text">
+        Abstände mit festem Zweck, zusammengesetzt aus den Grundwerten.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <table class="d-table">
+        <thead>
+          <tr>
+            <th scope="col">Token</th>
+            <th scope="col">Wert</th>
+            <th scope="col">Zweck</th>
+            <th scope="col">Verwendung</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows(spacingRoles, "none").map((row) => (
+              <tr>
+                <td>
+                  <code>{row.name}</code>
+                </td>
+                <td>
+                  <code class="d-table__value">{row.value}</code>
+                  {row.size && <span class="d-table__size">{row.size}</span>}
+                </td>
+                <td>{row.purpose}</td>
+                <td>
+                  <div class="d-usage" set:html={usageHtml(row.name)} />
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* ================= 3. Surfaces ================= */}
+  <section class="d-section d-part" id="teil-flaechen" data-surface="dark">
+    <div class="d-section__header">
+      <span class="d-section__number">Teil 3</span>
+      <h2 class="d-section__title">Flächen</h2>
+      <p class="d-section__text">
+        Ein Attribut, <code>data-surface</code>, an dem Element, das den Grund
+        malt. Alles darin bekommt lesbare Schrift, Nebentext, Linien und einen
+        sichtbaren Fokusring, ohne dass der Baustein davon wissen muss.
+      </p>
+    </div>
+  </section>
+
+  <section class="d-section" id="flaechen">
+    <div class="d-section__header">
+      <span class="d-section__number">3.1</span>
+      <h3 class="d-section__title">Die fünf Gründe</h3>
+      <p class="d-section__text">
+        Jede Kachel trägt das echte Attribut und malt ihren Grund selbst, wie
+        ein Baustein es tut: Die Fläche stellt Farben um, den Grund malt sie
+        nicht. Schrift, Nebentext, Linien und Fokusring kommen allein aus den
+        Rollen. Link und Button zeigen ihren Fokusring hier dauerhaft; mit der
+        Tabulatortaste bekommst du denselben Ring am echten Element.
+      </p>
+      <p class="d-section__text">
+        Die Kontraste sind aus tokens.css gerechnet: die Farbe der Rolle, bei
+        Deckung unter 100&nbsp;% auf den Grund gemischt. Über der Körnung liegt
+        der Nebentext auf dem Seitengrund etwas darunter, gemessen rund 4,4:1.
+      </p>
+    </div>
+
+    <div class="d-sample">
+      <div class="d-surfaces">
+        {
+          surfaces.map((s) => (
+            <div
+              class="d-surface"
+              data-surface={s.attr}
+              style={`background: var(${s.ground})`}
+            >
+              <p class="d-surface__name">
+                {s.name} ·{" "}
+                <code>
+                  {s.attr ? `data-surface="${s.attr}"` : "ohne Attribut"}
+                </code>
+              </p>
+              <p class="d-surface__text">
+                Schrift in <code>--c-text</code> auf <code>{s.ground}</code>.
+              </p>
+              <p class="d-surface__muted">
+                Nebentext in <code>--c-text-muted</code>. {s.text}
+              </p>
+              <hr class="d-surface__line" />
+              <hr class="d-surface__line d-surface__line--strong" />
+              <p class="d-surface__controls">
+                <a class="d-surface__link d-focus-static" href="#flaechen">
+                  Ein Textlink
+                </a>
+                <button type="button" class="d-surface__button d-focus-static">
+                  Ein Button
+                </button>
+              </p>
+              <dl class="d-surface__ratios">
+                {s.ratios.map((r) => (
+                  <div>
+                    <dt>{r.label}</dt>
+                    <dd>
+                      {r.value != null && r.rating ? (
+                        <>
+                          {ratio(r.value)}{" "}
+                          <span class={`d-marker d-marker--${r.rating.cls}`}>
+                            {r.rating.label}
+                          </span>
+                        </>
+                      ) : (
+                        "nicht rechenbar"
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p class="d-surface__overrides">
+                {s.overrides.length ? (
+                  <>
+                    Stellt um:{" "}
+                    {s.overrides.map((o, i) => (
+                      <>
+                        {i > 0 && ", "}
+                        <code>{o}</code>
+                      </>
+                    ))}
+                  </>
+                ) : (
+                  "Stellt nichts um: die Rollen des Seitengrunds."
+                )}
+              </p>
+              {s.attr ? (
+                <div class="d-usage" set:html={s.used} />
+              ) : (
+                <div class="d-usage">
+                  <span class="d-usage__line">
+                    <span class="d-usage__label">Verwendet</span> überall, wo
+                    kein Attribut steht
+                  </span>
+                </div>
+              )}
+            </div>
+          ))
+        }
+      </div>
+      {
+        unlistedSurfaces.length ? (
+          <p class="d-sample__text d-gap-top">
+            In tokens.css, aber noch ohne Kachel:{" "}
+            {unlistedSurfaces.map((k) => `data-surface="${k}"`).join(", ")}.
+          </p>
+        ) : null
+      }
+    </div>
+  </section>
+
+  {/* ================= 4. Small building blocks ================= */}
+  <section class="d-section d-part" id="bausteine" data-surface="dark">
+    <div class="d-section__header">
+      <span class="d-section__number">Teil 4</span>
+      <h2 class="d-section__title">Kleine Bausteine</h2>
+      <p class="d-section__text">
+        Die kleinen Teile, aus denen alles Übrige zusammengesetzt ist. Die
+        großen stehen auf der <a href="/design/komponenten">Komponenten-Seite</a
         >.
       </p>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
+  <section class="d-section" id="buttons">
     <div class="d-section__header">
-      <span class="d-section__number">01</span>
-      <h2 class="d-section__title">Farben</h2>
-      <p class="d-section__text">
-        Sechs Farben tragen die Gestaltung; dazu kommen Weiß und Schwarz als
-        Werkzeug, für Eingabefelder und Verläufe. Daneben steht das gemessene
-        Kontrastverhältnis gegen den Grund, auf dem die Farbe tatsächlich
-        vorkommt - WCAG&nbsp;AA verlangt 4,5:1 für Fließtext, 3:1 für große
-        Schrift und für Bedienelemente.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-grid">
-        {
-          COLORS.map((f) => {
-            const v = contrast(f.hex, f.against);
-            return (
-              <div class="d-color">
-                <div class="d-color__swatch" style={`background: ${f.hex}`} />
-                <p class="d-color__name">{f.name}</p>
-                <p class="d-color__hex">{f.hex}</p>
-                <p class="d-color__role">{f.role}</p>
-                <p class="d-color__value">
-                  {formatNumber(v)}:1 auf <code>{f.againstName}</code>{" "}
-                  <span
-                    class={
-                      v >= 4.5
-                        ? "d-marker d-marker--good"
-                        : v >= 3
-                          ? "d-marker d-marker--partial"
-                          : "d-marker d-marker--weak"
-                    }
-                  >
-                    {v >= 4.5
-                      ? "Fließtext"
-                      : v >= 3
-                        ? "nur groß"
-                        : "nur Fläche"}
-                  </span>
-                </p>
-              </div>
-            );
-          })
-        }
-      </div>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Abgeleitete Töne</span>
-        <span class="d-sample__path">src/styles/tokens.css</span>
-      </div>
-      <p class="d-sample__text">
-        Nebentext entsteht nicht aus einer eigenen Farbe, sondern aus der
-        Schriftfarbe mit verringerter Deckung. Die Deckungswerte sind gerechnet:
-        Taupe ist dunkler als Grau und braucht deshalb mehr.
-      </p>
-      <table class="d-table">
-        <thead>
-          <tr><th>Token</th><th>Regel</th><th>Zweck</th><th>Kontrast</th></tr>
-        </thead>
-        <tbody>
-          {
-            DERIVED.map((a) => (
-              <tr>
-                <td>
-                  <code>{a.name}</code>
-                </td>
-                <td>
-                  <code>{a.ink === HEX.grey ? "--c-grey" : "--c-dark"}</code>
-                  {` auf ${Math.round(a.cover * 100)} %`}
-                </td>
-                <td>{a.purpose}</td>
-                <td>
-                  {formatNumber(a.value)}:1{" "}
-                  <span
-                    class={
-                      a.decoration
-                        ? "d-marker d-marker--weak"
-                        : a.value >= 4.5
-                          ? "d-marker d-marker--good"
-                          : "d-marker d-marker--partial"
-                    }
-                  >
-                    {a.decoration
-                      ? "Schmuck"
-                      : a.value >= 4.5
-                        ? "Fließtext"
-                        : "nur groß"}
-                  </span>
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
-    <div class="d-section__header">
-      <span class="d-section__number">02</span>
-      <h2 class="d-section__title">Typografie</h2>
-      <p class="d-section__text">
-        Zwei Schriften. PP Neue Montreal trägt alles Gesetzte, GT Pressura Mono
-        alles Beschriftende - Toplines, Preise, Kleinstangaben. Die Skala ist
-        fluid: die Figma-Werte gelten bei 1728&nbsp;px Fensterbreite, darunter
-        und darüber rechnet <code>clamp()</code> weiter.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Schriften</span>
-      </div>
-      <div class="d-grid">
-        <div class="d-stage">
-          <p class="d-font-name">--f-sans · PP Neue Montreal</p>
-          <p class="d-font-sample" style="font-family: var(--f-sans)">
-            AaBbCc 0123
-          </p>
-          <p
-            class="d-font-sample"
-            style="font-family: var(--f-sans); font-weight: 500"
-          >
-            Medium 500
-          </p>
-        </div>
-        <div class="d-stage">
-          <p class="d-font-name">--f-mono · GT Pressura Mono</p>
-          <p
-            class="d-font-sample"
-            style="font-family: var(--f-mono); font-weight: 300"
-          >
-            AaBbCc 0123
-          </p>
-          <p
-            class="d-font-sample"
-            style="font-family: var(--f-mono); font-weight: var(--fw-light); text-transform: uppercase; letter-spacing: 0.08em"
-          >
-            Light 300 gesperrt
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Zeilenhöhe und Laufweite</span>
-      </div>
-      <p class="d-sample__text">
-        Beide gehören zur Skala und standen bis zum 02.09.2026 nicht auf dieser
-        Seite. Bei der Laufweite ist das nicht folgenlos geblieben: Neben den
-        zwei Token stehen im Bestand zwölf ausgeschriebene Werte an 115 Stellen,
-        27 davon schreiben genau den Wert aus, den ein Token schon hält.
-      </p>
-      <table class="d-table">
-        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
-        <tbody>
-          {
-            [...LINE_HEIGHTS, ...TRACKING].map((a) => (
-              <tr>
-                <>
-                  <td>
-                    <code>{a.token}</code>
-                  </td>
-                  <td>{a.value}</td>
-                  <td>{a.purpose}</td>
-                </>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Skala</span>
-      </div>
-      {
-        SIZES.map((g) => (
-          <div class="d-size">
-            <div class="d-size__meta">
-              <code>{g.token}</code>
-              <span>{g.figma}</span>
-              <span class="d-size__purpose">{g.purpose}</span>
-            </div>
-            <p class="d-size__sample" style={`font-size: var(${g.token})`}>
-              {g.text}
-            </p>
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
-    <div class="d-section__header">
-      <span class="d-section__number">03</span>
-      <h2 class="d-section__title">Abstände, Radien, Rahmen</h2>
-      <p class="d-section__text">
-        Die Abstandsskala wächst nicht linear - unten in Achterschritten, oben
-        in Sprüngen. Abstände zwischen Sections haben eigene Token, weil sie mit
-        der Fensterbreite mitwachsen müssen.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Abstände</span>
-      </div>
-      {
-        SPACING.map((t) => (
-          <div class="d-space">
-            <code class="d-space__name">{t}</code>
-            <div class="d-space__bar" style={`width: var(${t})`} />
-          </div>
-        ))
-      }
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Dazu drei fluide Werte für den Abstand zwischen Sections:
-        <code>--section-space</code> als Regelfall,
-        <code>--section-space-sm</code> wenn direkt darunter eine Farbfläche anschließt,
-        und <code>--section-space-lg</code> für den großen Absatz.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name"
-          >Fluide Abstände innerhalb einer Section</span
-        >
-        <span class="d-sample__path">--flow-*</span>
-      </div>
-      <p class="d-sample__text">
-        Eine Ebene unter <code>--section-space</code>. Die feste Skala oben kann
-        das nicht leisten - sie ist bewusst starr, diese Abstände sollen mit dem
-        Fenster wachsen. Bis zum 02.09.2026 brachte fast jeder Baustein dafür
-        seine eigene <code>clamp()</code>-Rampe mit, rund 78 Stück: sieben
-        endeten auf 96&nbsp;px, vier auf 72, vier auf 56, jeweils mit anderem
-        Startwert, ohne dass der Unterschied etwas bedeutet hätte.
-      </p>
-      <table class="d-table">
-        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
-        <tbody>
-          {
-            FLOW.map((a) => (
-              <tr>
-                <>
-                  <td>
-                    <code>{a.token}</code>
-                  </td>
-                  <td>{a.value}</td>
-                  <td>{a.purpose}</td>
-                </>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Layout</span>
-      </div>
-      <p class="d-sample__text">
-        Die Maße der Seite selbst. <code>--site-margin</code> und
-        <code>--site-gutter</code> sind die meistbenutzten Token des Projekts und
-        standen bis zum 02.09.2026 auf keiner Tafel.
-      </p>
-      <table class="d-table">
-        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
-        <tbody>
-          {
-            LAYOUT.map((a) => (
-              <tr>
-                <>
-                  <td>
-                    <code>{a.token}</code>
-                  </td>
-                  <td>{a.value}</td>
-                  <td>{a.purpose}</td>
-                </>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Radien</span>
-      </div>
-      <div class="d-stage d-stage--row">
-        {
-          RADII.map((r) => (
-            <div class="d-radius">
-              <div class="d-radius__field" style={`border-radius: var(${r})`} />
-              <code>{r}</code>
-            </div>
-          ))
-        }
-      </div>
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Rahmenstärke ist <code>--bw</code> (1&nbsp;px), überall bis auf fünf Stellen.
-        Die sind Gestaltung und kein Versehen: 10&nbsp;px um die Promokachel der Navigation,
-        2&nbsp;px als Markierung an Zeitleiste, Stellenliste und Personenzitat, 1,5&nbsp;px
-        an der Auswahl im Formular. Bis zum 02.09.2026 stand hier, es gebe „keine
-        zweite" - dabei waren es schon damals vier verschiedene, und acht weitere
-        Stellen schrieben
-        <code>1px</code> aus, statt das Token zu nehmen. Wer eine sechste einführt,
-        sollte sie hier eintragen können. Sonst ist es keine.
-      </p>
-    </div>
-  </section>
-
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
-    <div class="d-section__header">
-      <span class="d-section__number">04</span>
-      <h2 class="d-section__title">Bewegung</h2>
-      <p class="d-section__text">
-        Eine gemeinsame Sprache für CSS und GSAP. Die Kurven laufen lang aus und
-        federn nie zurück. Zum Ausprobieren die Felder überfahren.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Kurven</span>
-      </div>
-      {
-        CURVES.map((k) => (
-          <div class="d-curve">
-            <div class="d-curve__meta">
-              <code>{k.token}</code>
-              <span class="d-size__purpose">{k.purpose}</span>
-            </div>
-            <div class="d-curve__track">
-              <span
-                class="d-curve__ball"
-                style={`transition-timing-function: var(${k.token})`}
-              />
-            </div>
-          </div>
-        ))
-      }
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Dauern</span>
-      </div>
-      <table class="d-table">
-        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
-        <tbody>
-          {
-            DURATIONS.map((d) => (
-              <tr>
-                <>
-                  <td>
-                    <code>{d.token}</code>
-                  </td>
-                  <td>{d.value}</td>
-                  <td>{d.purpose}</td>
-                </>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
-    <div class="d-section__header">
-      <span class="d-section__number">05</span>
-      <h2 class="d-section__title">Buttons und Links</h2>
+      <span class="d-section__number">4.1</span>
+      <h3 class="d-section__title">Buttons und Links</h3>
       <p class="d-section__text">
         Der Button ist zweiteilig: Pille mit Beschriftung, abgesetzt daneben der
-        runde Pfeil. Beim Überfahren rückt der Pfeil nach rechts ab - der Button
+        runde Pfeil. Beim Überfahren rückt der Pfeil nach rechts ab, der Button
         öffnet sich in Leserichtung. Das ist die einzige Rückmeldung, und zwar
-        mit Absicht: Vorher kippte zusätzlich die Farbe um, und der Farbsprung
-        übertönte das feinere Signal. Beim Klick sinken Bedienelemente leicht
-        ein, mit einer Ausnahme - Akkordeons tun es nicht, eine ganze Zeile, die
-        beim Aufklappen zusammenzuckt, wirkt wie ein Ruckeln.
-      </p>
-      <p class="d-section__text">
-        Bis zum 02.09.2026 stand hier, beim Überfahren kehrten „beide Teile ihre
-        Farben um". Das war seit dem Umbau des Buttons nicht mehr wahr.
+        mit Absicht: Ein zusätzlicher Farbsprung übertönte das feinere Signal.
+        Beim Klick sinken Bedienelemente leicht ein, mit einer Ausnahme:
+        Akkordeons tun es nicht, eine ganze Zeile, die beim Aufklappen
+        zusammenzuckt, wirkt wie ein Ruckeln.
       </p>
     </div>
 
@@ -916,14 +1889,12 @@ const formatNumber = (n: number) =>
         <Button label="Dunkel" href="#" variant="dark" />
         <Button label="Absenden" type="submit" />
       </div>
-      <div class="d-stage d-stage--dark" style="margin-top: var(--sp-4)">
-        <div
-          class="d-stage--row"
-          style="display:flex; flex-wrap:wrap; gap: var(--sp-4)"
-        >
-          <Button label="Auf dunklem Grund" href="#" />
-          <Button label="Block" href="#" variant="block" />
-        </div>
+      <div
+        class="d-stage d-stage--dark d-stage--row d-gap-top"
+        data-surface="dark"
+      >
+        <Button label="Auf dunklem Grund" href="#" />
+        <Button label="Block" href="#" variant="block" />
       </div>
     </div>
 
@@ -932,25 +1903,24 @@ const formatNumber = (n: number) =>
         <span class="d-sample__name">Textlink und Topline</span>
       </div>
       <div class="d-stage">
-        <p style="margin-bottom: var(--sp-4)">
+        <p class="d-gap-bottom">
           <a class="c-link" href="#">Ein Textlink</a> im Fließtext.
         </p>
         <span class="c-topline">Vorher &amp; Nachher</span>
       </div>
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Die Topline erbt ihre Farbe von der Section, sie setzt keine eigene -
+      <p class="d-sample__text d-gap-top">
+        Die Topline erbt ihre Farbe von der Section und setzt keine eigene,
         sonst stünde sie auf dem braunen Band dunkel auf dunkel.
       </p>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
+  <section class="d-section" id="formular">
     <div class="d-section__header">
-      <span class="d-section__number">06</span>
-      <h2 class="d-section__title">Flächen und Formularelemente</h2>
+      <span class="d-section__number">4.2</span>
+      <h3 class="d-section__title">Akkordeon und Eingabefelder</h3>
       <p class="d-section__text">
-        Alles, was Inhalt trägt oder Eingaben entgegennimmt.
+        Alles, was Inhalt aufklappt oder Eingaben entgegennimmt.
       </p>
     </div>
 
@@ -976,7 +1946,7 @@ const formatNumber = (n: number) =>
             <input
               id="sg-name"
               type="text"
-              placeholder="Ihr Name"
+              placeholder="Dein Name"
               autocomplete="name"
             />
           </div>
@@ -1002,23 +1972,23 @@ const formatNumber = (n: number) =>
           </div>
         </div>
       </div>
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
+      <p class="d-sample__text d-gap-top">
         Die Beschriftung steht über dem Feld und ist über <code>for</code> mit ihm
-        verbunden - ein Platzhalter allein ist keine Beschriftung, er verschwindet
+        verbunden. Ein Platzhalter allein ist keine Beschriftung, er verschwindet
         beim Tippen.
       </p>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
+  <section class="d-section" id="symbole">
     <div class="d-section__header">
-      <span class="d-section__number">07</span>
-      <h2 class="d-section__title">Symbole</h2>
+      <span class="d-section__number">4.3</span>
+      <h3 class="d-section__title">Symbole</h3>
       <p class="d-section__text">
         Ein einziges SVG-Sprite, einmal im Dokument, überall per
         <code>&lt;use href="#i-…"&gt;</code> aufgerufen. Die Symbole erben
-        <code>currentColor</code>, sie tragen keine eigene Farbe.
+        <code>currentColor</code>, sie tragen keine eigene Farbe. Die Liste ist
+        aus dem Sprite gelesen.
       </p>
     </div>
 
@@ -1042,98 +2012,102 @@ const formatNumber = (n: number) =>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- */}
-  <section class="d-section">
-    <div class="d-section__header">
-      <span class="d-section__number">08</span>
-      <h2 class="d-section__title">Schatten, Körnung, Ebenen</h2>
-      <p class="d-section__text">
-        Der Rest des Systems. Diese drei Gruppen standen bis zum 02.09.2026 auf
-        keiner Tafel, obwohl sie an 19 Stellen im Einsatz sind - ein Styleguide,
-        der ein Drittel seiner eigenen Token nicht kennt, beschreibt nicht die
-        Seite, sondern einen Ausschnitt davon.
-      </p>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Schatten</span>
-      </div>
-      <p class="d-sample__text">
-        Die einzigen Stellen, an denen etwas eine Fläche über einer anderen
-        wirft. Die Farbe ist immer <code>--c-dark</code>, nie reines Schwarz.
-      </p>
-      <div
-        class="d-stage d-stage--row"
-        style="flex-wrap: wrap; gap: var(--sp-6)"
-      >
-        {
-          SHADOWS.map((s) => (
-            <div class="d-radius">
-              <div
-                class="d-shadow-probe"
-                style={`box-shadow: var(${s.token})`}
-              />
-              <code>{s.token}</code>
-              <p class="d-size__purpose" style="margin-top: var(--sp-1)">
-                {s.purpose}
-              </p>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Körnung</span>
-      </div>
-      <p class="d-sample__text">
-        Die Papierstruktur, die <code>ui/Backdrop.astro</code> über die Seite legt.
-        Zwei Deckkraftwerte, weil eine Fläche mit eigenem deckenden Grund die Körnung
-        anders trifft als der Seitengrund:
-        <code>--grain-opacity</code> (0,34) für die Auflage,
-        <code>--grain-opacity-surface</code> (0,17) für Flächen, die sie selbst mitbringen
-        müssen. Das Bild steht als <code>--grain-image</code> bereit.
-      </p>
-      <div class="d-stage d-stage--row">
-        <div class="d-grain d-grain--page"><span>Seitengrund</span></div>
-        <div class="d-grain d-grain--surface"><span>Eigene Fläche</span></div>
-      </div>
-    </div>
-
-    <div class="d-sample">
-      <div class="d-sample__header">
-        <span class="d-sample__name">Ebenen</span>
-      </div>
-      <table class="d-table">
-        <thead><tr><th>Token</th><th>Wert</th><th>Zweck</th></tr></thead>
-        <tbody>
-          {
-            LAYERS.map((a) => (
-              <tr>
-                <>
-                  <td>
-                    <code>{a.token}</code>
-                  </td>
-                  <td>{a.value}</td>
-                  <td>{a.purpose}</td>
-                </>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-      <p class="d-sample__text" style="margin-top: var(--sp-4)">
-        Der Sprung zum Inhalt liegt bewusst über der Navigation. Bei Gleichstand
-        gewinnt das später gezeichnete Element - er stand einmal auf derselben
-        Ebene wie die Leiste und war dadurch halb verdeckt.
-      </p>
-    </div>
-  </section>
-
   <style is:global>
-    /* --- Farbkacheln --- */
+    /* Everything here carries the `d-` prefix and styles the documentation
+       only. Values come from tokens.css; the few fixed sizes below are the
+       dimensions of a probe, not of the site. */
+
+    /* --- Part headers: a dark band, set through the real surface --- */
+    .d-part {
+      background: var(--c-dark);
+    }
+
+    .d-part .d-section__header {
+      margin-bottom: 0;
+    }
+
+    /* --- Contents --- */
+    .d-contents {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--sp-4);
+    }
+
+    .d-contents__head {
+      display: block;
+      margin-bottom: var(--sp-2);
+      font: var(--font-topline);
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+    }
+
+    .d-contents__list {
+      padding: 0;
+      list-style: none;
+      font: var(--font-small);
+      color: var(--c-text-muted);
+    }
+
+    .d-contents a {
+      text-decoration: underline;
+      text-decoration-thickness: var(--bw);
+      text-underline-offset: 3px;
+    }
+
+    .d-contents a:hover {
+      color: var(--c-text);
+      text-decoration-color: var(--c-brand);
+    }
+
+    .d-gap-top {
+      margin-top: var(--sp-4);
+    }
+
+    .d-gap-bottom {
+      margin-bottom: var(--sp-4);
+    }
+
+    /* --- Usage lines --- */
+    .d-usage {
+      margin-top: var(--sp-1);
+      font: var(--font-label);
+      letter-spacing: var(--tracking-mono);
+      color: var(--c-text-muted);
+    }
+
+    .d-usage__line {
+      display: block;
+    }
+
+    .d-usage__label {
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-label);
+    }
+
+    .d-usage__more {
+      display: inline;
+    }
+
+    .d-usage__more summary {
+      display: inline;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* Unused is marked by a frame and a word, not by colour alone
+       (WCAG 1.4.1). */
+    .d-usage__none {
+      display: inline-block;
+      padding: 0.1em 0.5em;
+      border: var(--bw) dashed var(--c-line-strong);
+      border-radius: var(--r-sm);
+      color: var(--c-text);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-label);
+    }
+
+    /* --- Colour tiles --- */
     .d-color__swatch {
       height: 96px;
       margin-bottom: var(--sp-3);
@@ -1149,8 +2123,7 @@ const formatNumber = (n: number) =>
     .d-color__hex,
     .d-color__role,
     .d-color__value {
-      font-size: var(--fs-text-small);
-      line-height: var(--lh-text);
+      font: var(--font-small);
       color: var(--c-text-muted);
     }
 
@@ -1158,14 +2131,12 @@ const formatNumber = (n: number) =>
       margin-block: var(--sp-1);
     }
 
-    /* Nicht nur farbig, sondern beschriftet: eine Ampel allein sagt denen
-       nichts, die die Farbe nicht unterscheiden (WCAG 1.4.1). */
     .d-marker {
       display: inline-block;
       padding: 0.1em 0.5em;
+      border: var(--bw) solid transparent;
       border-radius: var(--r-sm);
-      font-family: var(--f-mono);
-      font-size: var(--fs-label);
+      font: var(--font-label);
       letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
     }
@@ -1180,15 +2151,23 @@ const formatNumber = (n: number) =>
     }
     .d-marker--weak {
       background: transparent;
-      border: var(--bw) solid var(--c-line);
+      border-color: var(--c-line-strong);
       color: var(--c-text);
     }
 
-    /* --- Tabellen --- */
+    /* On a surface the markers follow its roles; a dark pill on a dark
+       ground would be a hole, not a label. */
+    .d-surface .d-marker {
+      background: transparent;
+      border-color: var(--c-line-strong);
+      color: var(--c-text);
+    }
+
+    /* --- Tables --- */
     .d-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: var(--fs-text-small);
+      font: var(--font-small);
       text-align: left;
     }
 
@@ -1200,8 +2179,7 @@ const formatNumber = (n: number) =>
     }
 
     .d-table th {
-      font-family: var(--f-mono);
-      font-weight: var(--fw-light);
+      font: var(--font-label);
       letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
     }
@@ -1210,11 +2188,135 @@ const formatNumber = (n: number) =>
       color: var(--c-text-muted);
     }
 
-    /* --- Schrift- und Gradproben --- */
+    .d-table td:first-child code {
+      white-space: nowrap;
+    }
+
+    .d-table__value {
+      word-break: break-word;
+    }
+
+    .d-table__size {
+      display: block;
+      margin-top: var(--sp-1);
+      font: var(--font-label);
+      letter-spacing: var(--tracking-mono);
+    }
+
+    .d-table__probe {
+      width: 30%;
+    }
+
+    /* Narrow windows: each row becomes a small card instead of a table
+       that scrolls sideways. */
+    @media (max-width: 700px) {
+      .d-table thead {
+        display: none;
+      }
+      .d-table tr {
+        display: block;
+        padding-block: var(--sp-2);
+        border-bottom: var(--bw) solid var(--c-line);
+      }
+      .d-table td {
+        display: block;
+        width: auto;
+        padding: var(--sp-1) 0;
+        border: 0;
+      }
+    }
+
+    /* --- Probes --- */
+    .d-probe-bar {
+      display: block;
+      max-width: 100%;
+      height: var(--sp-2);
+      border-radius: var(--r-sm);
+      background: var(--c-text);
+    }
+
+    .d-probe-lh {
+      display: inline-block;
+      padding-inline: var(--sp-1);
+      background: var(--c-tint);
+      color: var(--c-text);
+      font-size: var(--fs-text-main);
+    }
+
+    .d-probe-tracking {
+      font-size: var(--fs-text-large);
+      color: var(--c-text);
+    }
+
+    .d-probe-tracking--mono {
+      font: var(--font-label);
+      font-size: var(--fs-text-small);
+      text-transform: uppercase;
+    }
+
+    .d-probe-radius {
+      display: block;
+      width: var(--sp-10);
+      height: var(--sp-8);
+      background: var(--c-dark);
+    }
+
+    .d-probe-shadow {
+      display: block;
+      width: var(--sp-12);
+      height: var(--sp-8);
+      border-radius: var(--r-md);
+      background: var(--c-surface);
+    }
+
+    .d-probe-icon {
+      display: inline-grid;
+      place-items: center;
+      border-radius: var(--r-round);
+      color: var(--c-text);
+      outline: var(--bw) dashed var(--c-line);
+    }
+
+    .d-probe-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .d-probe-line {
+      display: block;
+      width: var(--sp-12);
+      border-top: var(--bw) solid var(--c-text);
+    }
+
+    .d-probe-focus {
+      display: block;
+      width: var(--sp-10);
+      height: var(--sp-5);
+      border-radius: var(--r-sm);
+      background: var(--c-surface);
+      outline: var(--focus-width) solid var(--c-focus);
+      outline-offset: var(--focus-offset);
+    }
+
+    .d-role-chip {
+      display: flex;
+      padding: var(--sp-1);
+      width: var(--sp-12);
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-sm);
+    }
+
+    .d-role-chip span {
+      display: block;
+      width: 100%;
+      height: var(--sp-5);
+      border-radius: var(--r-sm);
+    }
+
+    /* --- Fonts and the ladder --- */
     .d-font-name {
       margin-bottom: var(--sp-3);
-      font-family: var(--f-mono);
-      font-size: var(--fs-label);
+      font: var(--font-label);
       letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
       color: var(--c-text-muted);
@@ -1225,18 +2327,37 @@ const formatNumber = (n: number) =>
       line-height: var(--lh-snug);
     }
 
-    .d-size {
+    .d-font-sample--sans {
+      font-family: var(--f-sans);
+    }
+
+    .d-font-sample--medium {
+      font-weight: var(--fw-medium);
+    }
+
+    .d-font-sample--mono {
+      font-family: var(--f-mono);
+      font-weight: var(--fw-light);
+    }
+
+    .d-font-sample--caps {
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .d-size,
+    .d-style {
       padding-block: var(--sp-4);
       border-top: var(--bw) solid var(--c-line);
     }
 
-    .d-size__meta {
+    .d-size__meta,
+    .d-style__meta {
       display: flex;
       flex-wrap: wrap;
       gap: var(--sp-2) var(--sp-4);
       margin-bottom: var(--sp-2);
-      font-family: var(--f-mono);
-      font-size: var(--fs-label);
+      font: var(--font-label);
       letter-spacing: var(--tracking-mono);
       color: var(--c-text-muted);
     }
@@ -1245,169 +2366,120 @@ const formatNumber = (n: number) =>
       text-transform: none;
     }
 
-    /* Überlauf erlaubt: die großen Grade sind breiter als das Fenster, und
-       genau das sollen sie zeigen. Abgeschnitten wären sie eine Lüge über
-       ihre Größe — deshalb scrollt die Zeile für sich. */
+    /* Overflow allowed: the large steps are wider than the window, and that
+       is what they are meant to show. Cut off they would lie about their
+       size, so the line scrolls on its own. */
     .d-size__sample {
       overflow-x: auto;
-      font-weight: var(--fw-medium);
-      line-height: 1.05;
+      line-height: var(--lh-headline);
       white-space: nowrap;
     }
 
-    /* --- Abstände und Radien --- */
-    .d-space {
-      display: flex;
-      align-items: center;
-      gap: var(--sp-4);
-      padding-block: var(--sp-1);
+    .d-size__sample--heavy {
+      font-weight: var(--fw-medium);
     }
 
-    .d-space__name {
-      flex: 0 0 7ch;
-      font-size: var(--fs-label);
-      color: var(--c-text-muted);
+    .d-style__sample {
+      max-width: var(--measure-long);
     }
 
-    .d-space__bar {
-      height: 14px;
-      border-radius: var(--r-sm);
-      background: var(--c-dark);
+    .d-style__sample--caps {
+      text-transform: uppercase;
     }
 
-    .d-radius {
-      text-align: center;
-      font-size: var(--fs-label);
-    }
-
-    .d-radius__field {
-      width: 88px;
-      height: 88px;
-      margin-bottom: var(--sp-2);
-      border: var(--bw) solid var(--c-line);
-      background: var(--c-dark);
-    }
-
-    /* --- Bewegungskurven --- */
-    .d-curve {
-      padding-block: var(--sp-4);
-      border-top: var(--bw) solid var(--c-line);
-    }
-
-    .d-curve__meta {
+    .d-style__parts {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--sp-2) var(--sp-4);
-      margin-bottom: var(--sp-3);
-      font-family: var(--f-mono);
-      font-size: var(--fs-label);
+      gap: var(--sp-1) var(--sp-4);
+      margin-top: var(--sp-2);
+      font: var(--font-label);
+      letter-spacing: var(--tracking-mono);
       color: var(--c-text-muted);
     }
 
+    .d-code {
+      padding: var(--sp-4);
+      border-radius: var(--r-md);
+      background: var(--c-tint);
+      font-family: var(--f-mono);
+      font-size: var(--fs-text-small);
+      line-height: var(--lh-body);
+      white-space: pre-wrap;
+    }
+
+    .d-legacy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-1) var(--sp-4);
+      margin-top: var(--sp-2);
+      font-size: var(--fs-label-md);
+    }
+
+    .d-list {
+      padding-left: var(--sp-4);
+      font: var(--font-body);
+      color: var(--c-text-muted);
+    }
+
+    /* --- Measures --- */
+    .d-measure {
+      padding-block: var(--sp-3);
+      border-top: var(--bw) solid var(--c-line);
+      font: var(--font-label);
+      color: var(--c-text-muted);
+    }
+
+    .d-measure__text {
+      margin-top: var(--sp-1);
+      padding: var(--sp-2);
+      background: var(--c-tint);
+      font: var(--font-body);
+      color: var(--c-text);
+    }
+
+    /* --- Motion --- */
     .d-curve__track {
       position: relative;
-      height: 32px;
+      display: block;
+      height: var(--sp-5);
       border-radius: var(--r-round);
       background: var(--c-tint);
+      container-type: inline-size;
     }
 
     .d-curve__ball {
       position: absolute;
       top: 4px;
       left: 4px;
-      width: 24px;
-      height: 24px;
+      width: var(--sp-4);
+      height: var(--sp-4);
       border-radius: var(--r-round);
-      background: var(--c-brand);
+      background: var(--c-dark);
       transition-property: translate;
       transition-duration: var(--d-slow);
+      transition-timing-function: var(--e-out);
     }
 
-    .d-curve:hover .d-curve__ball,
-    .d-curve:focus-within .d-curve__ball {
-      translate: calc(100cqw - 32px) 0;
-    }
-
-    .d-curve__track {
-      container-type: inline-size;
+    .d-motion-row:hover .d-curve__ball {
+      translate: calc(100cqw - var(--sp-5)) 0;
     }
 
     @media (prefers-reduced-motion: reduce) {
       .d-curve__ball {
-        transition-duration: 0s;
+        transition-duration: 0s !important;
       }
     }
 
-    /* --- Formular --- */
-    .d-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--sp-4);
-    }
-
-    @media (max-width: 700px) {
-      .d-form {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Die Feldregeln liegen in Contact.astro und sind dort abgegrenzt — auf
-       dieser Seite gibt es sie nicht. Hier stehen deshalb nur die nötigsten,
-       bewusst als Nachbau gekennzeichnet. */
-    .d-form .c-field__label {
-      display: block;
-      margin-bottom: var(--sp-1);
-      font-family: var(--f-mono);
-      font-weight: var(--fw-light);
-      font-size: var(--fs-text-small);
-      letter-spacing: var(--tracking-wide);
-      text-transform: uppercase;
-      color: var(--c-neutral-800);
-    }
-
-    /* Wie in Contact.astro: der Pflichtstern trägt die Farbe der
-       Beschriftung. Pink erreicht bei dieser Größe auf hellem Grund keine
-       4.5:1 und wäre als Text unzulässig. */
-    .d-form .c-field__label span {
-      color: inherit;
-    }
-
-    .d-form input,
-    .d-form textarea {
-      width: 100%;
-      padding: var(--sp-3) var(--sp-4);
-      border: var(--bw) solid var(--c-line);
-      border-radius: var(--r-sm);
-      background: var(--c-white);
-      font-family: var(--f-sans);
-      font-size: var(--fs-text-main);
-      color: var(--c-neutral-800);
-    }
-
-    .d-form .c-field--tall {
-      grid-column: 1 / -1;
-    }
-
-    /* --- Schatten und Körnung --- */
-    .d-shadow-probe {
-      width: 120px;
-      height: 72px;
-      margin-bottom: var(--sp-2);
-      border-radius: var(--r-md);
-      background: var(--c-neutral-200);
-    }
-
+    /* --- Grain --- */
     .d-grain {
       position: relative;
       display: grid;
       place-items: center;
-      width: 180px;
+      width: 220px;
       height: 96px;
       border-radius: var(--r-md);
       background: var(--c-dark);
-      color: var(--c-grey);
-      font-family: var(--f-mono);
-      font-size: var(--fs-label);
+      font: var(--font-label);
       overflow: hidden;
     }
 
@@ -1431,7 +2503,152 @@ const formatNumber = (n: number) =>
       z-index: 1;
     }
 
-    /* --- Symbole --- */
+    /* --- Surfaces --- */
+    .d-surfaces {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--sp-4);
+    }
+
+    .d-surface {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      padding: var(--sp-5);
+      border: var(--bw) solid var(--c-line);
+      border-radius: var(--r-md);
+      color: var(--c-text);
+    }
+
+    .d-surface__name {
+      font: var(--font-topline);
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+    }
+
+    .d-surface__name code {
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .d-surface__text {
+      font: var(--font-body);
+    }
+
+    .d-surface__muted {
+      font: var(--font-body);
+      color: var(--c-text-muted);
+    }
+
+    .d-surface__line {
+      margin: 0;
+      border: 0;
+      border-top: var(--bw) solid var(--c-line);
+    }
+
+    .d-surface__line--strong {
+      border-top-color: var(--c-line-strong);
+    }
+
+    .d-surface__controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-4);
+      padding-block: var(--sp-1);
+    }
+
+    .d-surface__link {
+      color: var(--c-text);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .d-surface__button {
+      min-height: var(--icon-lg);
+      padding: var(--sp-1) var(--sp-3);
+      border: var(--bw) solid var(--c-line-strong);
+      border-radius: var(--r-round);
+      background: transparent;
+      font: var(--font-small);
+      color: var(--c-text);
+      cursor: pointer;
+    }
+
+    /* The ring as :focus-visible draws it (base.css), shown for good. */
+    .d-focus-static {
+      outline: var(--focus-width) solid var(--c-focus);
+      outline-offset: var(--focus-offset);
+    }
+
+    .d-surface__ratios {
+      display: grid;
+      gap: var(--sp-1);
+      font: var(--font-small);
+    }
+
+    .d-surface__ratios div {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--sp-2);
+    }
+
+    .d-surface__overrides {
+      font: var(--font-label);
+      letter-spacing: var(--tracking-mono);
+      color: var(--c-text-muted);
+    }
+
+    /* --- Form (a stand-in: the field rules live scoped in Contact.astro
+       and do not exist on this page) --- */
+    .d-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+
+    @media (max-width: 700px) {
+      .d-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .d-form .c-field__label {
+      display: block;
+      margin-bottom: var(--sp-1);
+      font: var(--font-topline);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--c-on-card);
+    }
+
+    /* As in Contact.astro: the required star takes the label colour. Pink
+       does not reach 4.5:1 on a light ground at this size. */
+    .d-form .c-field__label span {
+      color: inherit;
+    }
+
+    .d-form input,
+    .d-form textarea {
+      width: 100%;
+      padding: var(--sp-3) var(--sp-4);
+      border: var(--bw) solid var(--c-line-strong);
+      border-radius: var(--r-sm);
+      background: var(--c-white);
+      font: var(--font-body);
+      color: var(--c-on-card);
+    }
+
+    .d-form ::placeholder {
+      color: var(--c-placeholder);
+    }
+
+    .d-form .c-field--tall {
+      grid-column: 1 / -1;
+    }
+
+    /* --- Symbols --- */
     .d-symbol {
       display: flex;
       align-items: center;
@@ -1443,8 +2660,8 @@ const formatNumber = (n: number) =>
     }
 
     .d-symbol svg {
-      width: 24px;
-      height: 24px;
+      width: var(--icon-lg);
+      height: var(--icon-lg);
       flex: 0 0 auto;
     }
   </style>

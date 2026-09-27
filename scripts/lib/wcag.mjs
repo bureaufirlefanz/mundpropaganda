@@ -218,8 +218,12 @@ export function pruefeSeite() {
 
   /* --- 1.3.1 Überschriftenfolge ---------------------------------------- */
 
+  /* Headings inside `aria-hidden` or `inert` are not in the accessibility
+     tree, so they are not part of the outline a screen reader hears. The
+     component catalogue shows the page heroes that way, as pictures. */
   const ebenen = [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")]
     .filter(sichtbar)
+    .filter((h) => !h.closest('[aria-hidden="true"], [inert]'))
     .map((h) => ({
       n: Number(h.tagName[1]),
       text: h.textContent.trim().slice(0, 30),
