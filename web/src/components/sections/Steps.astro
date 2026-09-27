@@ -30,6 +30,12 @@ const { title, steps } = Astro.props;
             <span class="c-number c-step__num">{i + 1}</span>
             <h3 class="c-step__title">{s.title}</h3>
             <p class="c-step__text">{s.text}</p>
+            {s.duration && (
+              <p class="c-step__duration">
+                <span>Dauer</span>
+                {s.duration}
+              </p>
+            )}
           </article>
         ))
       }
@@ -106,4 +112,33 @@ const { title, steps } = Astro.props;
     line-height: var(--lh-text);
     color: color-mix(in srgb, var(--c-neutral-800) 80%, transparent);
   }
+
+  /* Die Dauer gehört zum Text darüber und nicht als eigener Block daneben —
+     der Abstand der Karte (`gap: var(--sp-6)`, 40px) trennte sie zu weit und
+     ließe sie wie eine zweite Angabe aussehen. Der negative Rand nimmt den
+     Abstand zurück und setzt ihn auf `--sp-3`; beide Werte kommen aus den
+     Tokens, gerechnet wird nur die Differenz.
+
+     `Dauer` steht als eigenes Span davor, damit die Zahl ohne das Wort
+     auskommt: Im Studio tippt die Redaktion „ca. 30 bis 60 Minuten", nicht
+     „Dauer: ca. 30 bis 60 Minuten". */
+  .c-step__duration {
+    margin-top: calc(var(--sp-3) - var(--sp-6));
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    font-family: var(--f-mono);
+    font-size: var(--fs-text-small);
+    line-height: var(--lh-text);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    /* 60 % kamen auf 4.29:1 und damit knapp unter AA (`npm run web:check`).
+       70 % halten den Abstand zum Fließtext darüber und bleiben darüber. */
+    color: color-mix(in srgb, var(--c-neutral-800) 70%, transparent);
+  }
+
+  /* Das Wort trug hier kurzzeitig eine hellere Farbe als die Angabe. Das kam
+     auf 2.77:1 und damit unter AA — `npm run web:check` hat es gemeldet.
+     Beides steht jetzt in derselben Farbe; unterschieden wird über die
+     Reihenfolge, nicht über den Kontrast. */
 </style>

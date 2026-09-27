@@ -1,6 +1,7 @@
 ---
 import Button from "../ui/Button.astro";
 import CmsImage from "../ui/CmsImage.astro";
+import Picture from "../ui/Picture.astro";
 import type { ImageSource } from "../../lib/images";
 /**
  * Einstiegstext: Überschrift links, daneben zwei Textspalten.
@@ -43,42 +44,118 @@ interface Props {
   lead?: string;
   action?: string;
   actionHref?: string;
+  /**
+   * Ein randloses Bild über dem Abschnitt, als Motivname aus der
+   * Bildpipeline (`Picture.astro`), nicht als CMS-Bild.
+   *
+   * Es bricht über die volle Fensterbreite aus und läuft ohne Rundung bis an
+   * beide Kanten — dieselbe Begründung wie bei `PostImage` in der Fassung
+   * `full`: Eine Rundung an einer Kante, die am Fensterrand endet, sieht aus
+   * wie ein Fehler beim Zuschneiden.
+   *
+   * `alt` beschreibt das Bild, das tatsächlich gerendert wird. `bleed` und
+   * `image` schließen sich in der Praxis aus: das eine ist die randlose
+   * Fassung, das andere das mittige Bild der Pillar Pages.
+   */
+  bleed?: string;
 }
 
-const { topline, headline, columns, lead, action, actionHref, image, alt = "", variant = "default" } = Astro.props;
+const {
+  topline,
+  headline,
+  columns,
+  lead,
+  action,
+  actionHref,
+  image,
+  alt = "",
+  variant = "default",
+  bleed,
+} = Astro.props;
 ---
 
-<section class:list={["container", "s-intro", variant === "centered" && "s-intro--centered"]}>
-  <div class="s-intro__head">
-    {topline && <span class="c-topline" data-reveal="fade">{topline}</span>}
-    {headline && <h2 class="s-intro__title" data-split="lines">{headline}</h2>}
-    {lead && <p class="s-intro__lead" data-reveal="up">{lead}</p>}
-    {action && (
-      <div class="s-intro__action" data-reveal="up" data-reveal-delay="0.08">
-        <Button label={action} href={actionHref ?? "#stellen"} />
-      </div>
-    )}
-  </div>
-  {image && (
-    <figure class="s-intro__media" data-reveal="scale">
-      <CmsImage source={image} alt={alt} widths={[640, 1024, 1600]} sizes="(max-width: 1000px) 92vw, 48vw" />
-    </figure>
-  )}
+<section
+  class:list={[
+    "container",
+    "s-intro",
+    variant === "centered" && "s-intro--centered",
+  ]}
+>
+  {
+    bleed && (
+      <figure class="s-intro__bleed">
+        <Picture name={bleed} alt={alt} sizes="100vw" />
+      </figure>
+    )
+  }
 
-  {/* Die Hülle nur in der zentrierten Fassung: Dort trägt sie das
+  <div class="s-intro__head">
+    {
+      topline && (
+        <span class="c-topline" data-reveal="fade">
+          {topline}
+        </span>
+      )
+    }
+    {
+      headline && (
+        <h2 class="s-intro__title" data-split="lines">
+          {headline}
+        </h2>
+      )
+    }
+    {
+      lead && (
+        <p class="s-intro__lead" data-reveal="up">
+          {lead}
+        </p>
+      )
+    }
+    {
+      action && (
+        <div class="s-intro__action" data-reveal="up" data-reveal-delay="0.08">
+          <Button label={action} href={actionHref ?? "#stellen"} />
+        </div>
+      )
+    }
+  </div>
+  {
+    image && (
+      <figure class="s-intro__media" data-reveal="scale">
+        <CmsImage
+          source={image}
+          alt={alt}
+          widths={[640, 1024, 1600]}
+          sizes="(max-width: 1000px) 92vw, 48vw"
+        />
+      </figure>
+    )
+  }
+
+  {
+    /* Die Hülle nur in der zentrierten Fassung: Dort trägt sie das
       Zweispaltenraster. Sie auch sonst zu setzen änderte das DOM der
       Leistungsseiten — `display: contents` hielte zwar die Darstellung
       gleich, aber `npm run web:styles` vergleicht die Elementfolge, und ein
-      zusätzliches Element ist eben doch eine Änderung. */}
-  {variant === "centered" ? (
-    <div class="s-intro__columns">
-      {columns.map((t, i) => (
-        <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>
-      ))}
-    </div>
-  ) : (
-    columns.map((t, i) => <p data-reveal="up" data-reveal-delay={i * 0.08}>{t}</p>)
-  )}
+      zusätzliches Element ist eben doch eine Änderung. */
+  }
+  {
+    variant === "centered" ? (
+      <div class="s-intro__columns">
+        {columns.map((t, i) => (
+          <p data-reveal="up" data-reveal-delay={i * 0.08}>
+            {t}
+          </p>
+        ))}
+      </div>
+    ) : (
+      columns.map((t, i) => (
+        <p data-reveal="up" data-reveal-delay={i * 0.08}>
+          {t}
+        </p>
+      ))
+    )
+  }
 </section>
 
 <style>
@@ -91,10 +168,45 @@ const { topline, headline, columns, lead, action, actionHref, image, alt = "", v
     padding-block: var(--section-space) var(--section-space-sm);
   }
 
+  /* Das randlose Bild über dem Raster.
+   *
+   * `width: 100vw` plus `margin-inline: calc(50% - 50vw)` holt es aus dem
+   * Satzspiegel zurück an die Fensterkanten — derselbe Griff wie in
+   * `PostImage` bei `data-width="full"`. Der negative obere Abstand hebt das
+   * Polster des Abschnitts auf, damit das Bild bündig oben ansetzt.
+   *
+   * `aspect-ratio` deckelt die Höhe: Ein 3:2-Foto über 1440px wäre 960px
+   * hoch und damit höher als das Fenster. Auf schmalen Fenstern darf es
+   * wieder hochkant werden, sonst bleibt vom Motiv ein Streifen. */
+  .s-intro__bleed {
+    grid-column: 1 / -1;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    margin-block: calc(var(--section-space) * -1) var(--sp-10);
+    overflow: hidden;
+    aspect-ratio: 2 / 1;
+  }
+
+  /* :global(img), weil das Bild aus Picture.astro kommt und das
+     Scope-Attribut dieser Datei nicht trägt. */
+  .s-intro__bleed :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+  }
+
+  @media (max-width: 900px) {
+    .s-intro__bleed {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
   .s-intro__lead {
     margin-top: var(--sp-5);
     font-size: var(--fs-text-large);
-    line-height: 1.45;
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -114,13 +226,13 @@ const { topline, headline, columns, lead, action, actionHref, image, alt = "", v
     font-size: var(--fs-h2-sm);
     font-weight: 400;
     line-height: 1.25;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-snug);
   }
 
   .s-intro p {
     max-width: 40ch;
     font-size: var(--fs-text-main);
-    line-height: 1.45;
+    line-height: var(--lh-text);
   }
 
   /* --- Die Fassung der Pillar Pages ------------------------------------

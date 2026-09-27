@@ -87,26 +87,26 @@ export const SERVICE_LIST_QUERY = defineQuery(`
  * `fixtures.ts`, und zwar bei jeder Leistung dieselben. Auf der
  * Bleaching-Seite stand deshalb „In vier Schritten zu neuen Veneers".
  *
- * `textSections` und `ctaBand` kamen später dazu, für Seiten, die mehr
- * tragen müssen als kurze Blöcke. Beide sind wahlfrei. Die Textstrecke
- * bringt ihre Position selbst mit — `placement` sagt, hinter welchem
- * Abschnitt sie landet, und `templates/Service.astro` verteilt danach.
+ * `explainer` ist der zweite Textblock weiter unten, mit randlosem Bild.
+ * `hero.claim`, `hero.actionLabel`, `pricingTitle` und `steps.items[].duration`
+ * sind mit der Veneers-Copy dazugekommen: alle wahlfrei, alle ohne Wirkung auf
+ * die Seiten, die sie nicht pflegen.
  */
 export const SERVICE_QUERY =
   defineQuery(`*[_type == "service" && slug.current == $slug][0]{
   title,
   topline,
-  hero{ text, image${BILD} },
+  hero{ claim, text, actionLabel, image${BILD} },
   intro{ topline, headline, columns },
   benefits{ topline, headline, items[]{ name, text, image${BILD} } },
+  pricingTitle,
   pricing[]{ name, price },
   faq[]{ question, answer },
   beforeAfter{ topline, before${BILD}, after${BILD} },
   statement{ topline, text },
-  steps{ title, items[]{ title, text } },
+  explainer{ topline, headline, columns, actionLabel },
+  steps{ title, items[]{ title, text, duration } },
   features[]{ topline, title, text, image${BILD} },
-  textSections[]{ placement, topline, headline, lead, columns, items },
-  ctaBand{ headline, text, actionLabel, image${BILD} },
   seo{ title, description, noIndex, image${BILD} }
 }`);
 

@@ -26,7 +26,7 @@ Der erste Bildschirm eines Seitentyps. Sie unterscheiden sich im Bau, nicht nur 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Hero` | Abschnitt | — | `lines: string[]` | Home | — |
-| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service | — |
+| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `claim?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` | Service | — |
 | `PillarHero` | Abschnitt | Der Kopf einer Pillar Page (Figma 177:1734). | `title: string` `eyebrow?: string` `image?: ImageSource` `alt?: string` | Pillar | — |
 | `CareersHero` | Abschnitt | Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` `fallback?: string` `zoom?: boolean` | Careers, Practice | — |
 
@@ -91,7 +91,7 @@ Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.
 | `Perks` | Abschnitt | Was die Praxis bietet, als Liste. Auf der Karriereseite. | `topline: string` `headline: string` `items: string[]` | Careers, design/komponenten | ✓ |
 | `Reasons` | Abschnitt | Zwei bis vier Blöcke, die je eine Frage beantworten, die vor einer Bewerbung wirklich gestellt wird: Wie komme ich hin, mit wem ar | `topline: string` `headline: string` `items: Reason[]` | Careers, design/komponenten | ✓ |
 | `Standards` | Abschnitt | Nummerierte Punkte links, ein zahnförmig maskiertes Foto rechts. | `title: string` `items: { name: string; text?: stri…` | Home, design/komponenten | ✓ |
-| `Benefits` | Abschnitt | Dieselbe Section wie im Prototyp — Markup und Klassen unverändert, nur die Inhalte kommen jetzt aus der Datenschicht. Die data-Att | `topline: string` `headline: string` `items: Entry[]` | Service, design/komponenten | ✓ |
+| `Benefits` | Abschnitt | Dieselbe Section wie im Prototyp — Markup und Klassen unverändert, nur die Inhalte kommen jetzt aus der Datenschicht. Die data-Att | `topline: string` `headline: string` `items: Entry[]` `footnote?: TextWithLinks` | Service, design/komponenten | ✓ |
 | `Values` | Abschnitt | Die Haltung der Praxis: drei bis fünf Punkte, jeder mit einem Wie. | `topline: string` `headline: string` `text?: string` `items: Value[]` | Practice, design/komponenten | ✓ |
 
 ## Stimmen und Geschichten
@@ -200,6 +200,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 - `fallbackEmail?: string` — Adresse für Stellen, an denen keine eigene hinterlegt ist.
 
+**`Benefits`**
+
+- `footnote?: TextWithLinks` — Der Satz unter der Liste, der weiterführt. Wahlfrei und ohne ihn unverändert: Die Aufzählung erklärt drei Arten kurz, und wer es genauer will, gehört auf die Seite, die es genauer erklärt. Die Ziele stehen im Repository, nicht im Studio — siehe `TextWithLinks` in `lib/shapes.ts`. /
+
 **`CareersHero`**
 
 - `fallback?: string` — Das gestaltete Ersatzmotiv, solange im Studio keines hängt. Wählbar, seit dieser Kopf auch die Praxisseite trägt: Dort wäre ein Behandlungsbild das falsche Versprechen — man will die Räume sehen, nicht den Stuhl. Voreinstellung bleibt die Karriereseite. /
@@ -270,6 +274,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`ServiceHero`**
 
 - `slug?: string` — Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`.
+- `claim?: string` — Die Zeile unter dem Leistungsnamen: wofür die Praxis bei dieser Behandlung steht. Sie ist bewusst kein zweites `h1`. Die Überschrift der Seite ist der Name der Behandlung — daran hängt `sizeCap` oben, und ein ganzer Satz liefe in derselben Größe ins Bild rechts daneben. Der Anspruch steht deshalb als eigener Absatz darunter, kleiner gesetzt. /
 - `action?: string` — Beschriftung des Buttons.
 
 **`Steps`**

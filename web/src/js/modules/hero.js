@@ -110,6 +110,19 @@ export function initHero() {
     );
     const chars = splits.flatMap((s) => s.chars);
 
+    /* Tempo des Aufstiegs. Die Wortmarke der Startseite ist kurz und darf
+       sich Zeit lassen; ein Anspruchssatz auf einer Leistungsseite besteht
+       aus acht Wörtern, und mit den ruhigen Werten lief er über zwei
+       Sekunden — der Besucher hat zu Ende gelesen, bevor das letzte Zeichen
+       oben ist. Trägt die Überschrift `data-hero-pace="quick"`, läuft
+       derselbe Auftritt in gut der halben Zeit.
+
+       Opt-in und nicht nach Zeichenzahl gerechnet: die Startseite behält so
+       nachweislich ihr Timing. */
+    const quick = [...words].some((w) => w.dataset.heroPace === "quick");
+    const wordDuration = quick ? 0.9 : 1.5;
+    const wordStagger = quick ? 0.008 : 0.018;
+
     const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
     /* Hintergrundlinien: der Pfad zeichnet sich von seinem Anfang aus ein.
@@ -144,8 +157,8 @@ export function initHero() {
         chars,
         {
           yPercent: 100,
-          duration: 1.5,
-          stagger: { each: 0.018, from: "start" },
+          duration: wordDuration,
+          stagger: { each: wordStagger, from: "start" },
         },
         0.25,
       )

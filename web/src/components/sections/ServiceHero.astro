@@ -22,6 +22,14 @@ interface Props {
   /** Entscheidet über das Ersatzmotiv. Siehe `lib/service-images.ts`. */
   slug?: string;
   topline?: string;
+  /**
+   * Wofür die Praxis bei dieser Behandlung steht. Steht anstelle des
+   * Leistungsnamens in der Überschrift — siehe `heading` unten.
+   *
+   * Wahlfrei: Ohne Anspruch trägt die Überschrift weiter den Namen, und alle
+   * übrigen Leistungsseiten bleiben unverändert.
+   */
+  claim?: string;
   text?: string;
   image?: ImageSource;
   alt?: string;
@@ -34,12 +42,25 @@ const {
   title,
   slug,
   topline,
+  claim,
   text,
   image,
   alt = "",
   action = "Termin buchen",
   actionHref = "#kontakt",
 } = Astro.props;
+
+/* Was in der Überschrift steht.
+ *
+ * Normalerweise der Leistungsname, einzeln und groß. Trägt die Leistung einen
+ * Anspruch, steht der stattdessen da — auf der Veneers-Seite „Wir feilen am
+ * Lächeln, nicht an der Substanz" statt „VENEERS".
+ *
+ * `title` bleibt davon unberührt und wird weiter gebraucht: für den
+ * Seitentitel, das Angebotsformular, den Magazin-Teaser und die Überschrift
+ * der Fragen. Die Topline darüber („Veneers in Berlin") nennt die Behandlung
+ * ohnehin weiter beim Namen, der Leistungsname geht also nicht verloren. */
+const heading = claim || title;
 
 /* Das längste Wort — und zwar so, wie die Hero-Choreografie es abgrenzt:
    SplitText trennt ausschließlich an Leerzeichen, und die Wort-Container
@@ -48,7 +69,7 @@ const {
    Zeichen, nicht als 12 — genau daran lief die Überschrift zuletzt noch ins
    Bild, als ich den Bindestrich mitgezählt hatte. */
 const longestUnit =
-  title
+  heading
     .split(/\s+/)
     .filter(Boolean)
     .reduce((a, b) => (b.length > a.length ? b : a), "").length || 1;
@@ -72,8 +93,17 @@ const sizeCap = (100 / (0.67 * longestUnit)).toFixed(2);
    dasselbe Bild, und keines davon passte zu mehr als einer Leistung. Jetzt
    kommt es aus `lib/service-images.ts`, derselben Quelle, aus der auch die
    Tabelle auf der Startseite liest. Wer dort auf „Bleaching" klickt, findet
-   das Bild wieder, das ihn hergebracht hat. */
-const MOTIF = serviceMotif(slug);
+   das Bild wieder, das ihn hergebracht hat.
+
+   Veneers ist die eine bewusste Ausnahme von diesem Grundsatz: der Hero
+   zeigt `veneers-anprobe` statt `veneers-farbbestimmung` aus der Liste —
+   dort wird gelächelt, in der Farbbestimmung nicht. Die Tabelle auf der
+   Startseite bleibt unangetastet und zeigt weiter das Listenbild; sie war
+   ausdrücklich nicht Teil dieser Änderung. */
+const HERO_MOTIF_OVERRIDE: Record<string, string> = {
+  veneers: "veneers-anprobe",
+};
+const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
 ---
 
 <section class="s-shero container" data-hero>
@@ -81,25 +111,63 @@ const MOTIF = serviceMotif(slug);
 
   <div class="s-shero__body">
     {
-      /* Topline und Fließtext tragen `data-hero-meta`, die Überschrift
-        `data-hero-word` — damit greift die Hero-Choreografie: der
-        Leistungsname steigt zeichenweise hinter seiner Maske auf. */
+      /* Die Überschrift trägt `data-hero-word` — damit greift die
+        Hero-Choreografie: der Leistungsname steigt zeichenweise hinter seiner
+        Maske auf.
+
+        Topline und Fließtext laufen NICHT über diese Timeline. `hero.js`
+        liest `data-hero-meta` zwar aus, lässt die Zeilen dort aber bewusst
+        außen vor (siehe den Kommentar vor dem `foot`-Tween) — gebraucht wird
+        das Attribut nur noch im Zweig für reduzierte Bewegung, der beide
+        Zeilen sofort sichtbar setzt.
+
+        Bewegt werden sie wie der übrige Seiteninhalt: die Topline blendet
+        auf, der Fließtext fährt zeilenweise hinter seiner Maske hoch. Dieselbe
+        Paarung wie in Benefits.astro. Der Highlight-Marker, der auf der
+        Startseite hier steht, wäre zu laut: seine Balken sind der Auftritt
+        der Startseite, nicht der einer Unterseite.
+
+        Die Zeiten richten sich nach der Überschrift: die steigt in der
+        Timeline von hero.js bei 0.25s an. Die Topline läuft mit ihr zugleich
+        los, der Fließtext kurz danach. Vorher standen hier 1.1 und 1.25 —
+        die Zeilen kamen erst, als die Überschrift schon fertig stand, und
+        der Hero baute sich in drei getrennten Schüben auf. */
     }
     {
       topline && (
-        <p class="s-shero__topline" data-hero-meta>
+        <p
+          class="s-shero__topline"
+          data-hero-meta
+          data-reveal="fade"
+          data-reveal-delay="0.25"
+        >
           {topline}
         </p>
       )
     }
     <h1
-      class="s-shero__title"
+      class:list={["s-shero__title", claim && "s-shero__title--claim"]}
       style={`--shero-cap: ${sizeCap}cqw`}
       data-hero-word
+      data-hero-pace={claim ? "quick" : undefined}
     >
-      {title}
+      {heading}
     </h1>
-    {text && <p data-hero-meta>{text}</p>}
+    {
+      /* Der Fließtext blendet als Ganzes auf und kommt dabei leicht von
+        unten — nicht zeilenweise. Zeilenweise war er zu lang dafür: der
+        Einstiegstext läuft über fünf bis sechs Zeilen, und die letzte stünde
+        eine Dreiviertelsekunde nach der ersten. Ein Absatz, der sich
+        zeilenweise aufbaut, wird gelesen wie ein Ladevorgang.
+
+        Er folgt der Topline um 0.15s — zwei Zeilen, die gleichzeitig
+        anlaufen, lesen sich als ein Block statt als Folge. */
+      text && (
+        <p data-hero-meta data-reveal="up" data-reveal-delay="0.4">
+          {text}
+        </p>
+      )
+    }
 
     <div class="s-shero__actions" data-hero-foot>
       <Button label={action} href={actionHref} />
@@ -209,6 +277,26 @@ const MOTIF = serviceMotif(slug);
     letter-spacing: var(--tracking-tighter);
     text-transform: uppercase;
     text-wrap: balance;
+  }
+
+  /* Ein Anspruch ist ein Satz, kein Wort — und ein Satz trägt tiefer.
+     „VENEERS" allein füllt die Spalte in --fs-display-2 (125px) und soll das
+     auch; „Wir feilen am Lächeln, nicht an der Substanz" stünde darin über
+     vier Zeilen und schöbe Button und Bewertungen aus dem Bild.
+
+     --fs-h1 (70px), eine Sprosse unter --fs-display-sm (90px): die Leiter in
+     tokens.css läuft 125 · 90 · 70 · 64 · 55 · 48 · 40.
+
+     Nur hier, nicht am Grundgrad: Die zehn übrigen Leistungsseiten tragen
+     weiter ihren Namen und behalten ihren Auftritt. Und nur der Grad ändert
+     sich — die Überschrift bleibt das <h1> der Seite. */
+  .s-shero__title--claim {
+    font-size: min(var(--fs-h1), 13vw, var(--shero-cap, 100cqw));
+    /* Versalien setzen einen Namen, keinen Satz: „VENEERS" ist eine
+       Wortmarke, „Wir feilen am Lächeln, nicht an der Substanz" ein Satz mit
+       Groß- und Kleinschreibung. In Versalien liest er sich als Ansage und
+       verliert die Satzzeichen aus dem Blick. */
+    text-transform: none;
   }
 
   .s-shero__body p {

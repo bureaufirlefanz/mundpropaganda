@@ -26,6 +26,8 @@ export interface Question {
 export interface Step {
   title: string;
   text: string;
+  /** Wie lange der Termin dauert, z. B. „ca. 30 bis 60 Minuten". Wahlfrei. */
+  duration?: string;
 }
 
 /**
@@ -54,3 +56,18 @@ export interface Entry {
   text: string;
   image?: ImageSource;
 }
+
+/**
+ * Ein Satz, in dem einzelne Wörter verlinkt sind.
+ *
+ * Die Teile stehen in Lesereihenfolge: Zeichenketten sind Text, Objekte sind
+ * Verweise. Das ist bewusst kein Portable Text — der käme aus dem Studio, und
+ * die Ziele dieser Verweise stehen nicht im Studio, sondern im Repository
+ * (`pages/veneers-berlin.astro`). Ein `link`-Objekt aus dem Schema kann sie
+ * deshalb nicht treffen: Es verlangt für interne Ziele eine Referenz auf ein
+ * Dokument, und die Pillar Page ist keines.
+ *
+ * Solange das so ist, ist der Satz gepflegter Inhalt im Code — dieselbe
+ * Begründung wie bei `content/nav-promo.ts`.
+ */
+export type TextWithLinks = (string | { label: string; href: string })[];

@@ -50,6 +50,23 @@ const {
    halten alle Karten den Platz frei. Sonst endeten Karten derselben Reihe
    auf verschiedenen Höhen. */
 const hasFacts = pricing.some((p) => p.reduction || p.durability);
+
+/* So viele Spalten, wie es Karten gibt — auf dem Schirm stehen sie damit in
+   EINER Reihe.
+
+   Vorher waren es feste vier. Das ging, solange jede Preistabelle vier Zeilen
+   hatte; mit der fünften Zeile der Veneers-Seite (Mock-up kam dazu) rutschte
+   eine Karte allein in eine zweite Reihe und stand dort neben drei leeren
+   Feldern.
+
+   Ein fester Wert 5 wäre die falsche Antwort gewesen: Die Pillar Page führt
+   vier Zeilen und bekäme dann ihrerseits eine Lücke. Die Zahl gehört an die
+   Daten, nicht in die Gestaltung.
+
+   Gedeckelt bei fünf, weil sechs Karten in einer Reihe schmäler werden als
+   der längste Name („Non-Prep-Veneers") ihn tragen kann. Sechs und mehr
+   laufen deshalb wieder in zwei Reihen zu je vier. */
+const columns = Math.min(pricing.length, 5);
 ---
 
 <section class="s-prices container" id={id} data-toc-target={id}>
@@ -60,7 +77,11 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
       </h2>
     )
   }
-  <div class="s-prices__grid" data-reveal-stagger="0.08">
+  <div
+    class="s-prices__grid"
+    style={`--price-columns: ${columns}`}
+    data-reveal-stagger="0.08"
+  >
     {
       pricing.map((p) => (
         <article class="c-price" data-reveal-child>
@@ -130,10 +151,31 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
     letter-spacing: var(--tracking-tight);
   }
 
+  /* Der Rückfall 4 gilt, falls die Eigenschaft fehlt — dann steht hier
+     wieder genau das Raster von vorher. */
   .s-prices__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--price-columns, 4), minmax(0, 1fr));
     gap: var(--site-gutter);
+  }
+
+  /* Fünf Spalten erst ab 1200px.
+
+     Gemessen, nicht geschätzt: Fünf Karten sind auf 1440px 251px breit und
+     auf 1201px noch 209px — dort tragen alle fünf Namen einzeilig. Auf
+     1000px wären es 174px, und bei 22px Schriftgrad brechen „Komposit-Veneer"
+     und „Non-Prep-Veneers" dann auf zwei Zeilen. Abgeschnitten wird nichts,
+     die Reihe wird nur unruhig: zwei hohe Namen neben drei flachen.
+
+     Zwischen 1000 und 1200 stehen deshalb vier nebeneinander und die fünfte
+     darunter. */
+  @media (max-width: 1200px) {
+    .s-prices__grid {
+      grid-template-columns: repeat(
+        min(var(--price-columns, 4), 4),
+        minmax(0, 1fr)
+      );
+    }
   }
 
   @media (max-width: 1000px) {

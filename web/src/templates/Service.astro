@@ -23,9 +23,8 @@ import Stories from "../components/sections/Stories.astro";
 import Features from "../components/sections/Features.astro";
 import Magazine from "../components/sections/Magazine.astro";
 import Faq from "../components/sections/Faq.astro";
-import TextColumns from "../components/sections/TextColumns.astro";
-import CtaBand from "../components/sections/CtaBand.astro";
 import Contact from "../components/sections/Contact.astro";
+import { benefitsFootnote } from "../content/service-crosslinks";
 import type { Service } from "../lib/services";
 import type { HomepageContent } from "../lib/homepage";
 import type { Post } from "../lib/magazine";
@@ -60,6 +59,63 @@ const { data: d, title, slug, stories, posts } = Astro.props;
  * `layouts/Base.astro`. */
 const MIT_FORMULAR = ["veneers", "keramikinlays"];
 const zeigtFormular = MIT_FORMULAR.includes(slug);
+
+/* Das Motiv über dem Erklärstück.
+ *
+ * Der Text dazu kommt seit der Veneers-Copy aus dem CMS (`explainer`), das
+ * Bild bleibt hier: Es ist eine Entscheidung über den Auftritt, keine Pflege
+ * — dieselbe Trennung wie bei Benefits, Vorher/Nachher und Split, wo die
+ * gestalteten Motive neben dem Markup stehen.
+ *
+ * Nicht `veneers-farbbestimmung`: Das trägt schon der Kopf dieser Seite
+ * (`lib/service-images.ts`), und zweimal dasselbe Motiv auf einer Seite fällt
+ * auf. `veneers-anprobe` ist quer genug für das randlose 2:1-Feld.
+ *
+ * Ohne Eintrag steht das Erklärstück ohne Bild — der Block trägt sich über
+ * seinen Text, und ein fremdes Motiv wäre schlechter als keines. */
+const ERKLAERSTUECK_MOTIV: Record<string, string> = {
+  veneers: "veneers-anprobe",
+};
+
+/* Der Alternativtext gehört zum Motiv und steht deshalb daneben. */
+const ERKLAERSTUECK_ALT: Record<string, string> = {
+  veneers: "Ein Farbmuster wird zum Vergleich an die Frontzähne gehalten.",
+};
+
+/* Wahlfrei, aber nicht halb — wie Intro und Benefits darunter. */
+const explainer =
+  d?.explainer?.headline && d.explainer.columns?.length
+    ? d.explainer
+    : undefined;
+
+/* Die Motive der Bild-Text-Zeilen, Zeile für Zeile.
+ *
+ * `sections/Features.astro` fällt sonst nach Position auf drei feste Motive
+ * zurück. Die Reihenfolge stammt aus dem Entwurf und passte, solange die
+ * Zeilen dort standen, wofür sie gedacht waren. Mit der neuen Copy stimmt sie
+ * nicht mehr: Über „Gute Beratung hat Zeit" hing ein Mikroskop aus der
+ * Wurzelbehandlung.
+ *
+ * Deshalb hier ausgeschrieben, wie auf der Praxisseite auch (`Practice.astro`)
+ * — dafür trägt `FeatureRow` das Feld `motif`. Und wie beim Erklärstück
+ * darüber: Das Bild ist eine Entscheidung über den Auftritt, der Text ist
+ * Pflege. Lädt die Redaktion im Studio ein eigenes Bild an die Zeile, hat
+ * das Vorrang.
+ *
+ *   beratung-modell        Hannes erklärt einer Patientin ein Modell
+ *   labor-hand-implantat   Laborbank unterm Mikroskop, Arbeit am Zahn
+ *   behandlung-prophylaxe  Spiegel mit dem Lächeln darin, Instrument daneben
+ *
+ * Zählt eine Leistung mehr Zeilen als hier Motive stehen, greift für den Rest
+ * wieder der Rückfall nach Position. */
+const FEATURE_MOTIVE: Record<string, string[]> = {
+  veneers: ["beratung-modell", "labor-hand-implantat", "behandlung-prophylaxe"],
+};
+
+const features = d?.features?.map((row, i) => ({
+  ...row,
+  motif: FEATURE_MOTIVE[slug]?.[i],
+}));
 
 /* Ein Abschnitt ist wahlfrei, aber nicht halb.
  *
@@ -96,37 +152,6 @@ const steps =
   d?.steps?.title && d.steps.items?.length
     ? { title: d.steps.title, items: d.steps.items }
     : undefined;
-
-/* Die Textstrecken tragen ihre Position selbst.
- *
- * Eine Leistungsseite hat eine feste Abfolge, und das soll sie behalten —
- * ein Baukasten, in dem sich jeder Abschnitt überallhin schieben lässt, hat
- * am Ende auf jeder Seite eine andere Dramaturgie. Gleichzeitig gehört der
- * Text „Für wen kommen Veneers infrage" VOR die drei Arten und der über die
- * Kosten HINTER die Preise. Ein einziger fester Platz träfe immer nur einen
- * von beiden.
- *
- * Deshalb sagt `placement` am Eintrag, hinter welchem Abschnitt er steht,
- * und die Vorlage fragt an vier Stellen nach. Die Reihenfolge innerhalb
- * einer Stelle ist die der Liste im Studio.
- *
- * Dieselbe Bedingung wie bei Intro und Benefits: wahlfrei, aber nicht halb.
- * Ohne Überschrift oder ohne Spalten erscheint der Abschnitt nicht — eine
- * Überschrift über einer leeren Fläche wäre die halbe Wahrheit statt keiner.
- */
-const textSectionsAt = (placement: string) =>
-  (d?.textSections ?? []).filter(
-    (s) => s.placement === placement && s.headline && s.columns?.length,
-  );
-
-/* Das Handlungsband. Die Überschrift trägt es, alles andere ist wahlfrei.
- *
- * Der Knopf zeigt immer auf `#kontakt` — die einzige Adresse, die es auf
- * jeder Seite gibt: entweder das Angebotsformular unten (siehe
- * MIT_FORMULAR) oder der Seitenfuß, der die Marke sonst übernimmt
- * (`layouts/Base.astro`). Ein Zielfeld im Studio hätte hier nur eine
- * sinnvolle Belegung und dafür jede unsinnige zugelassen. */
-const ctaBand = d?.ctaBand?.headline ? d.ctaBand : undefined;
 ---
 
 <Base
@@ -139,26 +164,16 @@ const ctaBand = d?.ctaBand?.headline ? d.ctaBand : undefined;
     topline={d?.topline}
     title={title}
     slug={slug}
+    claim={d?.hero?.claim}
     text={d?.hero?.text}
+    action={d?.hero?.actionLabel || undefined}
     image={d?.hero?.image}
     alt={d?.hero?.image?.alt ?? ""}
   />
 
   {intro && <Intro {...intro} />}
 
-  {
-    textSectionsAt("intro").map((s) => (
-      <TextColumns
-        topline={s.topline}
-        headline={s.headline!}
-        lead={s.lead}
-        columns={s.columns!}
-        items={s.items}
-      />
-    ))
-  }
-
-  {benefits && <Benefits {...benefits} />}
+  {benefits && <Benefits {...benefits} footnote={benefitsFootnote[slug]} />}
 
   {
     d?.beforeAfter?.topline && (
@@ -173,68 +188,37 @@ const ctaBand = d?.ctaBand?.headline ? d.ctaBand : undefined;
   {statement && <Statement {...statement} />}
 
   {
-    textSectionsAt("statement").map((s) => (
-      <TextColumns
-        topline={s.topline}
-        headline={s.headline!}
-        lead={s.lead}
-        columns={s.columns!}
-        items={s.items}
-      />
-    ))
-  }
-
-  {steps && <Steps title={steps.title} steps={steps.items} />}
-
-  {
-    textSectionsAt("steps").map((s) => (
-      <TextColumns
-        topline={s.topline}
-        headline={s.headline!}
-        lead={s.lead}
-        columns={s.columns!}
-        items={s.items}
-      />
-    ))
-  }
-
-  {
-    /* Die Einladung zwischen den Kapiteln — dieselbe Karte wie auf der Pillar
-      Page, hier hinter dem Ablauf: Wer gerade gelesen hat, wie es geht,
-      fragt sich, ob es für ihn passt. Das Motiv fällt auf das gestaltete
-      Bild zurück, wie bei Split, Experts und Stories auch; ohne Bild stünde
-      die Karte auf einer leeren Fläche. */
+    /* Zum Ort dieses Kommentars: Er darf weder in der Attributliste des
+      Elements stehen noch als erstes Kind des Bedingungsausdrucks darunter.
+      Beides hat der Build geschluckt und `astro check` gemeldet, mit einer
+      Fehlermeldung, die auf `<Base>` zeigte und nicht hierher. Vor die
+      Bedingung, dann stimmt es. */
   }
   {
-    ctaBand && (
-      <CtaBand
-        headline={ctaBand.headline!}
-        text={ctaBand.text}
-        actionLabel={ctaBand.actionLabel}
+    explainer && (
+      <Intro
+        bleed={ERKLAERSTUECK_MOTIV[slug]}
+        alt={ERKLAERSTUECK_ALT[slug] ?? ""}
+        topline={explainer.topline}
+        headline={explainer.headline!}
+        columns={explainer.columns!}
+        action={explainer.actionLabel || undefined}
         actionHref="#kontakt"
-        image={ctaBand.image ?? "beratung-patientin"}
-        alt={ctaBand.image?.alt ?? ""}
       />
     )
   }
 
+  {steps && <Steps title={steps.title} steps={steps.items} />}
+
   <Stories items={stories} />
 
-  {d?.pricing?.length ? <Prices pricing={d.pricing} /> : null}
-
   {
-    textSectionsAt("pricing").map((s) => (
-      <TextColumns
-        topline={s.topline}
-        headline={s.headline!}
-        lead={s.lead}
-        columns={s.columns!}
-        items={s.items}
-      />
-    ))
+    d?.pricing?.length ? (
+      <Prices pricing={d.pricing} title={d.pricingTitle || undefined} />
+    ) : null
   }
 
-  {d?.features?.length ? <Features lines={d.features} /> : null}
+  {features?.length ? <Features lines={features} /> : null}
 
   {
     /* Nur Beiträge, die im Studio auf diese Leistung verweisen — dafür ist die

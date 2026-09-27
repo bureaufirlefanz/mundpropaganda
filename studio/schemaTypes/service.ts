@@ -138,11 +138,35 @@ export const service = defineType({
       group: "content",
       options: { collapsible: true, collapsed: false },
       fields: [
+        /* Der Anspruch unter dem Leistungsnamen.
+
+           Die Überschrift im Hero ist der Name der Behandlung, einzeln und
+           groß — daran hängt die Choreografie, und ein ganzer Satz an dieser
+           Stelle liefe ins Bild. Die Textzeile darunter trägt deshalb, wofür
+           die Praxis bei dieser Behandlung steht („Wir feilen am Lächeln,
+           nicht an der Substanz“). Wahlfrei: Wer keine hat, zeigt keine. */
+        defineField({
+          name: "claim",
+          title: "Anspruch",
+          type: "string",
+          description:
+            "Eine Zeile unter dem Leistungsnamen, z. B. „Wir feilen am Lächeln, nicht an der Substanz“.",
+        }),
         defineField({
           name: "text",
           title: "Einleitung",
           type: "text",
           rows: 4,
+        }),
+        /* Die Beschriftung des Knopfes. Ohne Angabe bleibt es bei „Termin
+           buchen" — so steht es auf allen übrigen Leistungsseiten, und ein
+           Pflichtfeld hätte elf Dokumente auf einmal auffällig gemacht. */
+        defineField({
+          name: "actionLabel",
+          title: "Beschriftung des Buttons",
+          type: "string",
+          description:
+            "Leer lassen für „Termin buchen“. Der Button springt zum Kontaktabschnitt dieser Seite.",
         }),
         defineField({ name: "image", title: "Bild", type: "picture" }),
       ],
@@ -236,6 +260,72 @@ export const service = defineType({
           validation: (rule) => rule.required().min(2).max(5),
         }),
       ],
+    }),
+
+    /* --- Das Erklärstück ------------------------------------------------
+
+       Ein zweiter Intro-Block, weiter unten auf der Seite und mit einem
+       randlosen Bild darüber. Er beantwortet die eine Frage, die bei dieser
+       Behandlung jeder stellt, bevor er sich meldet — bei Veneers ist das
+       „Müssen meine Zähne abgeschliffen werden?“.
+
+       Er stand bis hierher als Platzhaltertext in `templates/Service.astro`,
+       ausdrücklich als „noch nicht redigiert“ gekennzeichnet. Jetzt trägt er
+       die freigegebene Fassung der Textagentur und gehört damit dorthin, wo
+       Inhalt gepflegt wird.
+
+       **Das Motiv bleibt im Baustein.** Es ist eine Entscheidung über den
+       Auftritt, keine Pflege — dieselbe Trennung wie bei Benefits, Split und
+       Vorher/Nachher, wo die gestalteten Motive neben dem Markup stehen und
+       nicht in der Datenschicht. */
+    defineField({
+      name: "explainer",
+      title: "Erklärstück",
+      type: "object",
+      group: "content",
+      options: { collapsible: true, collapsed: true },
+      description:
+        "Der Textblock mit randlosem Bild, weiter unten auf der Seite. Beantwortet die häufigste Frage zu dieser Behandlung. Ohne Überschrift erscheint er nicht.",
+      fields: [
+        defineField({
+          name: "topline",
+          title: "Topline",
+          type: "string",
+        }),
+        defineField({
+          name: "headline",
+          title: "Überschrift",
+          type: "string",
+          validation: (r) => r.required(),
+        }),
+        defineField({
+          name: "columns",
+          title: "Textspalten",
+          description:
+            "Eine oder zwei. Eine einzelne steht neben der Überschrift, zwei füllen die Zeile.",
+          type: "array",
+          of: [defineArrayMember({ type: "text", rows: 5 })],
+          validation: (r) => r.required().min(1).max(2),
+        }),
+        defineField({
+          name: "actionLabel",
+          title: "Beschriftung des Buttons",
+          type: "string",
+          description:
+            "Der Button springt zum Kontaktabschnitt. Leer lassen, wenn der Block ohne stehen soll.",
+        }),
+      ],
+    }),
+
+    /* Die Überschrift über den Preiskarten. Ohne Angabe bleibt es bei
+       „Kosten“ — der Voreinstellung in `sections/Prices.astro`, die alle
+       übrigen Leistungsseiten tragen. */
+    defineField({
+      name: "pricingTitle",
+      title: "Überschrift über den Kosten",
+      type: "string",
+      group: "content",
+      description: "Leer lassen für „Kosten“.",
     }),
 
     defineField({
@@ -401,154 +491,34 @@ export const service = defineType({
                   rows: 4,
                   validation: (r) => r.required(),
                 }),
+                /* Wie lange der Termin dauert.
+
+                   Steht abgesetzt unter dem Text, nicht darin: Vier Karten,
+                   die alle mit „Dauer: ..." enden, lesen sich als vier
+                   Nachklappern statt als eine Angabe, die man vergleichen
+                   kann. Wahlfrei — nicht jeder Schritt ist ein Termin. */
+                defineField({
+                  name: "duration",
+                  title: "Dauer",
+                  type: "string",
+                  description:
+                    "Ohne das Wort „Dauer“, z. B. „ca. 30 bis 60 Minuten“.",
+                }),
               ],
-              preview: { select: { title: "title", subtitle: "text" } },
+              preview: {
+                select: {
+                  title: "title",
+                  subtitle: "text",
+                  duration: "duration",
+                },
+                prepare: ({ title, subtitle, duration }) => ({
+                  title: title ?? "Ohne Titel",
+                  subtitle: [duration, subtitle].filter(Boolean).join(" · "),
+                }),
+              },
             }),
           ],
           validation: (r) => r.required().min(2),
-        }),
-      ],
-    }),
-
-    /* --- Zwei Abschnitte für lange Seiten -------------------------------
-
-       Eine Leistungsseite trägt zwischen Intro, Merkmalen und Ablauf nur
-       kurze Blöcke. Für ein Thema wie Veneers ist das zu wenig: Wer sich
-       für einen Eingriff entscheidet, liest, und was hier nicht steht, sucht
-       er woanders.
-
-       „Textabschnitte" sind deshalb längere Strecken im Magazinsatz —
-       Überschrift, ein Vorspann, darunter zwei bis drei Spalten Fließtext.
-       Sie stehen nicht an einer festen Stelle, sondern tragen ihre Position
-       selbst: `placement` sagt, hinter welchem Abschnitt der Block landet.
-       Der Grund ist die Dramaturgie einer Seite — der Text „Für wen kommen
-       Veneers infrage" gehört vor die drei Arten, der über die Kosten hinter
-       die Preise. Ein einziger fester Platz träfe immer nur einen davon.
-
-       Das „Handlungsband" ist die Einladung dazwischen: eine Karte auf einem
-       randabfallenden Bild, mit genau einem Knopf. Es steht hinter dem
-       Ablauf, weil dort die Frage entsteht, die es beantwortet. */
-
-    defineField({
-      name: "textSections",
-      title: "Textabschnitte",
-      type: "array",
-      group: "content",
-      description:
-        "Längere Textstrecken im Magazinsatz. Jede trägt selbst, an welcher Stelle der Seite sie steht.",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "textSection",
-          fields: [
-            defineField({
-              name: "placement",
-              title: "Wo steht der Abschnitt?",
-              type: "string",
-              description:
-                "Bestimmt die Stelle auf der Seite, nicht die Reihenfolge in dieser Liste.",
-              initialValue: "intro",
-              options: {
-                list: [
-                  { title: "Nach dem Intro", value: "intro" },
-                  { title: "Nach der Kernaussage", value: "statement" },
-                  { title: "Nach dem Ablauf", value: "steps" },
-                  { title: "Nach den Kosten", value: "pricing" },
-                ],
-                layout: "radio",
-              },
-              validation: (r) => r.required(),
-            }),
-            defineField({ name: "topline", title: "Topline", type: "string" }),
-            defineField({
-              name: "headline",
-              title: "Überschrift",
-              type: "string",
-              validation: (r) => r.required(),
-            }),
-            defineField({
-              name: "lead",
-              title: "Vorspann",
-              type: "text",
-              rows: 3,
-              description:
-                "Ein bis zwei Sätze, größer gesetzt. Leer lassen, wenn der Text ohne auskommt.",
-            }),
-            defineField({
-              name: "columns",
-              title: "Textspalten",
-              description:
-                "Zwei oder drei - mehr wird auf dem Schirm zur Spalte aus Einzelwörtern.",
-              type: "array",
-              of: [defineArrayMember({ type: "text", rows: 8 })],
-              validation: (r) => r.required().min(2).max(3),
-            }),
-            defineField({
-              name: "items",
-              title: "Aufzählung",
-              type: "array",
-              of: [defineArrayMember({ type: "string" })],
-              description:
-                "Steht abgesetzt unter den Spalten, zweispaltig. Wahlfrei - ohne Einträge erscheint sie nicht.",
-              validation: (r) => r.max(10),
-            }),
-          ],
-          preview: {
-            select: {
-              title: "headline",
-              placement: "placement",
-              topline: "topline",
-            },
-            prepare: ({ title, placement, topline }) => {
-              const wo = {
-                intro: "nach dem Intro",
-                statement: "nach der Kernaussage",
-                steps: "nach dem Ablauf",
-                pricing: "nach den Kosten",
-              };
-              return {
-                title: title ?? "Ohne Überschrift",
-                subtitle: [topline, wo[placement as keyof typeof wo]]
-                  .filter(Boolean)
-                  .join(" · "),
-              };
-            },
-          },
-        }),
-      ],
-    }),
-
-    defineField({
-      name: "ctaBand",
-      title: "Handlungsband",
-      type: "object",
-      group: "content",
-      options: { collapsible: true, collapsed: true },
-      description:
-        "Die Einladung mitten auf der Seite, hinter dem Ablauf. Ohne Überschrift erscheint sie nicht.",
-      fields: [
-        defineField({
-          name: "headline",
-          title: "Überschrift",
-          type: "string",
-          description:
-            "Kurz, zwei Zeilen - z. B. „Erst reden, dann entscheiden.“",
-          validation: (r) => r.required(),
-        }),
-        defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
-        defineField({
-          name: "actionLabel",
-          title: "Beschriftung des Knopfes",
-          type: "string",
-          description:
-            "Der Knopf springt zum Kontaktabschnitt dieser Seite. Leer lassen, wenn die Karte ohne Knopf stehen soll.",
-        }),
-        defineField({
-          name: "image",
-          title: "Bild",
-          type: "picture",
-          description:
-            "Läuft hinter der Karte über die volle Breite. Ohne eigenes Bild steht hier das gestaltete Motiv.",
         }),
       ],
     }),

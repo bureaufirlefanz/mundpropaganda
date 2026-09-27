@@ -4,7 +4,7 @@
  * die Inhalte kommen jetzt aus der Datenschicht. Die data-Attribute bleiben
  * erhalten, dadurch greift standards.js ohne Anpassung.
  */
-import type { Entry } from "../../lib/shapes";
+import type { Entry, TextWithLinks } from "../../lib/shapes";
 import CmsImage from "../ui/CmsImage.astro";
 import Picture from "../ui/Picture.astro";
 import { isCmsImage } from "../../lib/images";
@@ -13,8 +13,17 @@ interface Props {
   topline: string;
   headline: string;
   items: Entry[];
+  /**
+   * Der Satz unter der Liste, der weiterführt.
+   *
+   * Wahlfrei und ohne ihn unverändert: Die Aufzählung erklärt drei Arten
+   * kurz, und wer es genauer will, gehört auf die Seite, die es genauer
+   * erklärt. Die Ziele stehen im Repository, nicht im Studio — siehe
+   * `TextWithLinks` in `lib/shapes.ts`.
+   */
+  footnote?: TextWithLinks;
 }
-const { topline, headline, items } = Astro.props;
+const { topline, headline, items, footnote } = Astro.props;
 
 /* Klasse 3: die gestalteten Motive, positionsgenau. Sie kamen bis Aufgabe 4
    aus `mitRueckfall` in der Datenschicht — dort waren sie falsch aufgehoben,
@@ -74,7 +83,11 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
                   {e.name}
                 </button>
               </h3>
-              <div class="s-benefits__text" id={`benefit-${i}-text`}>
+              <div
+                class="s-benefits__text"
+                id={`benefit-${i}-text`}
+                data-standards-text
+              >
                 <p>{e.text}</p>
               </div>
             </div>
@@ -85,6 +98,20 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
         ))
       }
     </div>
+
+    {
+      footnote && (
+        <p class="s-benefits__more" data-reveal="up">
+          {footnote.map((teil) =>
+            typeof teil === "string" ? (
+              teil
+            ) : (
+              <a href={teil.href}>{teil.label}</a>
+            ),
+          )}
+        </p>
+      )
+    }
 
     <div
       class="s-benefits__media"
@@ -181,20 +208,51 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
      Gemessen waren das 23px auf 390px Breite und 3px auf 1600px; bei 1440px
      fiel es nicht auf, weil die Mindesthöhe dort gerade reichte.
 
-     Die Werte sind gemessen, nicht geschätzt: der offene Eintrag braucht
-     354px bei 1600, 341 bei 1440, 329 darunter — und 375 unter 600px, weil
-     dort am meisten umbricht. Darüber liegt etwas Luft.
+     Die Höhe rechnet `standards.js` aus dem längsten Eintrag aus und setzt
+     sie als `--list-height` (alle Zeilen zugeklappt plus der längste Text
+     aufgeklappt), bei jeder Breitenänderung neu. Bis zum 18.09.2026 stand
+     hier ein gemessener Festwert (23rem, 24rem unter 600px). Der reichte
+     genau für den damaligen Text und riss, als die Veneer-Arten nach dem
+     fachlichen Feedback um die Hälfte länger wurden: gebraucht wurden 403px
+     bei 1600, 468 bei 390 und 514 bei 320 — kein Festwert deckt 375 bis 514
+     unter 600px, ohne bei 599 ein Drittel Luft zu lassen. Der Rückfall ohne
+     JavaScript ist der alte Wert.
 
-     Wächst der Text im CMS deutlich, muss die Höhe mit. Abgeschnitten wird
-     nichts, sonst verschwände Inhalt lautlos — er liefe stattdessen über. */
+     Abgeschnitten wird nichts, sonst verschwände Inhalt lautlos — er liefe
+     stattdessen über. */
   .s-benefits__list {
     grid-column: 1;
-    height: 23rem;
+    height: var(--list-height, 23rem);
+  }
+
+  /* Steht unter der Liste in derselben Spalte, nicht über die ganze Breite:
+     rechts daneben liegt das Bildfeld. Der Abstand nach oben ist der der
+     Liste zu ihrem letzten Eintrag, damit der Satz zur Liste gehört und
+     nicht als eigener Abschnitt beginnt. */
+  .s-benefits__more {
+    grid-column: 1;
+    max-width: 42ch;
+    margin-top: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: var(--lh-text);
+    color: color-mix(in srgb, var(--c-bg) 70%, transparent);
+  }
+
+  /* Unterstrichen, weil der Verweis im Fließtext sonst nur an der Farbe zu
+     erkennen wäre — und Farbe allein reicht nicht (WCAG 1.4.1). */
+  .s-benefits__more a {
+    color: var(--c-bg);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .s-benefits__more a:hover {
+    text-decoration-thickness: 2px;
   }
 
   @media (max-width: 600px) {
     .s-benefits__list {
-      height: 24rem;
+      height: var(--list-height, 24rem);
     }
   }
 

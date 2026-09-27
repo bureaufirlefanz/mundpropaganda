@@ -146,6 +146,8 @@ function setup(section) {
 
   list.addEventListener("pointerleave", () => start());
 
+  fitList(list, rows);
+
   /* --- Nur laufen lassen, wenn die Section sichtbar ist ---------------- */
   ScrollTrigger.create({
     trigger: section,
@@ -158,4 +160,40 @@ function setup(section) {
   });
 
   show(0);
+}
+
+/* --- Höhe der Liste ----------------------------------------------------
+   Nur die Benefits klappen ihren Text auf; sie haben eine feste Höhe, damit
+   das Band beim Durchlaufen nicht springt (siehe `sections/Benefits.astro`).
+   Der Wert kommt aus dem Inhalt: alle Zeilen ohne Text plus der längste Text
+   im aufgeklappten Zustand samt seinem Abstand nach oben. Gemessen wird ohne
+   Umschalten — der Absatz meldet seine natürliche Höhe auch, wenn seine
+   Rasterzeile auf null steht. Ohne `[data-standards-text]` (Startseite)
+   passiert nichts. */
+function fitList(list, rows) {
+  const texts = rows.map((r) => r.querySelector("[data-standards-text]"));
+  if (texts.some((t) => !t)) return;
+
+  const fit = () => {
+    const gap = parseFloat(
+      getComputedStyle(list).getPropertyValue("--sp-2") || "0",
+    );
+    let collapsed = 0;
+    let longest = 0;
+    rows.forEach((row, i) => {
+      const text = texts[i];
+      const textBox = text.getBoundingClientRect().height;
+      const textGap = parseFloat(getComputedStyle(text).marginTop) || 0;
+      collapsed += row.getBoundingClientRect().height - textBox - textGap;
+      longest = Math.max(longest, text.firstElementChild?.scrollHeight ?? 0);
+    });
+    list.style.setProperty(
+      "--list-height",
+      `${Math.ceil(collapsed + longest + gap)}px`,
+    );
+  };
+
+  fit();
+  document.fonts?.ready.then(fit);
+  new ResizeObserver(fit).observe(list);
 }
