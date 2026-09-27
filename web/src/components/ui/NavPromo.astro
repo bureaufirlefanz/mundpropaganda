@@ -115,8 +115,8 @@ const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
     /* Zwei Zeilen, und der Umbruch an der richtigen Stelle: `balance` nimmt
        von zwei möglichen Aufteilungen die mit der kürzeren langen Zeile, also
        „Alles zum / Thema Veneers" statt „Alles zum Thema / Veneers". */
-    font-size: var(--fs-h3);
-    font-weight: 400;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-regular);
     line-height: var(--lh-heading);
     letter-spacing: var(--tracking-snug);
     text-wrap: balance;

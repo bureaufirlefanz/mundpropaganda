@@ -135,8 +135,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__title {
-    font-size: var(--fs-h2);
-    font-weight: 400;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-regular);
     line-height: var(--lh-title);
     letter-spacing: var(--tracking-snug);
   }
@@ -190,8 +190,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__name {
-    font-size: var(--fs-h4);
-    font-weight: 400;
+    font-size: var(--fs-title-sm);
+    font-weight: var(--fw-regular);
     line-height: var(--lh-title);
     letter-spacing: var(--tracking-snug);
     text-wrap: balance;
@@ -202,7 +202,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--sp-2) var(--sp-4);
-    font-weight: 400;
+    font-weight: var(--fw-regular);
     font-size: var(--fs-text-small);
     letter-spacing: 0;
     color: var(--c-text-muted);
@@ -283,7 +283,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
 
   .s-jobs__subtitle {
     margin-bottom: var(--sp-3);
-    font-weight: 300;
+    font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;

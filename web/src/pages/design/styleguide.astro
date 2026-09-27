@@ -198,55 +198,55 @@ const SIZES = [
     text: "24",
   },
   {
-    token: "--fs-h1",
+    token: "--fs-title-page",
     figma: "70 px",
     purpose: "Seitentitel der Leistungsseiten",
     text: "Veneers",
   },
   {
-    token: "--fs-h1-sm",
+    token: "--fs-title-xl",
     figma: "64 px",
     purpose: "Experten, Preise, Ablauf",
     text: "Unsere Experten",
   },
   {
-    token: "--fs-h1-xs",
+    token: "--fs-title-lg",
     figma: "55 px",
     purpose: "Galeriekopf, Geschichte",
     text: "Unsere Standorte",
   },
   {
-    token: "--fs-h2-lg",
+    token: "--fs-title-lg",
     figma: "48 px",
     purpose: "Panel, Merkmale",
     text: "Vier Tage Woche",
   },
   {
-    token: "--fs-h2",
+    token: "--fs-title",
     figma: "40 px",
     purpose: "Überschrift einer Section",
     text: "Unsere Standorte",
   },
   {
-    token: "--fs-h2-sm",
+    token: "--fs-title",
     figma: "36 px",
     purpose: "Einleitung, Statement",
     text: "Eine volle Stunde",
   },
   {
-    token: "--fs-h4",
+    token: "--fs-title-sm",
     figma: "32 px",
     purpose: "Inhaltsverzeichnis, Stellen, Preise",
     text: "Zahnreinigung",
   },
   {
-    token: "--fs-h4-sm",
+    token: "--fs-title-sm",
     figma: "28 px",
     purpose: "Vorteile, Zeitleiste, Werte",
     text: "Eigenes Meisterlabor",
   },
   {
-    token: "--fs-h5",
+    token: "--fs-title-xs",
     figma: "24 px",
     purpose: "Meta-Zeilen im Hero",
     text: "Zahnarzt Prenzlauer Berg",
@@ -295,7 +295,7 @@ const SIZES = [
   },
 ];
 
-/* `--fs-h3` ist ein Alias auf `--fs-h2` und steht deshalb nicht als eigene
+/* `--fs-title` ist ein Alias auf `--fs-title` und steht deshalb nicht als eigene
    Stufe in der Leiter. */
 
 const LINE_HEIGHTS = [
@@ -646,7 +646,7 @@ const formatNumber = (n: number) =>
           </p>
           <p
             class="d-font-sample"
-            style="font-family: var(--f-mono); font-weight: 300; text-transform: uppercase; letter-spacing: 0.08em"
+            style="font-family: var(--f-mono); font-weight: var(--fw-light); text-transform: uppercase; letter-spacing: 0.08em"
           >
             Light 300 gesperrt
           </p>
@@ -1201,7 +1201,7 @@ const formatNumber = (n: number) =>
 
     .d-table th {
       font-family: var(--f-mono);
-      font-weight: 300;
+      font-weight: var(--fw-light);
       letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
     }
@@ -1221,7 +1221,7 @@ const formatNumber = (n: number) =>
     }
 
     .d-font-sample {
-      font-size: var(--fs-h2);
+      font-size: var(--fs-title);
       line-height: var(--lh-snug);
     }
 
@@ -1250,7 +1250,7 @@ const formatNumber = (n: number) =>
        ihre Größe — deshalb scrollt die Zeile für sich. */
     .d-size__sample {
       overflow-x: auto;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       line-height: 1.05;
       white-space: nowrap;
     }
@@ -1358,7 +1358,7 @@ const formatNumber = (n: number) =>
       display: block;
       margin-bottom: var(--sp-1);
       font-family: var(--f-mono);
-      font-weight: 300;
+      font-weight: var(--fw-light);
       font-size: var(--fs-text-small);
       letter-spacing: var(--tracking-wide);
       text-transform: uppercase;

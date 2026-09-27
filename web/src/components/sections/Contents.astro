@@ -15,7 +15,7 @@
  *
  *   - Fläche `#403229` → `--c-dark`, Schrift `#d6d6d6` → `--c-grey`
  *   - Nummernkreis `#ff84c8` → `--c-brand`, Ziffer in `--c-dark`
- *   - Überschrift 40px → `--fs-h3`, Einträge → `--fs-h5`
+ *   - Überschrift 40px → `--fs-title`, Einträge → `--fs-title-xs`
  *   - Ziffer in GT Pressura Mono → `--f-mono`
  *
  * ── Warum die Nummern im Markup stehen ───────────────────────────────────
@@ -143,8 +143,8 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
 
   .s-contents__title {
     margin-bottom: clamp(var(--sp-6), 4.5vw, 78px);
-    font-size: var(--fs-h3);
-    font-weight: 500;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-medium);
     line-height: var(--lh-heading);
   }
 
@@ -174,11 +174,11 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
     --number-size: 28px;
   }
 
-  /* Eine Stufe unter der Überschrift des Abschnitts: `--fs-h5` statt
-     `--fs-h4`. Zehn Einträge in 32px drängten die Liste an den Rand der
+  /* Eine Stufe unter der Überschrift des Abschnitts: `--fs-title-xs` statt
+     `--fs-title-sm`. Zehn Einträge in 32px drängten die Liste an den Rand der
      Fläche. */
   .s-contents__label {
-    font-size: var(--fs-h5);
+    font-size: var(--fs-title-xs);
     line-height: var(--lh-title);
   }
 

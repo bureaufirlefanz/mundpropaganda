@@ -241,8 +241,8 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
 
   .s-shero__topline {
     font-family: var(--f-mono);
-    font-weight: 300;
-    font-size: var(--fs-h5);
+    font-weight: var(--fw-light);
+    font-size: var(--fs-title-xs);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
   }
@@ -272,7 +272,7 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
      kleiner — umbrechen können sie ja nicht. */
   .s-shero__title {
     font-size: min(var(--fs-display-2), 13vw, var(--shero-cap, 100cqw));
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     line-height: var(--lh-display);
     letter-spacing: var(--tracking-tighter);
     text-transform: uppercase;
@@ -284,14 +284,14 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
      auch; „Wir feilen am Lächeln, nicht an der Substanz" stünde darin über
      vier Zeilen und schöbe Button und Bewertungen aus dem Bild.
 
-     --fs-h1 (70px), eine Sprosse unter --fs-display-sm (90px): die Leiter in
+     --fs-title-page (70px), eine Sprosse unter --fs-display-sm (90px): die Leiter in
      tokens.css läuft 125 · 90 · 70 · 64 · 55 · 48 · 40.
 
      Nur hier, nicht am Grundgrad: Die zehn übrigen Leistungsseiten tragen
      weiter ihren Namen und behalten ihren Auftritt. Und nur der Grad ändert
      sich — die Überschrift bleibt das <h1> der Seite. */
   .s-shero__title--claim {
-    font-size: min(var(--fs-h1), 13vw, var(--shero-cap, 100cqw));
+    font-size: min(var(--fs-title-page), 13vw, var(--shero-cap, 100cqw));
     /* Versalien setzen einen Namen, keinen Satz: „VENEERS" ist eine
        Wortmarke, „Wir feilen am Lächeln, nicht an der Substanz" ein Satz mit
        Groß- und Kleinschreibung. In Versalien liest er sich als Ansage und

@@ -251,13 +251,13 @@ const { person: p } = Astro.props;
     background: var(--c-brand);
     color: var(--c-dark);
     font-size: var(--fs-display-md);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     line-height: var(--lh-tight);
   }
 
   .s-person__name {
-    font-size: var(--fs-h1);
-    font-weight: 500;
+    font-size: var(--fs-title-page);
+    font-weight: var(--fw-medium);
     line-height: 1.02;
     letter-spacing: var(--tracking-tighter);
   }
@@ -277,8 +277,8 @@ const { person: p } = Astro.props;
     margin: clamp(var(--sp-8), 5vw, var(--sp-10)) 0 0;
     padding-left: var(--sp-6);
     border-left: 2px solid var(--c-brand);
-    font-size: var(--fs-h4-sm);
-    font-weight: 400;
+    font-size: var(--fs-title-sm);
+    font-weight: var(--fw-regular);
     line-height: 1.3;
     letter-spacing: var(--tracking-snug);
     text-wrap: balance;
@@ -305,7 +305,7 @@ const { person: p } = Astro.props;
     padding-bottom: var(--sp-3);
     border-bottom: var(--bw) solid var(--c-line);
     font-family: var(--f-mono);
-    font-weight: 300;
+    font-weight: var(--fw-light);
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;

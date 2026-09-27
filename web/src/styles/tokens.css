@@ -1,136 +1,120 @@
 /* ==========================================================================
-   Design Tokens — 1:1 aus Figma-Variablen (Mundpropaganda Design)
-   Alles was hier steht ist die einzige Quelle der Wahrheit.
-   Webflow-Mapping: jede Custom Property wird später eine Webflow-Variable.
+   Design tokens — the only source of values for the website.
+
+   Three layers, read top to bottom:
+
+   1. BASE VALUES   colours, the type ladder, spacing, radii, motion.
+                    What the design is made of. Rarely touched.
+   2. ROLES         what a value is FOR: muted text on a dark band, the title
+                    of a section, the space between a heading and its content.
+                    Components use these.
+   3. SURFACES      `data-surface="dark|brand|taupe|card"` on an element
+                    redefines the colour roles for everything inside it.
+
+   The rule that keeps this file small: a new section is fitted onto the
+   existing roles. If nothing is close, a new role is added here, with a
+   name that says what it does, never where it is used. "Galeriekopf" is not
+   a role; "headline" is.
+
+   The homepage is the reference. Every value it uses is kept exactly; the
+   subpages move onto it, not the other way round.
    ========================================================================== */
 
 :root {
-  /* --- Farben --------------------------------------------------------- */
-  --c-brand: #ff84c8; /* brand */
-  --c-dark: #403229; /* dark / Brown */
-  --c-taupe: #d0bec3; /* taupe */
-  --c-grey: #d6d6d6; /* grey — Standard-Seitenhintergrund */
+  /* ======================================================================
+     1. BASE VALUES
+     ====================================================================== */
+
+  /* --- Colour ------------------------------------------------------------ */
+  --c-brand: #ff84c8;
+  --c-dark: #403229;
+  --c-taupe: #d0bec3;
+  --c-grey: #d6d6d6; /* page background */
   --c-neutral-800: #201d1d;
   --c-neutral-200: #f4f4f4;
   --c-white: #ffffff;
 
-  /* Semantisch */
-  --c-bg: var(--c-grey);
-  --c-text: var(--c-dark);
-  /* 75 %, nicht 55 %. Gemessen ergab 55 % auf --c-grey ein Verhältnis von
-     2.83:1 — WCAG 1.4.3 verlangt für Fließtext 4.5:1. 75 % ist der Wert, ab
-     dem es erreicht ist (gerechnet, nicht geschätzt). Der Ton bleibt sichtbar
-     zurückgenommen, er ist nur nicht mehr zu blass zum Lesen. */
-  --c-text-muted: color-mix(in srgb, var(--c-dark) 75%, transparent);
-  --c-line: color-mix(in srgb, var(--c-dark) 28%, transparent);
-  --c-surface: var(--c-neutral-200);
-  /* Die ruhige Fläche unter einem Bild, bis es da ist — und der Grund, auf
-     dem ein fehlendes Bild sitzt. Stand achtmal wörtlich in den Bausteinen. */
-  --c-tint: color-mix(in srgb, var(--c-dark) 8%, transparent);
-
-  /* --- Schriften ------------------------------------------------------ */
+  /* --- Fonts ------------------------------------------------------------- */
   --f-sans: "PP Neue Montreal", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "GT Pressura Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* --- Typo-Skala -----------------------------------------------------
-     Figma-Referenz bei 1728px Viewport. Fluid via clamp(), damit sich das
-     Design bis 1920+ weiterträgt statt zu zerreißen.
-     -------------------------------------------------------------------- */
-  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem); /* 250px @1728 */
-  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem); /* 125px */
-  --fs-h1: clamp(2.5rem, 4.05vw, 4.375rem); /* 70px  */
-  --fs-h2: clamp(1.75rem, 2.31vw, 2.5rem); /* 40px  */
-  --fs-h3: var(--fs-h2);
-  /* 32px — die Stufe zwischen Überschrift und Fließtext. Trägt die Einträge
-     im Inhaltsverzeichnis der Pillar Pages (Figma 177:2116). */
-  --fs-h4: clamp(1.375rem, 1.85vw, 2rem); /* 32px  */
-  --fs-h5: clamp(1.125rem, 1.39vw, 1.5rem); /* 24px  */
-  --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem); /* 20px  */
-  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem); /* 18px  */
-  --fs-text-small: 1rem; /* 16px  */
-  --fs-label: 0.75rem; /* 12px — Micro-Labels */
+  /* Only three cuts are loaded: Neue Montreal 400 and 500, Pressura Mono
+     300. Any other weight is snapped to the nearest cut by the browser. */
+  --fw-light: 300; /* mono */
+  --fw-regular: 400;
+  --fw-medium: 500;
 
-  /* Die Zwischenstufen. Sie standen bis zum 02.09.2026 nicht hier, sondern
-     als eigene clamp()-Rampe in fast jedem Baustein: 48 font-size-Regeln,
-     26 verschiedene Grade auf fünf Seiten, davon 16 auf keiner Skala. Viele
-     davon lagen um wenige Pixel auseinander und meinten dasselbe — dreimal
-     `0.75rem` statt `--fs-label`, `clamp(1.375rem, 1.85vw, 2rem)` als
-     wörtliche Kopie von `--fs-h4`.
+  /* --- Type ladder ------------------------------------------------------
+     Figma values at a 1728px viewport, fluid via clamp().
 
-     Die Werte sind nicht neu erfunden: Jede Stufe übernimmt den Wert, den
-     die Homepage an dieser Stelle schon hatte. Die Homepage ist der Maßstab,
-     die Unterseiten rücken auf sie ein.
+     Display   expressive one-offs: wordmarks, outline numerals, heroes.
+     Title     every heading that structures a page, seven steps.
+     Text      running copy.
+     Label     small print, buttons, navigation.
 
-     Die Leiter läuft lückenlos von oben nach unten:
-     283 · 250 · 200 · 144 · 125 · 90 · 70 · 64 · 55 · 48 · 40 · 36 · 32 ·
-     28 · 24 · 20 · 18 · 16 · 14 · 13 · 12 · 11 */
-  --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem); /* 283px — Standort-Ring */
-  --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem); /* 200px — Magazin-Wortmarke */
-  --fs-display-md: clamp(
-    4rem,
-    9vw,
-    9rem
-  ); /* 144px — Geschichten, Personenseite */
-  --fs-display-sm: clamp(
-    1.5rem,
-    5.2vw,
-    5.625rem
-  ); /* 90px  — Magazin-Kopf, Team, Praxis, Zahlen */
-  --fs-h1-sm: clamp(2rem, 3.7vw, 4rem); /* 64px  — Experten, Preise, Ablauf */
-  --fs-h1-xs: clamp(2rem, 3.2vw, 3.5rem); /* 55px  — Galerie-Kopf, Geschichte */
-  --fs-h2-lg: clamp(1.75rem, 2.8vw, 3rem); /* 48px  — Panel, Merkmale */
-  --fs-h2-sm: clamp(
-    1.5rem,
-    2.08vw,
-    2.25rem
-  ); /* 36px  — Einleitung, Statement */
-  --fs-h4-sm: clamp(
-    1.25rem,
-    1.7vw,
-    1.75rem
-  ); /* 28px  — Vorteile, Zeitleiste, Werte */
-  --fs-label-lg: 0.875rem; /* 14px  — Buttonbeschriftung */
-  --fs-label-md: 0.8125rem; /* 13px  — Navigation, Meta-Zeilen */
-  --fs-micro: 0.6875rem; /* 11px  — Fehlerzeichen, Badge auf Schmalgerät */
+     Until 2026-09-27 the title steps were called h1, h1-sm, h1-xs, h2-lg,
+     h2, h2-sm, h3 (= h2), h4, h4-sm and h5. The names described the HTML
+     level a size was first used on, which was rarely the level it ended up
+     on, and every new section added a step between two existing ones. Three
+     of those steps are gone (36, 28 and the h3 alias); STYLEGUIDE-UMBAU.md
+     says where they went. */
+  --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem); /* 283 — location ring */
+  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem); /* 250 — hero wordmark */
+  --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem); /* 200 — magazine wordmark */
+  --fs-display-md: clamp(4rem, 9vw, 9rem); /* 144 — stories, person */
+  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem); /* 125 — page heroes */
+  --fs-display-sm: clamp(1.5rem, 5.2vw, 5.625rem); /* 90 — figures */
 
-  /* --- Zeilenhöhen -----------------------------------------------------
-     Vier Werte standen hier, gebraucht wurden einundzwanzig. Die Folge waren
-     165 ausgeschriebene Zeilenhöhen in den Bausteinen — und der Token, der
-     „Überschrift" hieß, sagte 1.1, während fünfundzwanzig Bausteine 1.15
-     schrieben. Die Skala bildet jetzt ab, was tatsächlich gesetzt wird.
+  --fs-title-page: clamp(2.5rem, 4.05vw, 4.375rem); /* 70 — page title */
+  --fs-title-xl: clamp(2rem, 3.7vw, 4rem); /* 64 — large headline */
+  --fs-title-lg: clamp(2rem, 3.2vw, 3.5rem); /* 55 — headline */
+  --fs-title-md: clamp(1.75rem, 2.8vw, 3rem); /* 48 — small headline */
+  --fs-title: clamp(1.75rem, 2.31vw, 2.5rem); /* 40 — section title */
+  --fs-title-sm: clamp(1.375rem, 1.85vw, 2rem); /* 32 — card title */
+  --fs-title-xs: clamp(1.125rem, 1.39vw, 1.5rem); /* 24 — small title */
 
-     `--lh-heading` (1.1) und `--lh-title` (1.15) liegen dicht beieinander und
-     sind trotzdem zwei Werte: 1.1 gilt als Grundregel für h1 bis h6, 1.15
-     schreiben fünfundzwanzig Bausteine an ihren Abschnittsüberschriften aus.
-     Sie zu einem zusammenzuziehen wäre eine Gestaltungsentscheidung und
-     keine Aufräumarbeit — gemessen verschöbe sie jede Überschrift der Seite
-     um ein bis drei Pixel. Sie steht deshalb aus.
+  --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem); /* 20 — lead */
+  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem); /* 18 — body */
+  --fs-text-small: 1rem; /* 16 */
 
-     Wer einen Wert braucht, der hier nicht steht, sollte kurz innehalten —
-     zwischen 1.4 und 1.6 liegen in den Bausteinen noch fünf verschiedene
-     Werte, und das ist eher Zufall als Absicht. */
-  --lh-display: 0.92; /* Display-Typo, Versalien über die volle Breite */
-  --lh-tight: 1; /* Wortmarke, Ziffern, einzeilige Auszeichnung */
-  --lh-heading: 1.1; /* Grundregel für h1 bis h6 */
-  --lh-title: 1.15; /* Abschnittsüberschriften in den Bausteinen */
-  --lh-snug: 1.2; /* kurze Zeilen: Kachelnamen, Spaltenköpfe */
-  --lh-text: 1.45; /* Fließtext in Bausteinen */
-  --lh-body: 1.5; /* Fließtext in langen Strecken */
-  --lh-loose: 1.6; /* Rechtstexte, Magazinsatz */
+  --fs-label-lg: 0.875rem; /* 14 — button */
+  --fs-label-md: 0.8125rem; /* 13 — navigation, meta */
+  --fs-label: 0.75rem; /* 12 — small print */
+  --fs-micro: 0.6875rem; /* 11 — badges */
 
-  /* --- Laufweiten ------------------------------------------------------
-     Zwei Token gegen zwölf benutzte Werte. `--tracking-display` ist in
-     `--tracking-tight` aufgegangen — derselbe Wert, aber ein Name, der die
-     Größe nennt und nicht den Ort. */
-  --tracking-tighter: -0.03em; /* Display */
-  --tracking-tight: -0.02em; /* große Überschriften */
-  --tracking-snug: -0.01em; /* Überschriften, Auszeichnung im Fließtext */
-  --tracking-mono: 0.04em; /* Mono-Auszeichnung */
-  --tracking-wide: 0.06em; /* Mono-Labels */
-  --tracking-wider: 0.08em; /* Micro-Labels in Versalien */
-  --tracking-widest: 0.1em; /* die weitesten Versalien */
+  /* --- Line height -------------------------------------------------------
+     `--lh-heading` (1.1) and `--lh-title` (1.15) are still two values.
+     Merging them moves every heading on the site by one to three pixels,
+     the homepage included — a design decision, not a clean-up. Open. */
+  --lh-display: 0.92; /* wordmarks: lines touch */
+  --lh-tight: 1; /* large headlines, numerals */
+  --lh-headline: 1.05; /* page titles, small headlines */
+  --lh-heading: 1.1; /* base rule for h1–h6 */
+  --lh-title: 1.15; /* section and card titles */
+  --lh-snug: 1.2; /* short lines: tile names, column heads, labels */
+  --lh-compact: 1.3; /* dense small text: captions, meta, table cells */
+  --lh-text: 1.45; /* copy inside components */
+  --lh-body: 1.5; /* longer copy */
+  --lh-loose: 1.6; /* legal texts, articles */
 
-  /* --- Spacing -------------------------------------------------------- */
+  /* --- Letter spacing ------------------------------------------------- */
+  --tracking-tighter: -0.03em; /* display */
+  --tracking-tight: -0.02em; /* large headlines */
+  --tracking-snug: -0.01em; /* titles */
+  --tracking-mono: 0.04em; /* mono, mixed case */
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.08em; /* mono, uppercase */
+  --tracking-widest: 0.1em;
+
+  /* --- Spacing -----------------------------------------------------------
+     Three kinds, one rule each:
+
+     --sp-*             fixed, inside a component: gaps, padding, icon space
+     --flow-*           fluid, inside a section: heading to content, columns
+     --section-space-*  fluid, between sections
+
+     The `--sp-*` numbers are names, not multipliers (`--sp-12` is 112px).
+     Renaming them would touch 500 declarations for no visible gain. */
   --sp-1: 8px;
   --sp-2: 12px;
   --sp-3: 16px;
@@ -139,178 +123,234 @@
   --sp-6: 40px;
   --sp-8: 64px;
   --sp-10: 80px;
-  --sp-12: 112px; /* section-space/main */
+  --sp-12: 112px;
   --sp-16: 160px;
 
-  /* Der Entwurf setzt 112px an. Etwas großzügiger, weil die Seite mit
-     ihren großen Graden sonst gedrängt wirkt. */
-  --section-space: clamp(80px, 8.1vw, 140px);
-  /* Knapper Abschluss, wenn direkt darunter eine Farbfläche anschließt — die
-     Fläche bringt ihren eigenen Innenabstand mit, zwei volle Abstände
-     hintereinander reißen die Seite auseinander. */
-  --section-space-sm: clamp(48px, 4.8vw, 84px);
-  --section-space-lg: clamp(120px, 11.6vw, 200px);
-
-  /* Fluide Abstände INNERHALB einer Section — eine Ebene unter
-     `--section-space`, das zwischen Sections steht.
-
-     Warum es sie braucht: Bis zum 02.09.2026 brachte fast jeder Baustein
-     seine eigene clamp()-Rampe mit, rund 78 Stück. Sieben davon endeten auf
-     96px, vier auf 72px, vier auf 56px — jeweils mit leicht anderem
-     Startwert, ohne dass der Unterschied etwas bedeutet hätte. Die feste
-     Skala `--sp-*` konnte das nicht auffangen: Sie ist bewusst starr, diese
-     Abstände sollen mit dem Fenster wachsen.
-
-     Die Werte stammen aus den Bausteinen der Homepage (Geschichten,
-     Standards, Fuß), damit dort kein Pixel wandert. */
+  /* From the homepage blocks (stories, standards, footer), so nothing there
+     moves. Before 2026-09-02 almost every block brought its own clamp(). */
   --flow-sm: clamp(24px, 3vw, 56px);
   --flow-md: clamp(32px, 4vw, 72px);
   --flow-lg: clamp(40px, 5vw, 96px);
   --flow-xl: clamp(56px, 7vw, 120px);
   --flow-2xl: clamp(64px, 8.7vw, 150px);
 
-  /* --- Layout --------------------------------------------------------- */
+  /* Figma says 112px; a little more, because the large type crowds it. */
+  --section-space: clamp(80px, 8.1vw, 140px);
+  /* Short closing space when a coloured band follows directly — the band
+     brings its own padding. */
+  --section-space-sm: clamp(48px, 4.8vw, 84px);
+  --section-space-lg: clamp(120px, 11.6vw, 200px);
+
+  /* --- Layout ------------------------------------------------------------ */
   --site-margin: clamp(16px, 2.78vw, 48px);
   --site-gutter: clamp(16px, 1.85vw, 32px);
   --site-max: 1728px;
   --grid-cols: 12;
 
-  /* Breiten unterhalb der Seitenbreite. Sie stehen hier, weil sie mehrfach
-     gebraucht werden und dieselbe Entscheidung ausdrücken — nicht, weil jede
-     Zahl im CSS ein Token werden müsste.
+  /* How far the fixed navigation reaches into the page. Measured, the bar
+     ends at 76–78px and its outer frame is 102–104px; 96px sits between and
+     is what anchors and the sticky contents have always used. */
+  --nav-height: 96px;
 
-     `--mw-wide` ist das Maß der breiten, zentrierten Medienblöcke: der
-     Vorher/Nachher-Rahmen und die Bühne der Geschichten. Beide sind 16:9 und
-     sollen auf großen Schirmen nicht bis an die Seitenränder laufen.
+  --mw-wide: 1100px; /* wide centred media: before/after, stories stage */
+  --mw-panel: 353px; /* copy in the dark panel column (Figma) */
 
-     `--mw-panel` ist das Textmaß in der dunklen Panel-Spalte (Figma). Nur eine
-     Stelle, aber ein Maß mit Begründung: Darüber bricht der Absatz in Zeilen,
-     die für die Spaltenbreite zu lang zu lesen sind. */
-  --mw-wide: 1100px;
-  --mw-panel: 353px;
+  /* Text measures. `ch` follows the font size, so these are for running
+     copy only; headings keep their own measure where they break by design. */
+  --measure-narrow: 34ch; /* short notes, card copy */
+  --measure-medium: 46ch; /* intros, column copy */
+  --measure-text: 60ch; /* paragraphs */
+  --measure-long: 68ch; /* articles, legal text */
 
-  /* --- Radius --------------------------------------------------------- */
+  /* --- Size ---------------------------------------------------------------- */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px; /* also the WCAG 2.5.8 minimum target */
+  --control-lg: 48px; /* round buttons, handles, avatars */
+
+  /* --- Radius -------------------------------------------------------------- */
   --r-sm: 8px;
   --r-md: 16px;
   --r-lg: 32px;
-  /* Die große Panel-Rundung der Pillar Pages (Figma 177:1736). Der Kopf legt
-     eine helle Fläche über das randabfallende Bild; 32px wirken dort zu
-     knapp, 46px sind der Wert aus dem Entwurf. */
-  --r-xl: 46px;
+  --r-xl: 46px; /* pillar page panel (Figma 177:1736) */
   --r-round: 99999px;
-  /* Der feste Radius der Abschnittsnavigation. 26px ist die halbe Höhe des
-     geschlossenen Buttons (51px) — geschlossen ergibt das die Pille des
-     Entwurfs, aufgeklappt einen gerundeten Kasten.
-
-     Bewusst ein fester Wert und nicht `--r-round`: Der skalierte mit der
-     Höhe mit, und beim Aufklappen von 51 auf 416px wanderte die Rundung
-     sichtbar mit. Ein fester Wert bleibt ruhig — und braucht deshalb gar
-     keine Animation. */
+  /* Section dock: half the closed height (51px). Fixed, not --r-round, so
+     the corner does not grow while the dock opens from 51 to 416px. */
   --r-dock: 26px;
 
-  /* --- Körnung ---------------------------------------------------------
-     Die Papierstruktur, die `ui/Backdrop.astro` als feste Auflage über die
-     Seite legt. Steht hier als Token, weil jede Fläche, die einen eigenen
-     deckenden Grund malt, sie selbst mitbringen muss — sonst wirkt sie glatt
-     neben dem gekörnten Seitengrund. Genau das war am Kopf der Pillar Page
-     als Kante zu sehen. */
+  /* --- Border and focus ---------------------------------------------------- */
+  --bw: 1px;
+  --focus-width: 2px;
+  --focus-offset: 2px;
+
+  /* --- Grain ---------------------------------------------------------------
+     The paper texture `ui/Backdrop.astro` lays over the page. A surface that
+     paints its own opaque ground brings it along, at the lower opacity —
+     Backdrop multiplies against a transparent layer and lands weaker than
+     the same opacity on a solid colour (measured at the pillar page head). */
   --grain-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
   --grain-opacity: 0.34;
-  /* Für Flächen, die ihren eigenen deckenden Grund malen und die Körnung
-     selbst auflegen müssen.
-
-     Warum ein zweiter Wert: `Backdrop` multipliziert seine Körnung gegen eine
-     eigene, durchsichtige Ebene und landet dadurch schwächer auf der Seite,
-     als dieselbe Deckkraft direkt auf einer Farbfläche tut. Gemessen am Kopf
-     der Pillar Page: die Seite verliert 5 Stufen gegenüber #d6d6d6, eine
-     Fläche mit 0.34 verlöre 10. 0.17 trifft die Seite. */
   --grain-opacity-surface: 0.17;
 
-  /* --- Schatten --------------------------------------------------------
-     Die einzigen Stellen der Seite, an denen etwas eine Fläche über einer
-     anderen wirft. Sie standen bis eben als ausgeschriebene `rgb()`-Werte in
-     vier Bausteinen — und `64 50 41` ist nichts anderes als `--c-dark`, nur
-     von Hand abgetippt.
-
-     Warum die ganze Angabe hier steht und nicht nur die Farbe: Versatz,
-     Weichzeichnung und Ausdehnung sind dieselbe Gestaltungsentscheidung wie
-     der Farbton. Bliebe nur die Farbe ein Token, stünden die drei Längen
-     weiter verstreut in den Dateien, und ein Schatten, der überall gleich
-     aussehen soll, wäre wieder an vier Stellen zu ändern.
-
-     Bewusst `rgb()` und nicht `color-mix()` mit `--c-dark`: Der Browser
-     rechnet color-mix zu `color(srgb …)` aus, während dieselbe Farbe als
-     `rgba(…)` herauskommt. Optisch identisch, für den Stilvergleich in
-     `npm run web:styles` aber ein Unterschied — und der soll echte
-     Abweichungen melden, nicht Schreibweisen. */
+  /* --- Shadow --------------------------------------------------------------
+     Written as rgb(), not color-mix() with --c-dark: the browser serialises
+     color-mix differently, and `npm run web:styles` should report real
+     changes, not notation. `64 50 41` is --c-dark. */
   --shadow-bar: 0 8px 32px -14px rgb(64 50 41 / 0.16);
   --shadow-panel: 0 24px 56px -24px rgb(64 50 41 / 0.22);
   --shadow-card: 0 24px 60px -20px rgb(64 50 41 / 0.28);
   --shadow-handle: 0 4px 20px rgb(0 0 0 / 0.15);
   --shadow-handle-active: 0 6px 26px rgb(0 0 0 / 0.22);
 
-  /* --- Maße der Seitenleiste ------------------------------------------
-     Wie weit die Navigationsleiste von oben in die Seite reicht. Gebraucht
-     für Sprungmarken (`scroll-margin-top`) und das mitlaufende
-     Inhaltsverzeichnis.
-
-     Sie wurde an fünf Stellen als `var(--nav-height, 96px)` gelesen und
-     nirgends gesetzt — es galt also immer der Ersatzwert, und der stand
-     fünfmal da. Gemessen endet die Leiste bei 76 bis 78px, der äußere
-     Rahmen ist 102 bis 104px hoch; 96px liegt dazwischen und ist genau der
-     Wert, der bisher wirkte. Am Aussehen ändert sich damit nichts, nur der
-     Ort, an dem er steht. */
-  --nav-height: 96px;
-
-  /* --- Border --------------------------------------------------------- */
-  --bw: 1px;
-
-  /* --- Motion ---------------------------------------------------------
-     Eine gemeinsame Sprache für CSS und GSAP. Die Kurven sind bewusst
-     langsam-auslaufend (kein Bounce) — passt zum ruhigen, teuren Look.
-     -------------------------------------------------------------------- */
+  /* --- Motion --------------------------------------------------------------
+     Slow run-outs, no bounce. */
   --e-out: cubic-bezier(0.22, 1, 0.36, 1);
   --e-swift: cubic-bezier(0.4, 0, 0.2, 1);
-  /* Die ruhige Dauerschleife: Faden und Zahnlinien atmen damit endlos.
-     Bewusst nah an der Geraden — ein echtes ease-in-out steht in der Mitte
-     zu lange still, die Bewegung wirkt dann wie ein Ruckeln. Sie stand
-     zweimal wörtlich in den Bausteinen, bevor sie hier landete.
-
-     `--e-in-out` ist am 02.09.2026 entfallen. Es stand im Styleguide mit dem
-     Zweck „Aufklappen" und wurde an keiner einzigen Stelle benutzt — das
-     Akkordeon, also genau das genannte Beispiel, klappt mit `--e-out` auf. */
+  /* The endless ambient loop (thread, tooth lines). Close to linear: a real
+     ease-in-out stands still too long in the middle and reads as a stutter. */
   --e-ambient: cubic-bezier(0.32, 0.14, 0.68, 0.86);
   --d-fast: 0.25s;
   --d-base: 0.45s;
   --d-slow: 0.8s;
 
-  /* --- Z-Index -------------------------------------------------------- */
+  /* --- Layers -------------------------------------------------------------- */
   --z-sticky: 50;
   --z-nav: 100;
   --z-overlay: 200;
-  /* Über allem. Der Sprung zum Inhalt ist wertlos, sobald ihn irgendetwas
-     verdeckt — und genau das passierte: Er stand auf 100, die Navigation
-     steht auf --z-nav (ebenfalls 100), und bei Gleichstand gewinnt das später
-     gezeichnete Element. Sichtbar war der Sprung damit nur zur Hälfte, hinter
-     der Leiste, die er überspringen soll. */
+  /* Above everything: at 100 it tied with the navigation and lost. */
   --z-skiplink: 400;
+
+  /* ======================================================================
+     2. ROLES
+     ====================================================================== */
+
+  /* --- Colour roles on the page (grey) -------------------------------------
+     Muted text is 75 %: 55 % measured 2.83:1 on --c-grey, 75 % is where
+     WCAG 1.4.3 (4.5:1) is reached on the flat colour. Over the grain it
+     measures about 4.4:1 — see "Open" in STYLEGUIDE-UMBAU.md. */
+  --c-bg: var(--c-grey);
+  --c-text: var(--c-dark);
+  --c-text-muted: color-mix(in srgb, var(--c-dark) 75%, transparent);
+  --c-line: color-mix(in srgb, var(--c-dark) 28%, transparent);
+  /* Boundaries and secondary icons that must be seen: 3.3:1 (WCAG 1.4.11). */
+  --c-line-strong: color-mix(in srgb, var(--c-dark) 62%, transparent);
+  --c-surface: var(--c-neutral-200);
+  /* The quiet ground under an image until it has loaded. */
+  --c-tint: color-mix(in srgb, var(--c-dark) 8%, transparent);
+  --c-tint-brand: color-mix(in srgb, var(--c-brand) 16%, transparent);
+  --c-focus: var(--c-dark);
+
+  /* Roles for text on the other grounds. The surfaces below map them onto
+     --c-text & co.; use them directly only where a state, not a block,
+     turns dark (a pressed filter tag, the dark button). */
+  --c-on-dark: var(--c-grey);
+  --c-on-dark-muted: color-mix(in srgb, var(--c-grey) 65%, transparent); /* 4.56:1 */
+  --c-on-dark-line: color-mix(in srgb, var(--c-grey) 22%, transparent);
+  --c-on-dark-line-strong: color-mix(in srgb, var(--c-grey) 45%, transparent); /* 3.0:1 */
+  --c-on-brand-muted: color-mix(in srgb, var(--c-dark) 90%, transparent); /* 4.61:1 */
+  --c-on-taupe-muted: color-mix(in srgb, var(--c-dark) 82%, transparent); /* 4.68:1 */
+  --c-on-card: var(--c-neutral-800);
+  --c-on-card-muted: color-mix(in srgb, var(--c-neutral-800) 72%, transparent); /* 6.3:1 */
+  --c-placeholder: color-mix(in srgb, var(--c-neutral-800) 62%, transparent); /* 4.56:1 */
+  --c-glass: color-mix(in srgb, var(--c-white) 72%, transparent);
+
+  /* --- Text styles ---------------------------------------------------------
+     A whole type setting in one value, for `font:`. Letter spacing is not
+     part of the shorthand and has its own token next to each.
+
+         font: var(--font-section-title);
+         letter-spacing: var(--tracking-section-title);
+
+     Put `font:` first in a rule: the shorthand resets font-variant and
+     friends, so anything written above it is lost. */
+  --font-title-page: var(--fw-medium) var(--fs-title-page) / var(--lh-headline)
+    var(--f-sans);
+  --tracking-title-page: var(--tracking-tight);
+
+  --font-headline-xl: var(--fw-medium) var(--fs-title-xl) / var(--lh-tight)
+    var(--f-sans);
+  --font-headline: var(--fw-medium) var(--fs-title-lg) / var(--lh-tight)
+    var(--f-sans);
+  --font-headline-md: var(--fw-medium) var(--fs-title-md) / var(--lh-headline)
+    var(--f-sans);
+  --tracking-headline: var(--tracking-tight);
+
+  --font-section-title: var(--fw-regular) var(--fs-title) / var(--lh-title)
+    var(--f-sans);
+  --tracking-section-title: var(--tracking-snug);
+
+  --font-card-title: var(--fw-regular) var(--fs-title-sm) / var(--lh-title)
+    var(--f-sans);
+  --tracking-card-title: var(--tracking-snug);
+
+  --font-lead: var(--fw-regular) var(--fs-text-large) / var(--lh-text)
+    var(--f-sans);
+  --font-body: var(--fw-regular) var(--fs-text-main) / var(--lh-text)
+    var(--f-sans);
+  --font-body-long: var(--fw-regular) var(--fs-text-main) / var(--lh-loose)
+    var(--f-sans);
+  --font-small: var(--fw-regular) var(--fs-text-small) / var(--lh-body)
+    var(--f-sans);
+
+  /* Mono labels are uppercase as well; add `text-transform: uppercase`.
+     The topline keeps 1.4: it is the homepage's value on 25 blocks. */
+  --font-topline: var(--fw-light) var(--fs-text-small) / 1.4 var(--f-mono);
+  --font-label: var(--fw-light) var(--fs-label) / var(--lh-snug) var(--f-mono);
+  --tracking-label: var(--tracking-wider);
+
+  /* --- Spacing roles --------------------------------------------------- */
+  /* Where a page without a hero starts: below the navigation. */
+  --page-top: calc(var(--section-space) + 80px);
+  /* Top offset of the text heroes (service, practice story, person). */
+  --hero-offset: clamp(96px, 12vh, 160px);
 }
 
-/* Die Theme-Schicht ist am 2026-09-02 entfallen.
- *
- * Hier standen `[data-theme="dark"|"taupe"|"light"]` und schalteten `--c-bg`,
- * `--c-text`, `--c-text-muted` und `--c-line` um. Gut gedacht — nur setzte
- * kein einziges Element im Projekt jemals `data-theme`. Die dunklen
- * Abschnitte schreiben ihre Farben selbst aus (`background: var(--c-dark);
- * color: var(--c-bg)`), und zwar alle.
- *
- * Weg musste sie nicht wegen der zwanzig Zeilen, sondern weil eine halb
- * verdrahtete Mechanik gefährlicher ist als gar keine: Sie hat genau einen
- * Fehler erzeugt. Im Seitenfuß steht `color: var(--c-text-muted)` an den
- * Öffnungszeiten — jemand ging davon aus, dass die Schicht dort greift. Sie
- * greift nicht, `--c-text-muted` ist Braun auf Braun, und die Zeile wäre
- * unlesbar gewesen. Aufgefallen ist es nie, weil im Datensatz noch keine
- * Öffnungszeiten stehen und das Element deshalb gar nicht gerendert wird.
- *
- * Wer Themes will, führt sie bewusst wieder ein — und stellt dann die
- * Abschnitte mit um, statt beides nebeneinander stehen zu lassen. */
+/* ==========================================================================
+   3. SURFACES
+
+   Put `data-surface` on the element that paints the ground. Everything
+   inside picks up readable text, muted text, lines and a visible focus
+   ring, without the component having to know.
+
+   The theme layer removed on 2026-09-02 failed because nothing set it and
+   the dark bands kept writing their own colours. This one is set by every
+   block that paints a coloured ground; a new block does the same.
+   ========================================================================== */
+
+[data-surface="dark"] {
+  --c-text: var(--c-on-dark);
+  --c-text-muted: var(--c-on-dark-muted);
+  --c-line: var(--c-on-dark-line);
+  --c-line-strong: var(--c-on-dark-line-strong);
+  --c-focus: var(--c-on-dark);
+  color: var(--c-text);
+}
+
+[data-surface="brand"] {
+  --c-text-muted: var(--c-on-brand-muted);
+}
+
+[data-surface="taupe"] {
+  --c-text-muted: var(--c-on-taupe-muted);
+}
+
+[data-surface="card"] {
+  --c-text: var(--c-on-card);
+  --c-text-muted: var(--c-on-card-muted);
+}
+
+/* Legacy names, read only by the archived prototype in `prototypen/vite`,
+   which imports this file and must not be changed. Not for use in `web/`:
+   `npm run check:css` rejects them there. */
+:root {
+  --fs-h1: var(--fs-title-page);
+  --fs-h1-sm: var(--fs-title-xl);
+  --fs-h1-xs: var(--fs-title-lg);
+  --fs-h2-lg: var(--fs-title-md);
+  --fs-h2: var(--fs-title);
+  --fs-h2-sm: var(--fs-title);
+  --fs-h3: var(--fs-title);
+  --fs-h4: var(--fs-title-sm);
+  --fs-h4-sm: var(--fs-title-sm);
+  --fs-h5: var(--fs-title-xs);
+}

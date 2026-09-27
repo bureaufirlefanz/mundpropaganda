@@ -37,7 +37,25 @@ import { VIEWPORTS } from "./lib/smoke.mjs";
  * Der feste Port stand einem parallel laufenden Vorschau-Server im Weg. */
 const BASE = process.env.MP_BASE ?? "http://localhost:4322";
 const ORDNER = ".shots/styles";
-const PAGES = ["/", "/leistungen/veneers"];
+/* One page per template, so a token change is seen wherever it lands.
+   Narrow it down with MP_PAGES=/,/praxis when only a few matter. */
+const PAGES = process.env.MP_PAGES?.split(",") ?? [
+  "/",
+  "/leistungen/veneers",
+  "/leistungen/keramikinlays",
+  "/veneers-berlin",
+  "/praxis",
+  "/praxis/kerrin-gratecap",
+  "/karriere",
+  "/magazin",
+  "/magazin/warum-wir-nicht-mehr-abformen",
+  "/impressum",
+];
+
+/* MP_SUMMARY=1 folds the findings: one line per element class and
+   property, with how often it changed. For a deliberate change that touches
+   hundreds of nodes, the full list is unreadable. */
+const SUMMARY = Boolean(process.env.MP_SUMMARY);
 
 const befehl = process.argv[2] ?? "vergleichen";
 if (!["sichern", "vergleichen"].includes(befehl)) {
@@ -246,7 +264,23 @@ for (const vp of VIEWPORTS) {
     }
 
     const list = vergleiche(vorher, jetzt, `${path} · ${vp.name}`);
-    if (list.length) {
+    if (list.length && SUMMARY) {
+      findings += list.length;
+      const folded = new Map();
+      for (const f of list) {
+        const [head, ...rest] = f.split("\n");
+        const key = head.replace(/^.*? · .*? · /, "").replace(/ \(#\d+\)$/, "");
+        for (const line of rest) {
+          const change = line.trim();
+          if (/^(x|y|Breite|Höhe) /.test(change)) continue;
+          const k = `${key} — ${change}`;
+          folded.set(k, (folded.get(k) ?? 0) + 1);
+        }
+        if (!rest.length) folded.set(head, 1);
+      }
+      console.log(`  ✗ ${path} · ${vp.name} — ${list.length} element(s) differ`);
+      [...folded].forEach(([k, n]) => console.log(`      ${n}× ${k}`));
+    } else if (list.length) {
       findings += list.length;
       list.forEach((f) => console.log(`  ✗ ${f}`));
     } else {

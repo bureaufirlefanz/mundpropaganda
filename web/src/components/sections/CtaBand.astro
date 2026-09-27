@@ -8,7 +8,7 @@
  * Aus dem Entwurf, gegen Tokens gelegt:
  *
  *   - Karte in `--c-grey`, Rundung `--r-md`
- *   - Überschrift 40px → `--fs-h3`
+ *   - Überschrift 40px → `--fs-title`
  *   - Text klein und gedämpft, Button in Markenfarbe (`ui/Button.astro`)
  *
  * ── Was dieser Baustein nicht tut ────────────────────────────────────────
@@ -125,8 +125,8 @@ const {
      Rhythmus der Karte. */
   .s-ctaband__headline {
     max-width: 16ch;
-    font-size: var(--fs-h3);
-    font-weight: 400;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-regular);
     line-height: var(--lh-heading);
     letter-spacing: var(--tracking-snug);
     text-wrap: balance;

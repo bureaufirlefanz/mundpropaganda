@@ -148,7 +148,7 @@ const { topline, title, text, posts } = Astro.props;
     background: var(--c-brand);
     color: var(--c-dark);
     font-family: var(--f-sans);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     font-size: var(--fs-display-lg);
     line-height: 0.86;
     letter-spacing: var(--tracking-tighter);
@@ -178,7 +178,7 @@ const { topline, title, text, posts } = Astro.props;
     background: var(--c-white);
     color: var(--c-dark);
     font-family: var(--f-sans);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     font-size: var(--fs-display-sm);
     line-height: var(--lh-tight);
     letter-spacing: var(--tracking-tight);
@@ -192,8 +192,8 @@ const { topline, title, text, posts } = Astro.props;
 
   .s-magazine__title {
     margin-bottom: var(--sp-4);
-    font-size: var(--fs-h2);
-    font-weight: 400;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-regular);
     line-height: var(--lh-title);
     letter-spacing: var(--tracking-snug);
     text-transform: uppercase;

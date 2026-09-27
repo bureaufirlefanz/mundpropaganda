@@ -57,8 +57,8 @@ const { data: d, title } = Astro.props;
   }
 
   .s-legal__title {
-    font-size: var(--fs-h1);
-    font-weight: 500;
+    font-size: var(--fs-title-page);
+    font-weight: var(--fw-medium);
     line-height: 1.05;
     letter-spacing: var(--tracking-tight);
   }
@@ -72,8 +72,8 @@ const { data: d, title } = Astro.props;
   .s-legal__text :global(h2) {
     margin-top: var(--sp-10);
     margin-bottom: var(--sp-4);
-    font-size: var(--fs-h3);
-    font-weight: 500;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-medium);
     line-height: var(--lh-snug);
   }
 
@@ -81,7 +81,7 @@ const { data: d, title } = Astro.props;
     margin-top: var(--sp-8);
     margin-bottom: var(--sp-3);
     font-size: var(--fs-text-large);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
   }
 
   .s-legal__text :global(p),
