@@ -65,14 +65,18 @@ Two things that easily go wrong here:
 
 Responsibility is layered, not mixed:
 
-1. **`src/styles/tokens.css`** — the only fixed values in the project. Colours,
-   type scale, spacing, radii, motion sizes.
+1. **`src/styles/tokens.css`** — the only fixed values in the project, in
+   three layers: base values (colours, type ladder, spacing, radii, motion),
+   roles (colour roles, `--font-*` text styles, `--page-top`) and surfaces
+   (`data-surface="dark|brand|taupe|card"`).
 2. **`src/styles/base.css`** — fonts, reset, typography helpers, layout
    primitives (`.container`, `.grid`, `.section`, `.media`) and the motion base
    (`[data-reveal]`, marker rules, the mask that gives descenders room).
 3. **`src/styles/shared.css`** — what more than one block spells out and none
-   owns alone: `.c-topline` and the slider controls shared by Gallery and
-   Magazine. Deliberately short. If the file grows, that is the sign the block
+   owns alone: `.c-topline`, the slider controls shared by Gallery and
+   Magazine, the form fields (`.c-field`) and the numbered circle
+   (`.c-number`). Deliberately short; the last two are candidates for
+   `ui/Field.astro` and `ui/Number.astro`. If the file grows, that is the sign the block
    should become its own component.
 4. **Component styles** — in the `<style>` block of the respective `.astro`
    file. Astro scopes them automatically, which stops a section from slipping
@@ -85,8 +89,25 @@ opaque background on `.section` that painted over the grain. Their rules now
 sit next to the markup they concern.
 
 Rule: a component defines **no** colour or spacing values of its own. It only
-reaches for tokens. If a value is not available as a token, that is where it
-belongs — not in the component.
+reaches for tokens, and preferably for roles:
+
+- **Type:** `font: var(--font-section-title)` plus its `--tracking-*`, not
+  four separate declarations. `font:` goes first in the rule — the shorthand
+  resets `font-variant` and friends.
+- **Colour:** a block that paints a coloured ground sets `data-surface` on
+  that element and then uses `--c-text`, `--c-text-muted`, `--c-line`. The
+  surface also makes the focus ring readable. A state that turns dark (a
+  pressed tag) uses `--c-on-dark` directly instead.
+- **Space:** `--sp-*` inside a component, `--flow-*` inside a section,
+  `--section-space-*` between sections.
+
+If a value is not available as a token, that is where it belongs — not in
+the component. Fit new sections onto the existing roles first; a new token
+is named after what it does, never after where it is used.
+
+`npm run check:css` holds the line: undefined custom properties fail, and
+every file has a ceiling for literal values (`scripts/css-baseline.json`)
+that it may go below but never above.
 
 ### Two traps when scoping
 

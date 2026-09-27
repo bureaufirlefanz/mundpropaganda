@@ -55,8 +55,8 @@
      Until 2026-09-27 the title steps were called h1, h1-sm, h1-xs, h2-lg,
      h2, h2-sm, h3 (= h2), h4, h4-sm and h5. The names described the HTML
      level a size was first used on, which was rarely the level it ended up
-     on, and every new section added a step between two existing ones. Three
-     of those steps are gone (36, 28 and the h3 alias); STYLEGUIDE-UMBAU.md
+     on, and every new section added a step between two existing ones. Two
+     sizes are gone (36 and 28px), and so is the h3 alias; STYLEGUIDE-UMBAU.md
      says where they went. */
   --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem); /* 283 — location ring */
   --fs-display: clamp(4.5rem, 14.47vw, 15.625rem); /* 250 — hero wordmark */

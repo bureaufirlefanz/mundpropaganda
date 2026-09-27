@@ -68,7 +68,10 @@ audience are not names that belong to the code.
   a building block is missing. See `web/STRUKTUR.md`.
 - **One block, one file** — markup and rules together.
 - `web/src/styles/tokens.css` is the only source of values. No magic numbers,
-  no hex values outside it.
+  no hex values outside it. Components use roles: `--font-*` text styles,
+  colour roles on a `data-surface`, `--flow-*` spacing. `npm run check:css`
+  ratchets the literals that are left. Changes are listed in
+  `STYLEGUIDE-UMBAU.md`.
 - CSS convention: `s-*` section, `c-*` component, `__element`, `--modifier`.
   No Tailwind, no atomic utilities.
 - **No em dashes in text that appears on the page.** A hyphen will do; better

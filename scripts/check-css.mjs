@@ -236,14 +236,25 @@ function pruefeBreiten() {
 }
 
 /* ---------------------------------------------------------------------------
-   5. Custom properties that are read but never defined
+   5. Custom properties that are read but never set
    ---------------------------------------------------------------------------
-   A `var(--x)` without a fallback whose `--x` is set nowhere resolves to
+   A `var(--x)` whose `--x` is set nowhere resolves to its fallback, or to
    nothing, silently. That is how the "wide image" option in posts did
-   nothing for months (`--rand-breite`). Definitions are searched in CSS,
-   in inline `style` attributes and in JS (`setProperty("--x")`).
-   A read WITH a fallback is a documented hook and is allowed.
-   --------------------------------------------------------------------------- */
+   nothing for months: `var(--rand-breite, 0px)`, and nothing ever set
+   `--rand-breite`. Definitions are searched in CSS, in inline `style`
+   attributes and in JS (`setProperty("--x")`).
+
+   A read with a fallback can be a deliberate hook that a parent may set.
+   Those are listed here, with the reason, so an unset hook is a decision
+   and not an accident. */
+const UNSET_HOOKS = new Map([
+  [
+    "--post-surface-top",
+    "PostCard: the magazine overview is meant to lower the text surface. Not wired yet, see STYLEGUIDE-UMBAU.md.",
+  ],
+]);
+
+/* ------------------------------------------------------------------------ */
 function codeFiles(dir, found = []) {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
@@ -267,17 +278,23 @@ function checkUndefinedProperties() {
   const missing = [];
   for (const path of ALLE) {
     const text = ohneKommentare(readFileSync(path, "utf8"));
-    for (const m of text.matchAll(/var\(\s*(--[a-zA-Z0-9_-]+)\s*\)/g)) {
-      if (!defined.has(m[1])) missing.push([kurz(path), m[1]]);
+    for (const m of text.matchAll(/var\(\s*(--[a-zA-Z0-9_-]+)\s*([,)])/g)) {
+      const [, name, next] = m;
+      if (defined.has(name) || UNSET_HOOKS.has(name)) continue;
+      missing.push([kurz(path), name, next === ","]);
     }
   }
 
   if (!missing.length) {
-    console.log("  ✓ every var() without fallback has a definition");
+    console.log(
+      `  ✓ every var() is set somewhere (${UNSET_HOOKS.size} documented hook(s))`,
+    );
     return 0;
   }
-  for (const [file, name] of missing)
-    console.log(`  ✗ ${file}: ${name} is read but defined nowhere`);
+  for (const [file, name, fallback] of missing)
+    console.log(
+      `  ✗ ${file}: ${name} is read${fallback ? " (with a fallback)" : ""} but set nowhere`,
+    );
   return missing.length;
 }
 

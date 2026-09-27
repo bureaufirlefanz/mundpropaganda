@@ -73,8 +73,9 @@ The short version, the part needed most often:
   carry it.
 - **`html.js`, never a bare `.js`.** Otherwise it becomes
   `.js[data-astro-cid-…]` and never matches `<html>`.
-- **No colour or spacing values in components.** Tokens only. If one is
-  missing, it belongs in `tokens.css`.
+- **No colour or spacing values in components.** Tokens only, roles first
+  (`--font-*`, `data-surface` + `--c-text*`, `--flow-*`). If one is missing,
+  it belongs in `tokens.css`, named after its job.
 
 ## Language
 
