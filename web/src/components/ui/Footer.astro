@@ -62,7 +62,7 @@ const columns = (
 ).filter((col) => col.title && col.links.length > 0);
 ---
 
-<footer class="c-footer" id={id}>
+<footer class="c-footer" id={id} data-surface="dark">
   <div class="c-footer__inner">
     {
       /* Die Wortmarke füllt die Breite des Panels und bildet den Abschluss
@@ -230,7 +230,7 @@ const columns = (
     margin: 0 auto var(--footer-gap);
     border-radius: var(--r-md);
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
     overflow: hidden;
   }
 
@@ -276,7 +276,7 @@ const columns = (
     letter-spacing: var(--tracking-snug);
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   /* Kontakt links, die beiden Linkspalten am rechten Rand.
@@ -323,8 +323,8 @@ const columns = (
   .c-footer__social a {
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
     transition:
       color var(--d-fast) var(--e-swift),
       transform var(--d-base) var(--e-out);
@@ -371,7 +371,7 @@ const columns = (
     font-size: var(--fs-text-small);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   .c-footer__locations address {
@@ -403,7 +403,7 @@ const columns = (
 
        65 % ergeben auf dem dunklen Grund 4.5:1, derselbe Wert, den die
        entfallene Theme-Schicht für `dark` vorgesehen hatte. */
-    color: color-mix(in srgb, var(--c-grey) 65%, transparent);
+    color: var(--c-text-muted);
   }
 
   .c-footer__hours dd {
@@ -427,7 +427,7 @@ const columns = (
     font-size: var(--fs-text-small);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   .c-footer__bottom {
@@ -436,8 +436,7 @@ const columns = (
     justify-content: space-between;
     gap: var(--sp-5);
     padding: var(--sp-5) 0;
-    border-top: var(--bw) solid
-      color-mix(in srgb, var(--c-grey) 22%, transparent);
+    border-top: var(--bw) solid var(--c-line);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);

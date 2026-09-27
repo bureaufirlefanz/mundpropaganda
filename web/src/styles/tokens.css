@@ -244,14 +244,38 @@
      --c-text & co.; use them directly only where a state, not a block,
      turns dark (a pressed filter tag, the dark button). */
   --c-on-dark: var(--c-grey);
-  --c-on-dark-muted: color-mix(in srgb, var(--c-grey) 65%, transparent); /* 4.56:1 */
+  --c-on-dark-muted: color-mix(
+    in srgb,
+    var(--c-grey) 65%,
+    transparent
+  ); /* 4.56:1 */
   --c-on-dark-line: color-mix(in srgb, var(--c-grey) 22%, transparent);
-  --c-on-dark-line-strong: color-mix(in srgb, var(--c-grey) 45%, transparent); /* 3.0:1 */
-  --c-on-brand-muted: color-mix(in srgb, var(--c-dark) 90%, transparent); /* 4.61:1 */
-  --c-on-taupe-muted: color-mix(in srgb, var(--c-dark) 82%, transparent); /* 4.68:1 */
+  --c-on-dark-line-strong: color-mix(
+    in srgb,
+    var(--c-grey) 45%,
+    transparent
+  ); /* 3.0:1 */
+  --c-on-brand-muted: color-mix(
+    in srgb,
+    var(--c-dark) 90%,
+    transparent
+  ); /* 4.61:1 */
+  --c-on-taupe-muted: color-mix(
+    in srgb,
+    var(--c-dark) 82%,
+    transparent
+  ); /* 4.68:1 */
   --c-on-card: var(--c-neutral-800);
-  --c-on-card-muted: color-mix(in srgb, var(--c-neutral-800) 72%, transparent); /* 6.3:1 */
-  --c-placeholder: color-mix(in srgb, var(--c-neutral-800) 62%, transparent); /* 4.56:1 */
+  --c-on-card-muted: color-mix(
+    in srgb,
+    var(--c-neutral-800) 72%,
+    transparent
+  ); /* 6.3:1 */
+  --c-placeholder: color-mix(
+    in srgb,
+    var(--c-neutral-800) 62%,
+    transparent
+  ); /* 4.56:1 */
   --c-glass: color-mix(in srgb, var(--c-white) 72%, transparent);
 
   /* --- Text styles ---------------------------------------------------------
@@ -301,6 +325,7 @@
   /* --- Spacing roles --------------------------------------------------- */
   /* Where a page without a hero starts: below the navigation. */
   --page-top: calc(var(--section-space) + 80px);
+  --page-top-sm: calc(var(--section-space-sm) + 80px); /* narrow screens */
   /* Top offset of the text heroes (service, practice story, person). */
   --hero-offset: clamp(96px, 12vh, 160px);
 }

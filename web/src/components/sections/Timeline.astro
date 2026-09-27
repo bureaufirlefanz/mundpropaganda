@@ -72,10 +72,8 @@ const { headline, stages } = Astro.props;
   }
 
   .s-timeline__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-timeline__track {
@@ -146,13 +144,11 @@ const { headline, stages } = Astro.props;
      entfallen — der Titel beginnt jetzt direkt unter dem Punkt, und ein
      Rest-Abstand ließe die Etappen ohne Grund tiefer sitzen. */
   .s-timeline__stage-title {
+    font: var(--font-card-title);
     display: flex;
     align-items: baseline;
     gap: 0.5em;
-    font-size: var(--fs-title-sm);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    letter-spacing: var(--tracking-card-title);
     text-wrap: balance;
   }
 
@@ -181,10 +177,9 @@ const { headline, stages } = Astro.props;
   }
 
   .s-timeline__text {
-    max-width: 34ch;
+    font: var(--font-body);
+    max-width: var(--measure-narrow);
     margin-top: var(--sp-3);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -219,7 +214,7 @@ const { headline, stages } = Astro.props;
     }
 
     .s-timeline__text {
-      max-width: 46ch;
+      max-width: var(--measure-medium);
     }
   }
 </style>

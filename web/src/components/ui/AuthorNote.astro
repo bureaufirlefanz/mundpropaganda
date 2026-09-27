@@ -174,8 +174,8 @@ const hasContent =
   /* Same measure and rounding as the author of a magazine post. */
   .c-author-note__image {
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
+    width: var(--control-lg);
+    height: var(--control-lg);
     border-radius: var(--r-round);
     overflow: hidden;
   }
@@ -195,8 +195,8 @@ const hasContent =
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.35;
-    letter-spacing: var(--tracking-widest);
+    line-height: var(--lh-compact);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -204,7 +204,7 @@ const hasContent =
   .c-author-note__name {
     margin-top: var(--sp-1);
     font-size: var(--fs-text-small);
-    line-height: 1.3;
+    line-height: var(--lh-compact);
   }
 
   .c-author-note__role {
@@ -212,7 +212,7 @@ const hasContent =
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
     color: var(--c-text-muted);
   }
 
@@ -242,7 +242,7 @@ const hasContent =
 
   .c-author-note__date {
     font-size: var(--fs-text-small);
-    line-height: 1.3;
+    line-height: var(--lh-compact);
   }
 
   .c-author-note__sources {
@@ -258,8 +258,7 @@ const hasContent =
   }
 
   .c-author-note__source {
-    font-size: var(--fs-text-small);
-    line-height: var(--lh-body);
+    font: var(--font-small);
     color: var(--c-text-muted);
   }
 

@@ -72,11 +72,9 @@ const { id, topline, title, text } = Astro.props;
   }
 
   .s-panel__title {
+    font: var(--font-headline-md);
+    letter-spacing: var(--tracking-headline);
     margin-bottom: var(--sp-5);
-    font-size: var(--fs-title-md);
-    font-weight: var(--fw-medium);
-    line-height: 1.05;
-    letter-spacing: var(--tracking-tight);
   }
 
   @media (max-width: 900px) {

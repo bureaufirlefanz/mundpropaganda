@@ -62,11 +62,9 @@ const { id, topline, headline, items } = Astro.props;
   }
 
   .s-quickfacts__title {
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
     margin-top: var(--sp-4);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
   }
 
   /* Two columns from 700px up. `auto-fit` with a `min(100%, …)` floor keeps
@@ -92,8 +90,7 @@ const { id, topline, headline, items } = Astro.props;
   }
 
   .s-quickfacts__label {
-    font-size: var(--fs-text-small);
-    line-height: var(--lh-body);
+    font: var(--font-small);
     color: var(--c-text-muted);
   }
 

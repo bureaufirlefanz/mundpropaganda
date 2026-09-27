@@ -218,7 +218,7 @@ const action = (await resolved([nav?.action ?? null], here))[0];
        aber durchlässig genug, dass die Seite in Bewegung bleibt. Nur
        Unschärfe und Fläche — Glaskanten und Innenlicht standen hier schon
        und trugen zu dick auf. */
-    background: color-mix(in srgb, var(--c-white) 72%, transparent);
+    background: var(--c-glass);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     box-shadow: var(--shadow-bar);
@@ -325,7 +325,7 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     margin-inline: auto;
     /* Dasselbe Milchglas wie die Leiste darüber — beide sollen als eine
        Fläche gelesen werden. */
-    background: color-mix(in srgb, var(--c-white) 72%, transparent);
+    background: var(--c-glass);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     border-radius: var(--r-lg);

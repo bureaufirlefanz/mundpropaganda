@@ -26,7 +26,7 @@ const { title, steps } = Astro.props;
     <div class="s-steps__grid" data-reveal-stagger="0.08">
       {
         steps.map((s, i) => (
-          <article class="c-step" data-reveal-child>
+          <article class="c-step" data-surface="card" data-reveal-child>
             <span class="c-number c-step__num">{i + 1}</span>
             <h3 class="c-step__title">{s.title}</h3>
             <p class="c-step__text">{s.text}</p>
@@ -54,7 +54,7 @@ const { title, steps } = Astro.props;
     margin: 0 auto var(--sp-10);
     font-size: var(--fs-title-xl);
     font-weight: var(--fw-medium);
-    line-height: 1.02;
+    line-height: var(--lh-headline);
     letter-spacing: var(--tracking-tight);
   }
 
@@ -86,7 +86,7 @@ const { title, steps } = Astro.props;
     padding: var(--sp-4);
     border-radius: var(--r-md);
     background: var(--c-neutral-200);
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   /* Farbe, Form und Schnitt kommen aus `.c-number` in shared.css. Hier
@@ -98,19 +98,16 @@ const { title, steps } = Astro.props;
   }
 
   .c-step__title {
-    font-size: var(--fs-title-sm);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-card-title);
+    letter-spacing: var(--tracking-card-title);
   }
 
   /* `margin-top: auto` schiebt den Text an die Unterkante — dadurch setzen
      alle vier Karten ihn auf derselben Höhe an, egal wie lang der Titel ist. */
   .c-step__text {
+    font: var(--font-body);
     margin-top: auto;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
-    color: color-mix(in srgb, var(--c-neutral-800) 80%, transparent);
+    color: var(--c-text-muted);
   }
 
   /* Die Dauer gehört zum Text darüber und nicht als eigener Block daneben —
@@ -130,11 +127,12 @@ const { title, steps } = Astro.props;
     font-family: var(--f-mono);
     font-size: var(--fs-text-small);
     line-height: var(--lh-text);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    /* 60 % kamen auf 4.29:1 und damit knapp unter AA (`npm run web:check`).
-       70 % halten den Abstand zum Fließtext darüber und bleiben darüber. */
-    color: color-mix(in srgb, var(--c-neutral-800) 70%, transparent);
+    /* The card surface's muted text (72 %): 60 % measured 4.29:1, just below
+       AA. It now shares the colour of the step text above; the mono cut and
+       the capitals keep the two apart. */
+    color: var(--c-text-muted);
   }
 
   /* Das Wort trug hier kurzzeitig eine hellere Farbe als die Angabe. Das kam

@@ -61,8 +61,8 @@ const { questions } = Astro.props;
     display: grid;
     place-items: center;
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
+    width: var(--control-lg);
+    height: var(--control-lg);
     border-radius: var(--r-round);
     background: var(--c-brand);
     color: var(--c-dark);
@@ -70,8 +70,8 @@ const { questions } = Astro.props;
   }
 
   .c-accordion__icon svg {
-    width: 16px;
-    height: 16px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
   }
 
   .c-accordion__item[data-open="true"] .c-accordion__icon {

@@ -50,6 +50,7 @@ const MOTIFS = ["empfang-p25", "wartebereich", "behandlungszimmer-holz"];
       voices.map((s, i) => (
         <figure
           class="s-voices__card"
+          data-surface="card"
           style={`--offset: ${s.offset ?? 0}`}
           data-reveal="up"
           data-reveal-delay={i * 0.1}
@@ -96,10 +97,8 @@ const MOTIFS = ["empfang-p25", "wartebereich", "behandlungszimmer-holz"];
   }
 
   .s-voices__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* `align-items: start`, damit die Karten NICHT gleich hoch werden — sie
@@ -124,13 +123,12 @@ const MOTIFS = ["empfang-p25", "wartebereich", "behandlungszimmer-holz"];
     padding: var(--sp-5);
     border-radius: var(--r-md);
     background: var(--c-surface);
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   .s-voices__quote {
+    font: var(--font-lead);
     margin: 0;
-    font-size: var(--fs-text-large);
-    line-height: 1.4;
   }
 
   /* Die Anführungszeichen stehen im Satz, nicht als Schmuckzeichen darüber.
@@ -164,8 +162,7 @@ const MOTIFS = ["empfang-p25", "wartebereich", "behandlungszimmer-holz"];
     gap: var(--sp-3);
     margin-top: auto;
     padding-top: var(--sp-4);
-    border-top: var(--bw) solid
-      color-mix(in srgb, var(--c-neutral-800) 15%, transparent);
+    border-top: var(--bw) solid var(--c-line);
   }
 
   .s-voices__image {
@@ -200,10 +197,10 @@ const MOTIFS = ["empfang-p25", "wartebereich", "behandlungszimmer-holz"];
   .s-voices__since {
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.3;
+    line-height: var(--lh-compact);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--c-neutral-800) 70%, transparent);
+    color: var(--c-text-muted);
   }
 
   @media (max-width: 900px) {

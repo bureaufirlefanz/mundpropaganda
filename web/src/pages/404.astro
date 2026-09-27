@@ -83,10 +83,9 @@ const services = forTable(await loadServiceList()).slice(0, 6);
   }
 
   .s-notfound__text {
-    max-width: 46ch;
+    font: var(--font-body);
+    max-width: var(--measure-medium);
     margin-top: var(--sp-5);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -103,7 +102,7 @@ const services = forTable(await loadServiceList()).slice(0, 6);
   .s-notfound__label {
     font-family: var(--f-mono);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-mono);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }

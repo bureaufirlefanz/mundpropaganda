@@ -145,7 +145,7 @@ const MOTIFS = [
   </div>
 </section>
 
-<section class="s-quote">
+<section class="s-quote" data-surface="taupe">
   <div class="s-quote__inner">
     <span class="s-quote__mark" aria-hidden="true">&ldquo;</span>
 
@@ -362,20 +362,20 @@ const MOTIFS = [
   .s-stories__nav {
     display: grid;
     place-items: center;
-    width: 48px;
-    height: 48px;
+    width: var(--control-lg);
+    height: var(--control-lg);
     border-radius: var(--r-round);
     background: var(--c-dark);
     border: 0;
-    color: var(--c-grey);
+    color: var(--c-on-dark);
     transition:
       background var(--d-fast) var(--e-swift),
       color var(--d-fast) var(--e-swift);
   }
 
   .s-stories__nav svg {
-    width: 16px;
-    height: 16px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
   }
 
   .s-stories__nav[data-deck-prev] svg {

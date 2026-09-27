@@ -278,7 +278,9 @@ for (const vp of VIEWPORTS) {
         }
         if (!rest.length) folded.set(head, 1);
       }
-      console.log(`  ✗ ${path} · ${vp.name} — ${list.length} element(s) differ`);
+      console.log(
+        `  ✗ ${path} · ${vp.name} — ${list.length} element(s) differ`,
+      );
       [...folded].forEach(([k, n]) => console.log(`      ${n}× ${k}`));
     } else if (list.length) {
       findings += list.length;

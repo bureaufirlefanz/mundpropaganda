@@ -36,7 +36,9 @@ const width = node.width ?? "wide";
    randbreites. */
 const SIZES = {
   column: "(max-width: 1000px) 100vw, 68ch",
-  wide: "(max-width: 1000px) 100vw, 60vw",
+  /* Since 2026-09-27 a wide image really spans the column plus the margin
+     track (see Post.astro): about 74vw beside the contents, 94vw without. */
+  wide: "(max-width: 1000px) 100vw, 90vw",
   full: "100vw",
 } as const;
 ---
@@ -91,7 +93,7 @@ const SIZES = {
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.4;
+    line-height: var(--lh-text);
     letter-spacing: var(--tracking-mono);
     color: var(--c-text-muted);
   }

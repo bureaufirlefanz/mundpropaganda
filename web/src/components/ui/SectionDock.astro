@@ -181,11 +181,13 @@ const number = (i: number) => String(i + 1);
     color: var(--c-dark);
   }
 
-  /* Auf dem aktiven Eintrag liegt der rosa Marker; die Ziffer nimmt dort nur
-     die Schriftfarbe an. */
+  /* The active entry sits on the pink marker, so its number takes the muted
+     role for the brand ground (90 %, 4.61:1; the 70 % used before measured
+     3.17:1). Written directly rather than through data-surface="brand": the
+     marker is a moving state behind the link, not a block the link sits in. */
   .c-section-dock
     :global([data-section-dock-link][data-active] .c-section-dock__link-num) {
-    color: color-mix(in srgb, var(--c-dark) 70%, transparent);
+    color: var(--c-on-brand-muted);
   }
 
   /* Flex statt `block`: Ziffernkreis und Text stehen auf einer Mittelachse.

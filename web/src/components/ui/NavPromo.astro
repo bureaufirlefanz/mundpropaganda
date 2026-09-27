@@ -33,7 +33,7 @@ interface Props {
 const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
 ---
 
-<a class="c-navpromo" href={href}>
+<a class="c-navpromo" href={href} data-surface="dark">
   <div class="c-navpromo__media">
     {
       image && (
@@ -71,7 +71,7 @@ const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
     border-radius: var(--r-lg);
     overflow: hidden;
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
     text-decoration: none;
 
     /* Innerer Rand, der das Bild einfasst. Dieselbe Farbe wie die Fläche

@@ -94,7 +94,7 @@ const lines =
     aspect-ratio: 1728 / 855;
     min-height: 420px;
     overflow: hidden;
-    background: color-mix(in srgb, var(--c-dark) 12%, transparent);
+    background: var(--c-tint);
   }
 
   /* :global(img) — das Bild kommt aus CmsImage.astro und trägt das
@@ -117,7 +117,7 @@ const lines =
     width: min(1440px, calc(100% - 2 * clamp(var(--sp-3), 6.9vw, 120px)));
     margin-inline: auto;
     margin-top: clamp(-220px, -17.6vw, -80px);
-    padding: clamp(var(--sp-6), 3.5vw, 60px) var(--site-gutter) 0;
+    padding: var(--flow-md) var(--site-gutter) 0;
     border-start-start-radius: var(--r-xl);
     border-start-end-radius: var(--r-xl);
     background: var(--c-grey);
@@ -168,7 +168,7 @@ const lines =
   }
 
   .s-pillarhero__title {
-    margin-top: clamp(var(--sp-4), 2vw, var(--sp-8));
+    margin-top: var(--flow-sm);
     font-family: var(--f-sans);
     font-size: var(--fs-display-2);
     font-weight: var(--fw-medium);
@@ -184,13 +184,13 @@ const lines =
   @media (min-width: 1000px) {
     .s-pillarhero__panel {
       text-align: center;
-      padding-inline: clamp(var(--sp-6), 7vw, 120px);
+      padding-inline: var(--flow-xl);
     }
 
     .s-pillarhero__eyebrow {
       position: absolute;
-      left: clamp(var(--sp-6), 7vw, 120px);
-      top: clamp(var(--sp-6), 3.5vw, 60px);
+      left: var(--flow-xl);
+      top: var(--flow-md);
     }
   }
 

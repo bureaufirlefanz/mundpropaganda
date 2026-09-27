@@ -20,13 +20,11 @@ const { topline, text } = Astro.props;
 
 <style>
   .s-statement {
-    max-width: 46ch;
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
+    max-width: var(--measure-medium);
     margin-top: var(--sp-6);
     margin-inline: auto;
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: 1.25;
-    letter-spacing: var(--tracking-snug);
     text-align: center;
   }
 </style>

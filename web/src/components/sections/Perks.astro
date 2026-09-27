@@ -53,10 +53,8 @@ const { topline, headline, items } = Astro.props;
 
   .s-perks__title {
     margin-top: var(--sp-4);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-perks__list {
@@ -71,13 +69,12 @@ const { topline, headline, items } = Astro.props;
      stünde „Team-Events & Wöchentliches" unten in der einen Spalte und
      „Team-Meeting" oben in der nächsten. */
   .s-perks__item {
+    font: var(--font-body);
     display: flex;
     gap: var(--sp-3);
     break-inside: avoid;
     padding-block: var(--sp-3);
     border-top: var(--bw) solid var(--c-line);
-    font-size: var(--fs-text-main);
-    line-height: 1.4;
   }
 
   /* Ein kurzer Strich in Markenfarbe statt eines Aufzählungspunkts. Als

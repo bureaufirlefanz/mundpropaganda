@@ -163,32 +163,27 @@ p {
    jeden runden Button im Fokus in eine fast eckige Form. Ohne die Zeile folgt
    der Umriss der Form, die das Element ohnehin hat. */
 :focus-visible {
-  outline: 2px solid var(--c-dark);
-  outline-offset: 2px;
+  outline: var(--focus-width) solid var(--c-focus);
+  outline-offset: var(--focus-offset);
 }
 
-/* Auf dunklem Grund die Gegenfarbe. Dort verschmölze der dunkle Ring mit dem
-   Grund (1:1), der helle steht mit 12.28:1. */
-.c-footer :focus-visible,
-.c-navpromo:focus-visible,
-/* `.s-cta` stand hier und trifft nichts: Der Baustein heißt `.s-ctaband`.
-   Der Fokusring auf seinem Button war damit der dunkle auf dunklem Grund. */
-.s-ctaband :focus-visible,
-/* Nach innen, wo außen kein Platz ist.
+/* The ring takes its colour from the surface it sits on: `data-surface`
+   sets `--c-focus` light on dark grounds (12.28:1). Until 2026-09-27 this
+   was a hand-kept list of dark blocks, and the list is how the footer ended
+   up with a dark ring on a dark ground — its selector was there, the colour
+   declaration was not. A new dark block now only needs the attribute. */
 
-   Diese Elemente sitzen bündig in einem Vorfahren mit `overflow: hidden` —
-   gemessen im Tastaturlauf, Luft 0 Pixel. Ein Ring außerhalb der Kante wird
-   dort vollständig weggeschnitten, und die Fokusanzeige fehlt genau an den
-   Bedienelementen, die man am häufigsten anspringt.
+/* Drawn inside where there is no room outside.
 
-   `outline-offset: -2px` zeichnet ihn stattdessen innen. Er liegt damit
-   innerhalb der eigenen Fläche und kann von niemandem beschnitten werden.
-   Der Ring rückt dadurch um vier Pixel näher an den Inhalt; das ist der
-   Preis, und er ist kleiner als ein unsichtbarer Ring. */
+   These elements sit flush in an ancestor with `overflow: hidden` (measured
+   in a keyboard run: 0px of air). A ring outside the edge would be cut away
+   completely, on exactly the controls that get focused most. Inside, it
+   moves four pixels closer to the content; that is the price, and it is
+   smaller than an invisible ring. */
 .c-accordion__trigger:focus-visible,
 .c-post:focus-visible,
 .c-ring__stage:focus-visible {
-  outline-offset: -2px;
+  outline-offset: calc(var(--focus-width) * -1);
 }
 
 /* --- Typo-Utilities -------------------------------------------------- */
@@ -203,29 +198,12 @@ p {
    niemand benutzte, ist Ballast — und es liest sich wie ein Angebot, dem
    man folgen sollte.
 
-   Die beiden übrigen bleiben, weil `Panel.astro` sie benutzt. */
+   The two that remain (`.t-body`, `.t-muted`) are used by `Panel.astro`.
+   `.t-label` and `.t-mono` went on 2026-09-27: no use in any markup. */
 
 .t-body {
   font-size: var(--fs-text-main);
   line-height: var(--lh-text);
-}
-
-/* Das Mono-Micro-Label — Signature-Element der Marke. */
-.t-label {
-  font-family: var(--f-mono);
-  font-weight: var(--fw-light);
-  font-size: var(--fs-text-small);
-  line-height: var(--lh-body);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
-
-.t-mono {
-  font-family: var(--f-mono);
-  font-weight: var(--fw-light);
-  font-size: var(--fs-text-small);
-  line-height: var(--lh-body);
-  letter-spacing: var(--tracking-mono);
 }
 
 .t-muted {
@@ -275,10 +253,6 @@ p {
   .grid {
     --grid-cols: 4;
   }
-}
-
-.stack > * + * {
-  margin-top: var(--stack-space, var(--sp-3));
 }
 
 .sr-only {

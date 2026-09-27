@@ -84,7 +84,7 @@ const columns = Math.min(pricing.length, 5);
   >
     {
       pricing.map((p) => (
-        <article class="c-price" data-reveal-child>
+        <article class="c-price" data-surface="card" data-reveal-child>
           <h3 class="c-price__name">{p.name}</h3>
 
           {hasFacts && (
@@ -202,17 +202,15 @@ const columns = Math.min(pricing.length, 5);
     flex-direction: column;
     gap: var(--sp-4);
     min-height: 210px;
-    padding: 12px;
+    padding: var(--sp-2);
     border-radius: var(--r-md);
     background: var(--c-neutral-200);
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   .c-price__name {
-    font-size: var(--fs-title-sm);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-card-title);
+    letter-spacing: var(--tracking-card-title);
     text-wrap: balance;
   }
 
@@ -230,7 +228,7 @@ const columns = Math.min(pricing.length, 5);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-main);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     text-align: center;
   }
@@ -245,7 +243,7 @@ const columns = Math.min(pricing.length, 5);
     gap: var(--sp-2);
     margin: 0;
     font-size: var(--fs-text-small);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
   }
 
   .c-price__fact {
@@ -255,7 +253,7 @@ const columns = Math.min(pricing.length, 5);
   }
 
   .c-price__fact dt {
-    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+    color: var(--c-text-muted);
   }
 
   .c-price__fact dd {
@@ -288,7 +286,7 @@ const columns = Math.min(pricing.length, 5);
     font-family: var(--f-mono);
     font-size: var(--fs-label);
     font-weight: var(--fw-light);
-    letter-spacing: var(--tracking-mono);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
@@ -314,11 +312,10 @@ const columns = Math.min(pricing.length, 5);
   }
 
   .s-prices__note {
-    max-width: 68ch;
-    margin: var(--sp-8) auto 0;
-    font-size: var(--fs-text-small);
+    font: var(--font-small);
     font-style: italic;
-    line-height: 1.55;
+    max-width: var(--measure-long);
+    margin: var(--sp-8) auto 0;
     color: var(--c-text-muted);
     text-align: center;
   }
@@ -327,7 +324,7 @@ const columns = Math.min(pricing.length, 5);
      überhaupt „ab“ stehen darf. Gleiche Lesegröße wie die Anmerkung, ohne
      die Kursive, die ihn zur Randnotiz machen würde. */
   .s-prices__disclaimer {
-    max-width: 68ch;
+    max-width: var(--measure-long);
     margin: var(--sp-6) auto 0;
     padding-top: var(--sp-6);
     border-top: var(--bw) solid var(--c-line);

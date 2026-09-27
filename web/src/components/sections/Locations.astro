@@ -78,6 +78,7 @@ const route = (o: Location) =>
           {o.latitude != null && o.longitude != null ? (
             <button
               class="c-location__map"
+              data-surface="dark"
               type="button"
               data-embed={mapUrl(o.latitude, o.longitude)}
               aria-label={`Karte laden für ${o.name}`}
@@ -154,17 +155,15 @@ const route = (o: Location) =>
   .s-locations__title {
     max-width: 18ch;
     margin-top: var(--sp-4);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-locations__text {
-    max-width: 52ch;
+    max-width: var(--measure-text);
     margin-top: var(--sp-5);
     font-size: var(--fs-text-main);
-    line-height: 1.55;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 
@@ -211,7 +210,7 @@ const route = (o: Location) =>
     align-items: center;
     justify-content: center;
     gap: var(--sp-3);
-    color: var(--c-bg);
+    color: var(--c-text);
     transition: scale var(--d-base) var(--e-out);
   }
 
@@ -231,17 +230,20 @@ const route = (o: Location) =>
     display: inline-flex;
     align-items: center;
     padding: var(--sp-2) var(--sp-4);
-    border: var(--bw) solid color-mix(in srgb, var(--c-bg) 40%, transparent);
+    border: var(--bw) solid var(--c-line-strong);
     border-radius: var(--r-round);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
+  /* The ring sits outside the button, on the page ground, so it stays
+     dark: the dark surface on the button would otherwise turn `--c-focus`
+     light and the ring would vanish against the grey page. */
   .c-location__map:focus-visible {
-    outline: 2px solid var(--c-dark);
+    outline: var(--focus-width) solid var(--c-dark);
     outline-offset: 4px;
   }
 
@@ -264,7 +266,7 @@ const route = (o: Location) =>
     margin-bottom: var(--sp-2);
     font-size: var(--fs-text-large);
     font-weight: var(--fw-regular);
-    line-height: 1.25;
+    line-height: var(--lh-compact);
     letter-spacing: var(--tracking-snug);
   }
 
@@ -275,10 +277,9 @@ const route = (o: Location) =>
   }
 
   .c-location__text {
-    max-width: 44ch;
+    font: var(--font-small);
+    max-width: var(--measure-medium);
     margin-top: var(--sp-4);
-    font-size: var(--fs-text-small);
-    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 

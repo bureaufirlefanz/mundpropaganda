@@ -125,21 +125,18 @@ const MOTIFS = [
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
-    max-width: 42ch;
+    max-width: var(--measure-medium);
     padding-inline: var(--sp-5);
   }
 
   .s-feature__title {
-    font-size: var(--fs-title-md);
-    font-weight: var(--fw-medium);
-    line-height: 1.05;
-    letter-spacing: var(--tracking-tight);
+    font: var(--font-headline-md);
+    letter-spacing: var(--tracking-headline);
   }
 
   .s-feature__body p {
-    font-size: var(--fs-text-main);
+    font: var(--font-body);
     color: var(--c-text-muted);
-    line-height: var(--lh-text);
   }
 
   .s-feature--reverse .s-feature__media {

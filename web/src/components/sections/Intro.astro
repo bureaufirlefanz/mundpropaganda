@@ -204,9 +204,8 @@ const {
   }
 
   .s-intro__lead {
+    font: var(--font-lead);
     margin-top: var(--sp-5);
-    font-size: var(--fs-text-large);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
@@ -223,16 +222,13 @@ const {
   }
 
   .s-intro__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: 1.25;
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-intro p {
-    max-width: 40ch;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
+    font: var(--font-body);
+    max-width: var(--measure-medium);
   }
 
   /* --- Die Fassung der Pillar Pages ------------------------------------
@@ -262,7 +258,7 @@ const {
   .s-intro--centered .s-intro__columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(var(--sp-5), 4.2vw, 85px);
+    gap: var(--flow-md);
     width: min(60%, 100%);
     margin-top: clamp(var(--sp-6), 2.6vw, 46px);
   }

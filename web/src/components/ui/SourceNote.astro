@@ -28,7 +28,7 @@ const { variant = "info", title, href, linkLabel = "Zur Quelle" } = Astro.props;
 const isExternal = href?.startsWith("http") ?? false;
 ---
 
-<aside class="c-sourcenote" data-variant={variant}>
+<aside class="c-sourcenote" data-surface="dark" data-variant={variant}>
   {title && <p class="c-sourcenote__title">{title}</p>}
 
   <div class="c-sourcenote__body">
@@ -63,11 +63,11 @@ const isExternal = href?.startsWith("http") ?? false;
      Streifen links; auf dem ohnehin grauen Seitengrund sah das nach einem
      Fehler aus statt nach einer Auszeichnung. */
   .c-sourcenote {
-    max-width: 68ch;
+    max-width: var(--measure-long);
     padding: var(--sp-5) var(--sp-6);
     border-radius: var(--r-md);
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   /* Eigene Farbe statt geerbter: Der Kasten steht mal auf dem Seitengrund,
@@ -75,22 +75,21 @@ const isExternal = href?.startsWith("http") ?? false;
      Ton und kam auf 4,32:1 — WCAG 1.4.3 verlangt 4,5:1 (gemeldet von
      `npm run web:check` auf der Komponentenseite). */
   .c-sourcenote__title {
-    color: var(--c-grey);
+    color: var(--c-text);
     margin: 0 0 var(--sp-2);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.4;
-    letter-spacing: var(--tracking-wide);
+    line-height: var(--lh-text);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
-  /* 65 % ist der Wert, ab dem grauer Text auf Braun die 4.5:1 erreicht —
-     derselbe, den `tokens.css` für dunkle Flächen ansetzt. */
+  /* Muted text of the dark surface: 65 %, where grey on brown reaches
+     4.5:1. */
   .c-sourcenote__body {
-    font-size: var(--fs-text-small);
-    line-height: 1.55;
-    color: color-mix(in srgb, var(--c-grey) 65%, transparent);
+    font: var(--font-small);
+    color: var(--c-text-muted);
   }
 
   /* The slot content is written by the caller and carries the caller's
@@ -105,7 +104,7 @@ const isExternal = href?.startsWith("http") ?? false;
   }
 
   .c-sourcenote__link {
-    color: var(--c-grey);
+    color: var(--c-text);
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);

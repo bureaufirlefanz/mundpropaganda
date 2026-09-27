@@ -51,7 +51,7 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
   headings.length > 0 && (
     <section class="s-contents">
       <div class="s-contents__inner">
-        <div class="s-contents__panel">
+        <div class="s-contents__panel" data-surface="dark">
           <h2 class="s-contents__title" id="inhalt" data-split="lines">
             {headline}
           </h2>
@@ -97,8 +97,9 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
   .s-contents {
     width: 100vw;
     margin-inline: calc(50% - 50vw);
-    /* Platz für den Übersteh des Bildes nach oben und unten. */
-    padding-block: clamp(var(--sp-8), 4vw, 80px);
+    /* Room for the image overhang above and below (--flow-md, see
+       .s-contents__media); --section-space-sm is larger at every width. */
+    padding-block: var(--section-space-sm);
   }
 
   /* Zwei Zeilen: oben Fläche und Bild nebeneinander, darunter die
@@ -136,13 +137,13 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
   }
 
   .s-contents__panel {
-    padding: clamp(var(--sp-6), 4.5vw, 78px) clamp(var(--sp-5), 3.8vw, 65px);
+    padding: var(--flow-lg) var(--flow-md);
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   .s-contents__title {
-    margin-bottom: clamp(var(--sp-6), 4.5vw, 78px);
+    margin-bottom: var(--flow-lg);
     font-size: var(--fs-title);
     font-weight: var(--fw-medium);
     line-height: var(--lh-heading);
@@ -155,7 +156,7 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
     display: grid;
     grid-auto-flow: column;
     grid-template-rows: repeat(5, auto);
-    gap: clamp(var(--sp-4), 2.2vw, 38px) clamp(var(--sp-6), 6vw, 105px);
+    gap: clamp(var(--sp-4), 2.2vw, 38px) var(--flow-lg);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -225,8 +226,9 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
     }
   }
 
+  /* Ring width and colour come from base.css (var(--c-focus), light on the
+     dark surface); only the offset is this block's own. */
   .s-contents__link:focus-visible {
-    outline: var(--bw) solid var(--c-grey);
     outline-offset: 6px;
   }
 
@@ -237,10 +239,10 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
      eine Ebene höher liegt. Er ist deshalb an denselben Wert gekoppelt. */
   .s-contents__caption {
     margin-top: var(--sp-4);
-    padding-left: clamp(var(--sp-5), 3.8vw, 65px);
+    padding-left: var(--flow-md);
     padding-right: clamp(110px, 5.5vw, 130px);
     font-size: var(--fs-text-small);
-    line-height: 1.4;
+    line-height: var(--lh-text);
     color: var(--c-text);
     text-align: right;
   }
@@ -256,8 +258,8 @@ const { headings, headline = "Inhalt", image, alt = "", caption } = Astro.props;
   .s-contents__media {
     position: relative;
     z-index: 1;
-    margin-block: clamp(-72px, -3.4vw, -32px);
-    margin-left: clamp(-90px, -4.5vw, -40px);
+    margin-block: calc(var(--flow-md) * -1);
+    margin-left: calc(var(--flow-lg) * -1);
     overflow: hidden;
     /* Rundum, bei jeder Fensterbreite. Vorher war es links gerundet und
        rechts bündig — das sah bei jeder Breite anders aus und an der Kante

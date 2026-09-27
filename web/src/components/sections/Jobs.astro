@@ -135,20 +135,18 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* Schmaler als die Liste darunter: Der Absatz wird gelesen, die Liste
      überflogen — 60 Zeichen ist die Grenze, ab der das Auge die nächste
      Zeile nicht mehr sicher findet. */
   .s-jobs__text {
-    max-width: 60ch;
+    max-width: var(--measure-text);
     margin-top: var(--sp-5);
     font-size: var(--fs-text-main);
-    line-height: 1.55;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 
@@ -190,10 +188,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__name {
-    font-size: var(--fs-title-sm);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-card-title);
+    letter-spacing: var(--tracking-card-title);
     text-wrap: balance;
   }
 
@@ -214,7 +210,7 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   .s-jobs__badge {
     padding: 0.25em 0.7em;
     border-radius: var(--r-round);
-    background: color-mix(in srgb, var(--c-dark) 10%, transparent);
+    background: var(--c-tint);
     color: var(--c-text);
   }
 
@@ -234,8 +230,8 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__icon svg {
-    width: 16px;
-    height: 16px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
   }
 
   .s-jobs__item[data-open="true"] .s-jobs__icon {
@@ -269,16 +265,15 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__lead {
-    max-width: 62ch;
-    font-size: var(--fs-text-large);
-    line-height: var(--lh-text);
+    font: var(--font-lead);
+    max-width: var(--measure-text);
   }
 
   .s-jobs__columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-6) var(--site-gutter);
-    max-width: 68ch;
+    max-width: var(--measure-long);
   }
 
   .s-jobs__subtitle {
@@ -291,14 +286,13 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__bullets {
+    font: var(--font-body);
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
   }
 
   /* Eigener Punkt statt des Listenzeichens: dasselbe Zeichen wie in der
@@ -322,11 +316,10 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
   }
 
   .s-jobs__note {
-    max-width: 62ch;
+    font: var(--font-body);
+    max-width: var(--measure-text);
     padding: var(--sp-3) var(--sp-4);
     border-left: 2px solid var(--c-brand);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

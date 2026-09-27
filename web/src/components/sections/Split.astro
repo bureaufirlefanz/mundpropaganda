@@ -66,7 +66,12 @@ const { topline, title, paragraphs, image } = Astro.props;
     </h2>
   </div>
 
-  <div class="s-split__panel" data-reveal="left" data-reveal-trigger=".s-split">
+  <div
+    class="s-split__panel"
+    data-surface="dark"
+    data-reveal="left"
+    data-reveal-trigger=".s-split"
+  >
     {
       paragraphs.map((t, i) => (
         <p
@@ -150,10 +155,8 @@ const { topline, title, paragraphs, image } = Astro.props;
   }
 
   .s-split__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* Elliptische Ecke oben rechts: 43.5 % der Breite × 85 % der Höhe. */
@@ -173,7 +176,7 @@ const { topline, title, paragraphs, image } = Astro.props;
        Rundung — die Fläche soll dort nicht scharfkantig ansetzen. */
     border-radius: var(--r-md) 43.5% 0 0 / var(--r-md) 85% 0 0;
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
   }
 
   .s-split__panel p {
@@ -224,7 +227,7 @@ const { topline, title, paragraphs, image } = Astro.props;
       margin-top: calc(-1 * var(--overlap));
       padding: calc(var(--overlap) + var(--sp-8)) var(--site-margin) var(--sp-6);
       background: var(--c-dark);
-      color: var(--c-bg);
+      color: var(--c-on-dark);
     }
 
     /* Beide oberen Ecken, nicht nur die linke. Auf dem großen Schirm läuft

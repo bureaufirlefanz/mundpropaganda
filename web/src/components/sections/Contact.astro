@@ -141,7 +141,7 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
       <label class="c-field__label" for="f-photo">Foto deiner Zähne</label>
       <div class="c-field__control c-file" data-file>
         <input id="f-photo" name="photo" type="file" accept="image/*" />
-        <span class="c-file__face">
+        <span class="c-file__face" data-surface="card">
           <span data-file-name>Foto auswählen</span>
           <svg aria-hidden="true"><use href="#i-upload"></use></svg>
         </span>
@@ -242,7 +242,7 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
                 type="file"
                 accept="application/pdf,image/*"
               />
-              <span class="c-file__face">
+              <span class="c-file__face" data-surface="card">
                 <span data-file-name>Angebot auswählen</span>
                 <svg aria-hidden="true">
                   <use href="#i-upload" />
@@ -343,8 +343,8 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
      Vorgabe trotzdem erfüllen. */
   .c-checkbox input {
     appearance: none;
-    width: 24px;
-    height: 24px;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
     padding: 0;
     flex: 0 0 auto;
     border: 1.5px solid var(--c-neutral-800);
@@ -386,17 +386,18 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
     border: var(--bw) solid transparent;
     border-radius: var(--r-sm);
     background: var(--c-neutral-200);
-    /* Auf --c-neutral-200 ergaben 45 % nur 2.77:1. 62 % erreicht 4.56:1. */
-    color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+    /* Placeholder role: 62 % of neutral-800, 4.56:1 on --c-neutral-200
+       (45 % measured only 2.77:1). */
+    color: var(--c-placeholder);
     font-size: var(--fs-text-main);
     pointer-events: none;
   }
 
   .c-file__face svg {
-    width: 20px;
-    height: 20px;
+    width: var(--icon-md);
+    height: var(--icon-md);
     flex: 0 0 auto;
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   /* Das Feld selbst ist durchsichtig (opacity 0) und liegt über der Hülle —
@@ -408,13 +409,13 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
      weil das eigentliche Feld unsichtbar ist, war das die einzige Anzeige,
      die es gab. */
   .c-file input:focus-visible + .c-file__face {
-    outline: 2px solid var(--c-dark);
-    outline-offset: 2px;
+    outline: var(--focus-width) solid var(--c-focus);
+    outline-offset: var(--focus-offset);
     border-color: var(--c-dark);
   }
 
   .c-file[data-filled="true"] .c-file__face {
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   @media (max-width: 700px) {

@@ -148,10 +148,8 @@ const embedUrl = id
   .s-video__title {
     max-width: 24ch;
     margin-bottom: var(--sp-8);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* Ein Button, der wie eine Fläche aussieht: Der Browser gibt <button> einen
@@ -206,7 +204,7 @@ const embedUrl = id
   }
 
   .s-video__frame:focus-visible {
-    outline: 2px solid var(--c-dark);
+    outline: var(--focus-width) solid var(--c-focus);
     outline-offset: 4px;
   }
 

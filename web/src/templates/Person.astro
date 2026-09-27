@@ -76,6 +76,7 @@ const { person: p } = Astro.props;
             ) : (
               <div
                 class="s-person__image s-person__image--fallback"
+                data-surface="brand"
                 aria-hidden="true"
               >
                 {p.name.replace(/^(Dr\.|Prof\.)\s*/, "").charAt(0)}
@@ -182,7 +183,7 @@ const { person: p } = Astro.props;
   .s-person {
     position: relative;
     overflow-x: clip;
-    padding-block: calc(var(--section-space) + 96px) var(--section-space);
+    padding-block: var(--page-top) var(--section-space);
   }
 
   .s-person__inner {
@@ -226,7 +227,7 @@ const { person: p } = Astro.props;
      linke Hälfte der Seite leer stehen. */
   .s-person__media {
     position: sticky;
-    top: clamp(96px, 12vh, 160px);
+    top: var(--hero-offset);
   }
 
   .s-person__image {
@@ -249,23 +250,20 @@ const { person: p } = Astro.props;
     display: grid;
     place-items: center;
     background: var(--c-brand);
-    color: var(--c-dark);
+    color: var(--c-text);
     font-size: var(--fs-display-md);
     font-weight: var(--fw-medium);
     line-height: var(--lh-tight);
   }
 
   .s-person__name {
-    font-size: var(--fs-title-page);
-    font-weight: var(--fw-medium);
-    line-height: 1.02;
-    letter-spacing: var(--tracking-tighter);
+    font: var(--font-title-page);
+    letter-spacing: var(--tracking-title-page);
   }
 
   .s-person__role {
+    font: var(--font-lead);
     margin-top: var(--sp-3);
-    font-size: var(--fs-text-large);
-    line-height: 1.4;
     color: var(--c-text-muted);
   }
 
@@ -279,20 +277,19 @@ const { person: p } = Astro.props;
     border-left: 2px solid var(--c-brand);
     font-size: var(--fs-title-sm);
     font-weight: var(--fw-regular);
-    line-height: 1.3;
+    line-height: var(--lh-compact);
     letter-spacing: var(--tracking-snug);
     text-wrap: balance;
   }
 
   .s-person__intro {
-    max-width: 56ch;
+    font: var(--font-body-long);
+    max-width: var(--measure-text);
     margin-top: var(--sp-8);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
   }
 
   .s-person__bio {
-    max-width: 56ch;
+    max-width: var(--measure-text);
     margin-top: var(--sp-6);
   }
 
@@ -307,7 +304,7 @@ const { person: p } = Astro.props;
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -316,13 +313,12 @@ const { person: p } = Astro.props;
      „2016–2019" und „2014" sind unterschiedlich breit, und bei 1fr 1fr
      stünde der Text je Zeile an anderer Stelle. */
   .s-person__list {
+    font: var(--font-body);
     display: grid;
     grid-template-columns: max-content 1fr;
     gap: var(--sp-3) var(--sp-6);
-    max-width: 52ch;
+    max-width: var(--measure-text);
     margin: 0;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
   }
 
   .s-person__list dt {
@@ -365,14 +361,13 @@ const { person: p } = Astro.props;
 
   .s-person__focus-area:hover {
     border-color: var(--c-dark);
-    background: color-mix(in srgb, var(--c-brand) 16%, transparent);
+    background: var(--c-tint-brand);
   }
 
   /* :global(), weil PortableText das Markup zur Laufzeit erzeugt und das
      Scope-Attribut dieser Datei nicht trägt. */
   .s-person__bio :global(p) {
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
+    font: var(--font-body-long);
   }
 
   .s-person__bio :global(p + p) {
@@ -396,8 +391,7 @@ const { person: p } = Astro.props;
 
   @media (max-width: 900px) {
     .s-person {
-      padding-block: calc(var(--section-space-sm) + 80px)
-        var(--section-space-sm);
+      padding-block: var(--page-top-sm) var(--section-space-sm);
     }
 
     .s-person__header {

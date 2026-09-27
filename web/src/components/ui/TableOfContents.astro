@@ -78,7 +78,7 @@ const { headings, title = "Inhalt" } = Astro.props;
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-widest);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -100,7 +100,7 @@ const { headings, title = "Inhalt" } = Astro.props;
     gap: var(--sp-2);
     padding-block: 2px;
     font-size: var(--fs-text-small);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
     color: var(--c-text-muted);
     transition:
       color var(--d-base) var(--e-out),

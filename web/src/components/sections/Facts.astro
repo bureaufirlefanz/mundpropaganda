@@ -71,10 +71,8 @@ const { topline, headline, figures } = Astro.props;
   }
 
   .s-facts__title {
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-facts__grid {
@@ -104,10 +102,9 @@ const { topline, headline, figures } = Astro.props;
   }
 
   .s-facts__text {
+    font: var(--font-body);
     max-width: 26ch;
     margin: var(--sp-3) 0 0;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

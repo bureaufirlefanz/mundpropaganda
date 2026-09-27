@@ -66,7 +66,7 @@ const description = intro?.seo?.description || intro?.lead || "";
      Er ist das Markup dieses Zusammenbaus, und ein zweiter Ort bräuchte ihn
      erst, wenn eine weitere Übersicht dazukommt. */
   .s-magazine-intro {
-    padding-block: calc(var(--section-space) + 80px) var(--sp-6);
+    padding-block: var(--page-top) var(--sp-6);
   }
 
   .s-magazine-intro .c-topline {
@@ -88,10 +88,9 @@ const description = intro?.seo?.description || intro?.lead || "";
   }
 
   .s-magazine-intro__text {
-    max-width: 52ch;
+    font: var(--font-lead);
+    max-width: var(--measure-text);
     margin-top: var(--sp-6);
-    font-size: var(--fs-text-large);
-    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 </style>

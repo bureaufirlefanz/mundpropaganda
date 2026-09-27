@@ -43,7 +43,7 @@ const { topline, headline, items, footnote } = Astro.props;
 const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
 ---
 
-<section class="s-benefits" data-standards>
+<section class="s-benefits" data-surface="dark" data-standards>
   <div class="container s-benefits__inner">
     <div class="s-benefits__head">
       <span class="c-topline" data-reveal="fade">{topline}</span>
@@ -178,7 +178,7 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
        sonst, und die gewonnene Höhe geht ins Bild. */
     padding-block: var(--section-space);
     background: var(--c-dark);
-    color: var(--c-bg);
+    color: var(--c-text);
   }
 
   .s-benefits__inner {
@@ -231,17 +231,16 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
      nicht als eigener Abschnitt beginnt. */
   .s-benefits__more {
     grid-column: 1;
-    max-width: 42ch;
+    font: var(--font-body);
+    max-width: var(--measure-medium);
     margin-top: var(--sp-5);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
-    color: color-mix(in srgb, var(--c-bg) 70%, transparent);
+    color: var(--c-text-muted);
   }
 
   /* Unterstrichen, weil der Verweis im Fließtext sonst nur an der Farbe zu
      erkennen wäre — und Farbe allein reicht nicht (WCAG 1.4.1). */
   .s-benefits__more a {
-    color: var(--c-bg);
+    color: var(--c-text);
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
@@ -264,13 +263,12 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
     grid-template-columns: auto minmax(0, 1fr);
     gap: var(--sp-3);
     padding-block: var(--sp-4);
-    border-bottom: var(--bw) solid
-      color-mix(in srgb, var(--c-bg) 22%, transparent);
+    border-bottom: var(--bw) solid var(--c-line);
     cursor: default;
   }
 
   .s-benefits__row:first-child {
-    border-top: var(--bw) solid color-mix(in srgb, var(--c-bg) 22%, transparent);
+    border-top: var(--bw) solid var(--c-line);
   }
 
   /* Ziffer im Kreis. Der inaktive Zustand ist nur gedimmt, nicht
@@ -285,7 +283,7 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
     place-items: center;
     width: 26px;
     height: 26px;
-    border: var(--bw) solid color-mix(in srgb, var(--c-bg) 45%, transparent);
+    border: var(--bw) solid var(--c-line-strong);
     border-radius: var(--r-round);
     font-family: var(--f-mono);
     font-size: var(--fs-label);
@@ -299,9 +297,8 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
   /* Deutlich größer als der Fließtext darunter — im Entwurf trägt der Name
      die Zeile, der Text ordnet sich unter. */
   .s-benefits__name {
-    font-size: var(--fs-title-sm);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-snug);
+    font: var(--font-card-title);
+    letter-spacing: var(--tracking-card-title);
     opacity: 0.65;
     transition: opacity var(--d-base) var(--e-out);
   }
@@ -321,8 +318,9 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
     cursor: pointer;
   }
 
+  /* The ring colour comes from base.css (var(--c-focus), light on the dark
+     surface); only the offset and the rounding are this block's own. */
   .s-benefits__trigger:focus-visible {
-    outline: 2px solid var(--c-bg);
     outline-offset: 4px;
     border-radius: var(--r-sm);
   }
@@ -330,12 +328,11 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
   /* Zusammengeklappt über die Rasterzeile, nicht über display: none —
      sonst gäbe es keinen Übergang. */
   .s-benefits__text {
+    font: var(--font-body);
     display: grid;
     grid-template-rows: 0fr;
     margin-top: 0;
-    max-width: 46ch;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-text);
+    max-width: var(--measure-medium);
     opacity: 0;
     transition:
       grid-template-rows var(--d-slow) var(--e-out),

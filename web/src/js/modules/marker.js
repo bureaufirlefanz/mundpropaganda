@@ -32,10 +32,12 @@ export function initHighlightMarkerTextReveal() {
     barEase: "power3.inOut",
   };
 
+  /* Theme names map onto tokens, so the palette lives in tokens.css only.
+     Until 2026-09-27 this held a hand-typed copy of the three hex values. */
   const colorMap = {
-    brand: "#ff84c8",
-    dark: "#403229",
-    white: "#ffffff",
+    brand: "--c-brand",
+    dark: "--c-dark",
+    white: "--c-white",
   };
 
   const directionMap = {
@@ -45,8 +47,8 @@ export function initHighlightMarkerTextReveal() {
     down: { prop: "scaleY", origin: "center bottom" },
   };
 
-  function resolveColor(value) {
-    if (colorMap[value]) return colorMap[value];
+  function resolveColor(theme) {
+    const value = colorMap[theme] ?? theme;
     if (value.startsWith("--")) {
       return (
         getComputedStyle(document.body).getPropertyValue(value).trim() || value

@@ -216,7 +216,7 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
     grid-template-columns: 1fr 1fr;
     gap: var(--site-gutter);
     align-items: center;
-    padding-top: clamp(100px, 12vh, 160px);
+    padding-top: var(--hero-offset);
     padding-bottom: var(--sp-8);
     overflow: hidden;
   }
@@ -243,7 +243,7 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-title-xs);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
@@ -299,8 +299,11 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
     text-transform: none;
   }
 
+  /* Size and line height only, no `font:` shorthand: this selector also
+     matches the topline (a <p>) and outweighs `.s-shero__topline`, so a
+     shorthand would reset its mono family and light weight. */
   .s-shero__body p {
-    max-width: 42ch;
+    max-width: var(--measure-medium);
     font-size: var(--fs-text-main);
     line-height: var(--lh-text);
   }
@@ -316,7 +319,7 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
     /* Der Hero hat oben mehr Innenabstand als unten (Platz für die Leiste).
        Zentriert würde das Feld dadurch um die halbe Differenz zu tief
        sitzen — der negative obere Rand holt es auf die Sectionmitte. */
-    margin-top: calc((var(--sp-8) - clamp(100px, 12vh, 160px)) / 2);
+    margin-top: calc((var(--sp-8) - var(--hero-offset)) / 2);
     border-radius: 120px 0 0 var(--r-md);
     overflow: hidden;
   }

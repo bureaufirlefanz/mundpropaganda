@@ -134,7 +134,7 @@ const {
   .s-chero {
     position: relative;
     overflow-x: clip;
-    padding-block: calc(var(--section-space) + 96px) var(--section-space);
+    padding-block: var(--page-top) var(--section-space);
   }
 
   .s-chero__inner {
@@ -165,7 +165,7 @@ const {
      das Bild soll aufsteigen und nicht schweben. */
   .s-chero__media {
     width: 100%;
-    margin-top: clamp(var(--sp-8), 5vw, var(--sp-12));
+    margin-top: var(--flow-xl);
     aspect-ratio: 2 / 1;
     overflow: hidden;
     border-radius: clamp(120px, 16vw, 260px) clamp(120px, 16vw, 260px)
@@ -208,8 +208,7 @@ const {
 
   @media (max-width: 900px) {
     .s-chero {
-      padding-block: calc(var(--section-space-sm) + 80px)
-        var(--section-space-sm);
+      padding-block: var(--page-top-sm) var(--section-space-sm);
     }
 
     /* Auf schmalen Fenstern wieder hochformatig: 16:9 auf 390px Breite wäre

@@ -130,17 +130,15 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   .s-team__title {
     max-width: 18ch;
     margin-top: var(--sp-4);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   .s-team__text {
-    max-width: 52ch;
+    max-width: var(--measure-text);
     margin-top: var(--sp-5);
     font-size: var(--fs-text-main);
-    line-height: 1.55;
+    line-height: var(--lh-body);
     color: var(--c-text-muted);
   }
 
@@ -186,14 +184,14 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   .c-member__name {
     font-size: var(--fs-text-large);
     font-weight: var(--fw-regular);
-    line-height: 1.25;
+    line-height: var(--lh-compact);
     letter-spacing: var(--tracking-snug);
   }
 
   .c-member__role {
     margin-top: var(--sp-1);
     font-size: var(--fs-text-small);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
     color: var(--c-text-muted);
   }
 
@@ -215,7 +213,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
     padding-top: var(--sp-4);
     font-family: var(--f-mono);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-mono);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
@@ -238,7 +236,7 @@ const { id, topline, headline, text, photo, members } = Astro.props;
   }
 
   .c-member:focus-visible {
-    outline: 2px solid var(--c-dark);
+    outline: var(--focus-width) solid var(--c-focus);
     outline-offset: 6px;
     border-radius: var(--r-sm);
   }

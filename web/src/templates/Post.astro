@@ -94,10 +94,12 @@ const minutes = readingTime(d?.text);
       </div>
 
       <div class="container s-post__headline">
-        <div class="s-post__titlecard">
+        <div class="s-post__titlecard" data-surface="card">
           {
             d?.category && (
-              <span class="s-post__tag">{categoryLabel(d.category)}</span>
+              <span class="s-post__tag" data-surface="dark">
+                {categoryLabel(d.category)}
+              </span>
             )
           }
           <h1 class="s-post__title" data-split="lines">{title}</h1>
@@ -283,7 +285,7 @@ const minutes = readingTime(d?.text);
      im Rand statt im Satz. */
   .s-post__headline {
     display: grid;
-    grid-template-columns: minmax(0, 60ch) minmax(0, 1fr);
+    grid-template-columns: minmax(0, var(--measure-text)) minmax(0, 1fr);
     align-items: end;
     column-gap: clamp(var(--sp-6), 4vw, 80px);
   }
@@ -291,7 +293,7 @@ const minutes = readingTime(d?.text);
   .s-post__titlecard {
     position: relative;
     z-index: 1;
-    max-width: 60ch;
+    max-width: var(--measure-text);
     /* Weniger tief im Bild als zuerst gesetzt. Bei -140px lag die Oberkante
        mitten im Motiv und der Titel stand fast auf dem Bild statt davor. */
     margin-top: clamp(-88px, -5.5vw, -44px);
@@ -303,7 +305,7 @@ const minutes = readingTime(d?.text);
        Seitengrund (--c-bg) hob sie sich nicht ab und las sich als Loch im
        Bild statt als Karte darauf. */
     background: var(--c-white);
-    color: var(--c-neutral-800);
+    color: var(--c-text);
   }
 
   /* Der Tag als eigene Zeile über dem Titel, nicht als Teil einer Meta-Reihe.
@@ -314,29 +316,26 @@ const minutes = readingTime(d?.text);
     padding: 5px var(--sp-3) 6px;
     border-radius: var(--r-sm);
     background: var(--c-dark);
-    color: var(--c-grey);
+    color: var(--c-text);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
     line-height: var(--lh-tight);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
   .s-post__title {
-    font-size: var(--fs-title-page);
-    font-weight: var(--fw-medium);
-    line-height: 1.05;
-    letter-spacing: var(--tracking-tight);
+    font: var(--font-title-page);
+    letter-spacing: var(--tracking-title-page);
   }
 
-  /* Eigene Abstufung statt `--c-text-muted`: Das rechnet gegen den
-     Seitengrund, die Karte ist aber weiß. */
+  /* `--c-text-muted` comes from the card surface on the title card, so it
+     is measured against white, not against the page ground. */
   .s-post__lead {
+    font: var(--font-lead);
     margin-top: var(--sp-5);
-    font-size: var(--fs-text-large);
-    line-height: var(--lh-text);
-    color: color-mix(in srgb, var(--c-neutral-800) 72%, transparent);
+    color: var(--c-text-muted);
   }
 
   /* --- Satz -------------------------------------------------------------
@@ -362,7 +361,7 @@ const minutes = readingTime(d?.text);
   .s-post__body--toc {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 200px;
-    gap: clamp(var(--sp-8), 7vw, 140px);
+    gap: var(--flow-2xl);
     /* KEIN `align-items: start`: Das ließe die linke Spalte auf die Höhe des
        Verzeichnisses schrumpfen, und ein klebendes Element bewegt sich nur
        innerhalb seines Kastens. */
@@ -380,9 +379,12 @@ const minutes = readingTime(d?.text);
     grid-row: 1;
   }
 
+  /* A size container so that a wide image inside the text can measure the
+     whole column (text, gap and margin) in `cqi`. See the wide image below. */
   .s-post__column {
+    container-type: inline-size;
     display: grid;
-    grid-template-columns: minmax(0, 68ch) minmax(0, 1fr);
+    grid-template-columns: minmax(0, var(--measure-long)) minmax(0, 1fr);
     column-gap: clamp(var(--sp-6), 3vw, 64px);
     align-items: start;
   }
@@ -412,7 +414,7 @@ const minutes = readingTime(d?.text);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-widest);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }
@@ -420,7 +422,7 @@ const minutes = readingTime(d?.text);
   .s-post__fact dd {
     margin-top: 2px;
     font-size: var(--fs-text-small);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
   }
 
   /* Der Autor ist abgesetzt, nicht eingereiht: eine Linie darüber und ein
@@ -436,8 +438,8 @@ const minutes = readingTime(d?.text);
 
   .s-post__authorimage {
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
+    width: var(--control-lg);
+    height: var(--control-lg);
     border-radius: var(--r-round);
     overflow: hidden;
   }
@@ -450,7 +452,7 @@ const minutes = readingTime(d?.text);
 
   .s-post__authorname {
     font-size: var(--fs-text-small);
-    line-height: 1.3;
+    line-height: var(--lh-compact);
   }
 
   .s-post__authorrole {
@@ -458,7 +460,7 @@ const minutes = readingTime(d?.text);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
     color: var(--c-text-muted);
   }
 
@@ -466,9 +468,8 @@ const minutes = readingTime(d?.text);
      :global(), weil PortableText das Markup zur Laufzeit erzeugt.
      -------------------------------------------------------------------- */
   .s-post__text :global(p) {
+    font: var(--font-body-long);
     margin-bottom: var(--sp-5);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
   }
 
   /* Zwischentitel bekommen eine Nummer im linken Rand. Der Zähler läuft über
@@ -518,9 +519,8 @@ const minutes = readingTime(d?.text);
   }
 
   .s-post__text :global(li) {
+    font: var(--font-body-long);
     margin-bottom: var(--sp-2);
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
   }
 
   .s-post__text :global(a) {
@@ -529,11 +529,17 @@ const minutes = readingTime(d?.text);
     text-decoration-color: var(--c-brand);
   }
 
-  /* Ein Bild, das die Redaktion auf „über die Spalte hinaus" gestellt hat,
-     reicht bis an den rechten Rand des Satzspiegels. Das ist der einzige
-     Grund, warum der Textblock ein Raster ist. */
+  /* An image the editors set to "beyond the column" reaches the right edge
+     of the type area: across the gap and the margin track, up to the table
+     of contents or the container edge. `100cqi` is the width of
+     `.s-post__column`, which is a size container for exactly this reason.
+
+     Until 2026-09-27 this read `calc(100% + var(--rand-breite, 0px))`, and
+     `--rand-breite` was defined nowhere: the fallback of 0 kept every wide
+     image at column width, so the option did nothing. Where the text fills
+     the whole column (phones), wide and column are the same width. */
   .s-post__text :global(.c-postimage[data-width="wide"]) {
-    width: calc(100% + var(--rand-breite, 0px));
+    width: 100cqi;
   }
 
   .s-post__back {
@@ -551,11 +557,9 @@ const minutes = readingTime(d?.text);
   }
 
   .s-more__title {
+    font: var(--font-section-title);
     margin-top: var(--sp-3);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* Dieselben drei Spalten wie unter /magazin. Die Karte merkt selbst, dass
@@ -585,7 +589,7 @@ const minutes = readingTime(d?.text);
       flex-wrap: wrap;
       align-items: center;
       gap: var(--sp-6);
-      max-width: 68ch;
+      max-width: var(--measure-long);
       margin-top: var(--sp-6);
       padding-bottom: 0;
     }
@@ -602,7 +606,7 @@ const minutes = readingTime(d?.text);
     }
 
     .s-post__text {
-      max-width: 68ch;
+      max-width: var(--measure-long);
     }
   }
 

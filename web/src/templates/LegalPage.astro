@@ -45,7 +45,7 @@ const { data: d, title } = Astro.props;
 
 <style>
   .s-legal {
-    padding-block: calc(var(--section-space) + 80px) var(--section-space);
+    padding-block: var(--page-top) var(--section-space);
   }
 
   /* Dieselbe Spaltenbreite wie ein Magazinbeitrag. Rechtstexte sind länger
@@ -53,14 +53,12 @@ const { data: d, title } = Astro.props;
      über die Seitenbreite laufen zu lassen. */
   .s-legal__header,
   .s-legal__text {
-    max-width: 68ch;
+    max-width: var(--measure-long);
   }
 
   .s-legal__title {
-    font-size: var(--fs-title-page);
-    font-weight: var(--fw-medium);
-    line-height: 1.05;
-    letter-spacing: var(--tracking-tight);
+    font: var(--font-title-page);
+    letter-spacing: var(--tracking-title-page);
   }
 
   .s-legal__text {
@@ -86,7 +84,7 @@ const { data: d, title } = Astro.props;
 
   .s-legal__text :global(p),
   .s-legal__text :global(li) {
-    line-height: 1.65;
+    font: var(--font-body-long);
   }
 
   .s-legal__text :global(p + p) {

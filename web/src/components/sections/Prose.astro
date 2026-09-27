@@ -172,7 +172,7 @@ const hasNote = Boolean(note?.text);
      steht zwischen Text und Bild eine leere Bahn. 62ch bleibt lesbar, und
      der Innenabstand hält den Text vom Bild weg. */
   .s-prose__body {
-    max-width: 62ch;
+    max-width: var(--measure-text);
     padding-inline: var(--sp-5) var(--sp-8);
   }
 
@@ -185,8 +185,7 @@ const hasNote = Boolean(note?.text);
      nichts davon trägt das Scope-Attribut. Dieselben Regeln wie die
      Textspalte in `Post.astro`, damit ein Absatz überall gleich liest. */
   .s-prose__text :global(p) {
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
+    font: var(--font-body-long);
     color: var(--c-text-muted);
   }
 
@@ -199,11 +198,10 @@ const hasNote = Boolean(note?.text);
      Einzug, den sie hier nicht bekommen sollen. */
   .s-prose__text :global(ul),
   .s-prose__text :global(ol) {
+    font: var(--font-body-long);
     margin: var(--sp-4) 0 0;
     padding-left: 0;
     list-style-position: inside;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
     color: var(--c-text-muted);
   }
 
@@ -234,7 +232,7 @@ const hasNote = Boolean(note?.text);
     margin-top: var(--sp-6);
     font-size: var(--fs-text-large);
     font-weight: var(--fw-regular);
-    line-height: 1.25;
+    line-height: var(--lh-compact);
     color: var(--c-text);
   }
 

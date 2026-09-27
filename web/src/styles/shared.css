@@ -45,11 +45,8 @@ html.js [data-hero-scroll] {
 .c-topline {
   display: inline-flex;
   align-items: center;
-  font-family: var(--f-mono);
-  font-weight: var(--fw-light);
-  font-size: var(--fs-text-small);
-  line-height: 1.4;
-  letter-spacing: var(--tracking-wider);
+  font: var(--font-topline);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 
   /* Keine eigene Farbe: die Topline erbt sie von ihrer Section.
@@ -72,8 +69,8 @@ html.js [data-hero-scroll] {
 .s-gallery__arrow {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   color: var(--c-text);
   transition:
     color var(--d-fast) var(--e-swift),
@@ -81,8 +78,8 @@ html.js [data-hero-scroll] {
 }
 
 .s-gallery__arrow svg {
-  width: 20px;
-  height: 20px;
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .s-gallery__arrow[data-gallery-prev] svg,
@@ -133,8 +130,8 @@ html.js [data-hero-scroll] {
 .s-gallery__dot {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   padding: 0;
   border: 0;
   border-radius: var(--r-round);
@@ -147,7 +144,7 @@ html.js [data-hero-scroll] {
   width: 7px;
   height: 7px;
   border-radius: var(--r-round);
-  background: color-mix(in srgb, var(--c-dark) 28%, transparent);
+  background: var(--c-line);
   transition:
     background var(--d-fast) var(--e-swift),
     transform var(--d-base) var(--e-out);
@@ -218,7 +215,7 @@ html.js [data-hero-scroll] {
 .c-field input::placeholder,
 .c-field textarea::placeholder {
   /* Auf --c-neutral-200 ergaben 45 % nur 2.77:1. 62 % erreicht 4.56:1. */
-  color: color-mix(in srgb, var(--c-neutral-800) 62%, transparent);
+  color: var(--c-placeholder);
 }
 
 /* Hier stand `outline: none` mit einem rosa Rahmen als Ersatz. Zwei Fehler in
@@ -240,8 +237,8 @@ html.js [data-hero-scroll] {
 .c-field input:focus-visible,
 .c-field select:focus-visible,
 .c-field textarea:focus-visible {
-  outline: 2px solid var(--c-dark);
-  outline-offset: 2px;
+  outline: var(--focus-width) solid var(--c-focus);
+  outline-offset: var(--focus-offset);
   border-color: var(--c-dark);
 }
 
@@ -258,8 +255,8 @@ html.js [data-hero-scroll] {
   right: var(--sp-3);
   translate: 0 -50%;
   display: none;
-  width: 20px;
-  height: 20px;
+  width: var(--icon-md);
+  height: var(--icon-md);
   place-items: center;
   border-radius: var(--r-round);
   background: var(--c-brand);
@@ -291,7 +288,7 @@ html.js [data-hero-scroll] {
   font-family: var(--f-mono);
   font-weight: var(--fw-light);
   font-size: var(--fs-label);
-  line-height: 1.4;
+  line-height: var(--lh-text);
   letter-spacing: var(--tracking-mono);
 }
 

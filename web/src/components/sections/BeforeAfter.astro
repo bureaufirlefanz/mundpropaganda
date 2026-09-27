@@ -197,8 +197,8 @@ const MOTIF_AFTER = "teeth-macro-after";
     /* Keine Lücke: die beiden Pfeile sollen als ein Doppelpfeil lesen,
        nicht als zwei Zeichen nebeneinander. */
     gap: 0;
-    width: 48px;
-    height: 48px;
+    width: var(--control-lg);
+    height: var(--control-lg);
     border-radius: var(--r-round);
     background: var(--c-brand);
     color: var(--c-dark);
@@ -221,7 +221,7 @@ const MOTIF_AFTER = "teeth-macro-after";
 
   /* Sichtbarer Fokus am Button, nicht am 2px-Strich. */
   .s-ba__handle:focus-visible .s-ba__grip {
-    outline: var(--bw) solid var(--c-dark);
+    outline: var(--focus-width) solid var(--c-focus);
     outline-offset: 3px;
   }
 
@@ -246,7 +246,7 @@ const MOTIF_AFTER = "teeth-macro-after";
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 </style>

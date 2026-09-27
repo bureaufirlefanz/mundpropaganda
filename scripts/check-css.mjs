@@ -12,7 +12,7 @@
  *
  * Aufruf: npm run check:css
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,10 +51,6 @@ const BREAKPOINT_AUSNAHMEN = new Map([
   [800, "Karussell der Geschichten, eigene Mechanik."],
   [1100, "Breite Medienblöcke."],
   [1200, "Der Faden läuft breiter als der Inhalt."],
-  [
-    767,
-    "Aus der Stripe-Vorlage übernommen, siehe Kopf von Compare.astro. Kandidat für 700px — die Änderung verschiebt aber das Verhalten zwischen 701px und 767px und gehört deshalb bewusst entschieden, nicht nebenbei.",
-  ],
 ]);
 
 /* ---------------------------------------------------------------------------
@@ -239,6 +235,185 @@ function pruefeBreiten() {
   return treffer.length;
 }
 
+/* ---------------------------------------------------------------------------
+   5. Custom properties that are read but never defined
+   ---------------------------------------------------------------------------
+   A `var(--x)` without a fallback whose `--x` is set nowhere resolves to
+   nothing, silently. That is how the "wide image" option in posts did
+   nothing for months (`--rand-breite`). Definitions are searched in CSS,
+   in inline `style` attributes and in JS (`setProperty("--x")`).
+   A read WITH a fallback is a documented hook and is allowed.
+   --------------------------------------------------------------------------- */
+function codeFiles(dir, found = []) {
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) codeFiles(path, found);
+    else if (/\.(astro|css|js|ts)$/.test(name)) found.push(path);
+  }
+  return found;
+}
+
+function checkUndefinedProperties() {
+  const defined = new Set();
+  const all = codeFiles(SRC);
+  for (const path of all) {
+    const text = readFileSync(path, "utf8");
+    for (const m of text.matchAll(/(--[a-zA-Z0-9_-]+)\s*:/g)) defined.add(m[1]);
+    for (const m of text.matchAll(/["'`](--[a-zA-Z0-9_-]+)["'`]/g))
+      defined.add(m[1]);
+    /* Template-built names like `--${key}` can't be resolved statically. */
+  }
+
+  const missing = [];
+  for (const path of ALLE) {
+    const text = ohneKommentare(readFileSync(path, "utf8"));
+    for (const m of text.matchAll(/var\(\s*(--[a-zA-Z0-9_-]+)\s*\)/g)) {
+      if (!defined.has(m[1])) missing.push([kurz(path), m[1]]);
+    }
+  }
+
+  if (!missing.length) {
+    console.log("  ✓ every var() without fallback has a definition");
+    return 0;
+  }
+  for (const [file, name] of missing)
+    console.log(`  ✗ ${file}: ${name} is read but defined nowhere`);
+  return missing.length;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Legacy token names
+   ---------------------------------------------------------------------------
+   `--fs-h1` … `--fs-h5` survive in tokens.css only for the archived
+   prototype in prototypen/vite. Inside web/ they are the old, misleading
+   names and must not come back. */
+function checkLegacyNames() {
+  const hits = [];
+  for (const path of ALLE) {
+    if (kurz(path).endsWith("styles/tokens.css")) continue;
+    const text = ohneKommentare(readFileSync(path, "utf8"));
+    for (const m of text.matchAll(/--fs-h[1-5](?:-[a-z]+)?\b/g))
+      hits.push([kurz(path), m[0]]);
+  }
+  if (!hits.length) {
+    console.log("  ✓ no legacy --fs-h* names");
+    return 0;
+  }
+  for (const [file, name] of hits)
+    console.log(`  ✗ ${file}: ${name} → use the --fs-title-* step`);
+  return hits.length;
+}
+
+/* ---------------------------------------------------------------------------
+   7. Literal values, as a ratchet
+   ---------------------------------------------------------------------------
+   Values that belong in tokens.css but are still written out in a
+   component. They can't all go at once — the homepage is frozen, and some
+   literals are deliberate — so each file has a ceiling, recorded in
+   scripts/css-baseline.json. A file may go below it, never above it.
+
+   A new literal therefore fails the check. Either use a token, or, when
+   the literal is deliberate, raise the ceiling on purpose:
+
+       npm run check:css -- --update
+
+   and say why in the commit. A new file starts with a ceiling of zero.
+
+   What counts, per file (comments ignored, tokens.css and design/ pages
+   excluded):
+     clamp     clamp() with a px/rem literal, outside a custom property
+     px        px literals other than 0 and 1px
+     lh        line-height written as a number
+     tracking  letter-spacing written as a length
+     size      font-size not taken from a token
+     colour    color-mix(), rgb(), rgba(), hsl() outside tokens.css
+   --------------------------------------------------------------------------- */
+const BASELINE = join(ROOT, "scripts/css-baseline.json");
+
+function cssOf(path, text) {
+  if (path.endsWith(".css")) return text;
+  return [...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1])
+    .join("\n");
+}
+
+function countLiterals(path) {
+  const css = ohneKommentare(cssOf(path, readFileSync(path, "utf8")));
+  const count = { clamp: 0, px: 0, lh: 0, tracking: 0, size: 0, colour: 0 };
+  for (const m of css.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+);/g)) {
+    const [, prop, value] = m;
+    if (prop.startsWith("--")) continue;
+    if (/clamp\([^)]*\d(px|rem)/.test(value)) count.clamp++;
+    const px = (value.match(/(?<![\w.-])\d+(\.\d+)?px/g) ?? []).filter(
+      (v) => v !== "0px" && v !== "1px",
+    );
+    if (!value.includes("clamp(")) count.px += px.length;
+    if (prop === "line-height" && /^\s*[\d.]+\s*$/.test(value)) count.lh++;
+    if (prop === "letter-spacing" && /-?[\d.]+(em|px)/.test(value))
+      count.tracking++;
+    if (
+      prop === "font-size" &&
+      !/^\s*(var\(--fs-[\w-]+\)|inherit|1em|100%)\s*$/.test(value)
+    )
+      count.size++;
+    if (/color-mix\(|rgba?\(|hsla?\(/.test(value)) count.colour++;
+  }
+  return count;
+}
+
+function checkLiterals(update) {
+  const current = {};
+  for (const path of ALLE) {
+    const rel = kurz(path);
+    if (rel.endsWith("styles/tokens.css") || rel.includes("pages/design/"))
+      continue;
+    const c = countLiterals(path);
+    if (Object.values(c).some(Boolean)) current[rel] = c;
+  }
+
+  if (update) {
+    writeFileSync(BASELINE, JSON.stringify(current, null, 2) + "\n");
+    console.log(
+      `  ↓ ceilings written for ${Object.keys(current).length} files`,
+    );
+    return 0;
+  }
+
+  let baseline = {};
+  try {
+    baseline = JSON.parse(readFileSync(BASELINE, "utf8"));
+  } catch {
+    console.log("  ✗ scripts/css-baseline.json missing — run with --update");
+    return 1;
+  }
+
+  let over = 0;
+  let below = 0;
+  for (const [file, counts] of Object.entries(current)) {
+    const ceiling = baseline[file] ?? {};
+    for (const [kind, n] of Object.entries(counts)) {
+      const max = ceiling[kind] ?? 0;
+      if (n > max) {
+        console.log(`  ✗ ${file}: ${n} ${kind} literal(s), ceiling ${max}`);
+        over++;
+      } else if (n < max) below++;
+    }
+  }
+  const total = Object.values(current).reduce(
+    (sum, c) => sum + Object.values(c).reduce((a, b) => a + b, 0),
+    0,
+  );
+  if (!over)
+    console.log(
+      `  ✓ no file above its ceiling (${total} literals left in ${Object.keys(current).length} files)`,
+    );
+  if (below)
+    console.log(
+      `  · ${below} ceiling(s) can be lowered: npm run check:css -- --update`,
+    );
+  return over;
+}
+
 /* --- Lauf ---------------------------------------------------------------- */
 console.log(`Geprüfte Dateien: ${ALLE.length} unter web/src`);
 
@@ -253,6 +428,15 @@ befunde += pruefeBreakpoints();
 
 console.log("\n── Elementbreiten ──");
 befunde += pruefeBreiten();
+
+console.log("\n── Undefined custom properties ──");
+befunde += checkUndefinedProperties();
+
+console.log("\n── Legacy token names ──");
+befunde += checkLegacyNames();
+
+console.log("\n── Literal values (ratchet) ──");
+befunde += checkLiterals(process.argv.includes("--update"));
 
 console.log(befunde ? `\n${befunde} Befund(e).` : "\nAlles sauber.");
 process.exit(befunde ? 1 : 0);

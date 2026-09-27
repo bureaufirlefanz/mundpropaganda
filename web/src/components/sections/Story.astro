@@ -109,19 +109,16 @@ const { topline, headline, columns, image, figures } = Astro.props;
     max-width: 20ch;
     margin-top: var(--sp-4);
     margin-bottom: var(--sp-6);
-    font-size: var(--fs-title);
-    font-weight: var(--fw-regular);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    font: var(--font-section-title);
+    letter-spacing: var(--tracking-section-title);
   }
 
   /* 60 Zeichen ist die Grenze, ab der das Auge die nächste Zeile nicht mehr
      sicher findet. Der Absatz bleibt darunter, auch wenn die Spalte breiter
      werden darf. */
   .s-story__paragraph {
-    max-width: 58ch;
-    font-size: var(--fs-text-main);
-    line-height: var(--lh-loose);
+    font: var(--font-body-long);
+    max-width: var(--measure-text);
   }
 
   .s-story__paragraph + .s-story__paragraph {
@@ -146,16 +143,14 @@ const { topline, headline, columns, image, figures } = Astro.props;
   }
 
   .s-story__figure-value {
+    font: var(--font-headline);
     margin: 0;
-    font-size: var(--fs-title-lg);
-    font-weight: var(--fw-medium);
-    line-height: var(--lh-tight);
     letter-spacing: var(--tracking-tighter);
   }
 
   .s-story__figure-label {
     font-size: var(--fs-text-small);
-    line-height: 1.35;
+    line-height: var(--lh-compact);
     color: var(--c-text-muted);
   }
 
@@ -166,7 +161,7 @@ const { topline, headline, columns, image, figures } = Astro.props;
      die Spalte sähe aus wie eine Tabelle. */
   .s-story__media {
     position: sticky;
-    top: clamp(96px, 12vh, 160px);
+    top: var(--hero-offset);
     margin-top: clamp(var(--sp-6), 4vw, var(--sp-10));
   }
 

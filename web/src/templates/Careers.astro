@@ -258,12 +258,11 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
 
 <style>
   .c-speculative {
+    font: var(--font-lead);
     display: flex;
     flex-direction: column;
     gap: var(--sp-6);
-    max-width: 52ch;
-    font-size: var(--fs-text-large);
-    line-height: var(--lh-text);
+    max-width: var(--measure-text);
   }
 
   .c-speculative__action {
