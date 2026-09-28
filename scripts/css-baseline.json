@@ -65,11 +65,11 @@
   },
   "web/src/components/sections/Gallery.astro": {
     "clamp": 5,
-    "px": 5,
+    "px": 1,
     "lh": 0,
     "tracking": 1,
     "size": 1,
-    "colour": 1
+    "colour": 0
   },
   "web/src/components/sections/Hero.astro": {
     "clamp": 4,

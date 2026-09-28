@@ -70,10 +70,12 @@ const { locations } = await loadSettings();
  * Das Röntgengerät stand hier und ist wieder raus: Es war der einzige
  * Apparat zwischen lauter Räumen und Details, und genau das fiel auf. */
 const MOTIFS: RingImage[] = [
+  /* No location labels on the cards (removed 2026-09-28): the two
+     reception photos carried "Prenzlauer Allee" and "Christburger Straße"
+     as badges, the only text on the ring. The alt text still names them. */
   {
     name: "empfang-p25",
-    alt: "Empfang mit dem geschwungenen Bogen",
-    caption: "Prenzlauer Allee",
+    alt: "Empfang der Praxis Prenzlauer Allee mit dem geschwungenen Bogen",
   },
   { name: "zahnleuchte", alt: "Leuchte in Form eines Zahns über dem Empfang" },
   { name: "wartebereich", alt: "Wartebereich mit Holzbank am Fenster" },
@@ -83,8 +85,7 @@ const MOTIFS: RingImage[] = [
   { name: "flur-rot", alt: "Flur mit roter Wand" },
   {
     name: "empfang-c37",
-    alt: "Empfang der zweiten Praxis",
-    caption: "Christburger Straße",
+    alt: "Empfang der Praxis Christburger Straße",
   },
   { name: "spiegel-detail", alt: "Handspiegel auf der Ablage" },
   { name: "flur-bilder", alt: "Flur mit gerahmten Bildern und Sitzbank" },
@@ -147,7 +148,6 @@ const ringImages: RingImage[] = images?.length
               sizes="45vw"
               parallax="9"
             />
-            <figcaption class="s-gallery__caption">Prenzlauer Allee</figcaption>
           </figure>
           <figure class="s-gallery__item s-gallery__item--md">
             <Picture
@@ -156,9 +156,6 @@ const ringImages: RingImage[] = images?.length
               sizes="20vw"
               parallax="9"
             />
-            <figcaption class="s-gallery__caption">
-              Christburger Straße
-            </figcaption>
           </figure>
           <figure class="s-gallery__item s-gallery__item--sm">
             <Picture name="waschbecken" alt="" sizes="10vw" parallax="9" />
@@ -296,22 +293,6 @@ const ringImages: RingImage[] = images?.length
 
   .s-gallery__item--lg {
     width: clamp(300px, 44vw, 760px);
-  }
-
-  .s-gallery__caption {
-    position: absolute;
-    left: var(--sp-4);
-    bottom: var(--sp-4);
-    padding: 6px 12px;
-    border-radius: var(--r-round);
-    background: color-mix(in srgb, var(--c-white) 80%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    font-family: var(--f-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--c-dark);
   }
 
   /* --- Slider-Steuerung: nur die Hülle, die es hier allein gibt ---------- */

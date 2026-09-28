@@ -243,6 +243,11 @@ Application, Jobs, Values, Team, Locations, Magazine intro, Person, Prose) ·
   design: mono uppercase micro labels (tags, meta, toc heading, price
   "ab" / "/ Zahn", footer and menu labels on the homepage).
 
+- **Location ring** (homepage and `/praxis`): the two badges "Prenzlauer
+  Allee" and "Christburger Straße" on the reception photos are gone — a
+  deliberate homepage change. The alt texts now name the location instead.
+  Images uploaded in the Studio would still show their caption.
+
 ## 3. The homepage
 
 Untouched visually, verified with the computed-style diff. The homepage
