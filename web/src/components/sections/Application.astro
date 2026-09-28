@@ -327,7 +327,10 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     display: flex;
     align-items: center;
     gap: var(--sp-2);
-    font-size: var(--fs-label);
+    /* 16px, not 12: the step names are read, and they are the only hint at
+       what is still to come. At 12px sans they were the smallest text on
+       the careers page. */
+    font-size: var(--fs-text-small);
     /* Die gedämpfte Schriftfarbe trägt das Zurücktreten allein.
 
        Vorher lag zusätzlich `opacity: 0.5` darauf. Beides zusammen ergab eine
@@ -356,7 +359,7 @@ const STEPS = ["Stelle", "Kontakt", "Fragen", "Nachricht"];
     /* Bewusst em statt Token: Der Kreis ist 1.8em breit und hoch, Ziffer und
        Kreis skalieren zusammen mit dem Kontext. Ein fester Grad würde die
        Geometrie von der Schrift entkoppeln. */
-    font-size: 0.9em;
+    font-size: 0.875em; /* 14px digit in a 29px circle */
     line-height: var(--lh-tight);
   }
 

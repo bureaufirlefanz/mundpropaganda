@@ -239,11 +239,7 @@ const showDock = anchors.length >= 4;
                   headline={section.headline}
                 />
               )}
-              <Faq
-                title={id ? "" : section.headline}
-                text={section.text}
-                questions={section.questions}
-              />
+              <Faq questions={section.questions} />
             </div>
           );
 

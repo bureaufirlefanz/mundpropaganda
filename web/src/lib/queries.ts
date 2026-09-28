@@ -171,7 +171,7 @@ export const CAREERS_QUERY = defineQuery(`
     processHeadline, processStages[]{ title, text },
     speculativeTopline, speculativeTitle, speculativeText, speculativeParagraph,
     applicationEmail,
-    faqTitle, faq[]{ question, answer },
+    faq[]{ question, answer },
     seo{ title, description, noIndex, image${BILD} }
   }
 `);
@@ -325,7 +325,7 @@ export const HOMEPAGE_QUERY = defineQuery(`
     storiesItems[]{ name, image${BILD}, quote },
     storiesAction${LINK},
     magazineTopline, magazineTitle, magazineText,
-    faqTitle, faqText, faq[]{ question, answer },
+    faq[]{ question, answer },
     seo{ title, description, noIndex, image${BILD} }
   }
 `);

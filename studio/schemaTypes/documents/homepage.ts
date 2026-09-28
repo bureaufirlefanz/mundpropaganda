@@ -311,22 +311,27 @@ export const homepage = defineType({
     }),
 
     /* --- Fragen --------------------------------------------------------- */
+    /* Hidden, not removed: the FAQ head is fixed in `sections/Faq.astro`
+       since 2026-09-28. Removing the fields would make the Studio warn about
+       the values still stored in the document. */
     defineField({
       name: "faqTitle",
       title: "Überschrift",
       type: "string",
       group: "faq",
-      validation: (r) => r.required(),
+      hidden: true,
+      description:
+        "Wird nicht mehr angezeigt: Das FAQ trägt seit 28.09.2026 überall dieselbe Überschrift.",
     }),
-    /* Klasse 2: Die Zusatzzeile unter der Überschrift darf fehlen. Dann steht
-       sie nicht da — `Panel.astro` rendert den Absatz nur, wenn Text kommt.
-       Kein Ersatztext. */
     defineField({
       name: "faqText",
       title: "Zusatzzeile",
       type: "text",
       rows: 2,
       group: "faq",
+      hidden: true,
+      description:
+        "Wird nicht mehr angezeigt: Das FAQ trägt seit 28.09.2026 überall dieselbe Überschrift.",
     }),
     defineField({
       name: "faq",

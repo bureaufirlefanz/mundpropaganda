@@ -170,7 +170,7 @@ const { headline, stages } = Astro.props;
      Bahn hängt und nicht an einem festen Maß. */
   .s-timeline__number {
     --number-size: 1.7em;
-    --number-font: 0.62em;
+    --number-font: max(0.62em, var(--fs-label-lg));
 
     flex: 0 0 auto;
     align-self: center;

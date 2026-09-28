@@ -61,8 +61,6 @@ export interface HomepageContent {
   magazineTitle: string;
   magazineText: string;
 
-  faqTitle: string;
-  faqText?: string;
   faq: { question: string; answer?: string }[];
 
   /**
@@ -100,7 +98,6 @@ const REQUIRED_TEXT = [
   "magazineTopline",
   "magazineTitle",
   "magazineText",
-  "faqTitle",
 ] as const;
 
 const REQUIRED_LIST = [

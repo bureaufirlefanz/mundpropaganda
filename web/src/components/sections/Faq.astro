@@ -1,23 +1,32 @@
 ---
 /**
- * FAQ: Panel-Rahmen plus Akkordeon. Startseite und Leistungsseiten benutzen
- * denselben Baustein, nur mit anderen Fragen.
+ * FAQ: panel frame plus accordion. Every page uses the same block with the
+ * same head — topline, headline and a short line — only the questions
+ * differ.
+ *
+ * The head is fixed on purpose (decided 2026-09-28). It used to come from
+ * each page: "Häufige Fragen zu Veneers", "Fragen zur Bewerbung", and on the
+ * homepage a line about answering "am selben Werktag". The FAQ read
+ * differently on every page, and the one extra line was about opening hours
+ * rather than about the questions. The Studio fields `faqTitle` and
+ * `faqText` are hidden since.
  */
 import Panel from "../ui/Panel.astro";
 import Accordion from "../ui/Accordion.astro";
 import type { Question } from "../../lib/shapes";
 
 interface Props {
-  /** Wahlfrei — siehe `ui/SectionHeading.astro`. */
-  title?: string;
   questions: Question[];
-  topline?: string;
-  text?: string;
 }
 
-const { title, questions, topline = "FAQ", text } = Astro.props;
+const { questions } = Astro.props;
+
+const TOPLINE = "FAQ";
+const TITLE = "Häufige Fragen";
+const TEXT =
+  "Kurze Antworten auf das, was wir am häufigsten gefragt werden. Ist deine Frage nicht dabei, sprich uns einfach an.";
 ---
 
-<Panel id="faq" topline={topline} title={title} text={text}>
+<Panel id="faq" topline={TOPLINE} title={TITLE} text={TEXT}>
   <Accordion questions={questions} />
 </Panel>

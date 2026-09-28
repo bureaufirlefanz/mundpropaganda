@@ -540,12 +540,15 @@ export const careers = defineType({
     }),
 
     /* --- Fragen --------------------------------------------------------- */
+    /* Hidden, not removed — see the same field in homepage.ts. */
     defineField({
       name: "faqTitle",
       title: "Überschrift der Fragen",
       type: "string",
       group: "faq",
-      validation: (r) => r.required(),
+      hidden: true,
+      description:
+        "Wird nicht mehr angezeigt: Das FAQ trägt seit 28.09.2026 überall dieselbe Überschrift.",
     }),
     defineField({
       name: "faq",

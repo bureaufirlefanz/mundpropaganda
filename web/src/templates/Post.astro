@@ -459,7 +459,7 @@ const minutes = readingTime(d?.text);
     margin-top: 2px;
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
-    font-size: var(--fs-label);
+    font-size: var(--fs-label-lg);
     line-height: var(--lh-compact);
     color: var(--c-text-muted);
   }
@@ -548,8 +548,10 @@ const minutes = readingTime(d?.text);
 
   /* --- Weiterlesen ------------------------------------------------------ */
 
+  /* Closes the page like every other one: a full section space before the
+     footer. It had none, and the post cards ran straight into it. */
   .s-more {
-    padding-block: var(--section-space-sm) 0;
+    padding-block: var(--section-space-sm) var(--section-space);
   }
 
   .s-more__head {

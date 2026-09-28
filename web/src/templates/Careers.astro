@@ -249,11 +249,7 @@ const showJobs = Boolean(d?.jobsTopline && d.jobsHeadline && jobs.length);
     )
   }
 
-  {
-    d?.faqTitle && d.faq?.length ? (
-      <Faq title={d.faqTitle} questions={d.faq} />
-    ) : null
-  }
+  {d?.faq?.length ? <Faq questions={d.faq} /> : null}
 </Base>
 
 <style>

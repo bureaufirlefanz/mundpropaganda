@@ -221,6 +221,28 @@ Application, Jobs, Values, Team, Locations, Magazine intro, Person, Prose) ·
 - **`scripts/bausteine.mjs`** scans `layouts/` too, so Nav, Footer, Backdrop,
   Icons, Transition and StructuredData are no longer listed as unused.
 
+### Review round 2026-09-28
+
+- **FAQ head is the same everywhere:** topline "FAQ", title "Häufige
+  Fragen", and one generic line: "Kurze Antworten auf das, was wir am
+  häufigsten gefragt werden. Ist deine Frage nicht dabei, sprich uns
+  einfach an." It replaces "Häufige Fragen zu …" (service, pillar), "Fragen
+  zur Bewerbung" (careers) and, **on the homepage**, the line "Nichts dabei?
+  Schreiben Sie uns - wir antworten in der Regel am selben Werktag." — a
+  deliberate homepage change, one line longer. The Studio fields `faqTitle`
+  and `faqText` (homepage, careers) are hidden, not deleted. On the pillar
+  page the numbered heading "Häufige Fragen zu Veneers" still sits above the
+  panel, so the words appear twice there.
+- **Magazine article** — the "Weitere Beiträge" block ended with 0px above
+  the footer. It now closes with `--section-space`, like every other page.
+- **Minimum reading size 14px** (rule written at `--fs-label-lg`). Raised:
+  careers form step names 12 → 16px and their digits 10.8 → 14px, Jobs
+  number digits 12 → 14px, Voices role and "seit" 12 → 14px, person page
+  "Team" back link 12 → 14px, post author role 12 → 14px, section dock
+  digits 12 → 14px, Timeline digits on phones 13.6 → 14px. Still 12px by
+  design: mono uppercase micro labels (tags, meta, toc heading, price
+  "ab" / "/ Zahn", footer and menu labels on the homepage).
+
 ## 3. The homepage
 
 Untouched visually, verified with the computed-style diff. The homepage

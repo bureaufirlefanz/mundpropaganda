@@ -77,7 +77,11 @@
   --fs-text-main: clamp(1rem, 1.04vw, 1.125rem); /* 18 — body */
   --fs-text-small: 1rem; /* 16 */
 
-  --fs-label-lg: 0.875rem; /* 14 — button */
+  /* Minimum sizes: anything that is read — a sentence, a name, a step, a
+     digit that carries meaning — stays at 14px or above. 12 and 11px are
+     only for mono uppercase micro labels (tags, meta, small toplines) and
+     for glyph badges. */
+  --fs-label-lg: 0.875rem; /* 14 — button, smallest reading size */
   --fs-label-md: 0.8125rem; /* 13 — navigation, meta */
   --fs-label: 0.75rem; /* 12 — small print */
   --fs-micro: 0.6875rem; /* 11 — badges */

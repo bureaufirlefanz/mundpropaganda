@@ -237,11 +237,7 @@ const steps =
     )
   }
 
-  {
-    d?.faq?.length ? (
-      <Faq title={`Häufige Fragen zu ${title}`} questions={d.faq} />
-    ) : null
-  }
+  {d?.faq?.length ? <Faq questions={d.faq} /> : null}
 
   {zeigtFormular && <Contact service={title} />}
 </Base>
