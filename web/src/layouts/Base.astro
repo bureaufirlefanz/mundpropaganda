@@ -16,6 +16,8 @@ import "../styles/base.css";
 import "../styles/shared.css";
 
 import Icons from "../components/ui/Icons.astro";
+// TEST 2026-09-29: photo grade, remove once decided (see PhotoGrade.astro).
+import PhotoGrade from "../components/ui/PhotoGrade.astro";
 import Backdrop from "../components/ui/Backdrop.astro";
 import Transition from "../components/ui/Transition.astro";
 import Nav from "../components/ui/Nav.astro";
@@ -259,6 +261,7 @@ const zeigtPraxisdaten = pfad === "/" || pfad === "/praxis";
         kostet nichts; der Fall ist gemessen und nicht vermutet. */
     }
     <Icons />
+    <PhotoGrade />
     <Backdrop />
     <Transition />
     <Nav />

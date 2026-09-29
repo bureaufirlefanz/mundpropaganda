@@ -19,6 +19,8 @@ import "../styles/tokens.css";
 import "../styles/base.css";
 import "../styles/shared.css";
 import Icons from "../components/ui/Icons.astro";
+// TEST 2026-09-29: photo grade, remove once decided (see PhotoGrade.astro).
+import PhotoGrade from "../components/ui/PhotoGrade.astro";
 
 interface Props {
   title: string;
@@ -79,6 +81,8 @@ const PAGES = [
     <a class="c-skiplink" href="#main">Zum Inhalt springen</a>
 
     <Icons />
+
+    <PhotoGrade />
 
     <header class="d-header">
       <a class="d-header__brand" href="/">Mundpropaganda</a>

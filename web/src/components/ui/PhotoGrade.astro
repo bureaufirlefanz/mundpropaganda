@@ -1,0 +1,44 @@
+---
+/**
+ * TEST ONLY (2026-09-29) — a colour grade over every photo on the site, to
+ * judge whether the images read better slightly brighter and less pink.
+ * The photos will be replaced; remove this component (and its two
+ * includes in layouts/Base.astro and layouts/Design.astro) once decided.
+ *
+ * What it does, in Camera Raw terms:
+ *   Exposure +0.25 EV  → every channel × 2^0.25 = 1.189, in linear light
+ *   Tint −3            → green +1 %, red and blue −0.5 % (away from magenta)
+ *
+ * Done as an SVG colour matrix because SVG filters work in linearRGB by
+ * default, like Camera Raw's exposure. The CSS `brightness()` shorthand
+ * works on the gamma-encoded values and brightens the shadows too much.
+ * Unlike Camera Raw there is no highlight roll-off: values above white clip.
+ *
+ * Only raster photos are graded; SVG logos and icons are left alone.
+ */
+const R = (1.189 * 0.995).toFixed(4);
+const G = (1.189 * 1.01).toFixed(4);
+const B = (1.189 * 0.995).toFixed(4);
+---
+
+<svg class="c-photograde" aria-hidden="true" focusable="false">
+  <filter id="photo-grade" color-interpolation-filters="linearRGB">
+    <feColorMatrix
+      type="matrix"
+      values={`${R} 0 0 0 0  0 ${G} 0 0 0  0 0 ${B} 0 0  0 0 0 1 0`}
+    ></feColorMatrix>
+  </filter>
+</svg>
+
+<style is:global>
+  .c-photograde {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  img:not([src$=".svg"]) {
+    filter: url(#photo-grade);
+  }
+</style>
