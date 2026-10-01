@@ -161,6 +161,7 @@ const FOLDERS = ["components/sections", "components/ui"];
    on stages of their own. */
 const EXEMPT = {
   Icons: "SVG-Sprite, unsichtbar",
+  PhotoGrade: "Test-Farbkorrektur über allen Fotos, kein eigener Baustein",
   Transition: "Seitenübergang, kein Markup",
   VisualEditing: "nur im Vorschaumodus",
   StructuredData: "JSON-LD im Kopf der Seite, unsichtbar",

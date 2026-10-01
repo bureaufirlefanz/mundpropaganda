@@ -106,14 +106,12 @@ export const structure: StructureResolver = (S, context) =>
          umgekehrt. Beide waren bis hierher ausgeblendet — der Typ `beitrag`
          hatte keine Route, und die vier Beiträge standen fest im Markup des
          Karussells. Jetzt gibt es /magazin und /magazin/<slug>. */
-      /* Praxis und Team: erst die Seite, darunter die Personen. Beide waren
-         bis hierher ausgeblendet — `practice` hatte keine Route, und das
-         Team stand nur als Kurzprofil auf anderen Seiten. Jetzt gibt es
-         /praxis und /praxis/<slug>. */
+      /* The practice page, then the people. Since 2026-10-01 people have no
+         page of their own; they are the authors of magazine posts. */
       singleton(S, "practice", "Praxis", UsersIcon),
       orderableDocumentListDeskItem({
         type: "person",
-        title: "Team",
+        title: "Personen (Autoren)",
         icon: UserIcon,
         S,
         context,

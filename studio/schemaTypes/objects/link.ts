@@ -60,7 +60,6 @@ export const link = defineType({
         { type: "homepage" },
         { type: "service" },
         { type: "practice" },
-        { type: "person" },
         { type: "magazineIndex" },
         { type: "post" },
         { type: "careers" },

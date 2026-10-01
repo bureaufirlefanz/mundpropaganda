@@ -31,7 +31,8 @@
 export const DIRECTORIES = {
   service: "leistungen",
   post: "magazin",
-  person: "praxis",
+  /* `person` is gone since 2026-10-01: there are no person pages any more.
+     People remain as documents, for the magazine's author line. */
 } as const satisfies Record<string, string>;
 
 /** Einzeldokumente und ihr fester Pfad. */

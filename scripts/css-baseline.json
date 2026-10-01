@@ -207,14 +207,6 @@
     "size": 0,
     "colour": 0
   },
-  "web/src/components/sections/Team.astro": {
-    "clamp": 0,
-    "px": 2,
-    "lh": 0,
-    "tracking": 0,
-    "size": 0,
-    "colour": 0
-  },
   "web/src/components/sections/Timeline.astro": {
     "clamp": 0,
     "px": 9,
@@ -402,14 +394,6 @@
   "web/src/templates/Careers.astro": {
     "clamp": 0,
     "px": 2,
-    "lh": 0,
-    "tracking": 0,
-    "size": 0,
-    "colour": 0
-  },
-  "web/src/templates/Person.astro": {
-    "clamp": 1,
-    "px": 3,
     "lh": 0,
     "tracking": 0,
     "size": 0,

@@ -259,8 +259,14 @@ Application, Jobs, Values, Team, Locations, Magazine intro, Person, Prose) ·
   two-column masonry of six group photos on the right, 50vw wide. The photos
   are repo motifs (`team-*`); a CMS field can come later. The practice
   fields `teamTopline`, `teamHeadline`, `teamText`, `teamPhoto` are hidden
-  in the Studio. ⚑ The person pages (`/praxis/[slug]`) still exist but are
-  no longer linked from the practice page.
+  in the Studio.
+- **Person pages removed** (`/praxis/<slug>`, decided 2026-10-01): route,
+  `templates/Person.astro`, `sections/Team.astro`, the preview branch, the
+  path model entry (both halves) and `person` as an internal link target.
+  People remain in the Studio as "Personen (Autoren)" for the magazine's
+  author line; the fields only the person page used are hidden, values
+  kept. ⚑ If the old WordPress site had team URLs, they need a redirect to
+  `/praxis` at cutover.
 
 ## 3. The homepage
 

@@ -86,7 +86,6 @@ Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.
 | `PostList` | Abschnitt | Die Beiträge als Raster — die Übersicht unter /magazin. | `posts: Post[]` | Magazine, design/komponenten | ✓ |
 | `PostCard` | UI | Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. | `post: Post` `sizes: string` `parallax?: string` `withButton?: boolean` `headingLevel?: "h2" | "h3"` | Post, design/komponenten, sections/Magazine | ✓ |
 | `Jobs` | Abschnitt | Offene Stellen — jede Zeile klappt auf und zeigt Aufgaben, Profil und den Weg zur Bewerbung. | `id?: string` `topline: string` `headline: string` `jobs: Job[]` `applicationEmail: string` `text?: string` | Careers, design/komponenten | ✓ |
-| `Team` | Abschnitt | Das Team: Überschrift, darunter das Raster aller Personen. | `id?: string` `topline: string` `headline: string` `text?: string` `photo?: ImageSource` `members: Member[]` | design/komponenten | ✓ |
 | `Locations` | Abschnitt | Die Standorte mit Anschrift, Zeiten und Karte. | `id?: string` `topline: string` `headline: string` `text?: string` `locations: Location[]` | design/komponenten | ✓ |
 | `Perks` | Abschnitt | Was die Praxis bietet, als Liste. Auf der Karriereseite. | `topline: string` `headline: string` `items: string[]` | Careers, design/komponenten | ✓ |
 | `Reasons` | Abschnitt | Zwei bis vier Blöcke, die je eine Frage beantworten, die vor einer Bewerbung wirklich gestellt wird: Wie komme ich hin, mit wem ar | `topline: string` `headline: string` `items: Reason[]` | Careers, design/komponenten | ✓ |
@@ -114,7 +113,7 @@ Bilder, Vergleiche, Video.
 | `Gallery` | Abschnitt | Unsere Standorte. Zwei Darstellungen derselben Motive: "reihe" — die Bildreihe läuft beim Scrollen waagerecht durch (Bestand) "rin | `variant?: "reihe" | "ring"` `title: string` `images?: { image: ImageSource; capti…` | Home, Practice, design/komponenten | ✓ |
 | `BeforeAfter` | Abschnitt | Vorher/Nachher-Vergleich mit Schieberegler. | `topline: string` `before?: ImageSource` `after?: ImageSource` | Pillar, Service, design/komponenten | ✓ |
 | `VideoBlock` | Abschnitt | Ein YouTube-Video, das erst auf Klick lädt. | `url: string` `title?: string` `poster?: ImageSource` `fallback?: string` | Careers, design/komponenten | ✓ |
-| `CmsImage` | UI | Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im Studio keines gepflegt ist. Beide Fälle sehen im Markup gl | `source: ImageSource | undefined | n…` `alt?: string` `widths?: number[]` `sizes?: string` `eager?: boolean` `ratio?: number` | Person, Post, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Contents, sections/CtaBand, sections/Experts, sections/Features, sections/Intro, sections/PillarHero, sections/Prose, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Team, sections/VideoBlock, sections/Voices, ui/AuthorNote, ui/ImageRing, ui/NavPromo, ui/PostCard, ui/PostImage | — |
+| `CmsImage` | UI | Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im Studio keines gepflegt ist. Beide Fälle sehen im Markup gl | `source: ImageSource | undefined | n…` `alt?: string` `widths?: number[]` `sizes?: string` `eager?: boolean` `ratio?: number` | Post, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Contents, sections/CtaBand, sections/Experts, sections/Features, sections/Intro, sections/PillarHero, sections/Prose, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/VideoBlock, sections/Voices, ui/AuthorNote, ui/ImageRing, ui/NavPromo, ui/PostCard, ui/PostImage | — |
 | `Picture` | UI | Responsives Bild aus der lokalen Pipeline. | `name: string` `alt?: string` `sizes?: string` `eager?: boolean` `parallax?: string` | Post, design/komponenten, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Experts, sections/Features, sections/Gallery, sections/Hero, sections/Intro, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/TeamPhotos, sections/Voices, ui/ImageRing, ui/PostCard | ✓ |
 | `PostImage` | UI | Ein Bild im Fließtext eines Beitrags. | `node: {` | design/komponenten | ✓ |
 | `ImageRing` | UI | Bild-Ring — die Motive sitzen auf einem Zylinder, der um den Betrachter kreist. Alternative Darstellung zur laufenden Bildreihe. | `images: RingImage[]` `label: string` `minimum?: number` | design/komponenten | ✓ |
@@ -165,7 +164,7 @@ Kein eigener Inhalt — Sprites, Übergänge, Motive, Angaben für Suchmaschinen
 | `VisualEditing` | UI | Klick-zum-Bearbeiten in der Vorschau. | — | preview/[...path] | — |
 | `StructuredData` | UI | Die Praxis als strukturierte Daten (schema.org, JSON-LD). | — | layouts/Base | — |
 | `Thread` | UI | — | — | sections/Standards | — |
-| `ToothLines` | UI | — | — | Person, sections/CareersHero, sections/Hero, sections/ServiceHero | — |
+| `ToothLines` | UI | — | — | sections/CareersHero, sections/Hero, sections/ServiceHero | — |
 | `ToothRings` | UI | — | — | design/komponenten, sections/Standards | ✓ |
 
 ## Nicht einsortiert
@@ -176,13 +175,11 @@ in `scripts/bausteine.mjs` unter `GROUPS` ein.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `PhotoGrade` | UI | TEST ONLY (2026-09-29) — a colour grade over every photo on the site, to judge whether the images read better slightly brighter an | — | layouts/Base, layouts/Design | — |
-| `TeamPhotos` | Abschnitt | Team on the practice page: one large word on the left, a masonry of group photos on the right, half the window wide. Replaced the  | `id?: string` | Practice | — |
+| `TeamPhotos` | Abschnitt | Team on the practice page: one large word on the left, a masonry of group photos on the right, half the window wide. Replaced the  | `id?: string` | Practice, design/komponenten | ✓ |
 
 ## Deckung der Komponentenseite
 
-**2 Bausteine fehlen und gehören ergänzt:**
-
-`TeamPhotos` · `PhotoGrade`
+Es fehlt keiner.
 
 Bewusst nicht im Katalog:
 
@@ -191,6 +188,7 @@ Bewusst nicht im Katalog:
 - `Footer` — Seitenfuß aus layouts/Base.astro, schließt eine Seite ab; mitten im Katalog ergäbe er keinen Sinn
 - `Icons` — SVG-Sprite, unsichtbar
 - `Nav` — fixierte Leiste aus layouts/Base.astro, läge über jedem Beispiel
+- `PhotoGrade` — Test-Farbkorrektur über allen Fotos, kein eigener Baustein
 - `StructuredData` — JSON-LD im Kopf der Seite, unsichtbar
 - `Thread` — Verbindungslinie, gehört zu einem Abschnitt
 - `ToothLines` — Zierlinien im Hintergrund
@@ -356,7 +354,6 @@ Inhalte und Entwürfe.
 - `Home` — Der Zusammenbau der Startseite — Bausteine und ihre Reihenfolge.
 - `LegalPage` — Der Zusammenbau einer Rechtstextseite.
 - `Magazine` — Der Zusammenbau der Magazin-Übersicht.
-- `Person` — Die Seite einer Person aus dem Team.
 - `Pillar` — Der Zusammenbau einer Pillar Page.
 - `Post` — Der Zusammenbau einer Beitragsseite.
 - `Practice` — Der Zusammenbau der Praxisseite.

@@ -48,9 +48,9 @@
 import Design from "../../layouts/Design.astro";
 import { loadHomepage } from "../../lib/homepage";
 import { loadService } from "../../lib/services";
-import { loadPosts } from "../../lib/magazine";
+import { loadPosts, loadPost } from "../../lib/magazine";
 import { loadCareers, loadJobs } from "../../lib/careers";
-import { loadPractice, loadTeam } from "../../lib/practice";
+import { loadPractice } from "../../lib/practice";
 import { loadSettings } from "../../lib/settings";
 import { veneersPillar } from "../../content/veneers-pillar";
 import { benefitsFootnote } from "../../content/service-crosslinks";
@@ -107,7 +107,7 @@ import Prose from "../../components/sections/Prose.astro";
 import CtaBand from "../../components/sections/CtaBand.astro";
 import Story from "../../components/sections/Story.astro";
 import Values from "../../components/sections/Values.astro";
-import Team from "../../components/sections/Team.astro";
+import TeamPhotos from "../../components/sections/TeamPhotos.astro";
 import Locations from "../../components/sections/Locations.astro";
 import Perks from "../../components/sections/Perks.astro";
 import Reasons from "../../components/sections/Reasons.astro";
@@ -130,6 +130,16 @@ const content = await loadHomepage();
 const service = await loadService("veneers");
 const posts = await loadPosts();
 
+/* Two real authors for the AuthorNote sample, from the magazine — people
+   have no page of their own any more, the author line is where they
+   appear. */
+const sampleAuthors = (
+  await Promise.all(posts.slice(0, 6).map((p) => loadPost(p.slug)))
+)
+  .map((p) => p?.author)
+  .filter((a): a is NonNullable<typeof a> => Boolean(a?.name))
+  .filter((a, i, all) => all.findIndex((b) => b.name === a.name) === i);
+
 /* Die Karriere-Bausteine mit den echten Inhalten der Karriereseite. Bis zum
    Umzug ins CMS kamen sie aus Konstanten in lib/karriere.ts; die Datei trägt
    jetzt nur noch den Datenzugriff. */
@@ -140,7 +150,6 @@ const jobs = await loadJobs();
    Standorte kommen aus ihren eigenen Quellen - genau wie in `Practice.astro`,
    damit hier nichts zusammengesetzt wird, was es so nirgends gibt. */
 const practice = await loadPractice();
-const team = await loadTeam();
 const settings = await loadSettings();
 
 /* Die Pillar-Bausteine am Beispiel `/veneers-berlin`, der einzigen Pillar
@@ -1279,28 +1288,17 @@ const RING_IMAGES = [
 
     <div class="d-example">
       <div class="d-sample__header d-sample__header--wide">
-        <span class="d-sample__name">Team</span>
-        <span class="d-sample__path">components/sections/Team.astro</span>
+        <span class="d-sample__name">TeamPhotos</span>
+        <span class="d-sample__path">components/sections/TeamPhotos.astro</span>
       </div>
       <p class="d-sample__text d-indented">
-        Gruppenfoto über die volle Breite, darunter das Raster. Die Reihenfolge
-        ist der Punkt: Wer mit dem Raster beginnt, zeigt eine Personaldatenbank.
-        Jede Kachel führt auf eine eigene Adresse unter <code>/praxis/</code>
-        statt an Ort und Stelle aufzuklappen - eine Adresse lässt sich teilen und
-        finden.
+        Ein großes „Team“ links, rechts zwei Spalten Gruppenfotos über die halbe
+        Fensterbreite. Die Seitenverhältnisse stehen fest, damit beide Spalten
+        gleich hoch enden, auch bevor die Bilder geladen sind. Es gibt keine
+        Seiten für einzelne Personen mehr.
       </p>
       <div class="d-live">
-        {
-          practice?.teamTopline && practice.teamHeadline && team.length ? (
-            <Team
-              topline={practice.teamTopline}
-              headline={practice.teamHeadline}
-              text={practice.teamText ?? undefined}
-              photo={practice.teamPhoto}
-              members={team}
-            />
-          ) : null
-        }
+        <TeamPhotos id="team-sample" />
       </div>
     </div>
 
@@ -1736,24 +1734,16 @@ const RING_IMAGES = [
         zuletzt geschah und worauf er sich stützt. Medizinischer Text ohne Autor
         ist eine Behauptung, hinter der niemand steht. Der Baustein rendert gar
         nichts, solange nichts da ist - ein Platzhalter wie „Redaktion" wäre
-        selbst eine Aussage über die Urheberschaft. Hier mit zwei Personen aus
-        dem Team und der Quelle aus dem Textabschnitt oben; das Prüfdatum ist
-        erfunden.
+        selbst eine Aussage über die Urheberschaft. Hier mit Autorinnen und
+        Autoren aus dem Magazin und der Quelle aus dem Textabschnitt oben; das
+        Prüfdatum ist erfunden.
       </p>
       <div class="d-stage">
         {
-          team.length >= 2 ? (
+          sampleAuthors.length ? (
             <AuthorNote
-              author={{
-                name: team[0]!.name,
-                role: team[0]!.role,
-                slug: team[0]!.slug,
-              }}
-              reviewedBy={{
-                name: team[1]!.name,
-                role: team[1]!.role,
-                slug: team[1]!.slug,
-              }}
+              author={sampleAuthors[0]}
+              reviewedBy={sampleAuthors[1]}
               lastReviewed={REVIEW_DATE}
               sources={prose?.note ? [{ text: prose.note.text }] : undefined}
             />

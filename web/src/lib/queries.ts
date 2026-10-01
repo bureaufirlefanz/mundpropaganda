@@ -341,47 +341,7 @@ export const PRACTICE_QUERY = defineQuery(`
     storyTopline, storyHeadline, storyColumns, storyImage${BILD},
     figures[]{ value, text },
     valuesTopline, valuesHeadline, valuesText, valuesItems[]{ title, text },
-    teamTopline, teamHeadline, teamText, teamPhoto${BILD},
     locationsTopline, locationsHeadline, locationsText,
-    seo{ title, description, noIndex, image${BILD} }
-  }
-`);
-
-/**
- * Das Team fürs Raster. Sortiert nach `orderRank` — die Reihenfolge schreibt
- * die Drag-Liste im Studio.
- *
- * Nur Personen mit Slug: Ohne ihn gäbe es keine Detailseite, und eine Kachel,
- * die ins Leere führt, ist schlechter als keine.
- *
- * **Ohne `image`.** Das Raster zeigt keine Porträts (die Begründung steht in
- * `components/sections/Team.astro`), und eine Abfrage, die ein Bild holt, das
- * niemand rendert, schleppt bei vierzehn Personen vierzehn Bildmetadaten
- * durch den Build. Das Porträt holt `PERSON_QUERY` für die eigene Seite.
- */
-export const TEAM_QUERY = defineQuery(`
-  *[_type == "person" && defined(slug.current)] | order(orderRank) {
-    name,
-    "slug": slug.current,
-    role,
-    text
-  }
-`);
-
-/** Eine Person mit allem, was ihre Seite baut. */
-export const PERSON_QUERY = defineQuery(`
-  *[_type == "person" && slug.current == $slug][0]{
-    name,
-    "slug": slug.current,
-    role,
-    text,
-    quote,
-    image${BILD},
-    bio,
-    milestones[]{ year, text },
-    languages,
-    email,
-    "focusAreas": focusAreas[]->{ title, "slug": slug.current },
     seo{ title, description, noIndex, image${BILD} }
   }
 `);

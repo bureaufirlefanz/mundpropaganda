@@ -45,7 +45,6 @@ const PAGES = process.env.MP_PAGES?.split(",") ?? [
   "/leistungen/keramikinlays",
   "/veneers-berlin",
   "/praxis",
-  "/praxis/kerrin-gratecap",
   "/karriere",
   "/magazin",
   "/magazin/warum-wir-nicht-mehr-abformen",

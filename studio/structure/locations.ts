@@ -46,20 +46,12 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     }),
 
     person: defineLocations({
-      select: { title: "name", slug: "slug.current" },
-      resolve: (doc) => {
-        const path = pathFor("person", doc?.slug ?? undefined);
-        return {
-          locations: [
-            ...(path
-              ? [{ title: doc?.title ?? "Die Person", href: path }]
-              : []),
-            /* Und das Raster, in dem sie steht. Wer hier den Namen ändert,
-               ändert ihn dort mit — das soll man sehen. */
-            { title: "Praxis (Team-Raster)", href: "/praxis" },
-          ],
-        };
-      },
+      /* No page of its own since 2026-10-01. A person shows up as the
+         author of magazine posts; the magazine is where to look. */
+      select: {},
+      resolve: () => ({
+        locations: [{ title: "Magazin (als Autorin/Autor)", href: "/magazin" }],
+      }),
     }),
 
     magazineIndex: defineLocations({

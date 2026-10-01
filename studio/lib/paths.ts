@@ -13,7 +13,6 @@ import type { SlugOptions } from "sanity";
  *   /leistungen              Übersicht aller Leistungen
  *   /leistungen/<slug>       eine Leistung
  *   /praxis                  Praxis & Team
- *   /praxis/<slug>           eine Person des Teams
  *   /magazin                 Übersicht
  *   /magazin/<slug>          ein Beitrag
  *   /karriere                Karriere
@@ -72,11 +71,9 @@ const TOP_LEVEL = ["pillar", "legalPage"];
 const DIRECTORIES: Record<string, string> = {
   service: "leistungen",
   post: "magazin",
-  /* `person` war zwischenzeitlich draußen: Solange der Team-Abschnitt nur
-     Porträts ohne Verweis zeigte, wurden die Personenseiten nicht gebaut, und
-     ein Eintrag hier hätte im Studio einen Verweis auf eine 404 angeboten.
-     Seit das Raster Namen und Verweise trägt, gibt es die Seiten wieder. */
-  person: "praxis",
+  /* `person` is gone for good since 2026-10-01: the practice page shows
+     group photos, not a grid of people, and there are no person pages. A
+     path here would offer the Studio a link into a 404. */
 };
 
 /** Einzeldokumente und ihr fester Pfad. */

@@ -20,7 +20,6 @@ interface Person {
   name: string;
   role?: string | null;
   image?: ImageSource | null;
-  slug?: string | null;
 }
 
 interface Source {
@@ -90,18 +89,7 @@ const hasContent =
               )}
               <div class="c-author-note__identity">
                 <p class="c-author-note__label">{entry.label}</p>
-                <p class="c-author-note__name">
-                  {entry.slug ? (
-                    <a
-                      class="c-author-note__link"
-                      href={`/praxis/${entry.slug}`}
-                    >
-                      {entry.name}
-                    </a>
-                  ) : (
-                    entry.name
-                  )}
-                </p>
+                <p class="c-author-note__name">{entry.name}</p>
                 {entry.role && <p class="c-author-note__role">{entry.role}</p>}
               </div>
             </div>

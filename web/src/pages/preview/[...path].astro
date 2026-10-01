@@ -30,7 +30,6 @@ import Post from "../../templates/Post.astro";
 import CareersContent from "../../templates/Careers.astro";
 import LegalPage from "../../templates/LegalPage.astro";
 import PracticeContent from "../../templates/Practice.astro";
-import PersonContent from "../../templates/Person.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
 import { previewClient, PREVIEW_COOKIE } from "../../lib/preview";
@@ -47,8 +46,6 @@ import {
   LEGAL_PAGE_QUERY,
   RELATED_QUERY,
   PRACTICE_QUERY,
-  TEAM_QUERY,
-  PERSON_QUERY,
 } from "../../lib/queries";
 import { withoutNull } from "../../lib/without-null";
 import type { HomepageContent } from "../../lib/homepage";
@@ -61,11 +58,7 @@ import type {
 import type { CareersContent as CareersData, Job } from "../../lib/careers";
 import type { ServiceEntry } from "../../lib/service-list";
 import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
-import type {
-  PracticeContent as PracticeData,
-  Member,
-  PersonContent as PersonData,
-} from "../../lib/practice";
+import type { PracticeContent as PracticeData } from "../../lib/practice";
 import { loadSettings } from "../../lib/settings";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
@@ -107,12 +100,10 @@ let content: {
   careers?: CareersData;
   legalPage?: LegalPageData;
   practice?: PracticeData;
-  person?: PersonData;
-  team: Member[];
   posts: PostData[];
   jobs: Job[];
   title: string;
-} = { team: [], posts: [], jobs: [], title: "" };
+} = { posts: [], jobs: [], title: "" };
 
 if (target.kind === "homepage") {
   const [data, posts] = await Promise.all([
@@ -160,20 +151,8 @@ if (target.kind === "homepage") {
     posts: related,
   };
 } else if (target.kind === "practice") {
-  const [data, team] = await Promise.all([
-    load<PracticeData>(PRACTICE_QUERY),
-    load<Member[]>(TEAM_QUERY),
-  ]);
-  content = { ...content, practice: data, team: team ?? [] };
-} else if (target.kind === "person") {
-  const data = await load<PersonData>(PERSON_QUERY, { slug: target.slug });
-  /* Anders als bei den übrigen Sammlungen gibt es hier keine Liste, gegen die
-     sich der Slug prüfen ließe — und ein Entwurf ohne Namen ist keine Seite. */
-  if (!data)
-    return new Response("Für diesen Pfad gibt es keine Seite.", {
-      status: 404,
-    });
-  content = { ...content, person: data, title: data.name ?? "" };
+  const data = await load<PracticeData>(PRACTICE_QUERY);
+  content = { ...content, practice: data };
 } else if (target.kind === "legalPage") {
   const data = await load<LegalPageData>(LEGAL_PAGE_QUERY, {
     slug: target.slug,
@@ -244,17 +223,7 @@ const { locations } = await loadSettings();
 }
 {
   target.kind === "practice" && (
-    <PracticeContent
-      data={content.practice}
-      team={content.team}
-      locations={locations}
-    />
-  )
-}
-
-{
-  target.kind === "person" && content.person && (
-    <PersonContent person={content.person} />
+    <PracticeContent data={content.practice} locations={locations} />
   )
 }
 

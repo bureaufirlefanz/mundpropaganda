@@ -266,42 +266,29 @@ export const legalPage = defineType({
 /* --- Team --------------------------------------------------------------- */
 
 /**
- * Eine Person des Teams.
+ * A person: since 2026-10-01 only the author of magazine posts.
  *
- * Seit der Praxisseite trägt sie eine eigene Seite unter `/praxis/<slug>` und
- * nicht mehr nur eine Kachel. Der Grund ist nicht Vollständigkeit, sondern
- * wonach gesucht wird: Patienten suchen nach dem Namen ihrer Behandlerin,
- * nicht nach „Zahnarzt Prenzlauer Berg Team". Eine Kachel in einem Raster
- * kann darauf nicht antworten, eine Seite schon.
- *
- * Zwei Klassen von Feldern: Was das Raster braucht (Name, Rolle, Porträt,
- * Kurzprofil), und was nur die Detailseite füllt (Ausbildung, Sprachen,
- * Zitat, ausführlicher Text). Fehlt das Zweite, bleibt die Seite kurz — sie
- * verschwindet nicht.
+ * There used to be a page per person under `/praxis/<slug>` and a grid of
+ * people on the practice page. Both are gone; the practice page shows group
+ * photos. What a post's author line reads stays visible: name, role,
+ * portrait. Everything that only filled the person page is hidden, not
+ * deleted — the values stay in the documents in case the pages come back.
  */
 export const person = defineType({
   name: "person",
   title: "Person",
   type: "document",
   icon: UserIcon,
-  /* Ziehbar wie Leistungen und Stellen: Die Reihenfolge im Team-Raster ist
-     eine Entscheidung, keine Datenbankausgabe. */
   orderings: [orderRankOrdering],
-  groups: [
-    { name: "card", title: "Im Team-Raster", default: true },
-    { name: "detail", title: "Auf der eigenen Seite" },
-    { name: "seo", title: "SEO" },
-  ],
   fields: [
     orderRankField({ type: "person" }),
 
-    /* --- Was im Raster steht -------------------------------------------- */
+    /* --- What the author line shows ---------------------------------- */
     defineField({
       name: "name",
       title: "Name",
       type: "string",
       description: "Mit Titel, so wie er auf dem Praxisschild steht.",
-      group: "card",
       validation: (r) => r.required(),
     }),
     defineField({
@@ -311,8 +298,7 @@ export const person = defineType({
       description:
         "Die Adresse der eigenen Seite, z. B. /praxis/kerrin-gratecap.",
       options: { source: "name", maxLength: 60 },
-      group: "card",
-      validation: (r) => r.required(),
+      hidden: true,
     }),
     defineField({
       name: "role",
@@ -320,7 +306,6 @@ export const person = defineType({
       type: "string",
       description:
         "Kurz. Steht unter dem Namen, z. B. „Zahnärztin, Ästhetik und Prophylaxe“.",
-      group: "card",
       validation: (r) => r.required(),
     }),
     defineField({
@@ -330,7 +315,7 @@ export const person = defineType({
       rows: 4,
       description:
         "Zwei Sätze für die Kachel im Team-Raster. Sie tragen die Kachel, seit dort kein Bild mehr steht - je knapper, desto besser stehen die Kacheln nebeneinander.",
-      group: "card",
+      hidden: true,
     }),
     defineField({
       name: "focusAreas",
@@ -339,17 +324,16 @@ export const person = defineType({
       description:
         "Verweist auf Leistungen. Die Seite verlinkt sie - wer den Namen sucht, findet so die Behandlung.",
       of: [{ type: "reference", to: [{ type: "service" }] }],
-      group: "card",
+      hidden: true,
     }),
 
-    /* --- Was nur die eigene Seite füllt ---------------------------------- */
+    /* --- Hidden: only the former person page used these -------------- */
     defineField({
       name: "image",
       title: "Porträt",
       type: "picture",
       description:
         "Hochformat. Erscheint auf der eigenen Seite der Person, nicht im Team-Raster - dort stehen alle mit Namen und ohne Bild, damit das Raster vollständig sein kann. Ohne Porträt zeigt die Seite die Initiale auf Markenfläche.",
-      group: "detail",
     }),
     defineField({
       name: "quote",
@@ -358,7 +342,7 @@ export const person = defineType({
       rows: 3,
       description:
         "Ein Satz in eigenen Worten. Steht groß neben dem Porträt. Leer lassen, wenn es keinen gibt - ein erfundenes Zitat merkt man.",
-      group: "detail",
+      hidden: true,
     }),
     defineField({
       name: "bio",
@@ -366,14 +350,13 @@ export const person = defineType({
       type: "array",
       of: [blockContentMember],
       description: "Der Werdegang in Absätzen.",
-      group: "detail",
+      hidden: true,
     }),
     defineField({
       name: "milestones",
       title: "Stationen",
       type: "array",
       description: "Ausbildung und Werdegang, neueste zuerst.",
-      group: "detail",
       of: [
         defineArrayMember({
           type: "object",
@@ -398,6 +381,7 @@ export const person = defineType({
           },
         }),
       ],
+      hidden: true,
     }),
     defineField({
       name: "languages",
@@ -405,7 +389,7 @@ export const person = defineType({
       type: "array",
       of: [{ type: "string" }],
       description: "In denen behandelt wird.",
-      group: "detail",
+      hidden: true,
     }),
     defineField({
       name: "email",
@@ -413,15 +397,15 @@ export const person = defineType({
       type: "string",
       description:
         "Nur wenn die Person direkt erreichbar sein soll. Sonst leer lassen - dann steht die allgemeine Adresse da.",
-      group: "detail",
       validation: (r) => r.email(),
+      hidden: true,
     }),
 
     defineField({
       name: "seo",
       title: "Suchmaschine",
       type: "seo",
-      group: "seo",
+      hidden: true,
     }),
   ],
   preview: { select: { title: "name", subtitle: "role", media: "image" } },

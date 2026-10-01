@@ -30,12 +30,11 @@ import Values from "../components/sections/Values.astro";
 import Features from "../components/sections/Features.astro";
 import TeamPhotos from "../components/sections/TeamPhotos.astro";
 import Gallery from "../components/sections/Gallery.astro";
-import type { PracticeContent, Member } from "../lib/practice";
+import type { PracticeContent } from "../lib/practice";
 import type { Location } from "../lib/settings";
 
 interface Props {
   data: PracticeContent | undefined;
-  team: Member[];
   locations: Location[];
 }
 
@@ -172,7 +171,7 @@ const locationsSection =
 
   {
     /* Since 2026-10-01 a large "Team" and a photo masonry instead of the
-     grid of name cards (sections/Team.astro, still in the catalogue). */
+     grid of name cards that linked to person pages (both removed). */
   }
   <TeamPhotos />
 

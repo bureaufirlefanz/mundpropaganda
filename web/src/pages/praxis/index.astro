@@ -2,17 +2,15 @@
 /**
  * Die Route. Daten laden, Renderer aufrufen.
  *
- * Drei Quellen, weil die Seite drei Dinge zeigt, die anderswo gepflegt
- * werden: das Dokument selbst, die Personen-Sammlung und die Standorte aus
- * den Einstellungen. Zusammenlegen hieße doppelt pflegen.
+ * Two sources: the document itself and the locations from the settings.
+ * The team is shown as photos (sections/TeamPhotos.astro), not as people.
  */
 import PracticeContent from "../../templates/Practice.astro";
-import { loadPractice, loadTeam } from "../../lib/practice";
+import { loadPractice } from "../../lib/practice";
 import { loadSettings } from "../../lib/settings";
 
 const data = await loadPractice();
-const team = await loadTeam();
 const { locations } = await loadSettings();
 ---
 
-<PracticeContent data={data} team={team} locations={locations} />
+<PracticeContent data={data} locations={locations} />
