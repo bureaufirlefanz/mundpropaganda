@@ -28,7 +28,9 @@ export interface RingImage {
   /** Nur für den Rückfall: Name aus public/img, ohne Größe und Endung. */
   name?: string;
   alt?: string;
-  caption?: string;
+  /* No caption: the ring shows no text on its cards (decided 2026-10-01,
+     the location badges read as labels on a slideshow). The alt text
+     carries what the photo shows. */
 }
 
 interface Props {
@@ -98,9 +100,6 @@ const cards = Array.from({ length: count }, (_, i) => ({
                 alt={repeated ? "" : (image.alt ?? "")}
                 sizes="(max-width: 700px) 80vw, 38vw"
               />
-            )}
-            {image.caption && !repeated && (
-              <figcaption class="c-ring__caption">{image.caption}</figcaption>
             )}
           </figure>
         ))
@@ -278,24 +277,6 @@ const cards = Array.from({ length: count }, (_, i) => ({
     /* Das Ziehen darf nicht als Bild-Drag im Browser enden. */
     pointer-events: none;
     -webkit-user-drag: none;
-  }
-
-  .c-ring__caption {
-    position: absolute;
-    right: var(--sp-2);
-    bottom: var(--sp-2);
-    left: var(--sp-2);
-    padding: 0.35em 0.7em;
-    border-radius: var(--r-sm);
-    /* Eigener Grund statt Text direkt aufs Foto: über einem Bild ist kein
-       Kontrast garantiert. Braun auf Pink misst 5.50:1. */
-    background: var(--c-brand);
-    color: var(--c-dark);
-    font-family: var(--f-mono);
-    font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    text-align: center;
   }
 
   .c-ring__nav {

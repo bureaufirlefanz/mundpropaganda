@@ -129,7 +129,7 @@ Alles, was zu einem Termin führt.
 | `Contact` | Abschnitt | Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des Akkordeons ein Formular. | `service?: string` `extended?: boolean` | Pillar, Service, design/komponenten | ✓ |
 | `Application` | Abschnitt | Das Bewerbungsformular: mehrere Schritte, je nach Rolle andere Fragen. | `id?: string` `topline: string` `headline: string` `text?: string` `jobs: Job[]` `fallbackEmail?: string` | Careers, design/komponenten | ✓ |
 | `Button` | UI | Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil. | `label: string` `href?: string` `variant?: "dark" | "block"` `static?: boolean` `type?: "submit" | "button"` `labelAttrs?: Record<string, unknown>` | 404, Careers, Post, design/komponenten, design/styleguide, sections/Application, sections/Contact, sections/CtaBand, sections/Hero, sections/Intro, sections/Jobs, sections/Magazine, sections/ServiceHero, sections/Services, sections/Standards, sections/Stories, ui/Footer, ui/Nav, ui/NavPromo, ui/PostCard | ✓ |
-| `Faq` | Abschnitt | FAQ: Panel-Rahmen plus Akkordeon. Startseite und Leistungsseiten benutzen denselben Baustein, nur mit anderen Fragen. | `title?: string` `questions: Question[]` `topline?: string` `text?: string` | Careers, Home, Pillar, Service, design/komponenten | ✓ |
+| `Faq` | Abschnitt | FAQ: panel frame plus accordion. Every page uses the same block with the same head — topline, headline and a short line — only the | `questions: Question[]` | Careers, Home, Pillar, Service, design/komponenten | ✓ |
 | `Accordion` | UI | Akkordeon. Immer nur ein Eintrag offen (`data-accordion="single"`), gesteuert von modules/ui.js. | `questions: Question[]` | design/komponenten, design/styleguide, sections/Faq | ✓ |
 
 ## Hinweise und Belege
@@ -168,9 +168,20 @@ Kein eigener Inhalt — Sprites, Übergänge, Motive, Angaben für Suchmaschinen
 | `ToothLines` | UI | — | — | Person, sections/CareersHero, sections/Hero, sections/ServiceHero | — |
 | `ToothRings` | UI | — | — | design/komponenten, sections/Standards | ✓ |
 
+## Nicht einsortiert
+
+Diese Bausteine stehen in keiner Gruppe. Wer einen davon anfasst, trägt ihn
+in `scripts/bausteine.mjs` unter `GROUPS` ein.
+
+| Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
+|---|---|---|---|---|---|
+| `PhotoGrade` | UI | TEST ONLY (2026-09-29) — a colour grade over every photo on the site, to judge whether the images read better slightly brighter an | — | layouts/Base, layouts/Design | — |
+
 ## Deckung der Komponentenseite
 
-Es fehlt keiner.
+**1 Bausteine fehlen und gehören ergänzt:**
+
+`PhotoGrade`
 
 Bewusst nicht im Katalog:
 
@@ -223,10 +234,6 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`CtaBand`**
 
 - `actionHref?: string` — Fertiger Pfad. Dieser Baustein setzt keine URLs zusammen.
-
-**`Faq`**
-
-- `title?: string` — Wahlfrei — siehe `ui/SectionHeading.astro`.
 
 **`Gallery`**
 
