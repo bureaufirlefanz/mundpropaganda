@@ -197,6 +197,14 @@ const { id, topline, headline, jobs, applicationEmail, text } = Astro.props;
     text-wrap: balance;
   }
 
+  /* "Prophylaxeassistenz" is wider than the name column of a 320px phone and
+     ran 17px into the arrow beside it. */
+  @media (max-width: 700px) {
+    .s-jobs__name {
+      hyphens: auto;
+    }
+  }
+
   .s-jobs__meta {
     display: flex;
     flex-wrap: wrap;

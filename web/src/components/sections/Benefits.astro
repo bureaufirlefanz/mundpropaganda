@@ -137,14 +137,14 @@ const MOTIFS = ["modell-arbeit", "behandlung-bildschirm", "implantat-set"];
                 source={e.image}
                 alt=""
                 widths={[640, 1024, 1600]}
-                sizes="50vw"
+                sizes="(max-width: 700px) 660px, (max-width: 900px) 94vw, (max-width: 1360px) 970px, 71vw"
                 data-standards-img
               />
             ) : (
               <Picture
                 name={MOTIFS[i % MOTIFS.length]}
                 alt=""
-                sizes="50vw"
+                sizes="(max-width: 700px) 660px, (max-width: 900px) 94vw, (max-width: 1360px) 970px, 71vw"
                 data-standards-img
               />
             ),

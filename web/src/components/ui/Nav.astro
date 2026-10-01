@@ -134,6 +134,33 @@ const action = (await resolved([nav?.action ?? null], here))[0];
   <div class="c-megamenu" id="nav-mobile" data-mobile-menu>
     <div class="c-megamenu__inner">
       {
+        /* What the bar carries on a wide screen. Up to 1024px the bar hides
+          its links and its Button, and the panel listed nothing but the
+          services — Praxis, Magazin, Kontakt and booking were only reachable
+          through the footer on every phone and tablet.
+
+          The first main entry is left out: it is "Leistungen", and the
+          service groups below are that entry. */
+      }
+      {
+        mainMenu.length > 1 && (
+          <div data-megamenu-item>
+            {mainMenu.slice(1).map((entry) => (
+              <a class="c-megamenu__link" href={entry.href}>
+                {entry.text}
+              </a>
+            ))}
+          </div>
+        )
+      }
+      {
+        action && (
+          <div data-megamenu-item>
+            <Button label={action.text} href={action.href} />
+          </div>
+        )
+      }
+      {
         /* Alle Gruppen, nicht nur die erste. Vorher stand hier `columns[0]` —
           das Menü zeigte damit vier von elf Leistungen, und welche vier war
           reine Folge der Sortierung. Wer über das Telefon kommt, sieht jetzt

@@ -393,8 +393,20 @@ const caption = (w: CompareValue) =>
       padding-block: var(--sp-3) var(--sp-2);
     }
 
+    /* Three or four values share one phone width, about 110 and 85px each.
+       With 16px on both sides "Hochleistungskeramik" had 77px and ran into
+       the neighbouring column at 360px. A step smaller on the sides, and
+       long compounds may break — the document is `lang="de"`, so the browser
+       splits at syllables: "Hochleistungs-keramik". Only words of ten letters
+       and more, with four on either side of the break: without the limit the
+       browser also split "dün-ne" and "mi-nimaler". */
     .s-compare__cell {
-      padding-block: var(--sp-2) var(--sp-4);
+      padding: var(--sp-2) var(--sp-1) var(--sp-4);
+    }
+
+    .s-compare__value {
+      hyphens: auto;
+      hyphenate-limit-chars: 10 4 4;
     }
 
     /* Der erste Wert einer Zeile steht links außen — dort wäre die Linie ein

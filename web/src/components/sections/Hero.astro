@@ -473,10 +473,11 @@ const { lines } = Astro.props;
       text-align: left;
     }
 
-    .s-hero__foot {
-      left: var(--site-margin);
-      right: auto;
-    }
+    /* The badge stays bottom right here, as on the wide screen. It used to
+       move to the left edge at this width — onto the scroll arrow, which
+       sits there too: between 701 and 900px the arrow lay underneath the
+       badge and could not be tapped. Below 700px the arrow is gone and the
+       badge is centred, see the block further down. */
   }
 
   /* --- Schmale Fenster ---------------------------------------------------

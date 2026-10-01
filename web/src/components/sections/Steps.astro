@@ -89,6 +89,18 @@ const { title, steps } = Astro.props;
     color: var(--c-neutral-800);
   }
 
+  /* 479px is the height of the row of four on a wide screen. In two columns
+     and in one it only added empty space: the text is pushed to the bottom
+     edge (see `.c-step__text`), and between title and text stood up to 200px
+     of nothing — measured at 820px and 375px. The cards of a row still end
+     level, because grid items stretch to the tallest one; what stays between
+     title and text is the card's own gap. */
+  @media (max-width: 1000px) {
+    .c-step {
+      min-height: 0;
+    }
+  }
+
   /* Farbe, Form und Schnitt kommen aus `.c-number` in shared.css. Hier
      steht nur, was diesen Kreis von den übrigen unterscheidet: seine Größe.
      Dieser Baustein war die Vorlage für die gemeinsame Regel. */

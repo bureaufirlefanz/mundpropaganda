@@ -58,7 +58,7 @@ const { topline, title, text, posts } = Astro.props;
         posts.map((p, i) => (
           <PostCard
             post={p}
-            sizes="24vw"
+            sizes="(max-width: 700px) 84vw, (max-width: 1166px) 420px, 36vw"
             parallax="9"
             withButton
             data-magazine-item
@@ -233,6 +233,8 @@ const { topline, title, text, posts } = Astro.props;
   /* Die Karte selbst steht in `ui/PostCard.astro` — die Übersicht unter
      /magazin zeigt dieselbe. Von hier kommt nur ihre Breite: Die Spur
      scrollt waagerecht, also ist sie fest und nicht die der Zelle. */
+  /* The `sizes` on the cards spells out these three widths: 84vw on a
+     phone, 420px until 36vw passes it at 1166px, then 36vw. */
   .s-magazine__track {
     --post-width: clamp(420px, 36vw, 554px);
   }

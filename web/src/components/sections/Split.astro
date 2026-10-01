@@ -45,14 +45,14 @@ const { topline, title, paragraphs, image } = Astro.props;
           source={image}
           alt="Patientin lächelt nach der Behandlung"
           widths={[640, 1024, 1600, 2200]}
-          sizes="(max-width: 900px) 100vw, 58vw"
+          sizes="(max-width: 900px) 106vw, (max-width: 1080px) 880px, 81vw"
           data-parallax="10"
         />
       ) : (
         <Picture
           name="bleaching-beratung-spiegel"
           alt="Beratung am Behandlungsstuhl, die Patientin sieht ihr Ergebnis im Spiegel"
-          sizes="(max-width: 900px) 100vw, 58vw"
+          sizes="(max-width: 900px) 106vw, (max-width: 1080px) 880px, 81vw"
           parallax="10"
         />
       )
