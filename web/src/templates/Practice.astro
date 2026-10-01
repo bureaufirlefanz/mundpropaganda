@@ -8,7 +8,7 @@
  *   Hero       Wo bin ich hier
  *   Story      Wer seid ihr — mit Zahlen, die man nachprüfen kann
  *   Values     Wofür steht ihr, und was heißt das konkret
- *   Team       Wer behandelt mich — Gruppenfoto, dann das Raster
+ *   Team       Wer behandelt mich — großes "Team", daneben Gruppenfotos
  *   Locations  Wo finde ich euch
  *
  * Kein Kontaktabschnitt mehr: Das Angebotsformular steht nur noch dort, wo
@@ -28,7 +28,7 @@ import Intro from "../components/sections/Intro.astro";
 import Story from "../components/sections/Story.astro";
 import Values from "../components/sections/Values.astro";
 import Features from "../components/sections/Features.astro";
-import Team from "../components/sections/Team.astro";
+import TeamPhotos from "../components/sections/TeamPhotos.astro";
 import Gallery from "../components/sections/Gallery.astro";
 import type { PracticeContent, Member } from "../lib/practice";
 import type { Location } from "../lib/settings";
@@ -39,7 +39,7 @@ interface Props {
   locations: Location[];
 }
 
-const { data: d, team, locations } = Astro.props;
+const { data: d, locations } = Astro.props;
 
 /* Wahlfrei, aber nicht halb — dieselbe Regel wie auf der Karriereseite: Wer
    einen Abschnitt anlegt, füllt ihn. Die Abfrage kann das nicht zusagen,
@@ -62,20 +62,6 @@ const values =
         headline: d.valuesHeadline,
         text: d.valuesText ?? undefined,
         items: d.valuesItems,
-      }
-    : undefined;
-
-/* Das Team-Raster braucht Überschriften UND Personen. Ohne Personen entfällt
-   der Abschnitt ganz — ein Gruppenfoto über einem leeren Raster wäre die
-   Ankündigung von etwas, das nicht kommt. */
-const teamSection =
-  d?.teamTopline && d.teamHeadline && team.length
-    ? {
-        topline: d.teamTopline,
-        headline: d.teamHeadline,
-        text: d.teamText ?? undefined,
-        photo: d.teamPhoto,
-        members: team,
       }
     : undefined;
 
@@ -184,7 +170,11 @@ const locationsSection =
     ]}
   />
 
-  {teamSection && <Team id="team" {...teamSection} />}
+  {
+    /* Since 2026-10-01 a large "Team" and a photo masonry instead of the
+     grid of name cards (sections/Team.astro, still in the catalogue). */
+  }
+  <TeamPhotos />
 
   {
     /* Dieselbe Darstellung wie auf der Startseite: die Motive auf einem

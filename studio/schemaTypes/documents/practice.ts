@@ -47,7 +47,6 @@ export const practice = defineType({
     { name: "header", title: "Kopf", default: true },
     { name: "story", title: "Die Praxis" },
     { name: "values", title: "Haltung" },
-    { name: "team", title: "Team" },
     { name: "locations", title: "Standorte" },
     { name: "seo", title: "SEO" },
   ],
@@ -191,21 +190,34 @@ export const practice = defineType({
     }),
 
     /* --- Team ------------------------------------------------------------ */
-    ...heading("team", "team"),
+    /* Hidden, not removed (2026-10-01): the practice page shows a large
+       "Team" and group photos (sections/TeamPhotos.astro) instead of the
+       name-card grid these fields fed. Removing them would make the Studio
+       warn about the values still stored. The people themselves stay
+       editable as "Person" documents — their pages still exist. */
+    defineField({
+      name: "teamTopline",
+      title: "Topline",
+      type: "string",
+      hidden: true,
+    }),
+    defineField({
+      name: "teamHeadline",
+      title: "Überschrift",
+      type: "string",
+      hidden: true,
+    }),
     defineField({
       name: "teamText",
       title: "Einleitung",
       type: "text",
-      rows: 3,
-      group: "team",
+      hidden: true,
     }),
     defineField({
       name: "teamPhoto",
       title: "Teamfoto",
       type: "picture",
-      description:
-        "Über die volle Breite, vor dem Raster. Querformat. Ohne Foto beginnt der Abschnitt direkt mit den Personen.",
-      group: "team",
+      hidden: true,
     }),
 
     /* --- Standorte ------------------------------------------------------- */

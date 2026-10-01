@@ -86,7 +86,7 @@ Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.
 | `PostList` | Abschnitt | Die Beiträge als Raster — die Übersicht unter /magazin. | `posts: Post[]` | Magazine, design/komponenten | ✓ |
 | `PostCard` | UI | Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. | `post: Post` `sizes: string` `parallax?: string` `withButton?: boolean` `headingLevel?: "h2" | "h3"` | Post, design/komponenten, sections/Magazine | ✓ |
 | `Jobs` | Abschnitt | Offene Stellen — jede Zeile klappt auf und zeigt Aufgaben, Profil und den Weg zur Bewerbung. | `id?: string` `topline: string` `headline: string` `jobs: Job[]` `applicationEmail: string` `text?: string` | Careers, design/komponenten | ✓ |
-| `Team` | Abschnitt | Das Team: Überschrift, darunter das Raster aller Personen. | `id?: string` `topline: string` `headline: string` `text?: string` `photo?: ImageSource` `members: Member[]` | Practice, design/komponenten | ✓ |
+| `Team` | Abschnitt | Das Team: Überschrift, darunter das Raster aller Personen. | `id?: string` `topline: string` `headline: string` `text?: string` `photo?: ImageSource` `members: Member[]` | design/komponenten | ✓ |
 | `Locations` | Abschnitt | Die Standorte mit Anschrift, Zeiten und Karte. | `id?: string` `topline: string` `headline: string` `text?: string` `locations: Location[]` | design/komponenten | ✓ |
 | `Perks` | Abschnitt | Was die Praxis bietet, als Liste. Auf der Karriereseite. | `topline: string` `headline: string` `items: string[]` | Careers, design/komponenten | ✓ |
 | `Reasons` | Abschnitt | Zwei bis vier Blöcke, die je eine Frage beantworten, die vor einer Bewerbung wirklich gestellt wird: Wie komme ich hin, mit wem ar | `topline: string` `headline: string` `items: Reason[]` | Careers, design/komponenten | ✓ |
@@ -115,7 +115,7 @@ Bilder, Vergleiche, Video.
 | `BeforeAfter` | Abschnitt | Vorher/Nachher-Vergleich mit Schieberegler. | `topline: string` `before?: ImageSource` `after?: ImageSource` | Pillar, Service, design/komponenten | ✓ |
 | `VideoBlock` | Abschnitt | Ein YouTube-Video, das erst auf Klick lädt. | `url: string` `title?: string` `poster?: ImageSource` `fallback?: string` | Careers, design/komponenten | ✓ |
 | `CmsImage` | UI | Ein Bild, das aus dem CMS kommen kann — oder aus public/img, solange im Studio keines gepflegt ist. Beide Fälle sehen im Markup gl | `source: ImageSource | undefined | n…` `alt?: string` `widths?: number[]` `sizes?: string` `eager?: boolean` `ratio?: number` | Person, Post, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Contents, sections/CtaBand, sections/Experts, sections/Features, sections/Intro, sections/PillarHero, sections/Prose, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Team, sections/VideoBlock, sections/Voices, ui/AuthorNote, ui/ImageRing, ui/NavPromo, ui/PostCard, ui/PostImage | — |
-| `Picture` | UI | Responsives Bild aus der lokalen Pipeline. | `name: string` `alt?: string` `sizes?: string` `eager?: boolean` `parallax?: string` | Post, design/komponenten, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Experts, sections/Features, sections/Gallery, sections/Hero, sections/Intro, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/Voices, ui/ImageRing, ui/PostCard | ✓ |
+| `Picture` | UI | Responsives Bild aus der lokalen Pipeline. | `name: string` `alt?: string` `sizes?: string` `eager?: boolean` `parallax?: string` | Post, design/komponenten, sections/BeforeAfter, sections/Benefits, sections/CareersHero, sections/Experts, sections/Features, sections/Gallery, sections/Hero, sections/Intro, sections/ServiceHero, sections/Split, sections/Standards, sections/Stories, sections/Story, sections/TeamPhotos, sections/Voices, ui/ImageRing, ui/PostCard | ✓ |
 | `PostImage` | UI | Ein Bild im Fließtext eines Beitrags. | `node: {` | design/komponenten | ✓ |
 | `ImageRing` | UI | Bild-Ring — die Motive sitzen auf einem Zylinder, der um den Betrachter kreist. Alternative Darstellung zur laufenden Bildreihe. | `images: RingImage[]` `label: string` `minimum?: number` | design/komponenten | ✓ |
 
@@ -176,12 +176,13 @@ in `scripts/bausteine.mjs` unter `GROUPS` ein.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `PhotoGrade` | UI | TEST ONLY (2026-09-29) — a colour grade over every photo on the site, to judge whether the images read better slightly brighter an | — | layouts/Base, layouts/Design | — |
+| `TeamPhotos` | Abschnitt | Team on the practice page: one large word on the left, a masonry of group photos on the right, half the window wide. Replaced the  | `id?: string` | Practice | — |
 
 ## Deckung der Komponentenseite
 
-**1 Bausteine fehlen und gehören ergänzt:**
+**2 Bausteine fehlen und gehören ergänzt:**
 
-`PhotoGrade`
+`TeamPhotos` · `PhotoGrade`
 
 Bewusst nicht im Katalog:
 

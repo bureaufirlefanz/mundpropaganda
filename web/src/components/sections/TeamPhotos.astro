@@ -1,0 +1,142 @@
+---
+/**
+ * Team on the practice page: one large word on the left, a masonry of group
+ * photos on the right, half the window wide. Replaced the team grid with
+ * name cards on 2026-10-01 — the page shows the people, the person pages
+ * stay reachable from elsewhere.
+ *
+ * The masonry is CSS columns, not a script: two columns, photos keep their
+ * own proportions. The six motifs are chosen so both columns come out the
+ * same height (two portraits at 2:3, four landscapes at 3:2 — one portrait
+ * and two landscapes per column). Change the set, and the columns may end
+ * unevenly; reorder so each column gets the same mix.
+ *
+ * The photos live in the repo pipeline, like the other practice motifs.
+ * When the practice uploads its own team photos, this is where a CMS field
+ * would plug in.
+ */
+import Picture from "../ui/Picture.astro";
+
+interface Props {
+  id?: string;
+}
+
+const { id = "team" } = Astro.props;
+
+const PHOTOS = [
+  {
+    name: "team-implantate",
+    ratio: "2 / 3",
+    alt: "Drei Kolleginnen an der geschwungenen Holzbank",
+  },
+  {
+    name: "team-empfang",
+    ratio: "3 / 2",
+    alt: "Drei Kolleginnen am Empfangstresen",
+  },
+  {
+    name: "team-management",
+    ratio: "3 / 2",
+    alt: "Drei Teammitglieder an der Holzbank im Flur",
+  },
+  {
+    name: "team-labor",
+    ratio: "3 / 2",
+    alt: "Zwei Kollegen im hauseigenen Labor",
+  },
+  {
+    name: "team-veneers",
+    ratio: "2 / 3",
+    alt: "Drei Teammitglieder vor der geschwungenen Holzwand",
+  },
+  {
+    name: "team-prophylaxe",
+    ratio: "3 / 2",
+    alt: "Vier Teammitglieder auf der Holzbank",
+  },
+];
+---
+
+<section class="s-teamphotos" id={id}>
+  <h2 class="s-teamphotos__title" data-split="lines">Team</h2>
+  <div class="s-teamphotos__grid" data-reveal-stagger="0.08">
+    {
+      PHOTOS.map((photo) => (
+        <figure
+          class="s-teamphotos__item"
+          style={`--ratio: ${photo.ratio}`}
+          data-reveal="fade"
+        >
+          <Picture
+            name={photo.name}
+            alt={photo.alt}
+            sizes="(max-width: 900px) 50vw, 25vw"
+          />
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .s-teamphotos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 50vw;
+    gap: var(--site-gutter);
+    align-items: start;
+    padding-block: var(--section-space);
+    padding-left: var(--site-margin);
+  }
+
+  /* Stays in view while the photos scroll past, like the panel heads. */
+  .s-teamphotos__title {
+    position: sticky;
+    top: var(--nav-height);
+    font-size: var(--fs-display-md);
+    font-weight: var(--fw-medium);
+    line-height: var(--lh-display);
+    letter-spacing: var(--tracking-tighter);
+    text-transform: uppercase;
+  }
+
+  .s-teamphotos__grid {
+    columns: 2;
+    column-gap: var(--site-gutter);
+    padding-right: var(--site-margin);
+  }
+
+  .s-teamphotos__item {
+    margin: 0 0 var(--site-gutter);
+    break-inside: avoid;
+    /* The ratio is fixed up front: the photos load lazily, and CSS columns
+       balance on the heights they have at that moment — zero, before the
+       image arrives. Without it the columns came out four against two. */
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    border-radius: var(--r-md);
+    background: var(--c-tint);
+  }
+
+  .s-teamphotos__item :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .s-teamphotos {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--flow-md);
+      padding-inline: var(--site-margin);
+    }
+
+    .s-teamphotos__title {
+      position: static;
+    }
+
+    .s-teamphotos__grid {
+      padding-right: 0;
+    }
+  }
+</style>

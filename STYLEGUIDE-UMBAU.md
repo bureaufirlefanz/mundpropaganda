@@ -248,6 +248,20 @@ Application, Jobs, Values, Team, Locations, Magazine intro, Person, Prose) ·
   deliberate homepage change. The alt texts now name the location instead.
   Images uploaded in the Studio would still show their caption.
 
+### Review round 2026-10-01
+
+- **Location ring:** captions removed from `ImageRing` itself, so no card
+  shows text any more, also for photos uploaded later in the Studio (their
+  caption still becomes the alt text).
+- **Practice page, team:** the name-card grid ("Die Menschen, die Sie
+  behandeln" with links to the person pages) is replaced by
+  `sections/TeamPhotos.astro`: a large "Team" on the left, sticky, and a
+  two-column masonry of six group photos on the right, 50vw wide. The photos
+  are repo motifs (`team-*`); a CMS field can come later. The practice
+  fields `teamTopline`, `teamHeadline`, `teamText`, `teamPhoto` are hidden
+  in the Studio. ⚑ The person pages (`/praxis/[slug]`) still exist but are
+  no longer linked from the practice page.
+
 ## 3. The homepage
 
 Untouched visually, verified with the computed-style diff. The homepage
