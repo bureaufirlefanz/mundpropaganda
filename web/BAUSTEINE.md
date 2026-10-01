@@ -302,6 +302,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`CmsImage`**
 
 - `widths?: number[]` — Breiten für das srcset. Voreinstellung deckt Karten bis Vollpicture ab.
+- `sizes?: string` — The width the image has to COVER, not the width of its box. Under `object-fit: cover` a landscape photo in a portrait box shows only its middle: a 3:2 image in a 3:4 box needs twice the box width, so the right value there is `200vw`, not `100vw`. Too small a value makes the browser pick a file that is then stretched: the magazine cards declared `24vw` while being 84vw wide on a phone, and came out soft. Derive it from the component's CSS at each of its breakpoints; values above 100vw or in vh are correct. /
 - `eager?: boolean` — Nur für das LCP-Bild einer Seite setzen.
 - `ratio?: number` — Seitenverhältnis (Breite/Höhe). Nur setzen, wenn serverseitig beschnitten werden soll — dann wirkt auch der Bildmittelpunkt aus dem Studio. Ohne Angabe beschneidet CSS über `object-fit: cover`. /
 
@@ -322,6 +323,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 - `title?: string` — Wahlfrei — auf Pillar Pages steht die Überschrift nummeriert darüber (`ui/SectionHeading.astro`).
 - `text?: string` — Zusatzzeile unter der Headline. Nicht jedes Panel hat eine.
+
+**`Picture`**
+
+- `sizes?: string` — The width the image has to COVER, not the width of its box. Under `object-fit: cover` a landscape photo in a portrait box shows only its middle: a 3:2 image in a 3:4 box needs twice the box width, so the right value there is `200vw`, not `100vw`. Too small a value makes the browser pick a file that is then stretched: the magazine cards declared `24vw` while being 84vw wide on a phone, and came out soft. Derive it from the component's CSS at each of its breakpoints; values above 100vw or in vh are correct. /
 
 **`PostCard`**
 
