@@ -32,7 +32,11 @@ import LegalPage from "../../templates/LegalPage.astro";
 import PracticeContent from "../../templates/Practice.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
-import { previewClient, PREVIEW_COOKIE } from "../../lib/preview";
+import {
+  previewClient,
+  previewCookieValid,
+  PREVIEW_COOKIE,
+} from "../../lib/preview";
 import { targetFor } from "../../lib/paths";
 import {
   HOMEPAGE_QUERY,
@@ -65,10 +69,19 @@ import { loadSettings } from "../../lib/settings";
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
    geprüft wurde. Ohne diese Sperre wären sämtliche Entwürfe für jeden
    lesbar, der die Adresse errät — `/preview/` ist nicht geheim. */
-if (Astro.cookies.get(PREVIEW_COOKIE)?.value !== "an") {
+/* Drafts must never sit in a shared cache. */
+Astro.response.headers.set("Cache-Control", "private, no-store");
+
+if (!previewCookieValid(Astro.cookies.get(PREVIEW_COOKIE)?.value)) {
   return new Response(
     "Vorschau nicht freigeschaltet. Sie wird aus dem Studio heraus geöffnet.",
-    { status: 401, headers: { "content-type": "text/plain; charset=utf-8" } },
+    {
+      status: 401,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "private, no-store",
+      },
+    },
   );
 }
 

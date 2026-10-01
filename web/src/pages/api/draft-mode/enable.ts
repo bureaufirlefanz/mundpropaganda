@@ -1,6 +1,11 @@
 import type { APIRoute } from "astro";
 import { validatePreviewUrl } from "@sanity/preview-url-secret";
-import { previewClient, PREVIEW_COOKIE } from "../../../lib/preview";
+import {
+  previewClient,
+  previewCookieValue,
+  PREVIEW_COOKIE,
+  PREVIEW_COOKIE_MAX_AGE,
+} from "../../../lib/preview";
 
 /**
  * Schaltet die Vorschau frei.
@@ -32,8 +37,10 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     });
   }
 
-  cookies.set(PREVIEW_COOKIE, "an", {
+  /* Signed and expiring, see `previewCookieValue` in lib/preview.ts. */
+  cookies.set(PREVIEW_COOKIE, previewCookieValue()!, {
     path: "/",
+    maxAge: PREVIEW_COOKIE_MAX_AGE,
     /* httpOnly: Kein Skript im Browser soll das Cookie lesen können — es
        schaltet Entwürfe frei. sameSite "none" mit secure, weil die Vorschau
        im Studio in einem iframe steckt und das Cookie sonst bei fremder

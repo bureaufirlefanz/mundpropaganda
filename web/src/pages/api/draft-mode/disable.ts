@@ -12,5 +12,8 @@ export const prerender = false;
 export const GET: APIRoute = async ({ cookies, redirect, url }) => {
   cookies.delete(PREVIEW_COOKIE, { path: "/" });
   const target = url.searchParams.get("zurueck") ?? "/";
-  return redirect(target.startsWith("/") ? target : "/", 307);
+  /* Only a path on this site. `//evil.example` and `/\\evil.example` start
+     with a slash too, and browsers read both as another host. */
+  const local = /^\/(?![/\\])/.test(target);
+  return redirect(local ? target : "/", 307);
 };

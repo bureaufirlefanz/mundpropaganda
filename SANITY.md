@@ -276,11 +276,13 @@ auf eine Änderung, die nie ankommt.
 
 **Der Build Hook steht schon.** Angelegt, ausgelöst und geprüft: Ein POST
 darauf antwortet mit 200 und startet einen Deploy („Deploy triggered by
-hook"). Die Adresse:
+hook"). Die Adresse steht in Netlify unter Project configuration → Build &
+deploy → Build hooks, und nur dort.
 
-```
-https://api.netlify.com/build_hooks/6a736594a374ca00c47c1aa2
-```
+Sie stand bis 01.10.2026 hier, in einem öffentlichen Repository. Jeder
+konnte damit Produktions-Deploys auslösen (15 Credits je Stück). Der alte
+Hook ist deshalb in Netlify zu löschen und neu anzulegen; die neue Adresse
+gehört nicht zurück in diese Datei.
 
 Was fehlt, ist die Gegenseite bei Sanity. Sie lässt sich nicht mit dem
 Lesetoken anlegen — das Verwalten von Webhooks verlangt das Recht

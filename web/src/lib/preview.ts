@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { createClient, type SanityClient } from "@sanity/client";
 
 /**
@@ -75,3 +76,42 @@ export function previewClient(): SanityClient | null {
 
 /** Name des Cookies, das die Vorschau freischaltet. */
 export const PREVIEW_COOKIE = "mp-preview";
+
+/**
+ * The cookie's value: an expiry time, signed.
+ *
+ * Until 2026-10-01 the value was the fixed word "an", and `/preview/*`
+ * checked for nothing else. The repository is public, so anyone could set
+ * `mp-preview=an` by hand and read every draft through the read token.
+ * Now the value is `<expiry>.<HMAC-SHA256(expiry)>`, keyed with the read
+ * token itself: the one secret that already exists wherever the preview
+ * works, and which nobody outside the server ever sees. Rotating the token
+ * invalidates every preview cookie, which is what you want.
+ */
+const PREVIEW_TTL_SECONDS = 8 * 60 * 60;
+
+function sign(payload: string, key: string): string {
+  return createHmac("sha256", key).update(payload).digest("base64url");
+}
+
+/** A fresh cookie value, or `null` without a token. */
+export function previewCookieValue(now = Date.now()): string | null {
+  const key = previewToken();
+  if (!key) return null;
+  const expiry = String(Math.floor(now / 1000) + PREVIEW_TTL_SECONDS);
+  return `${expiry}.${sign(expiry, key)}`;
+}
+
+export const PREVIEW_COOKIE_MAX_AGE = PREVIEW_TTL_SECONDS;
+
+/** Whether a cookie value was issued by `previewCookieValue` and is current. */
+export function previewCookieValid(value?: string, now = Date.now()): boolean {
+  const key = previewToken();
+  if (!key || !value) return false;
+  const [expiry, signature] = value.split(".");
+  if (!expiry || !signature || !/^\d+$/.test(expiry)) return false;
+  if (Number(expiry) * 1000 < now) return false;
+  const expected = Buffer.from(sign(expiry, key));
+  const given = Buffer.from(signature);
+  return expected.length === given.length && timingSafeEqual(expected, given);
+}
