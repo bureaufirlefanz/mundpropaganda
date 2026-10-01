@@ -119,13 +119,19 @@ const AUSSCHNITT: Record<string, string> = {
                  ausgeliefert und sah entsprechend weich aus.
 
                  1600 als größte Stufe deckt das ab; darüber lohnt es nicht,
-                 die Maske schneidet ohnehin die Hälfte weg. */
+                 die Maske schneidet ohnehin die Hälfte weg.
+
+                 The size beyond 900px is a fixed `1600px`, no longer `40vw`.
+                 The stage is about 740px wide and 990px tall on an iPad in
+                 landscape, and a 3:2 photo covering that height needs about
+                 1480px of width — `40vw` claimed 472px, and three of the
+                 five motifs came out stretched to three times their file. */
           return isCmsImage(e.image) ? (
             <CmsImage
               source={e.image}
               alt=""
               widths={[640, 1024, 1600]}
-              sizes="(max-width: 900px) 70vw, 40vw"
+              sizes="(max-width: 900px) 70vw, 1600px"
               style={stil}
               data-standards-img
             />
@@ -133,7 +139,7 @@ const AUSSCHNITT: Record<string, string> = {
             <Picture
               name={motiv}
               alt=""
-              sizes="(max-width: 900px) 70vw, 40vw"
+              sizes="(max-width: 900px) 70vw, 1600px"
               style={stil}
               data-standards-img
             />

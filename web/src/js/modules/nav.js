@@ -148,6 +148,18 @@ export function initNav() {
       );
 
     burger.addEventListener("click", () => setzeMobil(!mobilIstOffen()));
+
+    /* The third trigger named above. A link to another page needs no help —
+       the router renders a fresh nav. But "Kontakt" and the Button point at
+       `#kontakt` on the home page: the page scrolls, and without this the
+       panel would stay open on top of the very section it just jumped to. */
+    mobilePanel.addEventListener(
+      "click",
+      (e) => {
+        if (e.target.closest("a")) setzeMobil(false);
+      },
+      { signal: pageSignal() },
+    );
   }
 
   document.addEventListener(

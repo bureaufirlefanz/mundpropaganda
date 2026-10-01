@@ -56,14 +56,14 @@ const MOTIFS = [
                 source={row.image}
                 alt=""
                 widths={[640, 1024, 1600, 2200]}
-                sizes="(max-width: 900px) 100vw, 50vw"
+                sizes="(max-width: 900px) 125vw, 61vw"
                 data-parallax="8"
               />
             ) : (
               <Picture
                 name={row.motif ?? MOTIFS[i % MOTIFS.length]}
                 alt=""
-                sizes="(max-width: 900px) 100vw, 50vw"
+                sizes="(max-width: 900px) 125vw, 61vw"
                 parallax="8"
               />
             )}
@@ -103,6 +103,9 @@ const MOTIFS = [
     padding-top: 0;
   }
 
+  /* `sizes` in the markup depends on this ratio: a 3:2 photo covering an
+     800:706 box needs 1.5 × 706/800 = 1.32 times its width — `125vw` for
+     the full-width box, `61vw` for the half. */
   .s-feature__media {
     aspect-ratio: 800 / 706;
     border-radius: var(--r-md);

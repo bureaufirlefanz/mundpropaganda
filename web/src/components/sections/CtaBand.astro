@@ -53,7 +53,7 @@ const {
           source={image}
           alt={alt}
           widths={[1024, 1600, 2200]}
-          sizes="100vw"
+          sizes="(max-width: 700px) 200vw, 100vw"
         />
       </div>
     )
@@ -93,7 +93,13 @@ const {
   }
 
   .s-ctaband__media {
-    /* Verhältnis aus dem Entwurf: 1728 zu 645. */
+    /* Verhältnis aus dem Entwurf: 1728 zu 645.
+
+       Definite width, for the same reason as in PillarHero: otherwise the
+       min-height travels back through the ratio into the width, and between
+       701 and 1000px the band was 1018px wide — on an iPad the photo was cut
+       off on the right. */
+    width: 100%;
     aspect-ratio: 1728 / 645;
     min-height: 380px;
     overflow: hidden;
@@ -168,6 +174,8 @@ const {
       align-items: start;
     }
 
+    /* `sizes` in the markup depends on this ratio: a 3:2 photo covering a
+       3:4 box needs twice the box width — `200vw`. */
     .s-ctaband__media {
       aspect-ratio: 3 / 4;
     }

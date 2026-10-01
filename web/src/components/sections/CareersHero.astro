@@ -110,14 +110,14 @@ const {
             source={image}
             alt={alt}
             widths={[640, 1024, 1600, 2200]}
-            sizes="(max-width: 900px) 92vw, 94vw"
+            sizes="(max-width: 900px) 189vw, 94vw"
             eager
           />
         ) : (
           <Picture
             name={fallback}
             alt={alt}
-            sizes="(max-width: 900px) 92vw, 94vw"
+            sizes="(max-width: 900px) 189vw, 94vw"
             eager
           />
         )
@@ -213,6 +213,9 @@ const {
 
     /* Auf schmalen Fenstern wieder hochformatig: 16:9 auf 390px Breite wäre
        ein 220px hoher Streifen, in dem vom Raum nichts zu erkennen ist. */
+    /* The `sizes` in the markup depends on this ratio: a 3:2 photo
+       covering a 3:4 box needs twice its width, hence `189vw` for a box
+       of 94vw. */
     .s-chero__media {
       aspect-ratio: 3 / 4;
       border-radius: clamp(72px, 22vw, 160px) clamp(72px, 22vw, 160px)

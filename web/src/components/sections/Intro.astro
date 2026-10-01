@@ -84,7 +84,11 @@ const {
   {
     bleed && (
       <figure class="s-intro__bleed">
-        <Picture name={bleed} alt={alt} sizes="100vw" />
+        <Picture
+          name={bleed}
+          alt={alt}
+          sizes="(max-width: 900px) 113vw, 100vw"
+        />
       </figure>
     )
   }

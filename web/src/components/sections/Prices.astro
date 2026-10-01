@@ -208,6 +208,16 @@ const columns = Math.min(pricing.length, 5);
     color: var(--c-text);
   }
 
+  /* The 210px keep cards that stand side by side the same height. In one
+     column there is no neighbour to match, and the full-width card showed
+     a hollow box with the name at the top and the pill at the bottom. What
+     separates the two now is the card's gap. */
+  @media (max-width: 600px) {
+    .c-price {
+      min-height: 0;
+    }
+  }
+
   .c-price__name {
     font: var(--font-card-title);
     letter-spacing: var(--tracking-card-title);

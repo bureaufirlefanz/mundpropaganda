@@ -40,14 +40,14 @@ const { title, names, paragraphs, image } = Astro.props;
           source={image}
           alt={names.replace(/\n/g, " ")}
           widths={[640, 1024, 1600]}
-          sizes="(max-width: 900px) 100vw, 62vw"
+          sizes="(max-width: 900px) 100vw, (max-width: 1775px) 1100px, 62vw"
           data-parallax="9"
         />
       ) : (
         <Picture
           name="experten"
           alt="Dr. Hannes Schulte-Ostermann und Dr. Kerrin Gratecap"
-          sizes="(max-width: 900px) 100vw, 62vw"
+          sizes="(max-width: 900px) 100vw, (max-width: 1775px) 1100px, 62vw"
           parallax="9"
         />
       )

@@ -92,13 +92,13 @@ const cards = Array.from({ length: count }, (_, i) => ({
                 source={image.image}
                 alt={repeated ? "" : (image.alt ?? "")}
                 widths={[640, 1024]}
-                sizes="(max-width: 700px) 80vw, 38vw"
+                sizes="(max-width: 700px) 127vw, (max-width: 800px) 400px, 50vw"
               />
             ) : (
               <Picture
                 name={image.name ?? "empfang-p25"}
                 alt={repeated ? "" : (image.alt ?? "")}
-                sizes="(max-width: 700px) 80vw, 38vw"
+                sizes="(max-width: 700px) 127vw, (max-width: 800px) 400px, 50vw"
               />
             )}
           </figure>
@@ -302,6 +302,12 @@ const cards = Array.from({ length: count }, (_, i) => ({
      Fenster: 92vw ergeben gerendert rund 68vw. Die Bühne folgt derselben
      Rechnung, damit oben und unten nur noch ein Rand bleibt.
      -------------------------------------------------------------------- */
+  /* `sizes` on the card images follows these measures. The image is the
+     card height tall and covers it, so a 3:2 photo needs 1.5 × the card
+     height of width; the perspective shows it at 0.738. Here that is
+     1.5 × 115vw × 0.738 ≈ 127vw, above 700px 1.5 × 360px × 0.738 ≈ 400px
+     until the height leaves its minimum at 800px, then 1.5 × 45vw × 0.738
+     ≈ 50vw. */
   @media (max-width: 700px) {
     .c-ring {
       --ring-gap: 10px;

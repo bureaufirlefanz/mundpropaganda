@@ -33,6 +33,7 @@ import TableOfContents from "../components/ui/TableOfContents.astro";
 import TextHeading from "../components/ui/TextHeading.astro";
 import PostImage from "../components/ui/PostImage.astro";
 import { isCmsImage } from "../lib/images";
+import { loadServiceList } from "../lib/service-list";
 import { headingsFrom, withHeadingIds } from "../lib/table-of-contents";
 import {
   categoryLabel,
@@ -62,6 +63,20 @@ const headings = headingsFrom(d?.text);
 const showToc = headings.length >= 3;
 const blocks = withHeadingIds(d?.text, headings);
 const minutes = readingTime(d?.text);
+
+/* The way back to the service carries the name it has in menu and footer
+   (`shortName`, falling back to the title), not the page title. The Button
+   is a one-line pill and does not wrap: "Zur Leistung: Prophylaxe /
+   Professionelle Zahnreinigung" ran 166px past the edge of a 320px phone.
+   The prefix had to go as well — measured, "Zur Leistung: Wurzelbehandlung"
+   is still 297px against 288px of room. The name alone fits every service
+   down to 320px, the longest being "Zahnersatz / Prothetik" at 214px. */
+const serviceSlug = d?.service?.slug;
+const serviceName = serviceSlug
+  ? ((await loadServiceList()).find((s) => s.slug === serviceSlug)?.name ??
+    d?.service?.title ??
+    "")
+  : "";
 ---
 
 <Base
@@ -84,11 +99,16 @@ const minutes = readingTime(d?.text);
               source={d.previewImage}
               alt=""
               widths={[640, 1024, 1600, 2200]}
-              sizes="100vw"
+              sizes="(max-width: 700px) and (orientation: portrait) 78vh, 100vw"
               eager
             />
           ) : (
-            <Picture name={motifFor(d?.slug)} alt="" sizes="100vw" eager />
+            <Picture
+              name={motifFor(d?.slug)}
+              alt=""
+              sizes="(max-width: 700px) and (orientation: portrait) 78vh, 100vw"
+              eager
+            />
           )
         }
       </div>
@@ -199,7 +219,7 @@ const minutes = readingTime(d?.text);
               {d?.service?.slug && (
                 <div class="s-post__back">
                   <Button
-                    label={`Zur Leistung: ${d.service.title}`}
+                    label={serviceName}
                     href={`/leistungen/${d.service.slug}`}
                     variant="dark"
                   />
@@ -234,7 +254,7 @@ const minutes = readingTime(d?.text);
           {related.map((p) => (
             <PostCard
               post={p}
-              sizes="(max-width: 700px) 100vw, 30vw"
+              sizes="(max-width: 640px) 94vw, (max-width: 1000px) 47vw, 31vw"
               withButton
               data-reveal-child
             />
@@ -267,6 +287,9 @@ const minutes = readingTime(d?.text);
      einer negativen Marge über die Unterkante des Bildes; die Höhe des Bildes
      ist deshalb so bemessen, dass darunter noch Platz bleibt.
      -------------------------------------------------------------------- */
+  /* `sizes` in the markup depends on this height: on a portrait phone the
+     box is taller than wide, and a 3:2 photo covering 52vh needs 78vh of
+     width. */
   .s-post__headerimage {
     height: clamp(300px, 52vh, 620px);
     overflow: hidden;

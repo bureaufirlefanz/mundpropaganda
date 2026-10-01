@@ -57,7 +57,7 @@ const lines =
       alt={alt}
       eager
       widths={[1024, 1600, 2200]}
-      sizes="100vw"
+      sizes="(max-width: 700px) 188vw, 100vw"
     />
   </div>
 
@@ -90,7 +90,13 @@ const lines =
 
   .s-pillarhero__media {
     /* Bildhöhe aus dem Entwurf: 855 von 1728 Breite. Als Verhältnis notiert,
-       damit es auf jeder Breite hält, mit einer Untergrenze fürs Handy. */
+       damit es auf jeder Breite hält, mit einer Untergrenze fürs Handy.
+
+       The width must be definite. Left automatic, the browser carries the
+       min-height back through the ratio into the width — 420 × 1728/855 —
+       and between 701 and 870px the image was 849px wide: wider than the
+       screen, cut off on the right and off-centre. */
+    width: 100%;
     aspect-ratio: 1728 / 855;
     min-height: 420px;
     overflow: hidden;
@@ -194,6 +200,8 @@ const lines =
     }
   }
 
+  /* `sizes` in the markup depends on this ratio: a 3:2 photo covering a
+     4:5 box needs 1.5 × 1.25 = 1.88 times the box width — `188vw`. */
   @media (max-width: 700px) {
     .s-pillarhero__media {
       aspect-ratio: 4 / 5;

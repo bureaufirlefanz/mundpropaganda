@@ -82,6 +82,17 @@ const { data: d, title } = Astro.props;
     font-weight: var(--fw-medium);
   }
 
+  /* Legal German builds words longer than a phone is wide:
+     "Berufshaftpflichtversicherung" ran 56px past the edge at 320px and was
+     cut off by the page. On narrow screens the headings may break at a
+     syllable; on wide ones they fit and stay untouched. */
+  @media (max-width: 700px) {
+    .s-legal__text :global(h2),
+    .s-legal__text :global(h3) {
+      hyphens: auto;
+    }
+  }
+
   .s-legal__text :global(p),
   .s-legal__text :global(li) {
     font: var(--font-body-long);
