@@ -23,8 +23,8 @@ import {
   servicesIndex,
   magazineIndex,
   contactPage,
-  emergency,
 } from "./documents/single-pages";
+import { emergency } from "./documents/emergency";
 import { careers } from "./documents/careers";
 /* Praxis hat einen eigenen Typ, seit sie eine Seite hat: feste Abfolge statt
    Baukasten, wie bei der Karriereseite. */

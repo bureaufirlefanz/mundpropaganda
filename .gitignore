@@ -42,3 +42,10 @@ assets/raw/*
 
 # Local Netlify folder
 .netlify
+
+# Agency deliveries and the review notes on them. The repository is public,
+# and the agency documents carry patients' names (one of them a minor),
+# internal legal concerns and staff matters. The copy itself reaches the site
+# through Sanity (studio/scripts/copy/), so nothing here is needed to build.
+texte/*.zip
+texte/FLAGS-*.md

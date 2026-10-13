@@ -3,7 +3,6 @@ import { UsersIcon } from "@sanity/icons/Users";
 import { DocumentsIcon } from "@sanity/icons/Documents";
 import { CaseIcon } from "@sanity/icons/Case";
 import { EnvelopeIcon } from "@sanity/icons/Envelope";
-import { WarningOutlineIcon } from "@sanity/icons/WarningOutline";
 import { TagsIcon } from "@sanity/icons/Tags";
 import { seoField } from "../objects/seo-field";
 
@@ -121,9 +120,5 @@ export const contactPage = einzelseite(
   EnvelopeIcon,
   "/kontakt",
 );
-export const emergency = einzelseite(
-  "emergency",
-  "Notdienst",
-  WarningOutlineIcon,
-  "/notdienst",
-);
+/* `emergency` no longer lives here: since 2026-10-13 the emergency page has
+   its own type with fixed fields, in `documents/emergency.ts`. */

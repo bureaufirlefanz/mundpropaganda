@@ -10,6 +10,7 @@ import { DocumentsIcon } from "@sanity/icons/Documents";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { MenuIcon } from "@sanity/icons/Menu";
 import { StackCompactIcon } from "@sanity/icons/StackCompact";
+import { WarningOutlineIcon } from "@sanity/icons/WarningOutline";
 import type { ComponentType } from "react";
 
 /**
@@ -23,8 +24,7 @@ import type { ComponentType } from "react";
  *
  * ── Was hier NICHT steht, und warum ──────────────────────────────────────
  *
- * Praxis & Team, Magazin (Übersicht und Beiträge), Kontakt, Notdienst, die
- * Leistungs-Übersicht, Pillar Pages und die Rechtstexte sind bewusst
+ * Kontakt, die Leistungs-Übersicht und Pillar Pages sind bewusst
  * ausgeblendet: **Diese Seiten gibt es auf der Website nicht.** Wer sie hier
  * pflegt und publiziert, sieht das Ergebnis nirgends — und glaubt danach
  * keinem anderen Feld mehr.
@@ -49,6 +49,7 @@ export const SINGLETONS = [
   "practice",
   "magazineIndex",
   "careers",
+  "emergency",
   "settings",
   "navigation",
   "footer",
@@ -59,7 +60,7 @@ export const SINGLETONS = [
  * und in dieser Liste, damit niemand sie versehentlich über die generische
  * Auflistung wieder hereinholt — sichtbar sind sie nicht.
  */
-export const UNROUTED = ["servicesIndex", "contactPage", "emergency", "pillar"];
+export const UNROUTED = ["servicesIndex", "contactPage", "pillar"];
 
 /** Typen mit eigenem, ausgeschriebenem Eintrag — nicht noch einmal generisch. */
 const EXPLICIT = [
@@ -121,6 +122,8 @@ export const structure: StructureResolver = (S, context) =>
       S.documentTypeListItem("post").title("Beiträge").icon(DocumentTextIcon),
 
       singleton(S, "careers", "Karriere", CaseIcon),
+      /* Back since 2026-10-13, now with its own route `/notdienst`. */
+      singleton(S, "emergency", "Notdienst", WarningOutlineIcon),
 
       S.divider(),
 

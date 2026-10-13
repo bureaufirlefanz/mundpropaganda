@@ -57,7 +57,11 @@ const hasNote = Boolean(note?.text);
 ---
 
 <section
-  class:list={["container", "s-prose", `s-prose--${side}`]}
+  class:list={[
+    "container",
+    "s-prose",
+    image ? `s-prose--${side}` : "s-prose--text-only",
+  ]}
   id={id}
   data-toc-target={id}
 >
@@ -177,6 +181,20 @@ const hasNote = Boolean(note?.text);
   .s-prose__body {
     max-width: var(--measure-text);
     padding-inline: var(--sp-5) var(--sp-8);
+  }
+
+  /* Without an image: one reading column, centred under the centred
+     `SectionHeading`. Added for the emergency page, whose sections are text
+     only. Left in the two-column grid, the text sat in the left half, out of
+     line with its heading, next to an empty right half. */
+  .s-prose--text-only .s-prose__inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .s-prose--text-only .s-prose__body {
+    width: 100%;
+    padding-inline: 0;
   }
 
   /* Steht das Bild links, gehört der größere Abstand auf die andere Seite. */

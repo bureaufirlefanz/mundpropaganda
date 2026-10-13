@@ -214,7 +214,11 @@ const steps =
 
   {
     d?.pricing?.length ? (
-      <Prices pricing={d.pricing} title={d.pricingTitle || undefined} />
+      <Prices
+        pricing={d.pricing}
+        title={d.pricingTitle || undefined}
+        note={d.pricingNote || undefined}
+      />
     ) : null
   }
 

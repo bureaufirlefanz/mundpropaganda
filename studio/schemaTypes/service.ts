@@ -358,6 +358,21 @@ export const service = defineType({
       ],
     }),
 
+    /* The paragraph under the price cards. `sections/Prices.astro` has carried
+       the slot (`note`) since the pillar page; the service pages had no field
+       for it. The agency copy of October 2026 puts the billing context there
+       ("Privatleistung", what the statutory insurance covers) — without it the
+       amounts read as final, and they never are. */
+    defineField({
+      name: "pricingNote",
+      title: "Hinweis unter den Kosten",
+      type: "text",
+      rows: 3,
+      group: "content",
+      description:
+        "Ein Absatz unter den Preiskarten, z. B. was die Krankenkasse übernimmt. Leer lassen, wenn nichts zu sagen ist.",
+    }),
+
     defineField({
       name: "faq",
       title: "Häufige Fragen",

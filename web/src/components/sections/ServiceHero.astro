@@ -36,6 +36,14 @@ interface Props {
   /** Beschriftung des Buttons. */
   action?: string;
   actionHref?: string;
+  /**
+   * On narrow screens, text and button before the image instead of after.
+   *
+   * For the emergency page: someone in pain on a phone must reach the call
+   * button in the first screen, and the 60vh image above it pushed the
+   * button below the fold. The service pages keep the image first.
+   */
+  textFirst?: boolean;
 }
 
 const {
@@ -48,6 +56,7 @@ const {
   alt = "",
   action = "Termin buchen",
   actionHref = "#kontakt",
+  textFirst = false,
 } = Astro.props;
 
 /* Was in der Überschrift steht.
@@ -106,7 +115,10 @@ const HERO_MOTIF_OVERRIDE: Record<string, string> = {
 const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
 ---
 
-<section class="s-shero container" data-hero>
+<section
+  class:list={["s-shero", "container", textFirst && "s-shero--text-first"]}
+  data-hero
+>
   <ToothLines />
 
   <div class="s-shero__body">
@@ -349,6 +361,10 @@ const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
       height: 60vh;
       margin-inline: calc(var(--site-margin) * -1);
       border-radius: var(--r-md);
+    }
+
+    .s-shero--text-first .s-shero__media {
+      order: 0;
     }
   }
 </style>

@@ -1,0 +1,16 @@
+---
+/**
+ * The route. Load the data, call the template.
+ *
+ * Two sources: the emergency document and the practice's phone number from
+ * the settings.
+ */
+import EmergencyContent from "../templates/Emergency.astro";
+import { loadEmergency } from "../lib/emergency";
+import { loadSettings } from "../lib/settings";
+
+const data = await loadEmergency();
+const { phone } = await loadSettings();
+---
+
+<EmergencyContent data={data} phone={phone} />

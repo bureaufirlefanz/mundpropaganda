@@ -416,7 +416,7 @@ async function loadPathModel(datei = "studio/lib/paths.ts") {
  * fiel es auf.
  *
  * Verglichen wird gegen das Studio OHNE die ausgeblendeten Typen: `pillar`,
- * `servicesIndex`, `contactPage` und `notdienst` haben im Studio einen Pfad
+ * `servicesIndex` und `contactPage` haben im Studio einen Pfad
  * für später, aber keine Seite — die Website kennt sie deshalb zu Recht nicht.
  */
 async function checkPathModel() {
