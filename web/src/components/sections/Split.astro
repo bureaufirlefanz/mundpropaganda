@@ -12,6 +12,7 @@
  */
 import Picture from "../ui/Picture.astro";
 import CmsImage from "../ui/CmsImage.astro";
+import Button from "../ui/Button.astro";
 import { isCmsImage, type ImageSource } from "../../lib/images";
 
 interface Props {
@@ -19,9 +20,19 @@ interface Props {
   title: string;
   paragraphs: string[];
   image?: ImageSource;
+  /** The button under the paragraphs. Without a label there is none. */
+  action?: string;
+  actionHref?: string;
 }
 
-const { topline, title, paragraphs, image } = Astro.props;
+const {
+  topline,
+  title,
+  paragraphs,
+  image,
+  action,
+  actionHref = "#kontakt",
+} = Astro.props;
 ---
 
 {
@@ -82,6 +93,18 @@ const { topline, title, paragraphs, image } = Astro.props;
           {t}
         </p>
       ))
+    }
+    {
+      action && (
+        <div
+          class="s-split__action"
+          data-reveal="up"
+          data-reveal-delay={0.3 + paragraphs.length * 0.12}
+          data-reveal-trigger=".s-split"
+        >
+          <Button label={action} href={actionHref} />
+        </div>
+      )
     }
   </div>
 </section>
@@ -274,5 +297,11 @@ const { topline, title, paragraphs, image } = Astro.props;
     .s-split__panel p {
       max-width: 42ch;
     }
+  }
+
+  /* The button closes the text column. No margin of its own: the panel's
+     `gap` sets the same distance as between the paragraphs. */
+  .s-split__action {
+    align-self: flex-start;
   }
 </style>
