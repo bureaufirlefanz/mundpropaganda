@@ -248,48 +248,9 @@ export const homepage = defineType({
     }),
 
     /* --- Geschichten ---------------------------------------------------- */
-    defineField({
-      name: "storiesItems",
-      title: "Geschichten",
-      type: "array",
-      description:
-        "Bild, Name und Zitat gehören zusammen - sie wechseln gemeinsam.",
-      group: "stories",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "story",
-          fields: [
-            defineField({
-              name: "name",
-              title: "Name",
-              type: "string",
-              validation: (r) => r.required(),
-            }),
-            defineField({ name: "image", title: "Bild", type: "picture" }),
-            defineField({
-              name: "quote",
-              title: "Zitat",
-              type: "text",
-              rows: 6,
-            }),
-          ],
-          preview: {
-            select: { title: "name", subtitle: "quote", media: "image" },
-          },
-        }),
-      ],
-      /* Klasse 1. Der Abschnitt ist ein Kartenfächer mit gekoppeltem
-         Zitatband — ohne Einträge bleibt ein leerer Fächer über einem leeren
-         Zitat stehen. Dieselben Geschichten stehen auch auf den
-         Leistungsseiten; sie werden EINMAL hier gepflegt. */
-      validation: (r) => r.required(),
-    }),
-    /* Klasse 2. Unter dem Zitat stand ein Button „Ganze Story lesen" mit
-       `href="#"` — er sah aus wie ein Angebot und ließ den Browser nach oben
-       springen. Es gibt keine ganze Story: Die Stimmen sind Zitate, keine
-       Beiträge. Wohin der Button führt, entscheidet jetzt die Redaktion; ohne
-       Verweis erscheint er nicht. */
+    /* `storiesItems` lived here until 2026-10-14. The stories are documents
+       now (`story`), assignable to services; the homepage shows all of them.
+       Only the button under the quotes stays here. */
     defineField({
       name: "storiesAction",
       title: "Button unter den Geschichten",

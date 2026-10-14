@@ -325,11 +325,23 @@ export const HOMEPAGE_QUERY = defineQuery(`
     standardsTitle, standardsItems[]{ name, text, image${BILD} },
     locationsTitle, locationsImages[]{ image${BILD}, caption },
     expertsTitle, expertsParagraphs, expertsNames, expertsImage${BILD},
-    storiesItems[]{ name, image${BILD}, quote },
     storiesAction${LINK},
     magazineTopline, magazineTitle, magazineText,
     faq[]{ question, answer },
     seo{ title, description, noIndex, image${BILD} }
+  }
+`);
+
+/**
+ * The stories (Transformation Stories), in the order of the Studio list.
+ * `services` carries the slugs a story is assigned to; empty means
+ * everywhere. The video comes as the asset's URL, ready for <video>.
+ */
+export const STORIES_QUERY = defineQuery(`
+  *[_type == "story"] | order(orderRank) {
+    _id, name, quote, image${BILD},
+    "video": video.asset->url,
+    "services": services[]->slug.current
   }
 `);
 

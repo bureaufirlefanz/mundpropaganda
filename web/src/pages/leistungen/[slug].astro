@@ -8,8 +8,8 @@
 import Service from "../../templates/Service.astro";
 import { loadService, loadSlugs } from "../../lib/services";
 import { loadServiceList } from "../../lib/service-list";
-import { loadHomepage } from "../../lib/homepage";
 import { loadPosts } from "../../lib/magazine";
+import { storiesFor } from "../../lib/stories";
 
 // Muss die Ladefunktion importieren, nicht auf Frontmatter-Konstanten
 // zugreifen: Astro hebt getStaticPaths in einen eigenen Modulkontext.
@@ -26,11 +26,9 @@ const data = await loadService(slug!);
 const entry = (await loadServiceList()).find((l) => l.slug === slug);
 const title = data?.title || entry?.name || "";
 
-/* Die Patientenstimmen sind dieselben wie auf der Startseite — und werden
-   deshalb an EINER Stelle gepflegt, im Startseiten-Dokument. Bis Aufgabe 4
-   standen sie als Vorgabe im Baustein, sodass jede Seite ihre eigene Kopie
-   bekam; wer eine Geschichte änderte, änderte sie nirgends sichtbar. */
-const { storiesItems } = await loadHomepage();
+/* The stories of this service: the generic ones and those assigned to it
+   in the Studio. Until 2026-10-14 every service showed the homepage's five. */
+const stories = await storiesFor(slug!);
 
 /* Nur die Beiträge, die auf diese Leistung verweisen. */
 const posts = await loadPosts(slug!);
@@ -40,6 +38,6 @@ const posts = await loadPosts(slug!);
   data={data}
   title={title}
   slug={slug!}
-  stories={storiesItems}
+  stories={stories}
   posts={posts}
 />

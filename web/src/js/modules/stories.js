@@ -120,7 +120,38 @@ function initDeck() {
     );
   };
 
+  /* Video stories: the card shows its poster until the play button is
+     pressed; then the <video> covers the card and runs with sound. A deck
+     move stops it, so no story talks on from behind the next card. */
+  const stopVideos = () => {
+    cards.forEach((card) => {
+      const video = card.querySelector("[data-story-video]");
+      if (!video) return;
+      video.pause();
+      card.removeAttribute("data-playing");
+    });
+  };
+  cards.forEach((card) => {
+    const play = card.querySelector("[data-story-play]");
+    const video = card.querySelector("[data-story-video]");
+    if (!play || !video) return;
+    play.addEventListener("click", (e) => {
+      e.stopPropagation();
+      card.setAttribute("data-playing", "");
+      video.play();
+    });
+    video.addEventListener("click", () => {
+      if (video.paused) video.play();
+      else video.pause();
+    });
+    video.addEventListener("ended", () => {
+      card.removeAttribute("data-playing");
+      video.currentTime = 0;
+    });
+  });
+
   const render = (animate = true) => {
+    stopVideos();
     layout(cards, index, animate);
     if (counter) counter.textContent = `${index + 1} / ${cards.length}`;
     showQuote(index, animate);

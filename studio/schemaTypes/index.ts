@@ -29,7 +29,14 @@ import { careers } from "./documents/careers";
    Baukasten, wie bei der Karriereseite. */
 import { practice } from "./documents/practice";
 
-import { post, pillar, legalPage, person, job } from "./documents/collections";
+import {
+  post,
+  pillar,
+  legalPage,
+  person,
+  job,
+  story,
+} from "./documents/collections";
 import { navigation, footer } from "./documents/chrome";
 
 export const schemaTypes = [
@@ -68,4 +75,5 @@ export const schemaTypes = [
   legalPage,
   person,
   job,
+  story,
 ];

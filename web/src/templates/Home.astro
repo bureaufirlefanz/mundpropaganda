@@ -25,13 +25,16 @@ import { isCmsImage, imageUrl } from "../lib/images";
 import { resolved } from "../lib/navigation";
 import type { HomepageContent } from "../lib/homepage";
 import type { Post } from "../lib/magazine";
+import type { Story } from "../lib/stories";
 
 interface Props {
   data: HomepageContent;
   posts: Post[];
+  /** All stories; they are documents since 2026-10-14, see lib/stories.ts. */
+  stories: Story[];
 }
 
-const { data, posts } = Astro.props;
+const { data, posts, stories } = Astro.props;
 
 /* Seitentitel und Beschreibung aus dem SEO-Feld. Kein Rückfall im Sinne der
    Aufgabe 4: Suchmaschinenangaben sind kein sichtbarer Seiteninhalt, und ein
@@ -86,7 +89,7 @@ const shareImage = isCmsImage(data.seo?.image)
       { label: "Karriere", href: "/karriere" },
     ]}
   />
-  <Stories items={data.storiesItems} action={storiesAction} />
+  {stories.length > 0 && <Stories items={stories} action={storiesAction} />}
   {
     posts.length > 0 && (
       <Magazine

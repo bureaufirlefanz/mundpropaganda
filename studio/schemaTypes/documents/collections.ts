@@ -7,6 +7,7 @@ import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { BlockContentIcon } from "@sanity/icons/BlockContent";
 import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
+import { HeartIcon } from "@sanity/icons/Heart";
 import { slugAvailable, slugIsFree, RESERVED_SLUGS } from "../../lib/paths";
 import { blockContentMember, inlineImageMember } from "../objects/rich-text";
 import { seoField } from "../objects/seo-field";
@@ -609,5 +610,66 @@ export const job = defineType({
         .filter(Boolean)
         .join(" · "),
     }),
+  },
+});
+
+/* --- Geschichten (Transformation Stories) ---------------------------------- */
+
+/**
+ * A story: the face, the name, the quote, and since 2026-10-14 optionally a
+ * video. Until then the stories were an array on the homepage document and
+ * every service page showed the same five. As documents they can be
+ * assigned: a story with no services is generic and appears everywhere, a
+ * story with services appears on those pages (and on the homepage). The
+ * homepage shows all of them.
+ */
+export const story = defineType({
+  name: "story",
+  title: "Geschichte",
+  type: "document",
+  icon: HeartIcon,
+  orderings: [orderRankOrdering],
+  fields: [
+    orderRankField({ type: "story" }),
+    defineField({
+      name: "name",
+      title: "Name",
+      type: "string",
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "image",
+      title: "Bild",
+      type: "picture",
+      description:
+        "Das Gesicht auf der Karte. Bei einem Video das Standbild, bevor es läuft.",
+    }),
+    defineField({
+      name: "video",
+      title: "Video",
+      type: "file",
+      options: { accept: "video/mp4" },
+      description:
+        "Hochkant, als MP4. Läuft auf Klick in der Karte; der Text darunter fasst zusammen, was gesagt wird.",
+    }),
+    defineField({
+      name: "quote",
+      title: "Zitat",
+      type: "text",
+      rows: 6,
+      description:
+        "Steht unter dem Fächer. Bei einem Video die kurze Zusammenfassung in eigenen Worten.",
+    }),
+    defineField({
+      name: "services",
+      title: "Leistungen",
+      type: "array",
+      of: [defineArrayMember({ type: "reference", to: [{ type: "service" }] })],
+      description:
+        "Auf welchen Leistungsseiten die Geschichte steht. Leer: auf allen. Die Startseite zeigt immer alle.",
+    }),
+  ],
+  preview: {
+    select: { title: "name", subtitle: "quote", media: "image" },
   },
 });

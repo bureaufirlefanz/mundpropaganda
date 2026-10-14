@@ -9,9 +9,11 @@
 import Home from "../templates/Home.astro";
 import { loadHomepage } from "../lib/homepage";
 import { loadPosts } from "../lib/magazine";
+import { loadStories } from "../lib/stories";
 
 const data = await loadHomepage();
 const posts = await loadPosts();
+const stories = await loadStories();
 ---
 
-<Home data={data} posts={posts} />
+<Home data={data} posts={posts} stories={stories} />

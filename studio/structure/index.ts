@@ -6,6 +6,7 @@ import { HomeIcon } from "@sanity/icons/Home";
 import { CaseIcon } from "@sanity/icons/Case";
 import { UserIcon } from "@sanity/icons/User";
 import { UsersIcon } from "@sanity/icons/Users";
+import { HeartIcon } from "@sanity/icons/Heart";
 import { DocumentsIcon } from "@sanity/icons/Documents";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { MenuIcon } from "@sanity/icons/Menu";
@@ -107,6 +108,15 @@ export const structure: StructureResolver = (S, context) =>
          Karussells. Jetzt gibt es /magazin und /magazin/<slug>. */
       /* The practice page, then the people. Since 2026-10-01 people have no
          page of their own; they are the authors of magazine posts. */
+      /* Stories: documents since 2026-10-14, assignable to services. */
+      orderableDocumentListDeskItem({
+        type: "story",
+        title: "Geschichten",
+        icon: HeartIcon,
+        S,
+        context,
+      }),
+
       singleton(S, "practice", "Praxis", UsersIcon),
       orderableDocumentListDeskItem({
         type: "person",

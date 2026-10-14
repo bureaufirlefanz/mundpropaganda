@@ -23,6 +23,13 @@ interface Geschichte {
   quote?: string;
   /** Bild aus dem CMS. Fehlt es, greift das Motiv an derselben Position. */
   image?: ImageSource;
+  /**
+   * A video story: the URL of an MP4. The card shows the image (or motif)
+   * as its poster with a play button; on press the video covers the card
+   * and runs with sound, `js/modules/stories.js`. The quote below is then
+   * the summary of what is said.
+   */
+  video?: string | null;
 }
 
 interface Props {
@@ -101,6 +108,27 @@ const MOTIFS = [
                 sizes="(max-width: 700px) 70vw, 30vw"
                 parallax="9"
               />
+            )}
+            {e.video && (
+              <>
+                <video
+                  class="s-stories__video"
+                  src={e.video}
+                  playsinline
+                  preload="none"
+                  data-story-video
+                />
+                <button
+                  class="s-stories__play"
+                  type="button"
+                  aria-label={`Video von ${e.name} abspielen`}
+                  data-story-play
+                >
+                  <svg aria-hidden="true">
+                    <use href="#i-play" />
+                  </svg>
+                </button>
+              </>
             )}
             <figcaption class="s-stories__name">{e.name}</figcaption>
           </figure>
@@ -337,6 +365,52 @@ const MOTIFS = [
     height: 100%;
     object-fit: cover;
     pointer-events: none;
+  }
+
+  /* --- Video ----------------------------------------------------------
+     Hidden under the poster until the card plays; then it covers the card.
+     The button is the pink circle of the site (c-number sizes), centred. */
+  .s-stories__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .s-stories__card[data-playing] .s-stories__video {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .s-stories__card[data-playing] .s-stories__play {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .s-stories__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: var(--sp-8);
+    height: var(--sp-8);
+    border: 0;
+    border-radius: var(--r-round);
+    background: var(--c-brand);
+    color: var(--c-dark);
+    cursor: pointer;
+    transition: opacity var(--d-fast) var(--e-swift);
+  }
+
+  .s-stories__play svg {
+    width: var(--sp-5);
+    height: var(--sp-5);
+    translate: 0.1em 0;
   }
 
   .s-stories__name {

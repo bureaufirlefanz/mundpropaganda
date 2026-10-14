@@ -64,6 +64,7 @@ import type { ServiceEntry } from "../../lib/service-list";
 import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
 import type { PracticeContent as PracticeData } from "../../lib/practice";
 import { loadSettings } from "../../lib/settings";
+import { loadStories, storiesFor, type Story } from "../../lib/stories";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
    und zwar erst, nachdem das Geheimnis aus der URL gegen den Datensatz
@@ -115,15 +116,21 @@ let content: {
   practice?: PracticeData;
   posts: PostData[];
   jobs: Job[];
+  stories: Story[];
   title: string;
-} = { posts: [], jobs: [], title: "" };
+} = { posts: [], jobs: [], stories: [], title: "" };
 
 if (target.kind === "homepage") {
   const [data, posts] = await Promise.all([
     load<HomepageContent>(HOMEPAGE_QUERY),
     load<PostData[]>(POSTS_QUERY, { service: null }),
   ]);
-  content = { ...content, homepage: data, posts: posts ?? [] };
+  content = {
+    ...content,
+    homepage: data,
+    posts: posts ?? [],
+    stories: await loadStories(),
+  };
 } else if (target.kind === "service") {
   const [data, list, home, posts] = await Promise.all([
     load<ServiceData>(SERVICE_QUERY, { slug: target.slug }),
@@ -135,6 +142,7 @@ if (target.kind === "homepage") {
     ...content,
     service: data,
     posts: posts ?? [],
+    stories: await storiesFor(target.slug ?? ""),
     title:
       data?.title ||
       (list ?? []).find((l) => l.slug === target.slug)?.name ||
@@ -189,7 +197,11 @@ const { locations } = await loadSettings();
 
 {
   target.kind === "homepage" && content.homepage && (
-    <Home data={content.homepage} posts={content.posts} />
+    <Home
+      data={content.homepage}
+      posts={content.posts}
+      stories={content.stories}
+    />
   )
 }
 
@@ -199,7 +211,7 @@ const { locations } = await loadSettings();
       data={content.service}
       title={content.title}
       slug={target.slug ?? ""}
-      stories={content.homepage?.storiesItems ?? []}
+      stories={content.stories}
       posts={content.posts}
     />
   )

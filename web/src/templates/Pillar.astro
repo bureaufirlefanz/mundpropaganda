@@ -53,12 +53,12 @@ import SectionHeading from "../components/ui/SectionHeading.astro";
 import SectionDock from "../components/ui/SectionDock.astro";
 import { headingsFromSections } from "../lib/table-of-contents";
 import { navLabelOf, type PillarPage } from "../lib/pillar-sections";
-import type { HomepageContent } from "../lib/homepage";
+import type { Story } from "../lib/stories";
 
 interface Props {
   page: PillarPage;
   /** Dieselben Stimmen wie auf Start- und Leistungsseiten, dort gepflegt. */
-  stories?: HomepageContent["storiesItems"];
+  stories?: Story[];
 }
 
 const { page, stories = [] } = Astro.props;

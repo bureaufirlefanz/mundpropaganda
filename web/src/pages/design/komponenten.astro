@@ -47,6 +47,7 @@
  */
 import Design from "../../layouts/Design.astro";
 import { loadHomepage } from "../../lib/homepage";
+import { loadStories } from "../../lib/stories";
 import { loadService } from "../../lib/services";
 import { loadPosts, loadPost } from "../../lib/magazine";
 import { loadCareers, loadJobs } from "../../lib/careers";
@@ -123,6 +124,7 @@ import Application from "../../components/sections/Application.astro";
    Beispieldaten wären der falsche Ersatz: Diese Seite soll zeigen, was es
    wirklich gibt, nicht etwas, das so nirgends steht. */
 const content = await loadHomepage();
+const stories = await loadStories();
 
 /* Die Leistungsbausteine am Beispiel Veneers — der einzigen voll gepflegten
    Leistung. Bis Aufgabe 4 kamen sie aus `beispielLeistung` in fixtures.ts;
@@ -931,7 +933,7 @@ const RING_IMAGES = [
         ein pinkes Zeichen auf Taupe lag bei 1,26:1 und damit weit unter den
         3:1, die WCAG für Bedienelemente verlangt.
       </p>
-      <div class="d-live"><Stories items={content.storiesItems} /></div>
+      <div class="d-live"><Stories items={stories} /></div>
     </div>
 
     <div class="d-example">

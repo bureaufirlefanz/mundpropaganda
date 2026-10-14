@@ -22,11 +22,11 @@
  */
 import Pillar from "../templates/Pillar.astro";
 import { veneersPillar } from "../content/veneers-pillar";
-import { loadHomepage } from "../lib/homepage";
+import { storiesFor } from "../lib/stories";
 
-/* Die Stimmen sind geteilter Inhalt: Sie stehen auf der Startseite, den
-   Leistungsseiten und hier — gepflegt werden sie an einer Stelle. */
-const { storiesItems } = await loadHomepage();
+/* The veneers stories: the generic ones and those assigned to the veneers
+   service, the same set the service page shows. */
+const stories = await storiesFor("veneers");
 ---
 
-<Pillar page={veneersPillar} stories={storiesItems} />
+<Pillar page={veneersPillar} stories={stories} />
