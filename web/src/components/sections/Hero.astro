@@ -147,11 +147,14 @@ const { lines } = Astro.props;
 
      Kein overflow: hidden — Zahn und Linien dürfen aus der Section laufen. */
   .s-hero {
+    /* Named once: the centring of the block below subtracts it again. */
+    --hero-top: clamp(100px, 11vh, 150px);
+
     position: relative;
     min-height: 100svh;
     /* Nur so viel, dass die Leiste frei steht — die Meta-Zeilen hängen nicht
        am Innenabstand, sondern sitzen absolut. */
-    padding-top: clamp(100px, 11vh, 150px);
+    padding-top: var(--hero-top);
     padding-bottom: var(--sp-5);
     display: flex;
     flex-direction: column;
@@ -230,7 +233,16 @@ const { lines } = Astro.props;
      deren Unterkante, ohne dass hier eine zweite Rechnung nötig wäre. */
   .s-hero__block {
     position: relative;
-    margin-top: auto;
+    /* Centred in the viewport, not glued to the bottom. The composition is
+       the wordmark (26.1vw) plus the tooth's overhang below it (25vw, the
+       margin); whatever height is left above and below is split in two.
+       On a 16:9 screen nothing is left and the margin is 0, exactly where
+       `margin-top: auto` used to put it. On a tall window (Flo, 2026-10-14:
+       the wordmark started at half height) the block moves up. */
+    margin-top: max(
+      0px,
+      calc((100svh - var(--hero-top) - var(--sp-5) - 51.1vw) / 2)
+    );
     margin-bottom: 25vw;
   }
 
