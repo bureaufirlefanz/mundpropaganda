@@ -177,7 +177,7 @@ html.js [data-hero-scroll] {
   font-family: var(--f-mono);
   font-weight: var(--fw-light);
   font-size: var(--fs-text-small);
-  letter-spacing: var(--tracking-wide);
+  letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
   color: var(--c-neutral-800);
 }
@@ -261,7 +261,7 @@ html.js [data-hero-scroll] {
   border-radius: var(--r-round);
   background: var(--c-brand);
   color: var(--c-white);
-  font-size: var(--fs-micro);
+  font-size: var(--fs-label);
 }
 
 .c-field[data-invalid="true"] .c-field__error {
@@ -354,7 +354,7 @@ html.js [data-hero-scroll] {
   font-family: var(--f-sans);
   font-weight: var(--fw-regular);
   font-size: var(--number-font, var(--fs-text-small));
-  line-height: var(--lh-tight);
+  line-height: var(--lh-heading);
   letter-spacing: 0;
 }
 
@@ -363,32 +363,19 @@ html.js [data-hero-scroll] {
    2026-09-02, zusammen mit der Theme-Schicht in `tokens.css`. */
 
 /* --- Text link ---------------------------------------------------------
-   The underline wipes in from the left on hover and out to the right on
-   leave: two transform origins, one pseudo element, the direction always
-   reads. Lived in Footer.astro while only the footer used it; since
-   2026-10-14 the experts section links to Praxis and Karriere with it. */
+   Underlined by default, so a link reads as one without a button or a
+   colour (WCAG 1.4.1 as well). The line thickens on hover. Until
+   2026-10-14 the underline wiped in on hover only; at rest the link looked
+   like plain text. */
 .c-link {
-  position: relative;
-  display: inline-block;
-  transition: color var(--d-fast) var(--e-swift);
-}
-
-.c-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.15em;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform var(--d-base) var(--e-out);
+  text-decoration: underline;
+  text-decoration-thickness: var(--bw);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--d-fast) var(--e-swift);
 }
 
 @media (hover: hover) {
-  .c-link:hover::after {
-    transform: scaleX(1);
-    transform-origin: left center;
+  .c-link:hover {
+    text-decoration-thickness: calc(2 * var(--bw));
   }
 }
