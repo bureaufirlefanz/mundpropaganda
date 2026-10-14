@@ -13,7 +13,7 @@ interface Props {
 const { title, steps } = Astro.props;
 
 /* The duration as a figure: "ca. 90 Minuten pro Sitzung" becomes "90 Min.",
-   "30 bis 60 Minuten" becomes "30 bis 60 Min.", "1,5 Stunden" becomes
+   "30 bis 60 Minuten" becomes "30-60 Min.", "1,5 Stunden" becomes
    "1,5 Std.". The editors type a sentence in the Studio; the card shows the
    number next to a clock. Text without a recognisable unit stays as typed,
    so nothing silently disappears. */
@@ -23,7 +23,7 @@ function shortDuration(text: string): string {
   );
   if (!m) return text;
   const unit = /^min/i.test(m[2]!) ? "Min." : "Std.";
-  return `${m[1]!.replace(/\s*(-|–)\s*/, " bis ")} ${unit}`;
+  return `${m[1]!.replace(/\s*(bis|-|–)\s*/, "-")} ${unit}`;
 }
 ---
 
