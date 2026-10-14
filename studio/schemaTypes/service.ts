@@ -212,6 +212,14 @@ export const service = defineType({
                   validation: (r) => r.required(),
                 }),
                 defineField({
+                  name: "text",
+                  title: "Text",
+                  type: "text",
+                  rows: 3,
+                  description:
+                    "Nur in der Kartenform der Leistungsseiten: der Satz zwischen Begriff und Wert.",
+                }),
+                defineField({
                   name: "value",
                   title: "Wert",
                   type: "string",
@@ -545,6 +553,16 @@ export const service = defineType({
       options: { collapsible: true, collapsed: true },
       description: "Der Ablauf der Behandlung als nummerierte Karten.",
       fields: [
+        /* The emergency page lists what to do until the appointment: five
+           cases, not a sequence. Without numbers the cards read as a list. */
+        defineField({
+          name: "unnumbered",
+          title: "Ohne Nummern",
+          type: "boolean",
+          description:
+            "Anschalten, wenn die Schritte keine Reihenfolge sind, z. B. Fälle oder Tipps.",
+          initialValue: false,
+        }),
         defineField({
           name: "title",
           title: "Überschrift",

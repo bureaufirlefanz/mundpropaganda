@@ -63,7 +63,7 @@ Zahlen, Preise, Gegenüberstellungen.
 | `Compare` | Abschnitt | Vergleichstabelle — zwei Spalten nebeneinander, Zeile für Zeile. | `topline?: string` `headline?: string` `columns: CompareColumn[]` `lines: CompareRow[]` `note?: string` | Careers, Pillar, design/komponenten | ✓ |
 | `Prices` | Abschnitt | Preisraster. Jede Karte trägt eine Bezeichnung und eine Preis-Pille, die bündig unten sitzt — dadurch stehen die Pillen aller Kart | `title?: string` `pricing: Price[]` `id?: string` `note?: string` `disclaimer?: string` | Pillar, Service, design/komponenten | ✓ |
 | `Facts` | Abschnitt | Zahlenleiste — vier überprüfbare Angaben über die Praxis, die beim Hereinscrollen hochzählen. | `topline: string` `headline: string` `figures: Figure[]` | Careers, design/komponenten | ✓ |
-| `QuickFacts` | Abschnitt | "Auf einen Blick" — a compact term/value overview at the top of a service page: duration, cost, durability, anaesthesia. | `id?: string` `topline?: string` `headline?: string` `items: { label: string; value: str…` | Pillar, Service, design/komponenten | ✓ |
+| `QuickFacts` | Abschnitt | "Auf einen Blick" — a compact term/value overview at the top of a service page: duration, cost, durability, anaesthesia. | `id?: string` `topline?: string` `headline?: string` `items: {` `variant?: "list" | "cards"` | Pillar, Service, design/komponenten | ✓ |
 
 ## Abläufe
 
@@ -71,7 +71,7 @@ Schritt für Schritt, mit und ohne Zeitachse.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `Steps` | Abschnitt | Nummerierte Karten: der Ablauf einer Behandlung in wenigen Schritten. | `title?: string` `steps: Step[]` | Pillar, Service, design/komponenten | ✓ |
+| `Steps` | Abschnitt | Nummerierte Karten: der Ablauf einer Behandlung in wenigen Schritten. | `title?: string` `steps: Step[]` `numbered?: boolean` | Pillar, Service, design/komponenten | ✓ |
 | `Timeline` | Abschnitt | Zeitstrahl — ein Ablauf als waagerechte Bahn, an der sich beim Scrollen eine Linie entlangzieht und die Marken nacheinander anspri | `headline: string` `stages: Stage[]` | Careers, design/komponenten | ✓ |
 | `Features` | Abschnitt | Alternierende Bild/Text-Zeilen. Jede zweite Zeile dreht die Reihenfolge um, dadurch wandert das Bild im Wechsel von links nach rec | `lines: FeatureRow[]` | Practice, Service, design/komponenten | ✓ |
 
@@ -279,7 +279,8 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 **`QuickFacts`**
 
-- `items: { label: string; value: string; href?: string | null }[]` — A value with `href` is a link: a number to dial, a page to open.
+- `items: {` — A value with `href` is a link: a number to dial, a page to open.
+- `variant?: "list" | "cards"` — `list` (default): term and value in a row, the quiet form of the pillar pages. `cards`: one card per item, the value large on top, the term as the line under it. For a page where the values are the point, the emergency page with its numbers. /
 
 **`ServiceHero`**
 
@@ -295,6 +296,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`Steps`**
 
 - `title?: string` — Wahlfrei — siehe `ui/SectionHeading.astro`.
+- `numbered?: boolean` — Off for cards that are cases or tips, not a sequence.
 
 **`Stories`**
 

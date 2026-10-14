@@ -62,6 +62,12 @@ const { data: d, title, slug, stories, posts } = Astro.props;
 const MIT_FORMULAR = ["veneers", "keramikinlays"];
 const zeigtFormular = MIT_FORMULAR.includes(slug);
 
+/* Keine Transformation Stories auf dem Notdienst: Wer mit Schmerzen kommt,
+   sucht eine Nummer, keine Veneers-Geschichte. Bis die Geschichten je
+   Leistung zugeordnet sind, ist das eine Liste wie MIT_FORMULAR. */
+const OHNE_STORIES = ["notdienst"];
+const zeigtStories = !OHNE_STORIES.includes(slug);
+
 /* Das Motiv über dem Erklärstück.
  *
  * Der Text dazu kommt seit der Veneers-Copy aus dem CMS (`explainer`), das
@@ -184,6 +190,7 @@ const steps =
         topline={d.quickFacts.topline ?? undefined}
         headline={d.quickFacts.headline ?? undefined}
         items={d.quickFacts.items}
+        variant="cards"
       />
     ) : null
   }
@@ -225,9 +232,17 @@ const steps =
     )
   }
 
-  {steps && <Steps title={steps.title} steps={steps.items} />}
+  {
+    steps && (
+      <Steps
+        title={steps.title}
+        steps={steps.items}
+        numbered={!d?.steps?.unnumbered}
+      />
+    )
+  }
 
-  <Stories items={stories} />
+  {zeigtStories && <Stories items={stories} />}
 
   {
     d?.pricing?.length ? (

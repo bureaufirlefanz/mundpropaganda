@@ -16,15 +16,35 @@ interface Props {
   topline?: string;
   headline?: string;
   /** A value with `href` is a link: a number to dial, a page to open. */
-  items: { label: string; value: string; href?: string | null }[];
+  items: {
+    label: string;
+    value: string;
+    href?: string | null;
+    /** Cards only: the sentence between the term and the value. */
+    text?: string | null;
+  }[];
+  /**
+   * `list` (default): term and value in a row, the quiet form of the pillar
+   * pages. `cards`: one card per item, the value large on top, the term as
+   * the line under it. For a page where the values are the point, the
+   * emergency page with its numbers.
+   */
+  variant?: "list" | "cards";
 }
 
-const { id, topline, headline, items } = Astro.props;
+const { id, topline, headline, items, variant = "list" } = Astro.props;
 ---
 
 {
   items.length > 0 && (
-    <section class="s-quickfacts container" id={id}>
+    <section
+      class:list={[
+        "s-quickfacts",
+        "container",
+        variant === "cards" && "s-quickfacts--cards",
+      ]}
+      id={id}
+    >
       {(topline || headline) && (
         <div class="s-quickfacts__head">
           {topline && (
@@ -42,8 +62,15 @@ const { id, topline, headline, items } = Astro.props;
 
       <dl class="s-quickfacts__list" data-reveal-stagger="0.04">
         {items.map((item) => (
-          <div class="s-quickfacts__row" data-reveal-child>
+          <div
+            class="s-quickfacts__row"
+            data-surface={variant === "cards" ? "card" : undefined}
+            data-reveal-child
+          >
             <dt class="s-quickfacts__label">{item.label}</dt>
+            {variant === "cards" && item.text && (
+              <dd class="s-quickfacts__text">{item.text}</dd>
+            )}
             <dd class="s-quickfacts__value">
               {item.href ? (
                 <a class="c-link" href={item.href}>
@@ -112,6 +139,43 @@ const { id, topline, headline, items } = Astro.props;
     font-size: var(--fs-text-main);
     line-height: var(--lh-body);
     color: var(--c-text);
+  }
+
+  /* --- Cards --------------------------------------------------------------
+     Each item on its own card: the term as a short title, the sentence
+     under it, the value at the bottom edge, large. Cards in a row end on
+     the same line because the value is pushed down with `margin-top: auto`. */
+  .s-quickfacts--cards .s-quickfacts__list {
+    gap: var(--site-gutter);
+  }
+
+  .s-quickfacts--cards .s-quickfacts__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-5);
+    border-top: 0;
+    border-radius: var(--r-md);
+    background: var(--c-white);
+  }
+
+  .s-quickfacts--cards .s-quickfacts__label {
+    font: var(--font-card-title);
+    letter-spacing: var(--tracking-card-title);
+    color: var(--c-text);
+  }
+
+  .s-quickfacts--cards .s-quickfacts__text {
+    margin: 0;
+    font: var(--font-body);
+    color: var(--c-text-muted);
+  }
+
+  .s-quickfacts--cards .s-quickfacts__value {
+    margin-top: auto;
+    padding-top: var(--sp-5);
+    font-size: var(--fs-text-large);
+    font-weight: var(--fw-medium);
   }
 
   @media (max-width: 900px) {

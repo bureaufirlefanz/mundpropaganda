@@ -56,36 +56,33 @@ export default {
         {
           _key: "f1",
           _type: "fact",
-          label: "Praxis",
+          label: "Unsere Praxis",
+          text: "Mo bis Do 8 bis 20 Uhr, Fr 8 bis 14:30 Uhr, der letzte Termin beginnt um 19:45 Uhr. Sag am Telefon gleich, dass du Schmerzen hast.",
           value: "030 5199 99580",
           href: "tel:+493051999580",
         },
         {
           _key: "f2",
           _type: "fact",
-          label: "Sprechzeiten",
-          value:
-            "Mo bis Do 8 bis 20 Uhr, Fr 8 bis 14:30 Uhr, letzter Termin 19:45 Uhr",
-        },
-        {
-          _key: "f3",
-          _type: "fact",
-          label: "Notdienst nachts und am Wochenende",
+          label: "Zahnärztlicher Notdienst Berlin",
+          text: "Nach 20 Uhr, an Wochenenden und Feiertagen. Die zentrale Nummer sagt dir, welche Praxis gerade Dienst hat.",
           value: "030 89004-333",
           href: "tel:+4930890043330",
         },
         {
-          _key: "f4",
+          _key: "f3",
           _type: "fact",
           label: "Ärztlicher Bereitschaftsdienst",
+          text: "Wenn du unsicher bist, ob es überhaupt zahnärztlich ist.",
           value: "116 117",
           href: "tel:116117",
         },
         {
-          _key: "f5",
+          _key: "f4",
           _type: "fact",
-          label: "Fieber, Schluckbeschwerden, Atemnot",
-          value: "Notaufnahme oder 112",
+          label: "Notaufnahme",
+          text: "Wenn zu einer Schwellung Fieber, Schluckbeschwerden oder Atemnot kommen oder sie bis zum Auge reicht.",
+          value: "112",
           href: "tel:112",
         },
       ],
@@ -138,6 +135,7 @@ export default {
 
     steps: {
       title: "Was du bis zum Termin tun kannst",
+      unnumbered: true,
       items: [
         {
           _key: "s1",

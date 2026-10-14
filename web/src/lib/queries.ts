@@ -97,7 +97,7 @@ export const SERVICE_QUERY =
   title,
   topline,
   hero{ claim, text, actionLabel, actionLink, image${BILD} },
-  quickFacts{ topline, headline, items[]{ label, value, href } },
+  quickFacts{ topline, headline, items[]{ label, text, value, href } },
   intro{ topline, headline, columns },
   benefits{ topline, headline, items[]{ name, text, image${BILD} } },
   pricingTitle,
@@ -108,7 +108,7 @@ export const SERVICE_QUERY =
   beforeAfter{ topline, before${BILD}, after${BILD} },
   statement{ topline, text },
   explainer{ topline, headline, columns, actionLabel, actionLink },
-  steps{ title, items[]{ title, text, duration } },
+  steps{ title, unnumbered, items[]{ title, text, duration } },
   features[]{ topline, title, text, image${BILD} },
   seo{ title, description, noIndex, image${BILD} }
 }`);

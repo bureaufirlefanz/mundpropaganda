@@ -8,9 +8,11 @@ interface Props {
   /** Wahlfrei — siehe `ui/SectionHeading.astro`. */
   title?: string;
   steps: Step[];
+  /** Off for cards that are cases or tips, not a sequence. */
+  numbered?: boolean;
 }
 
-const { title, steps } = Astro.props;
+const { title, steps, numbered = true } = Astro.props;
 
 /* The duration as a figure: "ca. 90 Minuten pro Sitzung" becomes "90 Min.",
    "30 bis 60 Minuten" becomes "30-60 Min.", "1,5 Stunden" becomes
@@ -41,7 +43,7 @@ function shortDuration(text: string): string {
       {
         steps.map((s, i) => (
           <article class="c-step" data-surface="card" data-reveal-child>
-            <span class="c-number c-step__num">{i + 1}</span>
+            {numbered && <span class="c-number c-step__num">{i + 1}</span>}
             <h3 class="c-step__title">{s.title}</h3>
             <p class="c-step__text">{s.text}</p>
             {s.duration && (
