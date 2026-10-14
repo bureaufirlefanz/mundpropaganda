@@ -56,36 +56,35 @@ export default {
         {
           _key: "f1",
           _type: "fact",
-          label: "Praxis, Mo bis Do 8 bis 20 Uhr, Fr 8 bis 14:30 Uhr",
+          label: "Praxis",
           value: "030 5199 99580",
           href: "tel:+493051999580",
         },
         {
           _key: "f2",
           _type: "fact",
-          label: "Letzter Termin",
-          value: "19:45 Uhr",
+          label: "Sprechzeiten",
+          value:
+            "Mo bis Do 8 bis 20 Uhr, Fr 8 bis 14:30 Uhr, letzter Termin 19:45 Uhr",
         },
         {
           _key: "f3",
           _type: "fact",
-          label:
-            "Nachts, Wochenende, Feiertage: zahnärztlicher Notdienst Berlin",
+          label: "Notdienst nachts und am Wochenende",
           value: "030 89004-333",
           href: "tel:+4930890043330",
         },
         {
           _key: "f4",
           _type: "fact",
-          label:
-            "Unsicher, ob es zahnärztlich ist: ärztlicher Bereitschaftsdienst",
+          label: "Ärztlicher Bereitschaftsdienst",
           value: "116 117",
           href: "tel:116117",
         },
         {
           _key: "f5",
           _type: "fact",
-          label: "Schwellung mit Fieber, Schluckbeschwerden oder Atemnot",
+          label: "Fieber, Schluckbeschwerden, Atemnot",
           value: "Notaufnahme oder 112",
           href: "tel:112",
         },

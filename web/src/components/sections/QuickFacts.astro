@@ -90,9 +90,13 @@ const { id, topline, headline, items } = Astro.props;
   /* The rule sits on top of every row, not below: with an even number of
      rows in two columns the last line would otherwise close only one
      column and leave the block visibly lopsided. */
+  /* `fit-content(45%)`, not `max-content`: a long term ("Notdienst nachts und
+     am Wochenende") took the whole row as max-content and pushed the value
+     out of sight. Now it wraps at under half the row; short terms, the
+     usual case, are unaffected. */
   .s-quickfacts__row {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: fit-content(45%) minmax(0, 1fr);
     gap: 0 var(--sp-5);
     padding-block: var(--sp-3);
     border-top: var(--bw) solid var(--c-line);
