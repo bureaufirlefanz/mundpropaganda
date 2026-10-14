@@ -714,10 +714,10 @@ const RING_IMAGES = [
       <p class="d-sample__text">
         Die Beitragskarte in zwei Fassungen. <code>overlap</code> ist die des Karussells:
         Bild, darauf versetzt eine weiße Fläche, die mit dem Text nach oben wächst.
-        <code>stacked</code> ist die der Übersicht unter /magazin: Bild oben, Fläche
-        darunter, beliebig viel Text. Die Breite kommt von außen über <code
-          >--post-width</code
-        >. Unter etwa 460px stapelt jede Karte von selbst.
+        <code>card</code> ist die der Übersicht unter /magazin: eine Fläche mit Bild,
+        Text und Button, alles linksbündig, beliebig viel Text. Die Breite kommt von
+        außen über <code>--post-width</code>. Unter etwa 460px stapelt die
+        überlappende Karte von selbst.
       </p>
       <div class="d-stage" style="max-width: 560px">
         {
@@ -728,7 +728,7 @@ const RING_IMAGES = [
                 post={posts[0]!}
                 sizes="500px"
                 withButton
-                variant="stacked"
+                variant="card"
               />
             </>
           ) : null

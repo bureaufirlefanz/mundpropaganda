@@ -84,7 +84,7 @@ Wiederholte Einträge. Vor einem neuen Kartenraster hier zuerst nachsehen.
 | `Services` | Abschnitt | Services-Tabelle. Die Zeilen kommen aus der Leistungen-Collection, nicht mehr aus dem Markup — dieselbe Quelle wie Menü und Footer | `title: string` | Home, design/komponenten | ✓ |
 | `Magazine` | Abschnitt | — | `topline: string` `title: string` `text: string` `posts: Post[]` | Home, Service, design/komponenten, magazin/index, preview/[...path] | ✓ |
 | `PostList` | Abschnitt | Die Beiträge als Raster — die Übersicht unter /magazin. | `posts: Post[]` | Magazine, design/komponenten | ✓ |
-| `PostCard` | UI | Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. | `post: Post` `sizes: string` `parallax?: string` `withButton?: boolean` `headingLevel?: "h2" | "h3"` `variant?: "overlap" | "stacked"` | Post, design/komponenten, sections/Magazine | ✓ |
+| `PostCard` | UI | Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. | `post: Post` `sizes: string` `parallax?: string` `withButton?: boolean` `headingLevel?: "h2" | "h3"` `variant?: "overlap" | "card"` | Post, design/komponenten, sections/Magazine | ✓ |
 | `Jobs` | Abschnitt | Offene Stellen — jede Zeile klappt auf und zeigt Aufgaben, Profil und den Weg zur Bewerbung. | `id?: string` `topline: string` `headline: string` `jobs: Job[]` `applicationEmail: string` `text?: string` | Careers, design/komponenten | ✓ |
 | `Locations` | Abschnitt | Die Standorte mit Anschrift, Zeiten und Karte. | `id?: string` `topline: string` `headline: string` `text?: string` `locations: Location[]` | design/komponenten | ✓ |
 | `Perks` | Abschnitt | Was die Praxis bietet, als Liste. Auf der Karriereseite. | `topline: string` `headline: string` `items: string[]` | Careers, design/komponenten | ✓ |
@@ -334,7 +334,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 - `parallax?: string` — Tiefe des Parallax auf dem Bild. Ohne Wert steht es still.
 - `withButton?: boolean` — Der Button trägt das Karussell, nicht die Übersicht.
 - `headingLevel?: "h2" | "h3"` — Die Ebene der Überschrift. Nicht fest verdrahtet, weil sie von der Seite abhängt: Im Karussell steht darüber ein h2 („Mund zu Mund"), also ist h3 richtig. Auf /magazin ist der Seitentitel das h1 und es gibt kein h2 dazwischen — dort wäre h3 eine übersprungene Ebene. Der Test in `web:check` hat genau das gemeldet: „h1 → h3 bei Zahngesundheit & Fitness". /
-- `variant?: "overlap" | "stacked"` — The composition. `overlap` is the card of the carousel: portrait image, the white surface set over its lower right. It needs around 420px of width and takes only so much text. `stacked` puts the image on top (4:3) and the surface below it, still shifted over the image edge: the surface grows with the text, which is what the overview under /magazin needs, where a post with a long title and lead must not break the row. Below 460px every card stacks anyway, see the container query. /
+- `variant?: "overlap" | "card"` — The composition. `overlap` is the card of the carousel: portrait image, the white surface set over its lower right. It needs around 420px of width and takes only so much text. `card` is the classic form for the overview under /magazin: one white card with padding, image on top (4:3), category, title, lead and button below it, everything left aligned. It takes any amount of text. (A `stacked` form with the surface shifted over the image edge lived here for a day on 2026-10-14; the overview wanted the plain card.) Below 460px the overlapping card stacks by itself, see the container query. /
 
 **`SectionDock`**
 

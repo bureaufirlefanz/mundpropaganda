@@ -43,7 +43,7 @@ const categories = [
           sizes="(max-width: 640px) 94vw, (max-width: 1000px) 47vw, 31vw"
           withButton
           headingLevel="h2"
-          variant="stacked"
+          variant="card"
           data-reveal-child
         />
       ))
@@ -67,18 +67,17 @@ const categories = [
     margin-bottom: var(--sp-8);
   }
 
-  /* Drei Spalten, die Karte gestapelt (`variant="stacked"`): Bild oben, die
-     weiße Fläche darunter, und die wächst mit dem Text. Die versetzte
-     Überlappung des Karussells trägt in 400px Spaltenbreite keinen langen
-     Titel samt Anriss; seit 2026-10-14 verlässt sich die Übersicht deshalb
-     nicht mehr auf die Schwelle in der Karte, sondern sagt es ihr.
+  /* Drei Spalten, die klassische Karte (`variant="card"`): eine Fläche mit
+     Bild, Text und Button, alles linksbündig. Die versetzte Überlappung des
+     Karussells trägt in 400px Spaltenbreite keinen langen Titel samt
+     Anriss; seit 2026-10-14 zeigt die Übersicht deshalb die einfache Form.
 
-     `align-items: start`, sonst dehnen die Zellen ihren Inhalt auf die
-     Zeilenhöhe und die weiße Fläche hinge unter dem Button. */
+     Die Zellen dehnen die Karten auf Reihenhöhe; der Button sitzt in der
+     Karte unten, also enden alle Karten einer Reihe auf derselben Linie. */
   .s-postlist__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
     gap: var(--flow-lg) var(--site-gutter);
   }
 

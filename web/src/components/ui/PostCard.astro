@@ -48,13 +48,15 @@ interface Props {
    *
    * `overlap` is the card of the carousel: portrait image, the white surface
    * set over its lower right. It needs around 420px of width and takes only
-   * so much text. `stacked` puts the image on top (4:3) and the surface
-   * below it, still shifted over the image edge: the surface grows with the
-   * text, which is what the overview under /magazin needs, where a post with
-   * a long title and lead must not break the row. Below 460px every card
-   * stacks anyway, see the container query.
+   * so much text. `card` is the classic form for the overview under
+   * /magazin: one white card with padding, image on top (4:3), category,
+   * title, lead and button below it, everything left aligned. It takes any
+   * amount of text. (A `stacked` form with the surface shifted over the
+   * image edge lived here for a day on 2026-10-14; the overview wanted the
+   * plain card.) Below 460px the overlapping card stacks by itself, see the
+   * container query.
    */
-  variant?: "overlap" | "stacked";
+  variant?: "overlap" | "card";
 }
 
 const {
@@ -86,8 +88,9 @@ const motif = motifFor(p.slug);
      pflegen. */
 }
 <a
-  class:list={["c-post", variant === "stacked" && "c-post--stacked"]}
+  class:list={["c-post", variant === "card" && "c-post--card"]}
   href={postPath(p.slug)}
+  data-surface={variant === "card" ? "card" : undefined}
   data-category={p.category ?? ""}
   {...rest}
 >
@@ -244,7 +247,7 @@ const motif = motifFor(p.slug);
     color: var(--c-on-card-muted);
     /* Four lines at most in the overlapping surface. A lead is a teaser,
        the full text is one click away; what is cut here is better cut than
-       pushed over the image's top edge. The stacked card lifts the clamp. */
+       pushed over the image's top edge. The classic card lifts the clamp. */
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
@@ -268,34 +271,51 @@ const motif = motifFor(p.slug);
     }
   }
 
-  /* --- Gestapelt als Variante --------------------------------------------
-     Dieselbe Komposition wie unten in der Container-Abfrage, nur auf
-     Zuruf: Die Übersicht unter /magazin stellt die Karte so, damit ein
-     langer Titel samt Anriss die Fläche wachsen lässt statt zu sprengen.
-     Die Regeln stehen zweimal, weil ein Selektor und eine @container-Regel
-     sich nicht zu einer Liste zusammenziehen lassen; wer eine ändert,
-     ändert beide. */
-  .c-post--stacked .c-post__media {
-    width: 100%;
-    aspect-ratio: 4 / 3;
+  /* --- Klassische Karte ---------------------------------------------------
+     Eine Fläche, alles darin, alles linksbündig: Bild, Rubrik, Titel, Anriss,
+     Button. Die Fläche ist die Karte selbst, `.c-post__surface` wird darin
+     zum einfachen Textblock. Der Button sitzt per `margin-top: auto` unten,
+     damit die Karten einer Reihe auf derselben Linie enden, wenn das Raster
+     sie auf eine Höhe dehnt. */
+  .c-post--card {
+    align-items: stretch;
+    padding: var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--c-white);
   }
 
-  .c-post--stacked .c-post__surface {
+  .c-post--card .c-post__media {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-sm);
+  }
+
+  /* `margin-top: 0` and `align-self` are spelled out because the container
+     query below still matches: it measures the content box, and in a 480px
+     column that is 432px, under its 460px threshold. Its negative margin
+     would pull the text up over the image. */
+  .c-post--card .c-post__surface {
     position: relative;
-    z-index: 1;
     inset: auto;
     min-height: 0;
     max-height: none;
-    align-self: flex-end;
-    width: 92%;
-    margin-top: calc(-1 * var(--sp-8));
+    align-self: stretch;
+    width: 100%;
+    margin-top: 0;
+    padding: var(--sp-4) 0 var(--sp-5);
+    border-radius: 0;
+    background: none;
   }
 
-  .c-post--stacked .c-post__text {
+  .c-post--card .c-post__text {
     margin-top: 0;
     padding-top: var(--sp-3);
     display: block;
     -webkit-line-clamp: none;
+  }
+
+  .c-post--card :global(.c-btn) {
+    margin-top: auto;
   }
 
   /* --- Schmale Karte ----------------------------------------------------
