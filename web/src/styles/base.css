@@ -392,7 +392,8 @@ main:focus {
    Wichtig: `yPercent` in reveal.js MUSS größer als 100 bleiben. Die Zeile
    startet um ihre eigene Höhe versetzt; wäre der Kasten tiefer und der
    Versatz unverändert, lugte ihre Oberkante ins Polster. */
-.split-line-mask {
+.split-line-mask,
+.hero-char-mask {
   padding-bottom: 0.24em;
   margin-bottom: -0.24em;
 }

@@ -106,6 +106,12 @@ export function initHero() {
           type: "words,chars",
           mask: "chars",
           wordsClass: "hero-word",
+          /* SplitText names a mask after its element's class plus "-mask";
+             without a class the char masks are anonymous and no stylesheet
+             can reach them. base.css gives `.hero-char-mask` the same room
+             for descenders as `.split-line-mask`: the claim of a service
+             page ("Gefertigt, wo behandelt wird") lost the loop of its g. */
+          charsClass: "hero-char",
         }),
     );
     const chars = splits.flatMap((s) => s.chars);
@@ -156,7 +162,10 @@ export function initHero() {
       .from(
         chars,
         {
-          yPercent: 100,
+          /* 130, not 100: the mask is 0.24em deeper than the glyph box (see
+             base.css), and a char offset by only its own height would show
+             its top through the padding. Same reasoning as in reveal.js. */
+          yPercent: 130,
           duration: wordDuration,
           stagger: { each: wordStagger, from: "start" },
         },
