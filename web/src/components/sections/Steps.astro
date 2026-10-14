@@ -14,6 +14,13 @@ interface Props {
 
 const { title, steps, numbered = true } = Astro.props;
 
+/* Up to four cards in one row. More than four are split into rows of
+   equal size: five become 3 + 2, six 3 + 3, seven 4 + 3, not 4 + 1 with a
+   lone card under a row of four. The count goes to the grid as a custom
+   property; under 1000px the stylesheet overrides it with two columns. */
+const rows = Math.ceil(steps.length / 4);
+const columns = Math.min(4, Math.ceil(steps.length / rows));
+
 /* The duration as a figure: "ca. 90 Minuten pro Sitzung" becomes "90 Min.",
    "30 bis 60 Minuten" becomes "30-60 Min.", "1,5 Stunden" becomes
    "1,5 Std.". The editors type a sentence in the Studio; the card shows the
@@ -39,10 +46,18 @@ function shortDuration(text: string): string {
       )
     }
 
-    <div class="s-steps__grid" data-reveal-stagger="0.08">
+    <div
+      class="s-steps__grid"
+      style={`--step-columns: ${columns}`}
+      data-reveal-stagger="0.08"
+    >
       {
         steps.map((s, i) => (
-          <article class="c-step" data-surface="card" data-reveal-child>
+          <article
+            class:list={["c-step", !numbered && "c-step--plain"]}
+            data-surface="card"
+            data-reveal-child
+          >
             {numbered && <span class="c-number c-step__num">{i + 1}</span>}
             <h3 class="c-step__title">{s.title}</h3>
             <p class="c-step__text">{s.text}</p>
@@ -82,7 +97,6 @@ function shortDuration(text: string): string {
      the page instead of hugging the left edge with empty columns beside it.
      The card width is the same as with four steps, so nothing else moves. */
   .s-steps__grid {
-    --step-columns: 4;
     display: grid;
     grid-template-columns: repeat(
       auto-fit,
@@ -138,6 +152,17 @@ function shortDuration(text: string): string {
   /* Farbe, Form und Schnitt kommen aus `.c-number` in shared.css. Hier
      steht nur, was diesen Kreis von den übrigen unterscheidet: seine Größe.
      Dieser Baustein war die Vorlage für die gemeinsame Regel. */
+  /* Without numbers the cards are a list of cases, not a row of equal
+     steps: no fixed height, the text follows the title directly. Otherwise
+     a short case stood with 200px of nothing between title and text. */
+  .c-step--plain {
+    min-height: 0;
+  }
+
+  .c-step--plain .c-step__text {
+    margin-top: 0;
+  }
+
   .c-step__num {
     --number-size: 40px;
     --number-font: var(--fs-text-main);

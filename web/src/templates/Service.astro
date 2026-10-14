@@ -28,7 +28,7 @@ import QuickFacts from "../components/sections/QuickFacts.astro";
 import CtaBand from "../components/sections/CtaBand.astro";
 import { benefitsFootnote } from "../content/service-crosslinks";
 import type { Service } from "../lib/services";
-import type { HomepageContent } from "../lib/homepage";
+import type { Story } from "../lib/stories";
 import type { Post } from "../lib/magazine";
 
 interface Props {
@@ -38,7 +38,7 @@ interface Props {
   /** Entscheidet, ob das Angebotsformular unten steht. Siehe MIT_FORMULAR. */
   slug: string;
   /** Dieselben Stimmen wie auf der Startseite, dort gepflegt. */
-  stories: HomepageContent["storiesItems"];
+  stories: Story[];
   /** Beiträge, die im Studio auf genau diese Leistung verweisen. */
   posts: Post[];
 }
@@ -242,7 +242,7 @@ const steps =
     )
   }
 
-  {zeigtStories && <Stories items={stories} />}
+  {zeigtStories && stories.length > 0 && <Stories items={stories} />}
 
   {
     d?.pricing?.length ? (
@@ -273,8 +273,6 @@ const steps =
     )
   }
 
-  {d?.faq?.length ? <Faq questions={d.faq} /> : null}
-
   {
     d?.closing?.headline ? (
       <CtaBand
@@ -285,6 +283,8 @@ const steps =
       />
     ) : null
   }
+
+  {d?.faq?.length ? <Faq questions={d.faq} /> : null}
 
   {zeigtFormular && <Contact service={title} />}
 </Base>
