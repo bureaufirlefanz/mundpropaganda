@@ -27,6 +27,13 @@
  * before anyone publishes it. Without either, the copy goes live directly.
  * `ONLY` takes one or more IDs, comma separated.
  *
+ *     cd studio && PUBLISH=1 npx sanity exec scripts/copy-import.mjs --with-user-token
+ *
+ * `PUBLISH=1` writes nothing new: it publishes the drafts of these pages as
+ * they are in the Studio now, including any edits made there since the
+ * import. Pages without a draft are skipped. Combine with `DRY=1` to list
+ * what would be published.
+ *
  * Running it again is harmless.
  */
 import { readdir } from "node:fs/promises";
@@ -38,6 +45,7 @@ const client = getCliClient({ apiVersion: "2026-07-28" });
 const DRY = process.env.DRY === "1";
 const DRAFT = process.env.DRAFT === "1";
 const ONLY = process.env.ONLY?.split(",").map((s) => s.trim());
+const PUBLISH = process.env.PUBLISH === "1";
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), "copy");
 
@@ -116,8 +124,42 @@ async function write(page) {
   console.log("  ✓ written");
 }
 
+/* Publishing is what the Studio's Publish button does: the draft replaces
+   the published document, and the draft goes. One transaction for all pages,
+   so a failure leaves the site entirely on the old state, not half on each. */
+async function publish(pages) {
+  const raw = client.withConfig({ perspective: "raw" });
+  const tx = raw.transaction();
+  let count = 0;
+  for (const { id } of pages) {
+    const draft = await raw.getDocument(`drafts.${id}`);
+    if (!draft) {
+      console.log(`  · ${id}: no draft, skipped`);
+      continue;
+    }
+    console.log(`  → ${id}  (draft from ${draft._updatedAt})`);
+    const { _id, _rev, _createdAt, _updatedAt, ...rest } = draft;
+    tx.createOrReplace({ ...rest, _id: id });
+    tx.delete(`drafts.${id}`);
+    count++;
+  }
+  if (DRY || !count) {
+    console.log(
+      DRY ? "\nDry run. Nothing published." : "\nNothing to publish.",
+    );
+    return;
+  }
+  await tx.commit();
+  console.log(`\nPublished ${count} pages.`);
+}
+
 const pages = await load();
 if (!pages.length) throw new Error("No page selected.");
+
+if (PUBLISH) {
+  await publish(pages);
+  process.exit(0);
+}
 
 /* Check everything before writing anything: a dash in the ninth file must not
    leave eight half-imported pages behind. */
