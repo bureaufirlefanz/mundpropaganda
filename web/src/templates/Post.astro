@@ -279,6 +279,7 @@ const serviceName = serviceSlug
 
 <style>
   .s-post {
+    --card-inset: clamp(var(--sp-6), 3vw, var(--sp-10));
     padding-bottom: var(--section-space);
   }
 
@@ -321,7 +322,7 @@ const serviceName = serviceSlug
        mitten im Motiv und der Titel stand fast auf dem Bild statt davor. */
     margin-top: clamp(-88px, -5.5vw, -44px);
     margin-inline: 0;
-    padding: clamp(var(--sp-6), 3vw, var(--sp-10));
+    padding: var(--card-inset);
     border-radius: var(--r-md);
     /* Weiß wie die Karten in der Magazin-Übersicht — dieselbe Fläche, die
        dort einen Beitrag trägt, trägt hier seinen Titel. Auf dem
@@ -367,8 +368,13 @@ const serviceName = serviceSlug
      Textblocks keine Rasterzellen wären — ein Bild könnte dann nicht über die
      Spalte hinausreichen.
      -------------------------------------------------------------------- */
+  /* The text starts on the line of the title in the card above, not on the
+     card's edge: the same inset as the card's padding, defined once as
+     `--card-inset` on `.s-post`. Two starts on two lines read as a jump. */
   .s-post__body {
     padding-top: var(--sp-10);
+    /* On top of the container's own margin: the body IS the container. */
+    padding-left: calc(var(--site-margin) + var(--card-inset));
   }
 
   /* Das Verzeichnis steht RECHTS, nicht links.
@@ -636,6 +642,10 @@ const serviceName = serviceSlug
   }
 
   @media (max-width: 1000px) {
+    .s-post__body {
+      padding-left: var(--site-margin);
+    }
+
     .s-post__body--toc {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-6);
