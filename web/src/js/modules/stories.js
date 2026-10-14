@@ -240,6 +240,11 @@ function initDeck() {
 
   stack.addEventListener("pointerdown", (e) => {
     if (prefersReducedMotion) return;
+    /* Not on the play button or a running video: `setPointerCapture`
+       below would route the click to the stack, and the button never got
+       it. A real tap on the pink circle did nothing; only a synthetic
+       `.click()` in tests worked. */
+    if (e.target.closest("[data-story-play], [data-story-video]")) return;
     dragging = true;
     startX = e.clientX;
     pointerId = e.pointerId;
