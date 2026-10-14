@@ -30,6 +30,7 @@ import Picture from "../components/ui/Picture.astro";
 import Button from "../components/ui/Button.astro";
 import PostCard from "../components/ui/PostCard.astro";
 import TableOfContents from "../components/ui/TableOfContents.astro";
+import SectionDock from "../components/ui/SectionDock.astro";
 import TextHeading from "../components/ui/TextHeading.astro";
 import PostImage from "../components/ui/PostImage.astro";
 import { isCmsImage } from "../lib/images";
@@ -183,6 +184,19 @@ const serviceName = serviceSlug
               </div>
             )
           }
+
+          {
+            /* The table of contents lives in the head since 2026-10-14, under
+               the facts, where it ends on the baseline of the title card.
+               Beside the text it hung alone in the grey, 200px wide next to
+               a 68ch column. While reading, the section dock at the bottom
+               edge names the current section. */
+          }
+          {
+            showToc && (
+              <TableOfContents headings={headings} placement="static" />
+            )
+          }
         </div>
       </div>
     </header>
@@ -190,19 +204,7 @@ const serviceName = serviceSlug
     {/* --- Satz: Verzeichnis, Text, Randspalte --------------------------- */}
     {
       d?.text && (
-        <div
-          class:list={[
-            "container",
-            "s-post__body",
-            showToc && "s-post__body--toc",
-          ]}
-        >
-          {showToc && (
-            <aside class="s-post__aside">
-              <TableOfContents headings={headings} />
-            </aside>
-          )}
-
+        <div class="container s-post__body">
           <div class="s-post__column">
             <div class="s-post__text" data-toc-bereich>
               <PortableText
@@ -274,6 +276,16 @@ const serviceName = serviceSlug
       am Fuß, siehe `contactSection` in `layouts/Base.astro`. Die vier bis
       sieben Verweise aus Menü, Fuß und den „Termin buchen"-Buttons führen
       damit zu Telefon, E-Mail, beiden Anschriften und den Zeiten. */
+  }
+
+  {
+    showToc && (
+      <SectionDock
+        headings={headings}
+        label="Abschnitte in diesem Beitrag"
+        rangeEnd="[data-toc-bereich]"
+      />
+    )
   }
 </Base>
 
@@ -375,37 +387,6 @@ const serviceName = serviceSlug
     padding-top: var(--sp-10);
     /* On top of the container's own margin: the body IS the container. */
     padding-left: calc(var(--site-margin) + var(--card-inset));
-  }
-
-  /* Das Verzeichnis steht RECHTS, nicht links.
-     
-     Links hätte es den Text eingerückt und von der Kante weggeschoben, an der
-     die Titelkarte darüber beginnt — zwei Anfänge auf zwei Linien. Rechts
-     liegt es auf derselben Seite wie die Angaben zum Beitrag im Kopf: alles
-     Beiläufige an einem Rand, der Text an seiner Kante.
-     
-     Die Reihenfolge im Markup bleibt Verzeichnis-vor-Text. Wer mit der
-     Tastatur oder einem Vorlesegerät kommt, bekommt die Übersicht zuerst;
-     `grid-column` verschiebt nur das Bild. */
-  .s-post__body--toc {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 200px;
-    gap: var(--flow-2xl);
-    /* KEIN `align-items: start`: Das ließe die linke Spalte auf die Höhe des
-       Verzeichnisses schrumpfen, und ein klebendes Element bewegt sich nur
-       innerhalb seines Kastens. */
-  }
-
-  /* Der Text bleibt bei seiner Lesebreite, das Raster daneben trägt die
-     Bilder, die darüber hinausreichen dürfen. */
-  .s-post__aside {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .s-post__body--toc .s-post__column {
-    grid-column: 1;
-    grid-row: 1;
   }
 
   /* A size container so that a wide image inside the text can measure the
@@ -644,19 +625,6 @@ const serviceName = serviceSlug
   @media (max-width: 1000px) {
     .s-post__body {
       padding-left: var(--site-margin);
-    }
-
-    .s-post__body--toc {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--sp-6);
-    }
-
-    /* Übereinander, und dann in der Reihenfolge des Markups: erst die
-       Übersicht, dann der Text. */
-    .s-post__aside,
-    .s-post__body--toc .s-post__column {
-      grid-column: 1;
-      grid-row: auto;
     }
 
     .s-more__grid {

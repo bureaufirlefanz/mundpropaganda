@@ -17,12 +17,22 @@ import type { Heading } from "../../lib/table-of-contents";
 interface Props {
   headings: Heading[];
   title?: string;
+  /**
+   * `sticky` (default) clings beside the text. `static` sits in the flow,
+   * for the head of a post, where it stands under the facts and the
+   * section dock takes over the orientation while scrolling.
+   */
+  placement?: "sticky" | "static";
 }
 
-const { headings, title = "Inhalt" } = Astro.props;
+const { headings, title = "Inhalt", placement = "sticky" } = Astro.props;
 ---
 
-<nav class="c-toc" aria-labelledby="toc-title" data-toc>
+<nav
+  class:list={["c-toc", placement === "static" && "c-toc--static"]}
+  aria-labelledby="toc-title"
+  data-toc
+>
   <p class="c-toc__heading" id="toc-title">{title}</p>
 
   <ol class="c-toc__list">
@@ -71,6 +81,29 @@ const { headings, title = "Inhalt" } = Astro.props;
 
   .c-toc::-webkit-scrollbar {
     display: none;
+  }
+
+  .c-toc--static {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* In the head the list runs in two columns: nine entries in one column
+     made the facts column taller than the title card, and the card lost its
+     overlap with the image (measured 678px against 503px). */
+  @media (min-width: 701px) {
+    .c-toc--static .c-toc__list {
+      /* `block`, not the flex column of the sticky list: CSS columns need a
+         block container, a flex container ignores them. */
+      display: block;
+      columns: 2;
+      column-gap: var(--sp-6);
+    }
+
+    .c-toc--static .c-toc__item {
+      break-inside: avoid;
+    }
   }
 
   .c-toc__heading {

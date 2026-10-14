@@ -34,9 +34,16 @@ interface Props {
   headings: Heading[];
   /** aria-label of the nav. */
   label?: string;
+  /**
+   * Selector of the element whose bottom ends the dock's range. Without it
+   * the range ends with the last section. A post's "sections" are single
+   * heading lines, so the last one passes in a blink and the dock vanished
+   * for the whole final chapter; there the text container is the range.
+   */
+  rangeEnd?: string;
 }
 
-const { headings, label = "Auf dieser Seite" } = Astro.props;
+const { headings, label = "Auf dieser Seite", rangeEnd } = Astro.props;
 
 /* The template bails out below two links; rendering a dock for one section
    would be a button that answers a question nobody asked. */
@@ -49,7 +56,12 @@ const number = (i: number) => String(i + 1);
 
 {
   enough && (
-    <nav data-section-dock-init aria-label={label} class="c-section-dock">
+    <nav
+      data-section-dock-init
+      data-section-dock-range-end={rangeEnd}
+      aria-label={label}
+      class="c-section-dock"
+    >
       <div data-section-dock-pill class="c-section-dock__pill">
         <button
           data-section-dock-toggle
@@ -207,6 +219,14 @@ const number = (i: number) => String(i + 1);
      tragen kein Scope-Attribut, und eine scoped Regel trifft sie nie. */
   .c-section-dock :global(.c-section-dock__label > span:last-child) {
     padding-right: var(--sp-2);
+    /* Capped: a post's headings are sentences ("Woran erkennst du eine gute
+       Veneers-Praxis?"), and the pill would run across half the screen.
+       The open list keeps the full text. Pillar labels are short and never
+       reach the cap. */
+    max-width: 24ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .c-section-dock__list {

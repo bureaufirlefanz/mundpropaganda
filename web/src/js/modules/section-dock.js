@@ -44,8 +44,11 @@ export function initSectionDock() {
     const links = list
       ? Array.from(list.querySelectorAll("[data-section-dock-link]"))
       : [];
+    /* getElementById, not querySelector: a post's heading ids can start
+       with a digit ("1-du-erfaehrst-..."), and "#1-du..." is not a valid
+       selector. querySelector threw, and the dock never initialised. */
     const sections = links.map((link) =>
-      document.querySelector(link.getAttribute("href")),
+      document.getElementById(link.getAttribute("href").slice(1)),
     );
     const labelTemplate = labelWrap ? labelWrap.firstElementChild : null;
     if (
@@ -472,9 +475,14 @@ export function initSectionDock() {
        Doppel: Das Verzeichnis ist zu dem Zeitpunkt nur noch am oberen Rand zu
        sehen, und wer weiterliest, braucht die Sprungmarken ab dem ersten
        Abschnitt. */
+    /* `data-section-dock-range-end`: see the prop in SectionDock.astro. */
+    const rangeEndSelector = dock.getAttribute("data-section-dock-range-end");
+    const rangeEnd =
+      (rangeEndSelector && document.querySelector(rangeEndSelector)) ||
+      sections[sections.length - 1];
     rangeTrigger = ScrollTrigger.create({
       trigger: sections[0],
-      endTrigger: sections[sections.length - 1],
+      endTrigger: rangeEnd,
       start: "top bottom",
       end: "bottom 10%",
       onToggle: updateHidden,
