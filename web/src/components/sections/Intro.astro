@@ -72,6 +72,16 @@ const {
   variant = "default",
   bleed,
 } = Astro.props;
+
+/* Too little text for two columns: one column, the other stays empty.
+   Two short paragraphs spread over columns two and three read as two
+   fragments with a gap between them (measured on the Zahnersatz page: 95
+   and 290 characters). Below about 480 characters they go into the first
+   text column together; that is roughly what one column holds in seven or
+   eight lines at the medium measure. Under 900px the grid is one column
+   anyway, so nothing changes there. */
+const compact =
+  variant === "default" && columns.join(" ").length < 480 && columns.length > 1;
 ---
 
 <section
@@ -146,6 +156,14 @@ const {
   {
     variant === "centered" ? (
       <div class="s-intro__columns">
+        {columns.map((t, i) => (
+          <p data-reveal="up" data-reveal-delay={i * 0.08}>
+            {t}
+          </p>
+        ))}
+      </div>
+    ) : compact ? (
+      <div class="s-intro__single">
         {columns.map((t, i) => (
           <p data-reveal="up" data-reveal-delay={i * 0.08}>
             {t}
@@ -235,6 +253,14 @@ const {
     max-width: var(--measure-medium);
   }
 
+  /* The short text in the first text column, see `compact` above. */
+  .s-intro__single {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+
   /* --- Die Fassung der Pillar Pages ------------------------------------
      Bild mittig und schmäler als die Seite, darunter zwei Textspalten als
      zentrierter Block. Maße aus dem Entwurf: Bild etwa 47 % der Breite, der
@@ -288,6 +314,10 @@ const {
   }
 
   @media (max-width: 900px) {
+    .s-intro__single {
+      grid-column: auto;
+    }
+
     .s-intro {
       grid-template-columns: 1fr;
     }
