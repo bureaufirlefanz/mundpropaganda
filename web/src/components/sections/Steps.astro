@@ -48,7 +48,7 @@ function shortDuration(text: string): string {
 
     <div
       class="s-steps__grid"
-      style={`--step-columns: ${columns}`}
+      style={`--columns-wide: ${columns}`}
       data-reveal-stagger="0.08"
     >
       {
@@ -97,6 +97,9 @@ function shortDuration(text: string): string {
      the page instead of hugging the left edge with empty columns beside it.
      The card width is the same as with four steps, so nothing else moves. */
   .s-steps__grid {
+    /* Copied from the inline `--columns-wide`: an inline custom property
+       would beat the media query below, the copy does not. */
+    --step-columns: var(--columns-wide, 4);
     display: grid;
     grid-template-columns: repeat(
       auto-fit,

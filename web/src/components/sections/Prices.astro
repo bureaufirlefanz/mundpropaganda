@@ -66,7 +66,12 @@ const hasFacts = pricing.some((p) => p.reduction || p.durability);
    Gedeckelt bei fünf, weil sechs Karten in einer Reihe schmäler werden als
    der längste Name („Non-Prep-Veneers") ihn tragen kann. Sechs und mehr
    laufen deshalb wieder in zwei Reihen zu je vier. */
-const columns = Math.min(pricing.length, 5);
+/* Up to four cards in one row, more are split into rows of equal size
+   (five become 3 + 2), the same rule as the steps. Each card is a quarter
+   of the row wide whatever the count, so two cards stand centred at card
+   width instead of stretching across the page. */
+const rows = Math.ceil(pricing.length / 4);
+const columns = Math.min(4, Math.ceil(pricing.length / rows));
 ---
 
 <section class="s-prices container" id={id} data-toc-target={id}>
@@ -79,7 +84,7 @@ const columns = Math.min(pricing.length, 5);
   }
   <div
     class="s-prices__grid"
-    style={`--price-columns: ${columns}`}
+    style={`--columns-wide: ${columns}`}
     data-reveal-stagger="0.08"
   >
     {
@@ -151,36 +156,33 @@ const columns = Math.min(pricing.length, 5);
     letter-spacing: var(--tracking-tight);
   }
 
-  /* Der Rückfall 4 gilt, falls die Eigenschaft fehlt — dann steht hier
-     wieder genau das Raster von vorher. */
+  /* `auto-fit` tracks of a fixed share of the row, centred: a row of two
+     stands in the middle at the width a card has in a row of four. Until
+     2026-10-14 the tracks were `1fr` and two cards ran across the page. The
+     fallback 4 applies if the property is missing. */
   .s-prices__grid {
+    /* The count comes in as `--columns-wide` on the element and is copied
+       here: an inline custom property would beat the media query below,
+       so the query sets this one, not the inline one. */
+    --price-columns: var(--columns-wide, 4);
     display: grid;
-    grid-template-columns: repeat(var(--price-columns, 4), minmax(0, 1fr));
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        0,
+        calc(
+          (100% - (var(--price-columns, 4) - 1) * var(--site-gutter)) /
+            var(--price-columns, 4)
+        )
+      )
+    );
+    justify-content: center;
     gap: var(--site-gutter);
-  }
-
-  /* Fünf Spalten erst ab 1200px.
-
-     Gemessen, nicht geschätzt: Fünf Karten sind auf 1440px 251px breit und
-     auf 1201px noch 209px — dort tragen alle fünf Namen einzeilig. Auf
-     1000px wären es 174px, und bei 22px Schriftgrad brechen „Komposit-Veneer"
-     und „Non-Prep-Veneers" dann auf zwei Zeilen. Abgeschnitten wird nichts,
-     die Reihe wird nur unruhig: zwei hohe Namen neben drei flachen.
-
-     Zwischen 1000 und 1200 stehen deshalb vier nebeneinander und die fünfte
-     darunter. */
-  @media (max-width: 1200px) {
-    .s-prices__grid {
-      grid-template-columns: repeat(
-        min(var(--price-columns, 4), 4),
-        minmax(0, 1fr)
-      );
-    }
   }
 
   @media (max-width: 1000px) {
     .s-prices__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      --price-columns: 2;
     }
   }
 
