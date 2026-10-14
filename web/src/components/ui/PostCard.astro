@@ -278,23 +278,23 @@ const motif = motifFor(p.slug);
      damit die Karten einer Reihe auf derselben Linie enden, wenn das Raster
      sie auf eine Höhe dehnt.
 
-     Das Bild sitzt knapp in der Fläche, derselbe schmale Rahmen wie am
-     Leistungs-Guide im Menü (`ui/NavPromo.astro`, 10px). Der Text darunter
-     rückt weiter ein; der Unterschied zwischen beiden Abständen steht als
-     `--inset` einmal da. */
+     Das Bild läuft bis an die Kanten der Fläche, die Rundung der Karte
+     beschneidet es (`overflow: hidden`). Text und Button rücken mit
+     `--inset` ein; ein Rahmen um das Bild (10px wie im Menü) stand hier
+     kurz und war noch zu viel. */
   .c-post--card {
-    --frame: 10px;
-    --inset: calc(var(--sp-4) - var(--frame));
+    --inset: var(--sp-5);
     align-items: stretch;
-    padding: var(--frame);
+    padding: 0;
     border-radius: var(--r-md);
+    overflow: hidden;
     background: var(--c-white);
   }
 
   .c-post--card .c-post__media {
     width: 100%;
     aspect-ratio: 4 / 3;
-    border-radius: var(--r-sm);
+    border-radius: 0;
   }
 
   /* `margin-top: 0` and `align-self` are spelled out because the container
@@ -309,7 +309,7 @@ const motif = motifFor(p.slug);
     align-self: stretch;
     width: 100%;
     margin-top: 0;
-    padding: var(--sp-4) var(--inset) var(--sp-5);
+    padding: var(--inset) var(--inset) var(--sp-5);
     border-radius: 0;
     background: none;
   }
