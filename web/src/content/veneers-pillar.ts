@@ -85,7 +85,7 @@ export const veneersPillar: PillarPage = {
          kämpft dadurch gegen den Radius aus dem CSS. */
       image: "behandlungszimmer-rot",
       alt: "",
-      caption: "Dr. Hannes Schulte-Ostermann",
+      caption: "Hannes Schulte-Ostermann",
     },
 
     /* --- 1 -------------------------------------------------------------- */
