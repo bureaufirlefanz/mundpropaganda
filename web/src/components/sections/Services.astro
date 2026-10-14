@@ -183,7 +183,7 @@ const previewPath = (l: (typeof lines)[number]) => {
     padding: 0 var(--sp-2) var(--sp-2);
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
-    font-size: var(--fs-text-small);
+    font-size: var(--fs-text-main);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     /* Diese Section liegt auf Taupe, nicht auf Grau — dort ist der Grund
@@ -241,7 +241,7 @@ const previewPath = (l: (typeof lines)[number]) => {
   .s-services__tag {
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
-    font-size: var(--fs-text-small);
+    font-size: var(--fs-text-main);
     line-height: var(--lh-text);
     letter-spacing: var(--tracking-mono);
   }
@@ -340,10 +340,13 @@ const previewPath = (l: (typeof lines)[number]) => {
     height: 15px;
   }
 
+  /* No row gap: each link carries its own rule beneath, the rows stack on
+     those. With the gutter as row gap too, the list had 110px between
+     lines of 24px type. */
   .s-services__more {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--site-gutter);
+    gap: 0 var(--site-gutter);
     margin-top: var(--sp-10);
   }
 
@@ -358,7 +361,7 @@ const previewPath = (l: (typeof lines)[number]) => {
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    padding-block: var(--sp-3);
+    padding-block: var(--sp-2);
     /* Platz für den Pfeil, der aus dem Fluss genommen ist. Ohne das liefe ein
        langer Name unter ihm hindurch. */
     padding-right: calc(var(--arrow) + var(--sp-3));

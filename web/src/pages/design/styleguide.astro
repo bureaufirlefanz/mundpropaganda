@@ -460,8 +460,7 @@ const PURPOSE: Record<string, string> = {
   "--fs-title-sm": "Kartentitel",
   "--fs-title-xs": "Kleiner Titel",
   "--fs-text-large": "Einleitung",
-  "--fs-text-main": "Fließtext",
-  "--fs-text-small": "Kleiner Text, Toplines",
+  "--fs-text-main": "Fließtext und jeder kleine Text",
   "--fs-label-lg": "Button, Navigation",
   "--fs-label": "Kleingedrucktes, Meta, Badges",
 
@@ -636,7 +635,6 @@ const SPECIMEN: Record<string, string> = {
   "--fs-title-xs": "Zahnarzt Prenzlauer Berg",
   "--fs-text-large": "Wir nehmen uns eine volle Stunde.",
   "--fs-text-main": "Sechs Behandlungsräume, eigenes Meisterlabor im Haus.",
-  "--fs-text-small": "Prenzlauer Berg",
   "--fs-label-lg": "Termin buchen",
   "--fs-label": "Ab 690 € je Zahn",
 };
@@ -2093,7 +2091,7 @@ letter-spacing: var(--tracking-section-title);</pre>
 
     .d-color__name {
       font-family: var(--f-mono);
-      font-size: var(--fs-text-small);
+      font-size: var(--fs-text-main);
     }
 
     .d-color__hex,
@@ -2226,7 +2224,7 @@ letter-spacing: var(--tracking-section-title);</pre>
 
     .d-probe-tracking--mono {
       font: var(--font-label);
-      font-size: var(--fs-text-small);
+      font-size: var(--fs-text-main);
       text-transform: uppercase;
     }
 
@@ -2378,7 +2376,7 @@ letter-spacing: var(--tracking-section-title);</pre>
       border-radius: var(--r-md);
       background: var(--c-tint);
       font-family: var(--f-mono);
-      font-size: var(--fs-text-small);
+      font-size: var(--fs-text-main);
       line-height: var(--lh-text);
       white-space: pre-wrap;
     }

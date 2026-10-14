@@ -176,7 +176,7 @@ html.js [data-hero-scroll] {
 .c-field__label {
   font-family: var(--f-mono);
   font-weight: var(--fw-light);
-  font-size: var(--fs-text-small);
+  font-size: var(--fs-text-main);
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
   color: var(--c-neutral-800);
@@ -303,7 +303,7 @@ html.js [data-hero-scroll] {
   color: var(--c-neutral-800);
   font-family: var(--f-mono);
   font-weight: var(--fw-light);
-  font-size: var(--fs-text-small);
+  font-size: var(--fs-text-main);
 }
 
 .c-form__status:empty {
@@ -353,7 +353,7 @@ html.js [data-hero-scroll] {
   color: var(--c-dark);
   font-family: var(--f-sans);
   font-weight: var(--fw-regular);
-  font-size: var(--number-font, var(--fs-text-small));
+  font-size: var(--number-font, var(--fs-text-main));
   line-height: var(--lh-heading);
   letter-spacing: 0;
 }

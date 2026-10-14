@@ -46,7 +46,8 @@ thing. Decided and done on branch `typo-reduktion`:
 | Text styles (`--font-*`) |     12 |    11 |
 
 - Sizes gone: 250 (unused), 144 (into 125), 64 (into 70), 55 (into 48),
-  13 (into 14), 11 (into 12).
+  16 (into 18, same evening: every small text is body size now, and
+  `--lh-text` went from 1.5 to 1.4 with it), 13 (into 14), 11 (into 12).
 - Line heights: `--lh-display` 0.92 for wordmarks, `--lh-heading` 1.1 for
   every headline, numeral and label, `--lh-text` 1.5 for everything read,
   `--lh-loose` 1.6 for long reads. 1, 1.05, 1.15, 1.2, 1.3 and 1.45 are gone.

@@ -74,8 +74,11 @@
   --fs-title-xs: clamp(1.125rem, 1.39vw, 1.5rem); /* 24 — small title */
 
   --fs-text-large: clamp(1.0625rem, 1.16vw, 1.25rem); /* 20 — lead */
-  --fs-text-main: clamp(1rem, 1.04vw, 1.125rem); /* 18 — body */
-  --fs-text-small: 1rem; /* 16 */
+  --fs-text-main: clamp(
+    1rem,
+    1.04vw,
+    1.125rem
+  ); /* 18 — body, every small text too */
 
   /* Minimum sizes: anything that is read — a sentence, a name, a step, a
      digit that carries meaning — stays at 14px or above. 12 and 11px are
@@ -92,7 +95,7 @@
      slightly different numbers. */
   --lh-display: 0.92; /* wordmarks: lines touch */
   --lh-heading: 1.1; /* every headline and title, numerals, labels */
-  --lh-text: 1.5; /* every text that is read */
+  --lh-text: 1.4; /* every text that is read */
   --lh-loose: 1.6; /* legal texts, articles */
 
   /* --- Tracking ------------------------------------------------------------
@@ -307,12 +310,12 @@
     var(--f-sans);
   --font-body-long: var(--fw-regular) var(--fs-text-main) / var(--lh-loose)
     var(--f-sans);
-  --font-small: var(--fw-regular) var(--fs-text-small) / var(--lh-text)
+  --font-small: var(--fw-regular) var(--fs-text-main) / var(--lh-text)
     var(--f-sans);
 
   /* Mono labels are uppercase as well; add `text-transform: uppercase`.
      The topline keeps 1.4: it is the homepage's value on 25 blocks. */
-  --font-topline: var(--fw-light) var(--fs-text-small) / var(--lh-text)
+  --font-topline: var(--fw-light) var(--fs-text-main) / var(--lh-text)
     var(--f-mono);
   --font-label: var(--fw-light) var(--fs-label) / var(--lh-heading)
     var(--f-mono);

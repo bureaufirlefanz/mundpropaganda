@@ -291,7 +291,7 @@ p {
   background: var(--c-dark);
   color: var(--c-grey);
   font-family: var(--f-mono);
-  font-size: var(--fs-text-small);
+  font-size: var(--fs-text-main);
   text-decoration: none;
   transform: translateY(calc(-100% - var(--sp-4)));
   transition: transform var(--d-fast) var(--e-out);
