@@ -6,6 +6,14 @@ export default defineCliConfig({
     dataset: "production",
   },
 
+  /* The hosted Studio: https://mundpropaganda.sanity.studio. Set here so
+   * `npm run deploy` does not stop to ask for it — the address is promised
+   * in ANLEITUNG.md and must not drift. Deploy with
+   * SANITY_STUDIO_PREVIEW_URL set to the website, otherwise the
+   * Presentation tool of the hosted Studio points at localhost. */
+  studioHost: "mundpropaganda",
+  deployment: { appId: "aho4vzmty9u3wqn1p1yl90jq" },
+
   /* TypeGen läuft — seit Aufgabe 1 der Umbauliste, gesteuert über
    * `sanity-typegen.json` im Projektstamm und `npm run types`.
    *
