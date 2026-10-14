@@ -153,14 +153,13 @@ const previewPath = (l: (typeof lines)[number]) => {
     padding-block: var(--section-space);
   }
 
-  /* H1-Grad (70px @1728), zentriert — wie im Entwurf. */
+  /* H1-Grad (70px @1728), zentriert — wie im Entwurf. Dieselbe Rolle
+     tragen seit 2026-10-14 die Standorte und die Experten. */
   .s-services__title {
+    font: var(--font-title-page);
+    letter-spacing: var(--tracking-title-page);
     text-align: center;
     margin-bottom: var(--sp-10);
-    font-size: var(--fs-title-page);
-    font-weight: var(--fw-medium);
-    line-height: 1.1;
-    letter-spacing: var(--tracking-tight);
   }
 
   /* Kopf und Zeilen teilen sich EIN Raster, nicht zwei ähnliche Aufteilungen.

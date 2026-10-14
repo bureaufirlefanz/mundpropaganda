@@ -256,12 +256,13 @@ const ringImages: RingImage[] = images?.length
     overflow: hidden;
   }
 
+  /* Same role as the Services title: the three section heads of the
+     homepage (Services, Standorte, Experten) share one cut. */
   .s-gallery__title {
+    font: var(--font-title-page);
+    letter-spacing: var(--tracking-title-page);
     text-align: center;
     margin-bottom: var(--sp-6);
-    font-size: var(--fs-title-lg);
-    font-weight: var(--fw-medium);
-    letter-spacing: var(--tracking-tight);
   }
 
   .s-gallery__track {
