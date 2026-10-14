@@ -276,10 +276,17 @@ const motif = motifFor(p.slug);
      Button. Die Fläche ist die Karte selbst, `.c-post__surface` wird darin
      zum einfachen Textblock. Der Button sitzt per `margin-top: auto` unten,
      damit die Karten einer Reihe auf derselben Linie enden, wenn das Raster
-     sie auf eine Höhe dehnt. */
+     sie auf eine Höhe dehnt.
+
+     Das Bild sitzt knapp in der Fläche, derselbe schmale Rahmen wie am
+     Leistungs-Guide im Menü (`ui/NavPromo.astro`, 10px). Der Text darunter
+     rückt weiter ein; der Unterschied zwischen beiden Abständen steht als
+     `--inset` einmal da. */
   .c-post--card {
+    --frame: 10px;
+    --inset: calc(var(--sp-4) - var(--frame));
     align-items: stretch;
-    padding: var(--sp-4);
+    padding: var(--frame);
     border-radius: var(--r-md);
     background: var(--c-white);
   }
@@ -302,7 +309,7 @@ const motif = motifFor(p.slug);
     align-self: stretch;
     width: 100%;
     margin-top: 0;
-    padding: var(--sp-4) 0 var(--sp-5);
+    padding: var(--sp-4) var(--inset) var(--sp-5);
     border-radius: 0;
     background: none;
   }
@@ -315,7 +322,7 @@ const motif = motifFor(p.slug);
   }
 
   .c-post--card :global(.c-btn) {
-    margin-top: auto;
+    margin: auto 0 var(--inset) var(--inset);
   }
 
   /* --- Schmale Karte ----------------------------------------------------
