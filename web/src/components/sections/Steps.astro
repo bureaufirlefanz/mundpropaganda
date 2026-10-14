@@ -11,6 +11,20 @@ interface Props {
 }
 
 const { title, steps } = Astro.props;
+
+/* The duration as a figure: "ca. 90 Minuten pro Sitzung" becomes "90 Min.",
+   "30 bis 60 Minuten" becomes "30 bis 60 Min.", "1,5 Stunden" becomes
+   "1,5 Std.". The editors type a sentence in the Studio; the card shows the
+   number next to a clock. Text without a recognisable unit stays as typed,
+   so nothing silently disappears. */
+function shortDuration(text: string): string {
+  const m = text.match(
+    /(\d+(?:[,.]\d+)?(?:\s*(?:bis|-|–)\s*\d+(?:[,.]\d+)?)?)\s*(min\w*|std\w*|stunde\w*)/i,
+  );
+  if (!m) return text;
+  const unit = /^min/i.test(m[2]!) ? "Min." : "Std.";
+  return `${m[1]!.replace(/\s*(-|–)\s*/, " bis ")} ${unit}`;
+}
 ---
 
 <section class="s-steps">
@@ -32,8 +46,11 @@ const { title, steps } = Astro.props;
             <p class="c-step__text">{s.text}</p>
             {s.duration && (
               <p class="c-step__duration">
-                <span>Dauer</span>
-                {s.duration}
+                <svg aria-hidden="true">
+                  <use href="#i-clock" />
+                </svg>
+                <span class="sr-only">Dauer</span>
+                {shortDuration(s.duration)}
               </p>
             )}
           </article>
@@ -143,14 +160,14 @@ const { title, steps } = Astro.props;
      Abstand zurück und setzt ihn auf `--sp-3`; beide Werte kommen aus den
      Tokens, gerechnet wird nur die Differenz.
 
-     `Dauer` steht als eigenes Span davor, damit die Zahl ohne das Wort
-     auskommt: Im Studio tippt die Redaktion „ca. 30 bis 60 Minuten", nicht
-     „Dauer: ca. 30 bis 60 Minuten". */
+     Since 2026-10-14 a clock stands in for the word "Dauer"; the word stays
+     for screen readers (`.sr-only`). The figure comes from `shortDuration()`
+     in the frontmatter. */
   .c-step__duration {
     margin-top: calc(var(--sp-3) - var(--sp-6));
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
+    align-items: center;
+    gap: var(--sp-1);
     font-family: var(--f-mono);
     font-size: var(--fs-text-small);
     line-height: var(--lh-text);
@@ -160,6 +177,12 @@ const { title, steps } = Astro.props;
        AA. It now shares the colour of the step text above; the mono cut and
        the capitals keep the two apart. */
     color: var(--c-text-muted);
+  }
+
+  .c-step__duration svg {
+    flex: 0 0 auto;
+    width: 1.1em;
+    height: 1.1em;
   }
 
   /* Das Wort trug hier kurzzeitig eine hellere Farbe als die Angabe. Das kam
