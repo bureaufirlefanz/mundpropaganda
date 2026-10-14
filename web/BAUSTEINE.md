@@ -50,9 +50,9 @@ Orientierung auf langen Seiten. Alle drei arbeiten mit derselben `Heading[]`-Lis
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Contents` | Abschnitt | Das Inhaltsverzeichnis einer Pillar Page (Figma 177:2107). | `headings: Heading[]` `headline?: string` `image?: ImageSource` `alt?: string` `caption?: string` | Pillar, design/komponenten | ✓ |
-| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` | Pillar, design/komponenten | ✓ |
-| `TableOfContents` | UI | Das Inhaltsverzeichnis neben einem Beitrag. | `headings: Heading[]` `title?: string` | Post, design/komponenten | ✓ |
-| `NavPromo` | UI | Das Werbefeld im großen Menü. | `headline: string` `href: string` `label?: string` `image?: ImageSource` `alt?: string` | design/komponenten, ui/Nav | ✓ |
+| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` `rangeEnd?: string` | Pillar, Post, design/komponenten | ✓ |
+| `TableOfContents` | UI | Das Inhaltsverzeichnis neben einem Beitrag. | `headings: Heading[]` `title?: string` `placement?: "sticky" | "static"` | Post, design/komponenten | ✓ |
+| `NavPromo` | UI | Das Werbefeld im großen Menü. | `tag?: string` `headline: string` `href: string` `label?: string` `image?: ImageSource` `alt?: string` | design/komponenten, ui/Nav | ✓ |
 
 ## Daten und Vergleich
 
@@ -326,6 +326,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 
 **`NavPromo`**
 
+- `tag?: string` — Short tag over the image, with a flame: "Hot Topic". Optional.
 - `headline: string` — Zwei bis drei Wörter. Der Kasten ist eine Menüspalte breit.
 
 **`Panel`**
@@ -347,11 +348,16 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`SectionDock`**
 
 - `label?: string` — aria-label of the nav.
+- `rangeEnd?: string` — Selector of the element whose bottom ends the dock's range. Without it the range ends with the last section. A post's "sections" are single heading lines, so the last one passes in a blink and the dock vanished for the whole final chapter; there the text container is the range. /
 
 **`SectionHeading`**
 
 - `number: number` — Die laufende Nummer, bereits 1-basiert.
 - `level?: 2 | 3` — 2 oder 3 — ein Cluster-Artikel braucht dieselbe Form womöglich als h3.
+
+**`TableOfContents`**
+
+- `placement?: "sticky" | "static"` — `sticky` (default) clings beside the text. `static` sits in the flow, for the head of a post, where it stands under the facts and the section dock takes over the orientation while scrolling. /
 
 **`TextHeading`**
 

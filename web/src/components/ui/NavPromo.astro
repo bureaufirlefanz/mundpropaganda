@@ -22,6 +22,8 @@ import CmsImage from "./CmsImage.astro";
 import type { ImageSource } from "../../lib/images";
 
 interface Props {
+  /** Short tag over the image, with a flame: "Hot Topic". Optional. */
+  tag?: string;
   /** Zwei bis drei Wörter. Der Kasten ist eine Menüspalte breit. */
   headline: string;
   href: string;
@@ -30,11 +32,28 @@ interface Props {
   alt?: string;
 }
 
-const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
+const {
+  tag,
+  headline,
+  href,
+  label = "Guide lesen",
+  image,
+  alt = "",
+} = Astro.props;
 ---
 
 <a class="c-navpromo" href={href} data-surface="dark">
   <div class="c-navpromo__media">
+    {
+      tag && (
+        <span class="c-navpromo__tag">
+          <svg aria-hidden="true">
+            <use href="#i-flame" />
+          </svg>
+          {tag}
+        </span>
+      )
+    }
     {
       image && (
         <CmsImage
@@ -91,8 +110,39 @@ const { headline, href, label = "Guide lesen", image, alt = "" } = Astro.props;
     /* `min-height: 0` ist bei einer 1fr-Zeile nicht wahlfrei: Ohne das wächst
        die Zeile auf die Eigenhöhe des Bildes, statt sich auf den übrigen
        Platz zu beschränken — der Kasten würde über seine Spalte hinauslaufen. */
+    position: relative;
     min-height: 0;
     overflow: hidden;
+  }
+
+  /* The tag over the image: the pill of the post head (`.s-post__tag`), with
+     a flame in front. Dark on the photo, the same as on the title card. */
+  .c-navpromo__tag {
+    position: absolute;
+    z-index: 1;
+    top: var(--sp-2);
+    right: var(--sp-2);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    /* The post tag writes 5px/6px; in em the pill keeps the same shape at
+       its own size without a px literal. */
+    padding: 0.35em var(--sp-2) 0.45em;
+    border-radius: var(--r-sm);
+    background: var(--c-dark);
+    color: var(--c-text);
+    font-family: var(--f-mono);
+    font-weight: var(--fw-light);
+    font-size: var(--fs-label);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .c-navpromo__tag svg {
+    width: 1.1em;
+    height: 1.1em;
+    color: var(--c-brand);
   }
 
   /* Das Bild kommt aus CmsImage und trägt dessen Scope, nicht diesen —

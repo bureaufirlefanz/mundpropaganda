@@ -14,6 +14,8 @@ import type { ImageSource } from "../lib/images";
  * trifft — das Menü hat genau eine freie Spalte.
  */
 export interface NavPromo {
+  /** Short tag over the image, e.g. "Hot Topic". Without it, no tag. */
+  tag?: string;
   headline: string;
   href: string;
   label: string;
@@ -22,6 +24,7 @@ export interface NavPromo {
 }
 
 export const navPromo: NavPromo = {
+  tag: "Hot Topic",
   headline: "Alles zum Thema Veneers",
   href: "/veneers-berlin",
   label: "Guide lesen",
