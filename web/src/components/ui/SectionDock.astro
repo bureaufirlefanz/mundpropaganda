@@ -49,13 +49,14 @@ interface Props {
    */
   idleLabel?: string;
   /**
-   * Where a section becomes the current one: when its top passes the
-   * bottom of the viewport (`bottom`, the default, right for the tall
-   * sections of a pillar page) or the middle (`center`, for a post whose
-   * sections are a few paragraphs: with `bottom` the pill named the
-   * section at the lower screen edge, not the one being read).
+   * Where a section becomes the current one. `bottom` (default): when its
+   * top passes the bottom of the viewport, right for the tall sections of a
+   * pillar page. `pill`: when its heading reaches the pill itself; scrolling
+   * back, the previous section takes over as soon as the heading drops
+   * below the pill again, so the pill names the text standing at its own
+   * height. For posts, whose sections are a few paragraphs.
    */
-  activeLine?: "bottom" | "center";
+  activeLine?: "bottom" | "pill";
 }
 
 const {

@@ -454,9 +454,29 @@ export function initSectionDock() {
        beim Hinaufscrollen — genau die beiden Kanten. Die Richtung geht an
        `setActive` weiter, damit die Beschriftung in die passende Richtung
        durchläuft. */
-    /* `data-section-dock-line`: see the prop in SectionDock.astro. */
+    /* `data-section-dock-line`: see the prop in SectionDock.astro.
+
+       `pill`: the line is the pill's own top edge. A heading crossing it on
+       the way down makes its section current; crossing it on the way up
+       hands over to the section before (whose last lines now stand at the
+       pill), or to the idle word above the first one. The line is read from
+       the dock's CSS each time, so it follows the safe area and font size. */
     const line = dock.getAttribute("data-section-dock-line") || "bottom";
+    const pillLine = () =>
+      "top bottom-=" +
+      (parseFloat(getComputedStyle(dock).bottom) + dock.offsetHeight) +
+      "px";
     sections.forEach((section, i) => {
+      if (line === "pill") {
+        ScrollTrigger.create({
+          trigger: section,
+          start: pillLine,
+          end: pillLine,
+          onEnter: () => setActive(i, true),
+          onLeaveBack: () => setActive(i > 0 ? i - 1 : idle ? -1 : 0, false),
+        });
+        return;
+      }
       ScrollTrigger.create({
         trigger: section,
         start: "top " + line,
