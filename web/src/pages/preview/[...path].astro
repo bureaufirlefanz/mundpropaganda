@@ -30,7 +30,6 @@ import Post from "../../templates/Post.astro";
 import CareersContent from "../../templates/Careers.astro";
 import LegalPage from "../../templates/LegalPage.astro";
 import PracticeContent from "../../templates/Practice.astro";
-import EmergencyContent from "../../templates/Emergency.astro";
 import VisualEditing from "../../components/ui/VisualEditing.astro";
 
 import {
@@ -51,7 +50,6 @@ import {
   LEGAL_PAGE_QUERY,
   RELATED_QUERY,
   PRACTICE_QUERY,
-  EMERGENCY_QUERY,
 } from "../../lib/queries";
 import { withoutNull } from "../../lib/without-null";
 import type { HomepageContent } from "../../lib/homepage";
@@ -65,7 +63,6 @@ import type { CareersContent as CareersData, Job } from "../../lib/careers";
 import type { ServiceEntry } from "../../lib/service-list";
 import type { LegalPage as LegalPageData } from "../../lib/legal-pages";
 import type { PracticeContent as PracticeData } from "../../lib/practice";
-import type { EmergencyContent as EmergencyData } from "../../lib/emergency";
 import { loadSettings } from "../../lib/settings";
 
 /* Ohne Cookie keine Vorschau. Es wird von `/api/draft-mode/enable` gesetzt,
@@ -116,7 +113,6 @@ let content: {
   careers?: CareersData;
   legalPage?: LegalPageData;
   practice?: PracticeData;
-  emergency?: EmergencyData;
   posts: PostData[];
   jobs: Job[];
   title: string;
@@ -170,9 +166,6 @@ if (target.kind === "homepage") {
 } else if (target.kind === "practice") {
   const data = await load<PracticeData>(PRACTICE_QUERY);
   content = { ...content, practice: data };
-} else if (target.kind === "emergency") {
-  const data = await load<EmergencyData>(EMERGENCY_QUERY);
-  content = { ...content, emergency: data };
 } else if (target.kind === "legalPage") {
   const data = await load<LegalPageData>(LEGAL_PAGE_QUERY, {
     slug: target.slug,
@@ -191,7 +184,7 @@ if (target.kind === "homepage") {
   ]);
   content = { ...content, careers: data, jobs: jobs ?? [] };
 }
-const { locations, phone } = await loadSettings();
+const { locations } = await loadSettings();
 ---
 
 {
@@ -244,11 +237,6 @@ const { locations, phone } = await loadSettings();
 {
   target.kind === "practice" && (
     <PracticeContent data={content.practice} locations={locations} />
-  )
-}
-{
-  target.kind === "emergency" && (
-    <EmergencyContent data={content.emergency} phone={phone} />
   )
 }
 

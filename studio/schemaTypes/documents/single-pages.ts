@@ -120,5 +120,6 @@ export const contactPage = einzelseite(
   EnvelopeIcon,
   "/kontakt",
 );
-/* `emergency` no longer lives here: since 2026-10-13 the emergency page has
-   its own type with fixed fields, in `documents/emergency.ts`. */
+/* `emergency` is gone: from 2026-10-13 the emergency page had its own type
+   with fixed fields; since 2026-10-14 it is a service like the others
+   (`service`, slug `notdienst`), listed under Leistungen and in the menu. */

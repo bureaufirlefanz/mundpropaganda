@@ -45,13 +45,6 @@ export const resolve: PresentationPluginOptions["resolve"] = {
       resolve: () => ({ locations: [{ title: "Praxis", href: "/praxis" }] }),
     }),
 
-    emergency: defineLocations({
-      select: {},
-      resolve: () => ({
-        locations: [{ title: "Notdienst", href: "/notdienst" }],
-      }),
-    }),
-
     person: defineLocations({
       /* No page of its own since 2026-10-01. A person shows up as the
          author of magazine posts; the magazine is where to look. */

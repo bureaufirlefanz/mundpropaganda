@@ -10,7 +10,6 @@ import { DocumentsIcon } from "@sanity/icons/Documents";
 import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { MenuIcon } from "@sanity/icons/Menu";
 import { StackCompactIcon } from "@sanity/icons/StackCompact";
-import { WarningOutlineIcon } from "@sanity/icons/WarningOutline";
 import type { ComponentType } from "react";
 
 /**
@@ -49,7 +48,6 @@ export const SINGLETONS = [
   "practice",
   "magazineIndex",
   "careers",
-  "emergency",
   "settings",
   "navigation",
   "footer",
@@ -122,8 +120,6 @@ export const structure: StructureResolver = (S, context) =>
       S.documentTypeListItem("post").title("Beiträge").icon(DocumentTextIcon),
 
       singleton(S, "careers", "Karriere", CaseIcon),
-      /* Back since 2026-10-13, now with its own route `/notdienst`. */
-      singleton(S, "emergency", "Notdienst", WarningOutlineIcon),
 
       S.divider(),
 

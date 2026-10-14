@@ -84,7 +84,6 @@ const FIXED_PATHS: Record<string, string> = {
   magazineIndex: "/magazin",
   careers: "/karriere",
   contactPage: "/kontakt",
-  emergency: "/notdienst",
 };
 
 /**

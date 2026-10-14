@@ -169,6 +169,8 @@ const steps =
     claim={d?.hero?.claim}
     text={d?.hero?.text}
     action={d?.hero?.actionLabel || undefined}
+    actionHref={d?.hero?.actionLink || undefined}
+    textFirst={d?.hero?.actionLink?.startsWith("tel:")}
     image={d?.hero?.image}
     alt={d?.hero?.image?.alt ?? ""}
   />

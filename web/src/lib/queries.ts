@@ -96,7 +96,7 @@ export const SERVICE_QUERY =
   defineQuery(`*[_type == "service" && slug.current == $slug][0]{
   title,
   topline,
-  hero{ claim, text, actionLabel, image${BILD} },
+  hero{ claim, text, actionLabel, actionLink, image${BILD} },
   intro{ topline, headline, columns },
   benefits{ topline, headline, items[]{ name, text, image${BILD} } },
   pricingTitle,
@@ -327,23 +327,6 @@ export const HOMEPAGE_QUERY = defineQuery(`
     storiesAction${LINK},
     magazineTopline, magazineTitle, magazineText,
     faq[]{ question, answer },
-    seo{ title, description, noIndex, image${BILD} }
-  }
-`);
-
-/**
- * The emergency page. The phone number is NOT in it — the template takes it
- * from the settings, the same source as header and footer.
- *
- * `body` comes back whole: it is Portable Text, and the links in it (`tel:`
- * for the emergency numbers, two external pages) are the point of the page.
- */
-export const EMERGENCY_QUERY = defineQuery(`
-  *[_id == "emergency"][0]{
-    title, lead, actionLabel, image${BILD},
-    sections[]{ _key, headline, body, warning },
-    faq[]{ question, answer },
-    closing{ headline, text, actionLabel },
     seo{ title, description, noIndex, image${BILD} }
   }
 `);

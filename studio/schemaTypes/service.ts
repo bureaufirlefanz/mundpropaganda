@@ -168,6 +168,17 @@ export const service = defineType({
           description:
             "Leer lassen für „Termin buchen“. Der Button springt zum Kontaktabschnitt dieser Seite.",
         }),
+        /* The emergency page is the one service whose button must dial, not
+           scroll: someone in pain on a phone. A link here replaces the jump
+           to the contact section; the website also puts the text before the
+           image on narrow screens when it is a `tel:` link. */
+        defineField({
+          name: "actionLink",
+          title: "Ziel des Buttons",
+          type: "string",
+          description:
+            "Leer lassen für den Kontaktabschnitt. Sonst z. B. „tel:+493051999580“ für eine Telefonnummer.",
+        }),
         defineField({ name: "image", title: "Bild", type: "picture" }),
       ],
     }),

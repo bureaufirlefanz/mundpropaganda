@@ -26,7 +26,7 @@ Der erste Bildschirm eines Seitentyps. Sie unterscheiden sich im Bau, nicht nur 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Hero` | Abschnitt | — | `lines: string[]` | Home, design/komponenten | ✓ |
-| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `claim?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` `textFirst?: boolean` | Emergency, Service, design/komponenten | ✓ |
+| `ServiceHero` | Abschnitt | Hero einer Leistungsseite: Text links, randabfallendes Bild rechts. | `title: string` `slug?: string` `topline?: string` `claim?: string` `text?: string` `image?: ImageSource` `alt?: string` `action?: string` `actionHref?: string` `textFirst?: boolean` | Service, design/komponenten | ✓ |
 | `PillarHero` | Abschnitt | Der Kopf einer Pillar Page (Figma 177:1734). | `title: string` `eyebrow?: string` `image?: ImageSource` `alt?: string` | Pillar, design/komponenten | ✓ |
 | `CareersHero` | Abschnitt | Der Kopf der Karriere- UND der Praxisseite: ein Wort, darunter der Bogen. | `title: string` `topline?: string` `image?: ImageSource` `alt?: string` `fallback?: string` `zoom?: boolean` | Careers, Practice, design/komponenten | ✓ |
 
@@ -37,11 +37,11 @@ Fließtext und Überleitungen.
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Intro` | Abschnitt | — | `topline?: string` `headline?: string` `columns: string[]` `image?: ImageSource` `alt?: string` `variant?: "default" | "centered"` `lead?: string` `action?: string` `actionHref?: string` `bleed?: string` | Careers, Pillar, Practice, Service, design/komponenten | ✓ |
-| `Prose` | Abschnitt | Ein Textabschnitt mit Bild daneben (Figma 177:1732 und 177:2276). | `id: string` `body: PortableTextBlock[]` `image?: ImageSource` `alt?: string` `side?: "left" | "right"` `note?: ProseNote | null` | Emergency, Pillar, design/komponenten | ✓ |
+| `Prose` | Abschnitt | Ein Textabschnitt mit Bild daneben (Figma 177:1732 und 177:2276). | `id: string` `body: PortableTextBlock[]` `image?: ImageSource` `alt?: string` `side?: "left" | "right"` `note?: ProseNote | null` | Pillar, design/komponenten | ✓ |
 | `Statement` | Abschnitt | Ein einzelner Absatz über die halbe Seitenbreite, größer gesetzt als Fließtext. Trägt eine Kernaussage, ohne eine Headline zu sein | `topline: string` `text: string` | Service, design/komponenten | ✓ |
 | `Split` | Abschnitt | Text links auf brauner Fläche, Bild rechts. | `topline: string` `title: string` `paragraphs: string[]` `image?: ImageSource` `action?: string` `actionHref?: string` | Home, design/komponenten | ✓ |
 | `TextHeading` | UI | Ein Zwischentitel im Fließtext — mit Sprungmarke. | `node: Block & { _tocId?: string }` | design/komponenten | ✓ |
-| `SectionHeading` | UI | Die nummerierte Abschnittsüberschrift einer Pillar Page (Figma 177:2162 + 177:1731). | `number: number` `headline: string` `level?: 2 | 3` | Emergency, Pillar, design/komponenten | ✓ |
+| `SectionHeading` | UI | Die nummerierte Abschnittsüberschrift einer Pillar Page (Figma 177:2162 + 177:1731). | `number: number` `headline: string` `level?: 2 | 3` | Pillar, design/komponenten | ✓ |
 
 ## Verzeichnis und Sprungmarken
 
@@ -50,7 +50,7 @@ Orientierung auf langen Seiten. Alle drei arbeiten mit derselben `Heading[]`-Lis
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Contents` | Abschnitt | Das Inhaltsverzeichnis einer Pillar Page (Figma 177:2107). | `headings: Heading[]` `headline?: string` `image?: ImageSource` `alt?: string` `caption?: string` | Pillar, design/komponenten | ✓ |
-| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` `rangeEnd?: string` `idleLabel?: string` `activeLine?: "bottom" | "center"` | Pillar, Post, design/komponenten | ✓ |
+| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` `rangeEnd?: string` `idleLabel?: string` `activeLine?: "bottom" | "pill"` | Pillar, Post, design/komponenten | ✓ |
 | `TableOfContents` | UI | Das Inhaltsverzeichnis neben einem Beitrag. | `headings: Heading[]` `title?: string` | design/komponenten | ✓ |
 | `NavPromo` | UI | Das Werbefeld im großen Menü. | `tag?: string` `headline: string` `href: string` `label?: string` `image?: ImageSource` `alt?: string` | design/komponenten, ui/Nav | ✓ |
 
@@ -124,11 +124,11 @@ Alles, was zu einem Termin führt.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `CtaBand` | Abschnitt | Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314). | `headline: string` `text?: string` `actionLabel?: string` `actionHref?: string` `image?: ImageSource` `alt?: string` | Emergency, Pillar, design/komponenten | ✓ |
+| `CtaBand` | Abschnitt | Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314). | `headline: string` `text?: string` `actionLabel?: string` `actionHref?: string` `image?: ImageSource` `alt?: string` | Pillar, design/komponenten | ✓ |
 | `Contact` | Abschnitt | Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des Akkordeons ein Formular. | `service?: string` `extended?: boolean` | Pillar, Service, design/komponenten | ✓ |
 | `Application` | Abschnitt | Das Bewerbungsformular: mehrere Schritte, je nach Rolle andere Fragen. | `id?: string` `topline: string` `headline: string` `text?: string` `jobs: Job[]` `fallbackEmail?: string` | Careers, design/komponenten | ✓ |
 | `Button` | UI | Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil. | `label: string` `href?: string` `variant?: "dark" | "block"` `static?: boolean` `type?: "submit" | "button"` `labelAttrs?: Record<string, unknown>` | 404, Careers, Post, design/komponenten, design/styleguide, sections/Application, sections/Contact, sections/CtaBand, sections/Hero, sections/Intro, sections/Jobs, sections/Magazine, sections/ServiceHero, sections/Services, sections/Split, sections/Standards, sections/Stories, ui/Footer, ui/Nav, ui/NavPromo, ui/PostCard | ✓ |
-| `Faq` | Abschnitt | FAQ: panel frame plus accordion. Every page uses the same block with the same head — topline, headline and a short line — only the | `questions: Question[]` | Careers, Emergency, Home, Pillar, Service, design/komponenten | ✓ |
+| `Faq` | Abschnitt | FAQ: panel frame plus accordion. Every page uses the same block with the same head — topline, headline and a short line — only the | `questions: Question[]` | Careers, Home, Pillar, Service, design/komponenten | ✓ |
 | `Accordion` | UI | Akkordeon. Immer nur ein Eintrag offen (`data-accordion="single"`), gesteuert von modules/ui.js. | `questions: Question[]` | design/komponenten, design/styleguide, sections/Faq | ✓ |
 
 ## Hinweise und Belege
@@ -350,7 +350,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 - `label?: string` — aria-label of the nav.
 - `rangeEnd?: string` — Selector of the element whose bottom ends the dock's range. Without it the range ends with the last section. A post's "sections" are single heading lines, so the last one passes in a blink and the dock vanished for the whole final chapter; there the text container is the range. /
 - `idleLabel?: string` — Text of the pill before the first section is reached, e.g. "Inhalt". With it the dock shows from the top of the page and the table of contents lives in the pill alone; without it the dock appears with the first section and starts on its number, as on the pillar pages. /
-- `activeLine?: "bottom" | "center"` — Where a section becomes the current one: when its top passes the bottom of the viewport (`bottom`, the default, right for the tall sections of a pillar page) or the middle (`center`, for a post whose sections are a few paragraphs: with `bottom` the pill named the section at the lower screen edge, not the one being read). /
+- `activeLine?: "bottom" | "pill"` — Where a section becomes the current one. `bottom` (default): when its top passes the bottom of the viewport, right for the tall sections of a pillar page. `pill`: when its heading reaches the pill itself; scrolling back, the previous section takes over as soon as the heading drops below the pill again, so the pill names the text standing at its own height. For posts, whose sections are a few paragraphs. /
 
 **`SectionHeading`**
 
@@ -370,7 +370,6 @@ Inhalte und Entwürfe.
 **templates/**
 
 - `Careers` — Der Zusammenbau der Karriereseite.
-- `Emergency` — The emergency page, `/notdienst`.
 - `Home` — Der Zusammenbau der Startseite — Bausteine und ihre Reihenfolge.
 - `LegalPage` — Der Zusammenbau einer Rechtstextseite.
 - `Magazine` — Der Zusammenbau der Magazin-Übersicht.

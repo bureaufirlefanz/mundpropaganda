@@ -41,7 +41,6 @@ export const FIXED_PATHS = {
   practice: "/praxis",
   magazineIndex: "/magazin",
   careers: "/karriere",
-  emergency: "/notdienst",
 } as const satisfies Record<string, string>;
 
 /**

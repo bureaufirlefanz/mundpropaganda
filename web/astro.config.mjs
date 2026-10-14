@@ -96,6 +96,10 @@ function suchmaschinenSperre({ projectId, dataset, apiVersion }) {
 export default defineConfig({
   output: "static",
 
+  /* The emergency page was `/notdienst` from 2026-10-13 to 2026-10-14; since
+     then it is a service like the others. */
+  redirects: { "/notdienst": "/leistungen/notdienst" },
+
   /* Nötig für die Vorschau-Route: Sie muss je Aufruf frisch rendern, weil sie
      Entwürfe zeigt. Alles Übrige bleibt vorgerendert.
 
