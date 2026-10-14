@@ -95,7 +95,7 @@ export const veneersPillar: PillarPage = {
       navLabel: "Was sind Veneers",
       headline: "Was sind Veneers",
       variant: "centered",
-      image: "veneers-modell",
+      image: "veneers-farbbestimmung",
       columns: [
         "Veneers, auf Deutsch Verblendschalen, sind dünne Schalen aus Keramik oder Komposit, die dauerhaft auf die Vorderseite eines Zahns geklebt werden. Sie sind zwischen 0,3 und 1 Millimeter dick. Ein Non-Prep-Veneer ist damit etwa so dünn wie drei übereinandergelegte Blatt Papier.",
         "Der entscheidende Unterschied zur Krone: Eine Krone umfasst den gesamten Zahn und erfordert, dass ringsum Zahnsubstanz abgetragen wird. Ein Veneer bedeckt nur die Sichtfläche. Deshalb gilt es als die deutlich zahnschonendere Lösung, wenn es um Ästhetik geht.",
@@ -171,7 +171,7 @@ export const veneersPillar: PillarPage = {
       _key: "abschleifen",
       navLabel: "Abschleifen",
       heading: "Müssen die Zähne abgeschliffen werden?",
-      image: "farbskala-bleaching",
+      image: "labor-hand-implantat",
       side: "left",
       body: blocks("abschleifen", [
         "Das ist die Frage, die uns am häufigsten gestellt wird, und die berechtigteste. Die Antwort lautet: Es kommt darauf an, und bei einem Teil der Patientinnen und Patienten lautet sie Nein.",
@@ -232,7 +232,7 @@ export const veneersPillar: PillarPage = {
       text: "In einem Beratungstermin klären wir, ob Veneers für dich das Richtige sind.",
       actionLabel: "Termin buchen",
       actionHref: "/#kontakt",
-      image: "beratung-patientin",
+      image: "beratung-hannes",
     },
 
     /* Der Beleg direkt hinter dem Ablauf: Wer gerade gelesen hat, wie es

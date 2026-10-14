@@ -29,10 +29,10 @@
 const MOTIFS: Record<string, string> = {
   veneers: "veneers-farbbestimmung",
   zahnimplantate: "implantat-beratung",
-  keramikinlays: "modell-abformung",
-  "zahnersatz-prothetik": "kronen-modell",
+  keramikinlays: "kronen-modell",
+  "zahnersatz-prothetik": "labor-hand-implantat",
   bleaching: "bleaching-beratung-spiegel",
-  aligner: "aligner",
+  aligner: "aligner-schiene",
   weisheitszahnentfernung: "blutabnahme-weissheitszahn",
   wurzelbehandlung: "wurzelbehandlung-mikroskop",
   "cmd-behandlung": "cmd-gesichtsbogen",
@@ -47,7 +47,7 @@ const MOTIFS: Record<string, string> = {
  * einzige Aufnahme, die auch bei einer neuen, hier noch nicht eingetragenen
  * Leistung nichts Falsches behauptet.
  */
-const FALLBACK = "beratung-patientin";
+const FALLBACK = "implantat-beratung";
 
 /** Der Motivname zu einer Leistung, für `Picture`. */
 export const serviceMotif = (slug?: string) =>

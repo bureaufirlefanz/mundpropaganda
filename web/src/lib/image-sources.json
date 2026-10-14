@@ -1,0 +1,275 @@
+{
+  "allowedPhotographerFiles": [
+    "260829_mundpropaganda_0085.jpg",
+    "260829_mundpropaganda_0134.jpg",
+    "260829_mundpropaganda_0182.jpg",
+    "260829_mundpropaganda_0208.jpg",
+    "260829_mundpropaganda_0267.jpg",
+    "260829_mundpropaganda_0339.jpg",
+    "260829_mundpropaganda_0360.jpg",
+    "260829_mundpropaganda_0405.jpg",
+    "260829_mundpropaganda_0452.jpg",
+    "260829_mundpropaganda_0504.jpg",
+    "260829_mundpropaganda_0516.jpg",
+    "260829_mundpropaganda_0578.jpg",
+    "260829_mundpropaganda_0596.jpg",
+    "260829_mundpropaganda_0633.jpg",
+    "260829_mundpropaganda_0639.jpg",
+    "260829_mundpropaganda_0676.jpg",
+    "260829_mundpropaganda_0757.jpg",
+    "260829_mundpropaganda_0793.jpg",
+    "260829_mundpropaganda_0848.jpg",
+    "260829_mundpropaganda_0874.jpg",
+    "260829_mundpropaganda_0920.jpg",
+    "260829_mundpropaganda_0986.jpg",
+    "260829_mundpropaganda_1022.jpg",
+    "260829_mundpropaganda_1061.jpg",
+    "260829_mundpropaganda_1121.jpg",
+    "260829_mundpropaganda_1126.jpg",
+    "260829_mundpropaganda_1128.jpg",
+    "260829_mundpropaganda_1136.jpg",
+    "260829_mundpropaganda_1140.jpg",
+    "260829_mundpropaganda_1143.jpg",
+    "260829_mundpropaganda_1156.jpg",
+    "260829_mundpropaganda_1166.jpg",
+    "260829_mundpropaganda_1170.jpg",
+    "260829_mundpropaganda_1178.jpg",
+    "260829_mundpropaganda_1185.jpg",
+    "260829_mundpropaganda_1186.jpg",
+    "260829_mundpropaganda_1219.jpg",
+    "260829_mundpropaganda_1229.jpg",
+    "260829_mundpropaganda_1344.jpg",
+    "260829_mundpropaganda_1351.jpg"
+  ],
+  "motifs": {
+    "abstract-01": {
+      "source": "design"
+    },
+    "abstract-02": {
+      "source": "design"
+    },
+    "aligner-schiene": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0793.jpg"
+    },
+    "behandlung-bildschirm": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0516.jpg"
+    },
+    "behandlung-prophylaxe": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0516.jpg"
+    },
+    "behandlungszimmer-holz": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1156.jpg"
+    },
+    "behandlungszimmer-rot": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1128.jpg"
+    },
+    "beratung-hannes": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0986.jpg"
+    },
+    "bleaching-beratung-spiegel": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0504.jpg"
+    },
+    "blutabnahme-weissheitszahn": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1022.jpg"
+    },
+    "cmd-gesichtsbogen": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0920.jpg"
+    },
+    "diffusor-atmo": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1143.jpg"
+    },
+    "empfang-c37": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1344.jpg"
+    },
+    "empfang-p25": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1166.jpg"
+    },
+    "experten": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0182.jpg"
+    },
+    "experten-draussen": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0208.jpg"
+    },
+    "fassade-p25": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1229.jpg"
+    },
+    "flaeche-rot": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1136.jpg"
+    },
+    "flur-bilder": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1186.jpg"
+    },
+    "flur-p25": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1178.jpg"
+    },
+    "flur-rot": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1185.jpg"
+    },
+    "hannes": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0085.jpg"
+    },
+    "implantat-beratung": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0757.jpg"
+    },
+    "instrumente": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0639.jpg"
+    },
+    "kerrin": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0134.jpg"
+    },
+    "kronen-modell": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0874.jpg"
+    },
+    "lab-veneers": {
+      "source": "design"
+    },
+    "labor-hand-implantat": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0633.jpg"
+    },
+    "labor-regal": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0596.jpg"
+    },
+    "lastenrad-nachhaltig": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1121.jpg"
+    },
+    "motion-01": {
+      "source": "design"
+    },
+    "motion-02": {
+      "source": "design"
+    },
+    "motion-03": {
+      "source": "design"
+    },
+    "motion-04": {
+      "source": "design"
+    },
+    "portrait-hero": {
+      "source": "design"
+    },
+    "portrait-tooth-mask": {
+      "source": "design"
+    },
+    "praxis-01": {
+      "source": "design"
+    },
+    "praxis-02": {
+      "source": "design"
+    },
+    "praxis-03": {
+      "source": "design"
+    },
+    "roentgen": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1061.jpg"
+    },
+    "smile-portrait": {
+      "source": "design"
+    },
+    "story-portrait-01": {
+      "source": "unclear",
+      "note": "Added 2026-08-06, before the shoot of 2026-08-29; origin to be confirmed."
+    },
+    "story-portrait-02": {
+      "source": "unclear",
+      "note": "Added 2026-08-06, before the shoot of 2026-08-29; origin to be confirmed."
+    },
+    "team-empfang": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0339.jpg"
+    },
+    "team-implantate": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0405.jpg"
+    },
+    "team-labor": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0578.jpg"
+    },
+    "team-management": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0360.jpg"
+    },
+    "team-prophylaxe": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0267.jpg"
+    },
+    "team-veneers": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0452.jpg"
+    },
+    "tee-kueche": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1170.jpg"
+    },
+    "teeth-macro": {
+      "source": "design"
+    },
+    "teeth-macro-after": {
+      "source": "design"
+    },
+    "tooth-3d": {
+      "source": "design"
+    },
+    "treatment-01": {
+      "source": "design"
+    },
+    "treatment-02": {
+      "source": "design"
+    },
+    "treatment-03": {
+      "source": "design"
+    },
+    "veneers-farbbestimmung": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0848.jpg"
+    },
+    "wartebereich": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1126.jpg"
+    },
+    "waschbecken": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1140.jpg"
+    },
+    "waschbecken-blau": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1351.jpg"
+    },
+    "wurzelbehandlung-mikroskop": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_0676.jpg"
+    },
+    "zahnleuchte": {
+      "source": "franz",
+      "file": "260829_mundpropaganda_1219.jpg"
+    }
+  }
+}

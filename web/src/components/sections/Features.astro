@@ -34,13 +34,14 @@ const { lines } = Astro.props;
 /* Klasse 3: die gestalteten Motive, in der Reihenfolge des Entwurfs. Über den
    Index und modulo, damit eine vierte Zeile nicht ohne Bild dasteht — und
    damit nicht alle Zeilen dasselbe Motiv tragen. */
-/* `veneers-modell` stand hier bis hierher an zweiter Stelle — dasselbe Motiv,
-   das die Navigationsempfehlung auf JEDER Seite zeigt. Damit lief es einem
-   auf 28 von 29 Seiten zweimal über den Weg. `beratung-modell` ist neu und
-   war nirgends verwendet. */
+/* An zweiter Stelle stand erst `veneers-modell` (lief einem auf 28 von 29
+   Seiten zweimal über den Weg, weil die Navigationsempfehlung dasselbe
+   Motiv zeigte), dann `beratung-modell`. Beide gehören nicht zur
+   freigegebenen Auswahl des Fotografen (2026-10-14), seitdem
+   `beratung-hannes`. */
 const MOTIFS = [
   "wurzelbehandlung-mikroskop",
-  "beratung-modell",
+  "beratung-hannes",
   "labor-hand-implantat",
 ];
 ---

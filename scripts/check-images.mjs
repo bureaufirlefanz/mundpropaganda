@@ -96,6 +96,61 @@ export async function checkImages() {
   return missing.length;
 }
 
+/**
+ * Jedes Motiv unter `web/public/img` muss eine bekannte Herkunft haben.
+ *
+ * Der Fall: Der Fotograf (Franz Grünewald) hat am 2026-10-03 eine finale
+ * Auswahl von 40 Bildern freigegeben. Alles andere aus seinem Shooting darf
+ * nicht auf die Seite, auch nicht die 17 „Add Ons" der ersten Lieferung, aus
+ * denen bis dahin die halbe Galerie bestand. Welches Foto wo herkommt, sah
+ * man den Dateien nicht an: Sie hießen `blumen` oder `holzbank`, nicht
+ * `260829_mundpropaganda_1075`.
+ *
+ * `web/src/lib/image-sources.json` hält deshalb für jedes Motiv fest, woher
+ * es stammt: `franz` mit der Originaldatei, die in der freigegebenen Liste
+ * stehen muss, oder `design` für Figma- und KI-Motive. Ein Motiv ohne
+ * Eintrag ist ein Befund, ein Fotografenbild außerhalb der Freigabe auch.
+ */
+export async function checkImageSources() {
+  const manifest = JSON.parse(
+    await readFile("web/src/lib/image-sources.json", "utf8"),
+  );
+  const allowed = new Set(manifest.allowedPhotographerFiles);
+  const motifs = new Set();
+  for (const file of await readdir("web/public/img")) {
+    const m = file.match(/^(.+)-\d+\.(avif|webp)$/);
+    if (m) motifs.add(m[1]);
+  }
+
+  const befunde = [];
+  for (const motif of [...motifs].sort()) {
+    const entry = manifest.motifs[motif];
+    if (!entry) {
+      befunde.push(`${motif}: keine Herkunft in image-sources.json`);
+    } else if (entry.source === "franz" && !allowed.has(entry.file)) {
+      befunde.push(
+        `${motif}: ${entry.file} ist nicht in der freigegebenen Auswahl`,
+      );
+    }
+  }
+  const stale = Object.keys(manifest.motifs).filter((m) => !motifs.has(m));
+  const unclear = Object.entries(manifest.motifs)
+    .filter(([m, e]) => e.source === "unclear" && motifs.has(m))
+    .map(([m]) => m);
+
+  if (!befunde.length) {
+    console.log(`  ✓ ${motifs.size} Motive mit bekannter Herkunft`);
+  }
+  for (const b of befunde) console.log(`  ✗ ${b}`);
+  if (unclear.length)
+    console.log(`  (Herkunft noch zu klären: ${unclear.join(", ")})`);
+  if (stale.length)
+    console.log(
+      `  (in image-sources.json, aber nicht mehr unter public/img: ${stale.join(", ")})`,
+    );
+  return befunde.length;
+}
+
 /* Direkt aufgerufen: selbst melden und mit passendem Code enden.
    Als Import: nur die Funktion, der Aufrufer zählt die Befunde.
 
@@ -106,11 +161,13 @@ export async function checkImages() {
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log("── Bilddateien ──");
   const fehlend = await checkImages();
+  console.log("── Bildherkunft ──");
+  const fremd = await checkImageSources();
   if (fehlend) {
     console.log(
       `\n${fehlend} Bildadresse(n) ohne Datei. Fehlt sie auch im Repository, liefert` +
         ` der nächste Deploy sie als 404 aus.`,
     );
   }
-  process.exit(fehlend ? 1 : 0);
+  process.exit(fehlend || fremd ? 1 : 0);
 }

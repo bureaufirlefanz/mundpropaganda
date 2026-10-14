@@ -25,6 +25,6 @@ export const navPromo: NavPromo = {
   headline: "Alles zum Thema Veneers",
   href: "/veneers-berlin",
   label: "Guide lesen",
-  image: "veneers-modell",
-  alt: "Zahnärztin im Behandlungsraum der Praxis",
+  image: "kronen-modell",
+  alt: "Zahnmodell mit Keramikkronen auf der Laborbank",
 };

@@ -69,17 +69,19 @@ const zeigtFormular = MIT_FORMULAR.includes(slug);
  *
  * Nicht `veneers-farbbestimmung`: Das trägt schon der Kopf dieser Seite
  * (`lib/service-images.ts`), und zweimal dasselbe Motiv auf einer Seite fällt
- * auf. `veneers-anprobe` ist quer genug für das randlose 2:1-Feld.
+ * auf. `bleaching-beratung-spiegel` ist quer genug für das randlose 2:1-Feld.
+ * (Bis 2026-10-14 stand hier `veneers-anprobe`; das Foto ist nicht in der
+ * freigegebenen Auswahl des Fotografen.)
  *
  * Ohne Eintrag steht das Erklärstück ohne Bild — der Block trägt sich über
  * seinen Text, und ein fremdes Motiv wäre schlechter als keines. */
 const ERKLAERSTUECK_MOTIV: Record<string, string> = {
-  veneers: "veneers-anprobe",
+  veneers: "bleaching-beratung-spiegel",
 };
 
 /* Der Alternativtext gehört zum Motiv und steht deshalb daneben. */
 const ERKLAERSTUECK_ALT: Record<string, string> = {
-  veneers: "Ein Farbmuster wird zum Vergleich an die Frontzähne gehalten.",
+  veneers: "Eine Patientin prüft ihr Lächeln im Handspiegel.",
 };
 
 /* Wahlfrei, aber nicht halb — wie Intro und Benefits darunter. */
@@ -102,14 +104,14 @@ const explainer =
  * Pflege. Lädt die Redaktion im Studio ein eigenes Bild an die Zeile, hat
  * das Vorrang.
  *
- *   beratung-modell        Hannes erklärt einer Patientin ein Modell
+ *   beratung-hannes        Hannes im Gespräch am Tisch
  *   labor-hand-implantat   Laborbank unterm Mikroskop, Arbeit am Zahn
  *   behandlung-prophylaxe  Spiegel mit dem Lächeln darin, Instrument daneben
  *
  * Zählt eine Leistung mehr Zeilen als hier Motive stehen, greift für den Rest
  * wieder der Rückfall nach Position. */
 const FEATURE_MOTIVE: Record<string, string[]> = {
-  veneers: ["beratung-modell", "labor-hand-implantat", "behandlung-prophylaxe"],
+  veneers: ["beratung-hannes", "labor-hand-implantat", "behandlung-prophylaxe"],
 };
 
 const features = d?.features?.map((row, i) => ({

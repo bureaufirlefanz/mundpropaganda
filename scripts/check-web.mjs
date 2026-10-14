@@ -22,7 +22,7 @@ import {
   melde,
 } from "./lib/smoke.mjs";
 import { pruefeSeite as wcagMessen, wcagBefunde } from "./lib/wcag.mjs";
-import { checkImages } from "./check-images.mjs";
+import { checkImages, checkImageSources } from "./check-images.mjs";
 
 /* Standardmäßig der Dev-Server, aber umstellbar:
  *
@@ -695,6 +695,9 @@ problems += await checkRouteCoverage(browser, PAGES);
 
 console.log(`\n── Bilddateien ──`);
 problems += await checkImages();
+
+console.log("\n── Bildherkunft ──");
+problems += await checkImageSources();
 
 console.log(`\n── Sprungmarken ──`);
 problems += await checkAnchors();

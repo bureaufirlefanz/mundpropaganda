@@ -104,14 +104,11 @@ const sizeCap = (100 / (0.67 * longestUnit)).toFixed(2);
    Tabelle auf der Startseite liest. Wer dort auf „Bleaching" klickt, findet
    das Bild wieder, das ihn hergebracht hat.
 
-   Veneers ist die eine bewusste Ausnahme von diesem Grundsatz: der Hero
-   zeigt `veneers-anprobe` statt `veneers-farbbestimmung` aus der Liste —
-   dort wird gelächelt, in der Farbbestimmung nicht. Die Tabelle auf der
-   Startseite bleibt unangetastet und zeigt weiter das Listenbild; sie war
-   ausdrücklich nicht Teil dieser Änderung. */
-const HERO_MOTIF_OVERRIDE: Record<string, string> = {
-  veneers: "veneers-anprobe",
-};
+   Veneers hatte bis 2026-10-14 eine Ausnahme (`veneers-anprobe`, ein
+   lächelndes Motiv statt der Farbbestimmung). Das Foto gehört nicht zur
+   freigegebenen Auswahl des Fotografen und ist entfallen; die Tabelle
+   bleibt leer, bis es einen neuen Grund für eine Ausnahme gibt. */
+const HERO_MOTIF_OVERRIDE: Record<string, string> = {};
 const MOTIF = (slug && HERO_MOTIF_OVERRIDE[slug]) || serviceMotif(slug);
 ---
 

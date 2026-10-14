@@ -33,6 +33,20 @@ got a 404 and showed nothing.
 PNG or JPEG in, WebP and AVIF out. Portrait for the story cards (they render
 between 563 and 1024 px wide), landscape for full-bleed sections.
 
+## Where a photo may come from
+
+The photographer (Franz Grünewald) released a final selection on 2026-10-03:
+`assets/Fotos Final/01 High-Res JPG`, 40 files. **Only those may be used.**
+Nothing else from his shoot, in particular not the "Add Ons" of the first
+delivery. The 21 originals that fell out on 2026-10-14 sit in
+`assets/raw-gesperrt/` so nobody re-imports them by accident.
+
+Every motif is listed in `web/src/lib/image-sources.json` with its origin:
+`franz` plus the original file name, or `design` for Figma and AI motifs.
+`npm run check:images` fails for a motif without an entry and for a
+photographer's file outside the released list. When you add a photo, add its
+line there too.
+
 ## Why this folder is empty in a fresh checkout
 
 The originals are large and are not versioned — the derived files under
