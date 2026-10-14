@@ -299,9 +299,10 @@ const {
     }
   }
 
-  /* The button closes the text column. No margin of its own: the panel's
-     `gap` sets the same distance as between the paragraphs. */
+  /* Bottom right of the panel: `margin-top: auto` pushes it past the gap to
+     the lower edge, `align-self` to the right. */
   .s-split__action {
-    align-self: flex-start;
+    margin-top: auto;
+    align-self: flex-end;
   }
 </style>

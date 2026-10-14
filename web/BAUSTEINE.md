@@ -102,7 +102,7 @@ Patientinnen und Patienten, Mitarbeitende.
 | `Stories` | Abschnitt | Karten und Zitate gehören zusammen: Beim Blättern wechselt beides gleichzeitig, deshalb ist es EIN Datensatz und nicht zwei parall | `items: Geschichte[]` `action?: { text: string; href: strin…` | Home, Pillar, Service, design/komponenten | ✓ |
 | `Story` | Abschnitt | Die Praxis in eigenen Worten: Text links, Bild rechts, Zahlen darunter. | `topline: string` `headline: string` `columns: string[]` `image?: ImageSource` `figures?: Figure[]` | Practice, design/komponenten | ✓ |
 | `Voices` | Abschnitt | Stimmen aus dem Team — Zitate, versetzt statt in einer Reihe. | `topline: string` `headline: string` `voices: Voice[]` | Careers, design/komponenten | ✓ |
-| `Experts` | Abschnitt | — | `title: string` `names: string` `paragraphs: string[]` `image?: ImageSource` | Home, design/komponenten | ✓ |
+| `Experts` | Abschnitt | — | `title: string` `names: string` `paragraphs: string[]` `image?: ImageSource` `links?: { label: string; href: stri…` | Home, design/komponenten | ✓ |
 
 ## Medien
 
@@ -233,6 +233,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 **`CtaBand`**
 
 - `actionHref?: string` — Fertiger Pfad. Dieser Baustein setzt keine URLs zusammen.
+
+**`Experts`**
+
+- `links?: { label: string; href: string }[]` — Text links under the paragraphs, e.g. Praxis and Karriere.
 
 **`Gallery`**
 

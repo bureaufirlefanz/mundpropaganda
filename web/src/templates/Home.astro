@@ -81,6 +81,10 @@ const shareImage = isCmsImage(data.seo?.image)
     names={data.expertsNames}
     paragraphs={data.expertsParagraphs}
     image={data.expertsImage}
+    links={[
+      { label: "Praxis", href: "/praxis" },
+      { label: "Karriere", href: "/karriere" },
+    ]}
   />
   <Stories items={data.storiesItems} action={storiesAction} />
   {

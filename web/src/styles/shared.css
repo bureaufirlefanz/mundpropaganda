@@ -361,3 +361,34 @@ html.js [data-hero-scroll] {
 /* Hier stand eine Regel für `[data-surface="brand"]` — eine Ziffer auf pinker
    Fläche. Das Attribut hat nie ein Element getragen; entfallen am
    2026-09-02, zusammen mit der Theme-Schicht in `tokens.css`. */
+
+/* --- Text link ---------------------------------------------------------
+   The underline wipes in from the left on hover and out to the right on
+   leave: two transform origins, one pseudo element, the direction always
+   reads. Lived in Footer.astro while only the footer used it; since
+   2026-10-14 the experts section links to Praxis and Karriere with it. */
+.c-link {
+  position: relative;
+  display: inline-block;
+  transition: color var(--d-fast) var(--e-swift);
+}
+
+.c-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.15em;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--d-base) var(--e-out);
+}
+
+@media (hover: hover) {
+  .c-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}

@@ -18,9 +18,11 @@ interface Props {
   names: string;
   paragraphs: string[];
   image?: ImageSource;
+  /** Text links under the paragraphs, e.g. Praxis and Karriere. */
+  links?: { label: string; href: string }[];
 }
 
-const { title, names, paragraphs, image } = Astro.props;
+const { title, names, paragraphs, image, links } = Astro.props;
 ---
 
 {
@@ -91,6 +93,22 @@ const { title, names, paragraphs, image } = Astro.props;
           </p>
         ))
       }
+      {
+        links?.length ? (
+          <p
+            class="s-experts__links"
+            data-reveal="up"
+            data-reveal-delay={0.06 + paragraphs.length * 0.06}
+            data-reveal-trigger=".s-experts"
+          >
+            {links.map((l) => (
+              <a class="c-link" href={l.href}>
+                {l.label}
+              </a>
+            ))}
+          </p>
+        ) : null
+      }
     </div>
   </div>
 </section>
@@ -141,6 +159,13 @@ const { title, names, paragraphs, image } = Astro.props;
   .s-experts__title {
     font: var(--font-title-page);
     letter-spacing: var(--tracking-title-page);
+  }
+
+  .s-experts__links {
+    display: flex;
+    gap: var(--sp-5);
+    font-size: var(--fs-text-main);
+    line-height: var(--lh-text);
   }
 
   .s-experts__names {

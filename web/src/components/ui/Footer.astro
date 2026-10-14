@@ -473,36 +473,6 @@ const columns = (
     }
   }
 
-  /* --- Textlink ---------------------------------------------------------
-     Die Unterstreichung wischt beim Betreten von links herein und beim
-     Verlassen nach rechts wieder hinaus. Zwei Transform-Origins, ein
-     Pseudo-Element — die Richtung bleibt dadurch immer nachvollziehbar.
-
-     Steht hier, weil .c-link derzeit nur im Footer vorkommt. Kommt er in
-     einer zweiten Komponente dazu, gehört er nach shared.css. */
-  .c-link {
-    position: relative;
-    display: inline-block;
-    transition: color var(--d-fast) var(--e-swift);
-  }
-
-  .c-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -0.15em;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right center;
-    transition: transform var(--d-base) var(--e-out);
-  }
-
-  @media (hover: hover) {
-    .c-link:hover::after {
-      transform: scaleX(1);
-      transform-origin: left center;
-    }
-  }
+  /* `.c-link`, the text link, lives in shared.css since 2026-10-14: the
+     experts section uses it too. */
 </style>
