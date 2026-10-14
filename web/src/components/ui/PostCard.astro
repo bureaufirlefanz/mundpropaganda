@@ -43,6 +43,18 @@ interface Props {
    * „h1 → h3 bei Zahngesundheit & Fitness".
    */
   headingLevel?: "h2" | "h3";
+  /**
+   * The composition.
+   *
+   * `overlap` is the card of the carousel: portrait image, the white surface
+   * set over its lower right. It needs around 420px of width and takes only
+   * so much text. `stacked` puts the image on top (4:3) and the surface
+   * below it, still shifted over the image edge: the surface grows with the
+   * text, which is what the overview under /magazin needs, where a post with
+   * a long title and lead must not break the row. Below 460px every card
+   * stacks anyway, see the container query.
+   */
+  variant?: "overlap" | "stacked";
 }
 
 const {
@@ -51,6 +63,7 @@ const {
   parallax,
   withButton = false,
   headingLevel: Titel = "h3",
+  variant = "overlap",
   ...rest
 } = Astro.props;
 
@@ -73,7 +86,7 @@ const motif = motifFor(p.slug);
      pflegen. */
 }
 <a
-  class="c-post"
+  class:list={["c-post", variant === "stacked" && "c-post--stacked"]}
   href={postPath(p.slug)}
   data-category={p.category ?? ""}
   {...rest}
@@ -179,12 +192,16 @@ const motif = motifFor(p.slug);
      soll mit dem Button abschließen, nicht mit dem Text darin. */
   .c-post__surface {
     position: absolute;
-    /* Die Unterkante steht fest (bündig mit dem Button), die Oberkante nicht:
-       Im Karussell ist die Karte schmal und der Text füllt die Fläche, in der
-       Übersicht ist sie breiter, derselbe Text braucht weniger Zeilen und die
-       Fläche stünde halb leer. Deshalb rückt der Ansatz dort nach unten. */
-    top: var(--post-surface-top, 27%);
+    /* Anchored at the bottom (flush with the button), the top is free: the
+       surface is at least 73 % of the card, as in the design, and grows
+       upward over the image when the text needs more. Until 2026-10-14 the
+       top was fixed at 27 %, and the first post with a long title and lead
+       ran out of the surface. `max-height: 100%` is the ceiling, the clamp
+       on the lead below is what keeps it from being reached. */
+    top: auto;
     bottom: 0;
+    min-height: 73%;
+    max-height: 100%;
     right: 0;
     width: 57%;
     display: flex;
@@ -221,10 +238,17 @@ const motif = motifFor(p.slug);
 
   .c-post__text {
     margin-top: auto;
-    padding-top: var(--sp-6);
+    padding-top: var(--sp-4);
     font-size: var(--fs-text-small);
     line-height: var(--lh-text);
     color: var(--c-on-card-muted);
+    /* Four lines at most in the overlapping surface. A lead is a teaser,
+       the full text is one click away; what is cut here is better cut than
+       pushed over the image's top edge. The stacked card lifts the clamp. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
   }
 
   /* :global(.c-btn), weil der Button aus Button.astro kommt. */
@@ -242,6 +266,36 @@ const motif = motifFor(p.slug);
     .c-post:hover :global(.c-btn__icon) {
       transform: translateX(5px);
     }
+  }
+
+  /* --- Gestapelt als Variante --------------------------------------------
+     Dieselbe Komposition wie unten in der Container-Abfrage, nur auf
+     Zuruf: Die Übersicht unter /magazin stellt die Karte so, damit ein
+     langer Titel samt Anriss die Fläche wachsen lässt statt zu sprengen.
+     Die Regeln stehen zweimal, weil ein Selektor und eine @container-Regel
+     sich nicht zu einer Liste zusammenziehen lassen; wer eine ändert,
+     ändert beide. */
+  .c-post--stacked .c-post__media {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .c-post--stacked .c-post__surface {
+    position: relative;
+    z-index: 1;
+    inset: auto;
+    min-height: 0;
+    max-height: none;
+    align-self: flex-end;
+    width: 92%;
+    margin-top: calc(-1 * var(--sp-8));
+  }
+
+  .c-post--stacked .c-post__text {
+    margin-top: 0;
+    padding-top: var(--sp-3);
+    display: block;
+    -webkit-line-clamp: none;
   }
 
   /* --- Schmale Karte ----------------------------------------------------
@@ -282,12 +336,11 @@ const motif = motifFor(p.slug);
          Verschiebung statt als Lage. Gemessen schob das die Karte um 120px
          nach unten und aus ihrem Beitrag heraus. */
       inset: auto;
+      min-height: 0;
+      max-height: none;
       align-self: flex-end;
       width: 92%;
       margin-top: calc(-1 * var(--sp-8));
-      /* Der Ansatz von oben gilt hier nicht: Die Fläche steht im Fluss und
-         bekommt ihre Höhe vom Text. */
-      top: auto;
     }
 
     /* `margin-top: auto` schob den Text in der absolut gesetzten Karte an
@@ -296,6 +349,8 @@ const motif = motifFor(p.slug);
     .c-post__text {
       margin-top: 0;
       padding-top: var(--sp-3);
+      display: block;
+      -webkit-line-clamp: none;
     }
   }
 </style>

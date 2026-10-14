@@ -43,6 +43,7 @@ const categories = [
           sizes="(max-width: 640px) 94vw, (max-width: 1000px) 47vw, 31vw"
           withButton
           headingLevel="h2"
+          variant="stacked"
           data-reveal-child
         />
       ))
@@ -66,11 +67,11 @@ const categories = [
     margin-bottom: var(--sp-8);
   }
 
-  /* Drei Spalten. Auf 1440px Fenster sind das rund 400px je Karte — zu wenig
-     für die versetzte Überlappung, und genau deshalb muss hier nichts weiter
-     stehen: Die Karte merkt es selbst und stapelt (siehe PostCard.astro,
-     Schwelle 460px). Vorher stand hier eine zweite, eigene Kartenform für
-     genau diesen Fall.
+  /* Drei Spalten, die Karte gestapelt (`variant="stacked"`): Bild oben, die
+     weiße Fläche darunter, und die wächst mit dem Text. Die versetzte
+     Überlappung des Karussells trägt in 400px Spaltenbreite keinen langen
+     Titel samt Anriss; seit 2026-10-14 verlässt sich die Übersicht deshalb
+     nicht mehr auf die Schwelle in der Karte, sondern sagt es ihr.
 
      `align-items: start`, sonst dehnen die Zellen ihren Inhalt auf die
      Zeilenhöhe und die weiße Fläche hinge unter dem Button. */

@@ -712,16 +712,25 @@ const RING_IMAGES = [
         <span class="d-sample__path">components/ui/PostCard.astro</span>
       </div>
       <p class="d-sample__text">
-        Die Beitragskarte: Bild, darauf versetzt eine weiße Fläche. Dieselbe
-        Karte im Karussell und im Raster - die Breite kommt von außen über
-        <code>--post-width</code>, alles andere steht nur an dieser einen
-        Stelle. Unter etwa 420px trägt die weiße Fläche den Text nicht mehr,
-        deshalb stapelt sie dort.
+        Die Beitragskarte in zwei Fassungen. <code>overlap</code> ist die des Karussells:
+        Bild, darauf versetzt eine weiße Fläche, die mit dem Text nach oben wächst.
+        <code>stacked</code> ist die der Übersicht unter /magazin: Bild oben, Fläche
+        darunter, beliebig viel Text. Die Breite kommt von außen über <code
+          >--post-width</code
+        >. Unter etwa 460px stapelt jede Karte von selbst.
       </p>
       <div class="d-stage" style="max-width: 560px">
         {
           posts.length ? (
-            <PostCard post={posts[0]!} sizes="500px" withButton />
+            <>
+              <PostCard post={posts[0]!} sizes="500px" withButton />
+              <PostCard
+                post={posts[0]!}
+                sizes="500px"
+                withButton
+                variant="stacked"
+              />
+            </>
           ) : null
         }
       </div>
