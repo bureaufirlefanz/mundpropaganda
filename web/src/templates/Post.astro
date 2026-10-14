@@ -267,17 +267,19 @@ const serviceName = serviceSlug
   {
     /* The table of contents lives in the section dock alone (since
        2026-10-14): the pill at the bottom edge reads "Inhalt", opens into the
-       full list, and names the current section once the text is reached.
+       list of chapters (h2 only, the sub-headings stay in the text), and
+       names the current chapter once the text is reached.
        Beside the text (200px next to a 68ch column) and in the head it was
        lost or made the head taller than the title card. */
   }
   {
     showToc && (
       <SectionDock
-        headings={headings}
+        headings={headings.filter((h) => h.level === 2)}
         label="Abschnitte in diesem Beitrag"
         rangeEnd="[data-toc-bereich]"
         idleLabel="Inhalt"
+        activeLine="center"
       />
     )
   }
@@ -286,6 +288,10 @@ const serviceName = serviceSlug
 <style>
   .s-post {
     --card-inset: clamp(var(--sp-6), 3vw, var(--sp-10));
+    /* The one width of the page: title card, facts and text column share
+       it and sit centred. Inside it the text runs at the long measure; the
+       card is wider by its own inset on both sides. */
+    --post-width: calc(var(--measure-long) + 2 * var(--card-inset));
     padding-bottom: var(--section-space);
   }
 
@@ -310,24 +316,23 @@ const serviceName = serviceSlug
     object-fit: cover;
   }
 
-  /* Titelkarte links, Nebenangaben rechts daneben. Die Karte behält ihre
-     Lesebreite; die Angaben bekommen, was übrig bleibt, und stehen dadurch
-     im Rand statt im Satz. */
+  /* Title card, the facts in one row beneath it. Until 2026-10-14 the facts
+     stood in a second column to the right of the card on wide screens; the
+     row below the card is the one form now, at every width. */
   .s-post__headline {
     display: grid;
-    grid-template-columns: minmax(0, var(--measure-text)) minmax(0, 1fr);
-    align-items: end;
-    column-gap: clamp(var(--sp-6), 4vw, 80px);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .s-post__titlecard {
     position: relative;
     z-index: 1;
-    max-width: var(--measure-text);
+    width: 100%;
+    max-width: var(--post-width);
     /* Weniger tief im Bild als zuerst gesetzt. Bei -140px lag die Oberkante
        mitten im Motiv und der Titel stand fast auf dem Bild statt davor. */
     margin-top: clamp(-88px, -5.5vw, -44px);
-    margin-inline: 0;
+    margin-inline: auto;
     padding: var(--card-inset);
     border-radius: var(--r-md);
     /* Weiß wie die Karten in der Magazin-Übersicht — dieselbe Fläche, die
@@ -379,39 +384,46 @@ const serviceName = serviceSlug
      `--card-inset` on `.s-post`. Two starts on two lines read as a jump. */
   .s-post__body {
     padding-top: var(--sp-10);
-    /* On top of the container's own margin: the body IS the container. */
-    padding-left: calc(var(--site-margin) + var(--card-inset));
   }
 
-  /* A size container so that a wide image inside the text can measure the
-     whole column (text, gap and margin) in `cqi`. See the wide image below. */
+  /* Centred under the card at the card's width, the text inset like the
+     card's. A size container so that a wide image can measure the text
+     width in `cqi`, see the wide image below. Until 2026-10-14 the text
+     stood at the left edge with a margin track for wide images beside it. */
   .s-post__column {
     container-type: inline-size;
-    display: grid;
-    grid-template-columns: minmax(0, var(--measure-long)) minmax(0, 1fr);
-    column-gap: clamp(var(--sp-6), 3vw, 64px);
-    align-items: start;
+    max-width: var(--post-width);
+    margin-inline: auto;
+    padding-inline: var(--card-inset);
   }
 
   .s-post__text {
-    grid-column: 1;
     min-width: 0;
   }
 
   /* Die Angaben sitzen auf der Grundlinie der Titelkarte, nicht an deren
      Oberkante: Der Titel ist unterschiedlich hoch, die Unterkante ist die
      einzige Linie, die beide teilen. */
+  /* Same width as the card, inset like its text: the facts start on the
+     line of the title. */
   .s-post__facts {
     display: flex;
-    flex-direction: column;
-    gap: var(--sp-5);
-    padding-bottom: clamp(var(--sp-6), 3vw, var(--sp-10));
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-6);
+    /* `width: 100%` is not optional: as a grid item with auto margins the
+       row would shrink to its content and centre that, 70px off the title's
+       line. With a width it fills up to the card's width like the card. */
+    width: 100%;
+    max-width: var(--post-width);
+    margin-top: var(--sp-6);
+    margin-inline: auto;
+    padding-inline: var(--card-inset);
   }
 
   .s-post__factlist {
     display: flex;
-    flex-direction: column;
-    gap: var(--sp-3);
+    gap: var(--sp-6);
   }
 
   .s-post__fact dt {
@@ -436,8 +448,7 @@ const serviceName = serviceSlug
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    padding-top: var(--sp-5);
-    border-top: var(--bw) solid var(--c-line);
+    margin-left: auto;
   }
 
   .s-post__authorimage {
@@ -543,7 +554,9 @@ const serviceName = serviceSlug
      image at column width, so the option did nothing. Where the text fills
      the whole column (phones), wide and column are the same width. */
   .s-post__text :global(.c-postimage[data-width="wide"]) {
-    width: 100cqi;
+    /* Out to the card's edges: the text width plus the inset on both sides. */
+    width: calc(100cqi + 2 * var(--card-inset));
+    margin-left: calc(-1 * var(--card-inset));
   }
 
   .s-post__back {
@@ -581,46 +594,7 @@ const serviceName = serviceSlug
      Erst fällt der Rand weg (die Nebenangaben rücken über den Text), dann
      das Verzeichnis (es liegt darüber statt daneben).
      -------------------------------------------------------------------- */
-  @media (max-width: 1200px) {
-    .s-post__headline {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .s-post__column {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .s-post__facts {
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--sp-6);
-      max-width: var(--measure-long);
-      margin-top: var(--sp-6);
-      padding-bottom: 0;
-    }
-
-    .s-post__factlist {
-      flex-direction: row;
-      gap: var(--sp-6);
-    }
-
-    .s-post__author {
-      padding-top: 0;
-      border-top: 0;
-      margin-left: auto;
-    }
-
-    .s-post__text {
-      max-width: var(--measure-long);
-    }
-  }
-
   @media (max-width: 1000px) {
-    .s-post__body {
-      padding-left: var(--site-margin);
-    }
-
     .s-more__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }

@@ -48,6 +48,14 @@ interface Props {
    * first section and starts on its number, as on the pillar pages.
    */
   idleLabel?: string;
+  /**
+   * Where a section becomes the current one: when its top passes the
+   * bottom of the viewport (`bottom`, the default, right for the tall
+   * sections of a pillar page) or the middle (`center`, for a post whose
+   * sections are a few paragraphs: with `bottom` the pill named the
+   * section at the lower screen edge, not the one being read).
+   */
+  activeLine?: "bottom" | "center";
 }
 
 const {
@@ -55,11 +63,20 @@ const {
   label = "Auf dieser Seite",
   rangeEnd,
   idleLabel,
+  activeLine = "bottom",
 } = Astro.props;
 
-/* A post's headings may carry their own numbering ("1. Du erfährst…"); next
-   to the dock's number that read twice. The dock shows the text alone. */
+/* A post's headings may carry their own numbering ("1. Du erfährst…"). Next
+   to the dock's running number that read twice, and stripped it put a "2"
+   in front of what the text calls "1.". So: where headings number
+   themselves, the dock takes their numbers and leaves the unnumbered ones
+   ("Woran erkennst du…", "Warnsignale") without a circle. Where none do, as
+   on the pillar pages, it numbers them in order, as before. */
+const own = headings.map((h) => h.text.match(/^(\d+)[.)]\s*/));
+const useOwn = own.some(Boolean);
 const plain = (text: string) => text.replace(/^\d+[.)]\s*/, "");
+const numberOf = (i: number): string | null =>
+  useOwn ? (own[i]?.[1] ?? null) : number(i);
 
 /* The template bails out below two links; rendering a dock for one section
    would be a button that answers a question nobody asked. */
@@ -76,6 +93,7 @@ const number = (i: number) => String(i + 1);
       data-section-dock-init
       data-section-dock-range-end={rangeEnd}
       data-section-dock-idle={idleLabel ? "" : undefined}
+      data-section-dock-line={activeLine}
       aria-label={label}
       class="c-section-dock"
     >
@@ -88,12 +106,19 @@ const number = (i: number) => String(i + 1);
           type="button"
         >
           <span data-section-dock-label-wrap class="c-section-dock__label-wrap">
-            <span class="c-section-dock__label">
+            <span
+              class:list={[
+                "c-section-dock__label",
+                idleLabel && "c-section-dock__label--idle",
+              ]}
+            >
               {idleLabel ? (
                 <span>{idleLabel}</span>
               ) : (
                 <>
-                  <span class="c-section-dock__link-num">{number(0)}</span>
+                  {numberOf(0) !== null && (
+                    <span class="c-section-dock__link-num">{numberOf(0)}</span>
+                  )}
                   <span>{plain(headings[0].text)}</span>
                 </>
               )}
@@ -115,7 +140,9 @@ const number = (i: number) => String(i + 1);
                   href={`#${h.id}`}
                   class="c-section-dock__link"
                 >
-                  <span class="c-section-dock__link-num">{number(i)}</span>
+                  {numberOf(i) !== null && (
+                    <span class="c-section-dock__link-num">{numberOf(i)}</span>
+                  )}
                   <span>{plain(h.text)}</span>
                 </a>
               </li>
@@ -250,6 +277,14 @@ const number = (i: number) => String(i + 1);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* A label without a number circle (the idle word, or a heading that has
+     none): the right-hand padding meant to balance the circle would push
+     the text off centre, so the same padding goes on both sides. */
+  .c-section-dock
+    :global(.c-section-dock__label > span:first-child:last-child) {
+    padding-inline: var(--sp-2);
   }
 
   .c-section-dock__list {

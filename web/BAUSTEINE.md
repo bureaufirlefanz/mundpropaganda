@@ -50,7 +50,7 @@ Orientierung auf langen Seiten. Alle drei arbeiten mit derselben `Heading[]`-Lis
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
 | `Contents` | Abschnitt | Das Inhaltsverzeichnis einer Pillar Page (Figma 177:2107). | `headings: Heading[]` `headline?: string` `image?: ImageSource` `alt?: string` `caption?: string` | Pillar, design/komponenten | ✓ |
-| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` `rangeEnd?: string` `idleLabel?: string` | Pillar, Post, design/komponenten | ✓ |
+| `SectionDock` | UI | Section Anchor Dock — a fixed pill at the bottom edge that names the current section and expands into the full section list on hov | `headings: Heading[]` `label?: string` `rangeEnd?: string` `idleLabel?: string` `activeLine?: "bottom" | "center"` | Pillar, Post, design/komponenten | ✓ |
 | `TableOfContents` | UI | Das Inhaltsverzeichnis neben einem Beitrag. | `headings: Heading[]` `title?: string` | design/komponenten | ✓ |
 | `NavPromo` | UI | Das Werbefeld im großen Menü. | `tag?: string` `headline: string` `href: string` `label?: string` `image?: ImageSource` `alt?: string` | design/komponenten, ui/Nav | ✓ |
 
@@ -350,6 +350,7 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 - `label?: string` — aria-label of the nav.
 - `rangeEnd?: string` — Selector of the element whose bottom ends the dock's range. Without it the range ends with the last section. A post's "sections" are single heading lines, so the last one passes in a blink and the dock vanished for the whole final chapter; there the text container is the range. /
 - `idleLabel?: string` — Text of the pill before the first section is reached, e.g. "Inhalt". With it the dock shows from the top of the page and the table of contents lives in the pill alone; without it the dock appears with the first section and starts on its number, as on the pillar pages. /
+- `activeLine?: "bottom" | "center"` — Where a section becomes the current one: when its top passes the bottom of the viewport (`bottom`, the default, right for the tall sections of a pillar page) or the middle (`center`, for a post whose sections are a few paragraphs: with `bottom` the pill named the section at the lower screen edge, not the one being read). /
 
 **`SectionHeading`**
 

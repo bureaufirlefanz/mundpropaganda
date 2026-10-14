@@ -107,6 +107,8 @@ export function initSectionDock() {
     function buildLabel(index) {
       const span = labelTemplate.cloneNode(false);
       span.innerHTML = index < 0 ? idleHTML : links[index].innerHTML;
+      /* The template may carry the idle class; it belongs to the word only. */
+      span.classList.toggle("c-section-dock__label--idle", index < 0);
       return span;
     }
 
@@ -222,17 +224,29 @@ export function initSectionDock() {
       });
     }
 
+    /* No entry is current in the idle state: the marker has nowhere to be
+       and would sit at 0/0, a pink circle in the list's top left corner.
+       Hidden until a section becomes current. */
     function placeIndicator(index) {
-      if (index < 0) return;
+      if (index < 0) {
+        gsap.killTweensOf(indicator);
+        gsap.set(indicator, { autoAlpha: 0 });
+        return;
+      }
       Object.assign(rect, rectFor(links[index]));
       gsap.killTweensOf(rect);
       gsap.killTweensOf(indicator);
-      gsap.set(indicator, { scaleX: 1, scaleY: 1 });
+      gsap.set(indicator, { scaleX: 1, scaleY: 1, autoAlpha: 1 });
       render();
     }
 
     function hopIndicator(index) {
-      if (index < 0) return;
+      if (index < 0) {
+        gsap.killTweensOf(indicator);
+        gsap.set(indicator, { autoAlpha: 0 });
+        return;
+      }
+      gsap.set(indicator, { autoAlpha: 1 });
       const target = rectFor(links[index]);
       gsap.killTweensOf(rect);
       gsap.killTweensOf(indicator);
@@ -440,10 +454,12 @@ export function initSectionDock() {
        beim Hinaufscrollen — genau die beiden Kanten. Die Richtung geht an
        `setActive` weiter, damit die Beschriftung in die passende Richtung
        durchläuft. */
+    /* `data-section-dock-line`: see the prop in SectionDock.astro. */
+    const line = dock.getAttribute("data-section-dock-line") || "bottom";
     sections.forEach((section, i) => {
       ScrollTrigger.create({
         trigger: section,
-        start: "top bottom",
+        start: "top " + line,
         end: "bottom center",
         onEnter: () => setActive(i, true),
         onEnterBack: () => setActive(i, false),
