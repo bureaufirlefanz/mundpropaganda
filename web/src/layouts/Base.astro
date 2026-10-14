@@ -273,7 +273,15 @@ const zeigtPraxisdaten = pfad === "/" || pfad === "/praxis";
     }
     <main id="main" tabindex="-1"><slot /></main>
 
-    <Footer id={contactSection ? undefined : "kontakt"} />
+    {
+      /* With a contact form at the end of <main>, the footer stands on the
+         same taupe ground as the form (see `sections/Contact.astro`): the
+         wrapper carries the colour down to the bottom edge of the page, the
+         dark footer box rests on it with its usual gap. */
+    }
+    <div class="l-tail" data-tail={contactSection ? "contact" : undefined}>
+      <Footer id={contactSection ? undefined : "kontakt"} />
+    </div>
 
     <script>
       import { init } from "../js/init.js";
@@ -320,6 +328,10 @@ const zeigtPraxisdaten = pfad === "/" || pfad === "/praxis";
     </script>
 
     <style>
+      .l-tail[data-tail="contact"] {
+        background: var(--c-taupe);
+      }
+
       /* Der Inhalt liegt über den Hintergrundebenen. Die Navigation bleibt
          außen vor — sie trägt bereits --z-nav; ein zweiter Wert hier hätte
          sie auf dieselbe Ebene wie den Inhalt gesetzt, der im DOM später

@@ -86,198 +86,207 @@ const { contactTitle, contactText, email } = await loadSettings();
 const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
 ---
 
-<Panel id="kontakt" topline="Kontakt" title={contactTitle} text={contactText}>
-  <form
-    class="c-form"
-    name="contact"
-    method="POST"
-    enctype="multipart/form-data"
-    data-netlify="true"
-    data-netlify-honeypot="bot-field"
-    data-form
-    data-form-fallback={email}
-    data-reveal-stagger="0.06"
-  >
-    {
-      /* Netlify erkennt die Einsendung an diesem Feld wieder. Es muss denselben
+{
+  /* The taupe ground. A contact form only ever stands right before the
+     footer, and there it sits on a taupe field that `layouts/Base.astro`
+     continues behind the footer (`contactSection`): one surface from the
+     form to the bottom of the page, the dark footer box resting on it. */
+}
+<div class="s-contact" data-surface="taupe">
+  <Panel id="kontakt" topline="Kontakt" title={contactTitle} text={contactText}>
+    <form
+      class="c-form"
+      name="contact"
+      method="POST"
+      enctype="multipart/form-data"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      data-form
+      data-form-fallback={email}
+      data-reveal-stagger="0.06"
+    >
+      {
+        /* Netlify erkennt die Einsendung an diesem Feld wieder. Es muss denselben
         Wert tragen wie `name` am Formular. */
-    }
-    <input type="hidden" name="form-name" value="contact" />
+      }
+      <input type="hidden" name="form-name" value="contact" />
 
-    {
-      /* Die Falle für Ausfüllmaschinen: ein Feld, das niemand sieht und das
+      {
+        /* Die Falle für Ausfüllmaschinen: ein Feld, das niemand sieht und das
         deshalb leer bleiben muss. Ist es gefüllt, verwirft Netlify die
         Einsendung. `hidden` statt `display: none` im CSS, damit es auch ohne
         Stylesheet unsichtbar bleibt, und mit Beschriftung, weil ein Feld ohne
         sie in der Prüfung als unbeschriftet gilt. */
-    }
-    <p class="c-form__trap" hidden>
-      <label
-        >Dieses Feld bitte leer lassen <input
-          name="bot-field"
-          tabindex="-1"
-          autocomplete="off"
-        /></label
-      >
-    </p>
+      }
+      <p class="c-form__trap" hidden>
+        <label
+          >Dieses Feld bitte leer lassen <input
+            name="bot-field"
+            tabindex="-1"
+            autocomplete="off"
+          /></label
+        >
+      </p>
 
-    <div class="c-field" data-field data-reveal-child>
-      <label class="c-field__label" for="f-name">Name <span>*</span></label>
-      <div class="c-field__control">
-        <input
-          id="f-name"
-          name="name"
-          type="text"
-          placeholder="Dein Name"
-          autocomplete="name"
-          required
-        />
-        <span class="c-field__error" aria-hidden="true">!</span>
+      <div class="c-field" data-field data-reveal-child>
+        <label class="c-field__label" for="f-name">Name <span>*</span></label>
+        <div class="c-field__control">
+          <input
+            id="f-name"
+            name="name"
+            type="text"
+            placeholder="Dein Name"
+            autocomplete="name"
+            required
+          />
+          <span class="c-field__error" aria-hidden="true">!</span>
+        </div>
+        <p class="c-field__message" id="f-name-fehler" hidden></p>
       </div>
-      <p class="c-field__message" id="f-name-fehler" hidden></p>
-    </div>
 
-    <div class="c-field" data-field data-reveal-child>
-      <label class="c-field__label" for="f-photo">Foto deiner Zähne</label>
-      <div class="c-field__control c-file" data-file>
-        <input id="f-photo" name="photo" type="file" accept="image/*" />
-        <span class="c-file__face" data-surface="card">
-          <span data-file-name>Foto auswählen</span>
-          <svg aria-hidden="true"><use href="#i-upload"></use></svg>
-        </span>
+      <div class="c-field" data-field data-reveal-child>
+        <label class="c-field__label" for="f-photo">Foto deiner Zähne</label>
+        <div class="c-field__control c-file" data-file>
+          <input id="f-photo" name="photo" type="file" accept="image/*" />
+          <span class="c-file__face" data-surface="card">
+            <span data-file-name>Foto auswählen</span>
+            <svg aria-hidden="true"><use href="#i-upload"></use></svg>
+          </span>
+        </div>
       </div>
-    </div>
 
-    <div class="c-field" data-field data-reveal-child>
-      <label class="c-field__label" for="f-mail"
-        >E-Mail-Adresse <span>*</span></label
-      >
-      <div class="c-field__control">
-        <input
-          id="f-mail"
-          name="email"
-          type="email"
-          placeholder="hello@veneers.de"
-          autocomplete="email"
-          required
-        />
-        <span class="c-field__error" aria-hidden="true">!</span>
+      <div class="c-field" data-field data-reveal-child>
+        <label class="c-field__label" for="f-mail"
+          >E-Mail-Adresse <span>*</span></label
+        >
+        <div class="c-field__control">
+          <input
+            id="f-mail"
+            name="email"
+            type="email"
+            placeholder="hello@veneers.de"
+            autocomplete="email"
+            required
+          />
+          <span class="c-field__error" aria-hidden="true">!</span>
+        </div>
+        <p class="c-field__message" id="f-mail-fehler" hidden></p>
       </div>
-      <p class="c-field__message" id="f-mail-fehler" hidden></p>
-    </div>
 
-    <div class="c-field c-field--tall" data-field data-reveal-child>
-      <label class="c-field__label" for="f-msg">Nachricht <span>*</span></label>
-      <div class="c-field__control">
-        <textarea
-          id="f-msg"
-          name="message"
-          placeholder="Hi Mundpropaganda"
-          required></textarea>
-        <span class="c-field__error" aria-hidden="true">!</span>
+      <div class="c-field c-field--tall" data-field data-reveal-child>
+        <label class="c-field__label" for="f-msg"
+          >Nachricht <span>*</span></label
+        >
+        <div class="c-field__control">
+          <textarea
+            id="f-msg"
+            name="message"
+            placeholder="Hi Mundpropaganda"
+            required></textarea>
+          <span class="c-field__error" aria-hidden="true">!</span>
+        </div>
+        <p class="c-field__message" id="f-msg-fehler" hidden></p>
       </div>
-      <p class="c-field__message" id="f-msg-fehler" hidden></p>
-    </div>
 
-    <div class="c-field" data-field data-reveal-child>
-      <label class="c-field__label" for="f-service"
-        >Leistung <span>*</span></label
-      >
-      <div class="c-field__control">
-        <select id="f-service" name="service" required>
-          <option value="">Leistung auswählen</option>
-          {SERVICES.map((l) => <option selected={l === service}>{l}</option>)}
-        </select>
+      <div class="c-field" data-field data-reveal-child>
+        <label class="c-field__label" for="f-service"
+          >Leistung <span>*</span></label
+        >
+        <div class="c-field__control">
+          <select id="f-service" name="service" required>
+            <option value="">Leistung auswählen</option>
+            {SERVICES.map((l) => <option selected={l === service}>{l}</option>)}
+          </select>
+        </div>
+        <p class="c-field__message" id="f-service-fehler" hidden></p>
       </div>
-      <p class="c-field__message" id="f-service-fehler" hidden></p>
-    </div>
 
-    {
-      extended && (
-        <>
-          <div class="c-field" data-field data-reveal-child>
-            <label class="c-field__label" for="f-callback">
-              Telefon für den Rückruf
-            </label>
-            <div class="c-field__control">
-              <input
-                id="f-callback"
-                name="callback"
-                type="tel"
-                placeholder="0170 1234567"
-                autocomplete="tel"
-              />
-              <span class="c-field__error" aria-hidden="true">
-                !
-              </span>
+      {
+        extended && (
+          <>
+            <div class="c-field" data-field data-reveal-child>
+              <label class="c-field__label" for="f-callback">
+                Telefon für den Rückruf
+              </label>
+              <div class="c-field__control">
+                <input
+                  id="f-callback"
+                  name="callback"
+                  type="tel"
+                  placeholder="0170 1234567"
+                  autocomplete="tel"
+                />
+                <span class="c-field__error" aria-hidden="true">
+                  !
+                </span>
+              </div>
+              <p class="c-field__message" id="f-callback-fehler" hidden />
             </div>
-            <p class="c-field__message" id="f-callback-fehler" hidden />
-          </div>
 
-          <div class="c-field" data-field data-reveal-child>
-            <label class="c-field__label" for="f-reachable">
-              Wann erreichen wir dich am besten?
-            </label>
-            <div class="c-field__control">
-              <select id="f-reachable" name="reachable">
-                <option value="">Zeitraum auswählen</option>
-                {REACHABLE.map((r) => (
-                  <option>{r}</option>
-                ))}
-              </select>
+            <div class="c-field" data-field data-reveal-child>
+              <label class="c-field__label" for="f-reachable">
+                Wann erreichen wir dich am besten?
+              </label>
+              <div class="c-field__control">
+                <select id="f-reachable" name="reachable">
+                  <option value="">Zeitraum auswählen</option>
+                  {REACHABLE.map((r) => (
+                    <option>{r}</option>
+                  ))}
+                </select>
+              </div>
+              <p class="c-field__message" id="f-reachable-fehler" hidden />
             </div>
-            <p class="c-field__message" id="f-reachable-fehler" hidden />
-          </div>
 
-          {/* PDF zuerst: So kommen Angebote meistens. Bilder bleiben erlaubt,
+            {/* PDF zuerst: So kommen Angebote meistens. Bilder bleiben erlaubt,
             weil ein abfotografierter Kostenplan genauso brauchbar ist. */}
-          <div class="c-field c-field--full" data-field data-reveal-child>
-            <label class="c-field__label" for="f-quote">
-              Hast du schon ein Angebot? Lade es hier hoch
-            </label>
-            <div class="c-field__control c-file" data-file>
-              <input
-                id="f-quote"
-                name="quote"
-                type="file"
-                accept="application/pdf,image/*"
-              />
-              <span class="c-file__face" data-surface="card">
-                <span data-file-name>Angebot auswählen</span>
-                <svg aria-hidden="true">
-                  <use href="#i-upload" />
-                </svg>
-              </span>
+            <div class="c-field c-field--full" data-field data-reveal-child>
+              <label class="c-field__label" for="f-quote">
+                Hast du schon ein Angebot? Lade es hier hoch
+              </label>
+              <div class="c-field__control c-file" data-file>
+                <input
+                  id="f-quote"
+                  name="quote"
+                  type="file"
+                  accept="application/pdf,image/*"
+                />
+                <span class="c-file__face" data-surface="card">
+                  <span data-file-name>Angebot auswählen</span>
+                  <svg aria-hidden="true">
+                    <use href="#i-upload" />
+                  </svg>
+                </span>
+              </div>
             </div>
-          </div>
-        </>
-      )
-    }
+          </>
+        )
+      }
 
-    {
-      /* `data-field` fehlte hier. Ohne das lief die Pflichtprüfung an der
+      {
+        /* `data-field` fehlte hier. Ohne das lief die Pflichtprüfung an der
         Checkbox vorbei — und weil das Formular `novalidate` trägt, prüfte
         auch der Browser nicht nach. Die Zustimmung war damit trotz
         `required` faktisch wahlfrei. */
-    }
-    <div class="c-field c-field--full" data-field data-reveal-child>
-      <label class="c-checkbox">
-        <input id="f-privacy" type="checkbox" name="privacy" required />
-        <span>Datenschutzerklärung bestätigen</span>
-      </label>
-      <p class="c-field__message" id="f-privacy-fehler" hidden></p>
-    </div>
+      }
+      <div class="c-field c-field--full" data-field data-reveal-child>
+        <label class="c-checkbox">
+          <input id="f-privacy" type="checkbox" name="privacy" required />
+          <span>Datenschutzerklärung bestätigen</span>
+        </label>
+        <p class="c-field__message" id="f-privacy-fehler" hidden></p>
+      </div>
 
-    <div class="c-field c-field--full" data-reveal-child>
-      <Button
-        label="Unverbindliches Angebot anfordern"
-        type="submit"
-        variant="block"
-      />
-    </div>
+      <div class="c-field c-field--full" data-reveal-child>
+        <Button
+          label="Unverbindliches Angebot anfordern"
+          type="submit"
+          variant="block"
+        />
+      </div>
 
-    {
-      /* WCAG 2.2, 4.1.3 Statusmeldungen. Bis hierher war die einzige Rückmeldung
+      {
+        /* WCAG 2.2, 4.1.3 Statusmeldungen. Bis hierher war die einzige Rückmeldung
         nach dem Absenden die geänderte Aufschrift des Buttons. Wer nicht
         hinsieht, erfährt davon nichts: Ein Textwechsel irgendwo im Dokument
         wird nicht angesagt.
@@ -290,13 +299,23 @@ const SERVICES = forTable(await loadServiceList()).map((l) => l.name);
         Das Element steht von Anfang an im Dokument und bleibt leer. Ein erst
         beim Absenden eingefügter Bereich wird von manchen Vorlesegeräten
         nicht beobachtet — die Region muss vorher da sein. */
-    }
-    <p class="c-form__status" data-form-status role="status" aria-live="polite">
-    </p>
-  </form>
-</Panel>
+      }
+      <p
+        class="c-form__status"
+        data-form-status
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+    </form>
+  </Panel>
+</div>
 
 <style>
+  .s-contact {
+    background: var(--c-taupe);
+  }
+
   /* Der Panel-Rahmen selbst liegt in Panel.astro. Hier steht nur, was der
      Kontaktbereich zusätzlich braucht — das Formular. */
 
