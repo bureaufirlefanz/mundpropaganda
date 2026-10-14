@@ -342,7 +342,7 @@ const previewPath = (l: (typeof lines)[number]) => {
 
   /* No row gap: each link carries its own rule beneath, the rows stack on
      those. With the gutter as row gap too, the list had 110px between
-     lines of 24px type. */
+     lines of 24px type; now 58px, after 49 felt a touch tight. */
   .s-services__more {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -361,7 +361,7 @@ const previewPath = (l: (typeof lines)[number]) => {
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    padding-block: var(--sp-2);
+    padding-block: var(--sp-3);
     /* Platz für den Pfeil, der aus dem Fluss genommen ist. Ohne das liefe ein
        langer Name unter ihm hindurch. */
     padding-right: calc(var(--arrow) + var(--sp-3));
