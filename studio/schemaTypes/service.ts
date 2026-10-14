@@ -183,6 +183,56 @@ export const service = defineType({
       ],
     }),
 
+    /* "Auf einen Blick" right under the head: the facts a visitor arrives
+       with a question for. On the emergency page these are the numbers and
+       the hours; a value with a link is tappable (tel:, a page). The same
+       block the pillar pages carry, see `objects/abschnitte.ts`. */
+    defineField({
+      name: "quickFacts",
+      title: "Auf einen Blick",
+      type: "object",
+      group: "content",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({ name: "topline", title: "Rubrik", type: "string" }),
+        defineField({ name: "headline", title: "Überschrift", type: "string" }),
+        defineField({
+          name: "items",
+          title: "Angaben",
+          type: "array",
+          of: [
+            defineArrayMember({
+              type: "object",
+              name: "fact",
+              fields: [
+                defineField({
+                  name: "label",
+                  title: "Begriff",
+                  type: "string",
+                  validation: (r) => r.required(),
+                }),
+                defineField({
+                  name: "value",
+                  title: "Wert",
+                  type: "string",
+                  validation: (r) => r.required(),
+                }),
+                defineField({
+                  name: "href",
+                  title: "Link",
+                  type: "string",
+                  description:
+                    "Wahlfrei. Macht den Wert anklickbar, z. B. „tel:+4930890043330“ oder „/leistungen/wurzelbehandlung“.",
+                }),
+              ],
+              preview: { select: { title: "label", subtitle: "value" } },
+            }),
+          ],
+          validation: (r) => r.max(6),
+        }),
+      ],
+    }),
+
     defineField({
       name: "intro",
       title: "Intro",
@@ -324,6 +374,13 @@ export const service = defineType({
           type: "string",
           description:
             "Der Button springt zum Kontaktabschnitt. Leer lassen, wenn der Block ohne stehen soll.",
+        }),
+        defineField({
+          name: "actionLink",
+          title: "Ziel des Buttons",
+          type: "string",
+          description:
+            "Leer lassen für den Kontaktabschnitt. Sonst z. B. „tel:+493051999580“.",
         }),
       ],
     }),
@@ -598,6 +655,32 @@ export const service = defineType({
 
        Der alte Wert wandert mit `scripts/service-seo.mjs` nach
        `seo.description`. */
+    /* The closing band before the foot: one sentence, one button. The
+       emergency page says "lieber einmal zu früh anrufen" here and dials.
+       Without a headline the band is not rendered. */
+    defineField({
+      name: "closing",
+      title: "Abschluss",
+      type: "object",
+      group: "content",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({ name: "headline", title: "Überschrift", type: "string" }),
+        defineField({ name: "text", title: "Text", type: "text", rows: 3 }),
+        defineField({
+          name: "actionLabel",
+          title: "Beschriftung des Buttons",
+          type: "string",
+        }),
+        defineField({
+          name: "actionLink",
+          title: "Ziel des Buttons",
+          type: "string",
+          description: "Leer lassen für den Kontaktabschnitt.",
+        }),
+      ],
+    }),
+
     seoField,
   ],
 

@@ -63,7 +63,7 @@ Zahlen, Preise, Gegenüberstellungen.
 | `Compare` | Abschnitt | Vergleichstabelle — zwei Spalten nebeneinander, Zeile für Zeile. | `topline?: string` `headline?: string` `columns: CompareColumn[]` `lines: CompareRow[]` `note?: string` | Careers, Pillar, design/komponenten | ✓ |
 | `Prices` | Abschnitt | Preisraster. Jede Karte trägt eine Bezeichnung und eine Preis-Pille, die bündig unten sitzt — dadurch stehen die Pillen aller Kart | `title?: string` `pricing: Price[]` `id?: string` `note?: string` `disclaimer?: string` | Pillar, Service, design/komponenten | ✓ |
 | `Facts` | Abschnitt | Zahlenleiste — vier überprüfbare Angaben über die Praxis, die beim Hereinscrollen hochzählen. | `topline: string` `headline: string` `figures: Figure[]` | Careers, design/komponenten | ✓ |
-| `QuickFacts` | Abschnitt | "Auf einen Blick" — a compact term/value overview at the top of a service page: duration, cost, durability, anaesthesia. | `id?: string` `topline?: string` `headline?: string` `items: { label: string; value: str…` | Pillar, design/komponenten | ✓ |
+| `QuickFacts` | Abschnitt | "Auf einen Blick" — a compact term/value overview at the top of a service page: duration, cost, durability, anaesthesia. | `id?: string` `topline?: string` `headline?: string` `items: { label: string; value: str…` | Pillar, Service, design/komponenten | ✓ |
 
 ## Abläufe
 
@@ -124,7 +124,7 @@ Alles, was zu einem Termin führt.
 
 | Baustein | Art | Was es ist | Angaben | Verwendet in | Katalog |
 |---|---|---|---|---|---|
-| `CtaBand` | Abschnitt | Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314). | `headline: string` `text?: string` `actionLabel?: string` `actionHref?: string` `image?: ImageSource` `alt?: string` | Pillar, design/komponenten | ✓ |
+| `CtaBand` | Abschnitt | Das Handlungsband zwischen zwei Abschnitten (Figma 177:2314). | `headline: string` `text?: string` `actionLabel?: string` `actionHref?: string` `image?: ImageSource` `alt?: string` | Pillar, Service, design/komponenten | ✓ |
 | `Contact` | Abschnitt | Kontaktbereich: derselbe Panel-Aufbau wie das FAQ, rechts statt des Akkordeons ein Formular. | `service?: string` `extended?: boolean` | Pillar, Service, design/komponenten | ✓ |
 | `Application` | Abschnitt | Das Bewerbungsformular: mehrere Schritte, je nach Rolle andere Fragen. | `id?: string` `topline: string` `headline: string` `text?: string` `jobs: Job[]` `fallbackEmail?: string` | Careers, design/komponenten | ✓ |
 | `Button` | UI | Zweiteiliger Button: Pille mit Label plus abgesetzter runder Pfeil. | `label: string` `href?: string` `variant?: "dark" | "block"` `static?: boolean` `type?: "submit" | "button"` `labelAttrs?: Record<string, unknown>` | 404, Careers, Post, design/komponenten, design/styleguide, sections/Application, sections/Contact, sections/CtaBand, sections/Hero, sections/Intro, sections/Jobs, sections/Magazine, sections/ServiceHero, sections/Services, sections/Split, sections/Standards, sections/Stories, ui/Footer, ui/Nav, ui/NavPromo, ui/PostCard | ✓ |
@@ -276,6 +276,10 @@ taucht hier nicht auf; das ist der Zweck der Liste.
 - `id: string` — Sprungmarke, erzeugt von `idFrom()` — hier wird keine gebaut.
 - `image?: ImageSource` — Bild aus dem CMS — oder der Name eines gestalteten Motivs aus `lib/image-widths.json`. `CmsImage` bedient beides. /
 - `side?: "left" | "right"` — Auf welcher Seite das Bild steht. Ohne Angabe rechts.
+
+**`QuickFacts`**
+
+- `items: { label: string; value: string; href?: string | null }[]` — A value with `href` is a link: a number to dial, a page to open.
 
 **`ServiceHero`**
 

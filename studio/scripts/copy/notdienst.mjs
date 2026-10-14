@@ -15,15 +15,17 @@
  *
  *   H1                      → topline ("Zahnarzt Notdienst in Berlin"),
  *                             title "Notdienst", claim the second half
- *   Markenzeile + Hero      → hero.text
+ *   Markenzeile + Hero      → hero.text, the first three sentences; the
+ *                             hours and the other numbers are facts, not
+ *                             prose, and stand in quickFacts right below
+ *   (numbers, hours)        → quickFacts, each number tappable
  *   H2 1 "Akute Zahnschmerzen" → intro (two columns)
  *   "Und einmal deutlich: … 112" → statement
  *   H2 2 "Nachts und am Wochenende" → benefits (one item per H3)
  *   H2 3 "Was du bis zum Termin tun kannst" → steps (one card per H3)
  *   H2 4 "Kosten"           → explainer, button dials
  *   FAQ                     → faq
- *   Abschluss               → dropped: the service page ends on the FAQ,
- *                             and the number stands in the hero and the foot
+ *   Abschluss               → closing, the band after the FAQ, dials
  */
 export default {
   id: "service-notdienst",
@@ -43,9 +45,52 @@ export default {
   set: {
     "hero.claim": "Schnelle Hilfe bei Zahnschmerzen",
     "hero.text":
-      "Wenn es jetzt wehtut, hilft dir kein Ratgeber. Deshalb zuerst das Wichtigste: Ruf uns an unter 030 5199 99580. Montag bis Donnerstag von 8 bis 20 Uhr, freitags von 8 bis 14:30 Uhr nehmen wir ab. Wenn du Schmerzen hast, sag das gleich am Telefon. Für Schmerzfälle halten wir jeden Tag Zeit frei. Das ist keine Kulanz, sondern so eingeplant. Außerhalb dieser Zeiten bist du bei uns falsch, aber nicht verloren. Weiter unten steht, wen du nachts, am Wochenende und an Feiertagen erreichst.",
+      "Wenn es jetzt wehtut, hilft dir kein Ratgeber. Deshalb zuerst das Wichtigste: Ruf uns an. Wenn du Schmerzen hast, sag das gleich am Telefon. Für Schmerzfälle halten wir jeden Tag Zeit frei. Das ist keine Kulanz, sondern so eingeplant.",
     "hero.actionLabel": "Jetzt anrufen",
     "hero.actionLink": "tel:+493051999580",
+
+    quickFacts: {
+      topline: "Auf einen Blick",
+      headline: "Wen du wann erreichst",
+      items: [
+        {
+          _key: "f1",
+          _type: "fact",
+          label: "Praxis, Mo bis Do 8 bis 20 Uhr, Fr 8 bis 14:30 Uhr",
+          value: "030 5199 99580",
+          href: "tel:+493051999580",
+        },
+        {
+          _key: "f2",
+          _type: "fact",
+          label: "Letzter Termin",
+          value: "19:45 Uhr",
+        },
+        {
+          _key: "f3",
+          _type: "fact",
+          label:
+            "Nachts, Wochenende, Feiertage: zahnärztlicher Notdienst Berlin",
+          value: "030 89004-333",
+          href: "tel:+4930890043330",
+        },
+        {
+          _key: "f4",
+          _type: "fact",
+          label:
+            "Unsicher, ob es zahnärztlich ist: ärztlicher Bereitschaftsdienst",
+          value: "116 117",
+          href: "tel:116117",
+        },
+        {
+          _key: "f5",
+          _type: "fact",
+          label: "Schwellung mit Fieber, Schluckbeschwerden oder Atemnot",
+          value: "Notaufnahme oder 112",
+          href: "tel:112",
+        },
+      ],
+    },
 
     intro: {
       topline: "Akute Zahnschmerzen?",
@@ -137,6 +182,15 @@ export default {
         "Privat versichert? Dann rechnen wir nach der Gebührenordnung für Zahnärzte ab. Wenn du magst, schätzen wir dir den Betrag am Telefon grob ein, bevor du kommst.",
       ],
       actionLabel: "Jetzt anrufen",
+      actionLink: "tel:+493051999580",
+    },
+
+    closing: {
+      headline:
+        "Im Zweifel: lieber einmal zu früh anrufen als eine Nacht zu lange warten.",
+      text: "Du erreichst uns unter 030 5199 99580.",
+      actionLabel: "Jetzt anrufen",
+      actionLink: "tel:+493051999580",
     },
 
     faq: [
@@ -179,10 +233,8 @@ export default {
   },
 
   notes: [
-    "Links inside the text (KZV, Charité, tel: numbers, Wurzelbehandlung) are plain text in the service blocks; the hero button dials.",
-    "Closing ('Im Zweifel: lieber einmal zu früh anrufen …') dropped: the service page ends on the FAQ.",
-    "The 116 117 sentence became a fourth benefits item.",
-    "The explainer's button jumps to the contact section (the foot with the number); only the hero button dials.",
+    "Links inside the running text (KZV, Charité, Wurzelbehandlung) are plain text in the service blocks; every number stands tappable in quickFacts, and hero, explainer and closing buttons dial.",
+    "The 116 117 sentence became a fourth benefits item and a quick fact.",
     "The old `emergency` document (and its draft) still sits in the dataset without a schema; delete it in the Studio or with a script once the service is published.",
   ],
 };

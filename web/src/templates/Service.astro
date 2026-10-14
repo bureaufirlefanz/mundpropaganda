@@ -24,6 +24,8 @@ import Features from "../components/sections/Features.astro";
 import Magazine from "../components/sections/Magazine.astro";
 import Faq from "../components/sections/Faq.astro";
 import Contact from "../components/sections/Contact.astro";
+import QuickFacts from "../components/sections/QuickFacts.astro";
+import CtaBand from "../components/sections/CtaBand.astro";
 import { benefitsFootnote } from "../content/service-crosslinks";
 import type { Service } from "../lib/services";
 import type { HomepageContent } from "../lib/homepage";
@@ -175,6 +177,17 @@ const steps =
     alt={d?.hero?.image?.alt ?? ""}
   />
 
+  {
+    /* Right under the head: the facts someone in a hurry came for. */
+    d?.quickFacts?.items?.length ? (
+      <QuickFacts
+        topline={d.quickFacts.topline ?? undefined}
+        headline={d.quickFacts.headline ?? undefined}
+        items={d.quickFacts.items}
+      />
+    ) : null
+  }
+
   {intro && <Intro {...intro} />}
 
   {benefits && <Benefits {...benefits} footnote={benefitsFootnote[slug]} />}
@@ -207,7 +220,7 @@ const steps =
         headline={explainer.headline!}
         columns={explainer.columns!}
         action={explainer.actionLabel || undefined}
-        actionHref="#kontakt"
+        actionHref={explainer.actionLink || "#kontakt"}
       />
     )
   }
@@ -246,6 +259,17 @@ const steps =
   }
 
   {d?.faq?.length ? <Faq questions={d.faq} /> : null}
+
+  {
+    d?.closing?.headline ? (
+      <CtaBand
+        headline={d.closing.headline}
+        text={d.closing.text ?? undefined}
+        actionLabel={d.closing.actionLabel ?? undefined}
+        actionHref={d.closing.actionLink || "#kontakt"}
+      />
+    ) : null
+  }
 
   {zeigtFormular && <Contact service={title} />}
 </Base>

@@ -15,7 +15,8 @@ interface Props {
   id?: string;
   topline?: string;
   headline?: string;
-  items: { label: string; value: string }[];
+  /** A value with `href` is a link: a number to dial, a page to open. */
+  items: { label: string; value: string; href?: string | null }[];
 }
 
 const { id, topline, headline, items } = Astro.props;
@@ -43,7 +44,15 @@ const { id, topline, headline, items } = Astro.props;
         {items.map((item) => (
           <div class="s-quickfacts__row" data-reveal-child>
             <dt class="s-quickfacts__label">{item.label}</dt>
-            <dd class="s-quickfacts__value">{item.value}</dd>
+            <dd class="s-quickfacts__value">
+              {item.href ? (
+                <a class="c-link" href={item.href}>
+                  {item.value}
+                </a>
+              ) : (
+                item.value
+              )}
+            </dd>
           </div>
         ))}
       </dl>
