@@ -12,13 +12,19 @@ const { topline, text } = Astro.props;
 ---
 
 <section class="section">
-  <div class="container">
+  <div class="container s-statement__inner">
     <span class="c-topline" data-reveal="fade">{topline}</span>
     <p class="s-statement" data-reveal="up">{text}</p>
   </div>
 </section>
 
 <style>
+  /* The paragraph is centred, so the topline sits centred above it too. Left
+     aligned it hung alone at the margin, as if it belonged to another block. */
+  .s-statement__inner {
+    text-align: center;
+  }
+
   .s-statement {
     font: var(--font-section-title);
     letter-spacing: var(--tracking-section-title);
