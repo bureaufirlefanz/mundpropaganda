@@ -41,9 +41,25 @@ interface Props {
    * for the whole final chapter; there the text container is the range.
    */
   rangeEnd?: string;
+  /**
+   * Text of the pill before the first section is reached, e.g. "Inhalt".
+   * With it the dock shows from the top of the page and the table of
+   * contents lives in the pill alone; without it the dock appears with the
+   * first section and starts on its number, as on the pillar pages.
+   */
+  idleLabel?: string;
 }
 
-const { headings, label = "Auf dieser Seite", rangeEnd } = Astro.props;
+const {
+  headings,
+  label = "Auf dieser Seite",
+  rangeEnd,
+  idleLabel,
+} = Astro.props;
+
+/* A post's headings may carry their own numbering ("1. Du erfährst…"); next
+   to the dock's number that read twice. The dock shows the text alone. */
+const plain = (text: string) => text.replace(/^\d+[.)]\s*/, "");
 
 /* The template bails out below two links; rendering a dock for one section
    would be a button that answers a question nobody asked. */
@@ -59,6 +75,7 @@ const number = (i: number) => String(i + 1);
     <nav
       data-section-dock-init
       data-section-dock-range-end={rangeEnd}
+      data-section-dock-idle={idleLabel ? "" : undefined}
       aria-label={label}
       class="c-section-dock"
     >
@@ -72,8 +89,14 @@ const number = (i: number) => String(i + 1);
         >
           <span data-section-dock-label-wrap class="c-section-dock__label-wrap">
             <span class="c-section-dock__label">
-              <span class="c-section-dock__link-num">{number(0)}</span>
-              <span>{headings[0].text}</span>
+              {idleLabel ? (
+                <span>{idleLabel}</span>
+              ) : (
+                <>
+                  <span class="c-section-dock__link-num">{number(0)}</span>
+                  <span>{plain(headings[0].text)}</span>
+                </>
+              )}
             </span>
           </span>
         </button>
@@ -93,7 +116,7 @@ const number = (i: number) => String(i + 1);
                   class="c-section-dock__link"
                 >
                   <span class="c-section-dock__link-num">{number(i)}</span>
-                  <span>{h.text}</span>
+                  <span>{plain(h.text)}</span>
                 </a>
               </li>
             ))}
@@ -223,7 +246,7 @@ const number = (i: number) => String(i + 1);
        Veneers-Praxis?"), and the pill would run across half the screen.
        The open list keeps the full text. Pillar labels are short and never
        reach the cap. */
-    max-width: 24ch;
+    max-width: 18ch;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

@@ -63,10 +63,17 @@ export function initSectionDock() {
     )
       return;
 
-    let activeIndex = Math.max(
-      0,
-      links.findIndex((l) => l.hasAttribute("data-active")),
-    );
+    /* `data-section-dock-idle`: the pill starts on a word ("Inhalt") instead
+       of the first section, index -1, and keeps the markup the template
+       rendered for it. See the prop in SectionDock.astro. */
+    const idle = dock.hasAttribute("data-section-dock-idle");
+    const idleHTML = idle ? labelTemplate.innerHTML : null;
+    let activeIndex = idle
+      ? -1
+      : Math.max(
+          0,
+          links.findIndex((l) => l.hasAttribute("data-active")),
+        );
     let open = false;
     let dockTl = null;
     const rect = { x: 0, y: 0, w: 0, h: 0 };
@@ -99,7 +106,7 @@ export function initSectionDock() {
 
     function buildLabel(index) {
       const span = labelTemplate.cloneNode(false);
-      span.innerHTML = links[index].innerHTML;
+      span.innerHTML = index < 0 ? idleHTML : links[index].innerHTML;
       return span;
     }
 
@@ -216,6 +223,7 @@ export function initSectionDock() {
     }
 
     function placeIndicator(index) {
+      if (index < 0) return;
       Object.assign(rect, rectFor(links[index]));
       gsap.killTweensOf(rect);
       gsap.killTweensOf(indicator);
@@ -224,6 +232,7 @@ export function initSectionDock() {
     }
 
     function hopIndicator(index) {
+      if (index < 0) return;
       const target = rectFor(links[index]);
       gsap.killTweensOf(rect);
       gsap.killTweensOf(indicator);
@@ -324,7 +333,8 @@ export function initSectionDock() {
       if (dockTl) dockTl.kill();
       gsap.set(list, { visibility: "inherit" });
       gsap.set(pill, { width: fromW, height: fromH });
-      gsap.set(links[activeIndex], { yPercent: 0, opacity: 1 });
+      if (activeIndex >= 0)
+        gsap.set(links[activeIndex], { yPercent: 0, opacity: 1 });
 
       dockTl = gsap
         .timeline()
@@ -437,6 +447,10 @@ export function initSectionDock() {
         end: "bottom center",
         onEnter: () => setActive(i, true),
         onEnterBack: () => setActive(i, false),
+        /* Back above the first section: the pill returns to its word. */
+        onLeaveBack: () => {
+          if (idle && i === 0) setActive(-1, false);
+        },
       });
     });
 
@@ -480,8 +494,10 @@ export function initSectionDock() {
     const rangeEnd =
       (rangeEndSelector && document.querySelector(rangeEndSelector)) ||
       sections[sections.length - 1];
+    /* With an idle word the dock is there from the top of the page (the
+       body's top edge passes the bottom of the viewport at scroll 0). */
     rangeTrigger = ScrollTrigger.create({
-      trigger: sections[0],
+      trigger: idle ? document.body : sections[0],
       endTrigger: rangeEnd,
       start: "top bottom",
       end: "bottom 10%",
@@ -519,7 +535,7 @@ export function initSectionDock() {
         return;
       }
       openDock();
-      links[activeIndex].focus();
+      links[Math.max(0, activeIndex)].focus();
     });
 
     if (canHover.matches) {

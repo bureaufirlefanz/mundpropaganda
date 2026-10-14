@@ -29,7 +29,6 @@ import CmsImage from "../components/ui/CmsImage.astro";
 import Picture from "../components/ui/Picture.astro";
 import Button from "../components/ui/Button.astro";
 import PostCard from "../components/ui/PostCard.astro";
-import TableOfContents from "../components/ui/TableOfContents.astro";
 import SectionDock from "../components/ui/SectionDock.astro";
 import TextHeading from "../components/ui/TextHeading.astro";
 import PostImage from "../components/ui/PostImage.astro";
@@ -184,19 +183,6 @@ const serviceName = serviceSlug
               </div>
             )
           }
-
-          {
-            /* The table of contents lives in the head since 2026-10-14, under
-               the facts, where it ends on the baseline of the title card.
-               Beside the text it hung alone in the grey, 200px wide next to
-               a 68ch column. While reading, the section dock at the bottom
-               edge names the current section. */
-          }
-          {
-            showToc && (
-              <TableOfContents headings={headings} placement="static" />
-            )
-          }
         </div>
       </div>
     </header>
@@ -279,11 +265,19 @@ const serviceName = serviceSlug
   }
 
   {
+    /* The table of contents lives in the section dock alone (since
+       2026-10-14): the pill at the bottom edge reads "Inhalt", opens into the
+       full list, and names the current section once the text is reached.
+       Beside the text (200px next to a 68ch column) and in the head it was
+       lost or made the head taller than the title card. */
+  }
+  {
     showToc && (
       <SectionDock
         headings={headings}
         label="Abschnitte in diesem Beitrag"
         rangeEnd="[data-toc-bereich]"
+        idleLabel="Inhalt"
       />
     )
   }
