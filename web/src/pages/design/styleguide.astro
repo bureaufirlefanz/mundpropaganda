@@ -451,44 +451,26 @@ const PURPOSE: Record<string, string> = {
   "--fw-medium": "500, Überschriften und Display",
 
   "--fs-display-xl": "Konturschrift im Ring",
-  "--fs-display": "Wortmarke im Hero",
   "--fs-display-lg": "Wortmarke des Magazins",
-  "--fs-display-md": "Große Namen und Geschichten",
-  "--fs-display-2": "Seitenköpfe",
+  "--fs-display-2": "Seitenköpfe, große Namen",
   "--fs-display-sm": "Kennzahlen",
   "--fs-title-page": "Seitentitel",
-  "--fs-title-xl": "Große Überschrift",
-  "--fs-title-lg": "Überschrift",
-  "--fs-title-md": "Kleine Überschrift",
+  "--fs-title-md": "Überschrift",
   "--fs-title": "Titel einer Section",
   "--fs-title-sm": "Kartentitel",
   "--fs-title-xs": "Kleiner Titel",
   "--fs-text-large": "Einleitung",
   "--fs-text-main": "Fließtext",
   "--fs-text-small": "Kleiner Text, Toplines",
-  "--fs-label-lg": "Buttonbeschriftung",
-  "--fs-label-md": "Navigation, Meta-Zeilen",
-  "--fs-label": "Kleingedrucktes",
-  "--fs-micro": "Badges",
+  "--fs-label-lg": "Button, Navigation",
+  "--fs-label": "Kleingedrucktes, Meta, Badges",
 
   "--lh-display": "Wortmarken, die Zeilen berühren sich",
-  "--lh-tight": "Große Überschriften, Ziffern",
-  "--lh-headline": "Seitentitel, kleine Überschriften",
-  "--lh-heading": "Grundregel für h1 bis h6",
-  "--lh-title": "Section- und Kartentitel",
-  "--lh-snug": "Kurze Zeilen: Kachelnamen, Spaltenköpfe, Labels",
-  "--lh-compact": "Dichter Kleintext: Bildunterschriften, Meta, Tabellenzellen",
-  "--lh-text": "Fließtext in Bausteinen",
-  "--lh-body": "Längere Textstrecken",
+  "--lh-heading": "Jede Überschrift, Ziffern, Labels",
+  "--lh-text": "Alles, was gelesen wird",
   "--lh-loose": "Rechtstexte, Beiträge",
-
-  "--tracking-tighter": "Display",
-  "--tracking-tight": "Große Überschriften",
-  "--tracking-snug": "Titel",
-  "--tracking-mono": "Mono in gemischter Schreibung",
-  "--tracking-wide": "Mono-Beschriftungen",
-  "--tracking-wider": "Mono in Versalien",
-  "--tracking-widest": "Die weitesten Versalien",
+  "--tracking-tight": "Sans-Überschriften und Display",
+  "--tracking-mono": "Mono, Versalien und gemischt",
 
   "--sp-1": "Kleinste Lücke: Symbol zu Text",
   "--sp-2": "Enge Lücken in einer Zeile",
@@ -644,14 +626,10 @@ const uncovered = TOKENS.filter((t) => !covered.has(t));
 
 const SPECIMEN: Record<string, string> = {
   "--fs-display-xl": "Berlin",
-  "--fs-display": "Mund",
   "--fs-display-lg": "Magazin",
-  "--fs-display-md": "Anna",
   "--fs-display-2": "Veneers",
   "--fs-display-sm": "24",
   "--fs-title-page": "Veneers in Berlin",
-  "--fs-title-xl": "Unsere Experten",
-  "--fs-title-lg": "Unsere Standorte",
   "--fs-title-md": "Vier Tage Woche",
   "--fs-title": "Eine volle Stunde",
   "--fs-title-sm": "Zahnreinigung",
@@ -660,9 +638,7 @@ const SPECIMEN: Record<string, string> = {
   "--fs-text-main": "Sechs Behandlungsräume, eigenes Meisterlabor im Haus.",
   "--fs-text-small": "Prenzlauer Berg",
   "--fs-label-lg": "Termin buchen",
-  "--fs-label-md": "Leistungen",
   "--fs-label": "Ab 690 € je Zahn",
-  "--fs-micro": "4,9 von 5",
 };
 
 const TYPE_GROUPS = [
@@ -680,7 +656,7 @@ const TYPE_GROUPS = [
   {
     name: "Label",
     text: "Kleingedrucktes, Buttons, Navigation.",
-    test: starts("--fs-label", "--fs-micro"),
+    test: starts("--fs-label"),
   },
 ];
 const typeGroups = [
@@ -771,7 +747,7 @@ const BASE_CHAPTERS: Chapter[] = [
     id: "zeilenhoehe",
     number: "1.4",
     title: "Zeilenhöhe",
-    text: "Von den Wortmarken, deren Zeilen sich berühren, bis zu den Rechtstexten. <code>--lh-heading</code> (1,1) und <code>--lh-title</code> (1,15) sind noch zwei Werte: Sie zusammenzulegen verschöbe jede Überschrift der Seite um ein bis drei Pixel, die Startseite eingeschlossen. Das ist eine Gestaltungsentscheidung und keine Aufräumarbeit, deshalb bleibt es offen.",
+    text: "Vier Werte seit dem 14.10.2026: die Wortmarken, deren Zeilen sich berühren, alle Überschriften auf 1,1, alles Gelesene auf 1,5, die langen Strecken auf 1,6. Die Zwischenwerte meinten dasselbe in leicht anderen Zahlen.",
     samples: [{ name: "Token", rows: rows(lineHeights, "lh") }],
   },
   {
@@ -2180,7 +2156,7 @@ letter-spacing: var(--tracking-section-title);</pre>
 
     .d-table th {
       font: var(--font-label);
-      letter-spacing: var(--tracking-wide);
+      letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
     }
 
@@ -2317,14 +2293,14 @@ letter-spacing: var(--tracking-section-title);</pre>
     .d-font-name {
       margin-bottom: var(--sp-3);
       font: var(--font-label);
-      letter-spacing: var(--tracking-wide);
+      letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
       color: var(--c-text-muted);
     }
 
     .d-font-sample {
       font-size: var(--fs-title);
-      line-height: var(--lh-snug);
+      line-height: var(--lh-heading);
     }
 
     .d-font-sample--sans {
@@ -2341,7 +2317,7 @@ letter-spacing: var(--tracking-section-title);</pre>
     }
 
     .d-font-sample--caps {
-      letter-spacing: var(--tracking-wider);
+      letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
     }
 
@@ -2371,7 +2347,7 @@ letter-spacing: var(--tracking-section-title);</pre>
        size, so the line scrolls on its own. */
     .d-size__sample {
       overflow-x: auto;
-      line-height: var(--lh-headline);
+      line-height: var(--lh-heading);
       white-space: nowrap;
     }
 
@@ -2403,7 +2379,7 @@ letter-spacing: var(--tracking-section-title);</pre>
       background: var(--c-tint);
       font-family: var(--f-mono);
       font-size: var(--fs-text-small);
-      line-height: var(--lh-body);
+      line-height: var(--lh-text);
       white-space: pre-wrap;
     }
 
@@ -2412,7 +2388,7 @@ letter-spacing: var(--tracking-section-title);</pre>
       flex-wrap: wrap;
       gap: var(--sp-1) var(--sp-4);
       margin-top: var(--sp-2);
-      font-size: var(--fs-label-md);
+      font-size: var(--fs-label);
     }
 
     .d-list {
@@ -2618,7 +2594,7 @@ letter-spacing: var(--tracking-section-title);</pre>
       display: block;
       margin-bottom: var(--sp-1);
       font: var(--font-topline);
-      letter-spacing: var(--tracking-wide);
+      letter-spacing: var(--tracking-mono);
       text-transform: uppercase;
       color: var(--c-on-card);
     }

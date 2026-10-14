@@ -150,8 +150,8 @@ const { topline, title, text, posts } = Astro.props;
     font-family: var(--f-sans);
     font-weight: var(--fw-medium);
     font-size: var(--fs-display-lg);
-    line-height: 0.86;
-    letter-spacing: var(--tracking-tighter);
+    line-height: var(--lh-display);
+    letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
     white-space: nowrap;
     rotate: 1.8deg;
@@ -180,7 +180,7 @@ const { topline, title, text, posts } = Astro.props;
     font-family: var(--f-sans);
     font-weight: var(--fw-medium);
     font-size: var(--fs-display-sm);
-    line-height: var(--lh-tight);
+    line-height: var(--lh-heading);
     letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
     rotate: -3deg;
@@ -199,7 +199,7 @@ const { topline, title, text, posts } = Astro.props;
 
   .s-magazine__intro p {
     font-size: var(--fs-text-small);
-    line-height: var(--lh-body);
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 

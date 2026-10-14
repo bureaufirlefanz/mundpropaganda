@@ -269,7 +269,7 @@ const MOTIFS = [
     font-family: var(--f-sans);
     font-weight: var(--fw-medium);
     font-size: 48px;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
     text-transform: uppercase;
     fill: var(--c-dark);
   }
@@ -423,8 +423,8 @@ const MOTIFS = [
     background: var(--c-brand);
     color: var(--c-dark);
     font-family: var(--f-mono);
-    font-size: var(--fs-label-md);
-    letter-spacing: var(--tracking-wide);
+    font-size: var(--fs-label-lg);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -468,7 +468,7 @@ const MOTIFS = [
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-mono);
     color: var(--c-text-muted);
     font-variant-numeric: tabular-nums;
   }
@@ -505,8 +505,8 @@ const MOTIFS = [
   }
 
   .s-quote__mark {
-    font-size: var(--fs-display-md);
-    line-height: 0.7;
+    font-size: var(--fs-display-2);
+    line-height: var(--lh-display);
     font-weight: var(--fw-medium);
     color: var(--c-dark);
     flex: 0 0 auto;
@@ -526,7 +526,7 @@ const MOTIFS = [
     columns: 2;
     column-gap: var(--flow-md);
     font-size: var(--fs-text-large);
-    line-height: 1.4;
+    line-height: var(--lh-text);
     opacity: 0;
   }
 

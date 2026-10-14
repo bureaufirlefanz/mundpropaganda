@@ -60,7 +60,7 @@ body {
   font-family: var(--f-sans);
   font-size: var(--fs-text-main);
   font-weight: var(--fw-regular);
-  line-height: var(--lh-body);
+  line-height: var(--lh-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

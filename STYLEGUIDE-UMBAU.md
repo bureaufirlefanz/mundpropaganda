@@ -33,6 +33,38 @@ The remaining literals are mostly on the homepage (frozen, see below) or are
 one-offs that did not earn a token. Each file's count is recorded in
 `scripts/css-baseline.json` and can only go down.
 
+## Stage 2, 2026-10-14: the ladder itself
+
+Flo looked at the styleguide and found too many steps that mean the same
+thing. Decided and done on branch `typo-reduktion`:
+
+| Measure                  | Before | After |
+| ------------------------ | -----: | ----: |
+| Font-size steps          |     20 |    14 |
+| Line-height tokens       |     10 |     4 |
+| Tracking tokens          |      7 |     2 |
+| Text styles (`--font-*`) |     12 |    11 |
+
+- Sizes gone: 250 (unused), 144 (into 125), 64 (into 70), 55 (into 48),
+  13 (into 14), 11 (into 12).
+- Line heights: `--lh-display` 0.92 for wordmarks, `--lh-heading` 1.1 for
+  every headline, numeral and label, `--lh-text` 1.5 for everything read,
+  `--lh-loose` 1.6 for long reads. 1, 1.05, 1.15, 1.2, 1.3 and 1.45 are gone.
+- Tracking: `--tracking-tight` -0.02em for sans headlines and display,
+  `--tracking-mono` 0.06em for mono. -0.03, -0.01, 0.04, 0.08 and 0.1 are
+  gone. The role aliases (`--tracking-section-title` …) stay and point at
+  the two.
+- `--font-headline-xl` and `--font-headline-md` gone, `--font-title-xs`
+  (24px) new; the last literal line heights and letter spacings in the
+  components became tokens.
+
+This time the homepage moved: `npm run web:styles` against the baseline of
+the morning reports differences on every page, nearly all of them line
+heights and letter spacings and the widths and heights that follow from
+them. That is the point of the change, not a regression. Checked by eye on
+the homepage, a service page, the magazine and the footer; the smoke test
+(contrast, headings, anchors) is green.
+
 ## How to review
 
 ```bash

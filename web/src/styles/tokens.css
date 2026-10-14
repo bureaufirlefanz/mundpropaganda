@@ -59,16 +59,16 @@
      sizes are gone (36 and 28px), and so is the h3 alias; STYLEGUIDE-UMBAU.md
      says where they went. */
   --fs-display-xl: clamp(3.5rem, 16.4vw, 17.75rem); /* 283 — location ring */
-  --fs-display: clamp(4.5rem, 14.47vw, 15.625rem); /* 250 — hero wordmark */
   --fs-display-lg: clamp(3rem, 11.6vw, 12.5rem); /* 200 — magazine wordmark */
-  --fs-display-md: clamp(4rem, 9vw, 9rem); /* 144 — stories, person */
-  --fs-display-2: clamp(3rem, 7.23vw, 7.8125rem); /* 125 — page heroes */
+  --fs-display-2: clamp(
+    3rem,
+    7.23vw,
+    7.8125rem
+  ); /* 125 — page heroes, stories, person */
   --fs-display-sm: clamp(1.5rem, 5.2vw, 5.625rem); /* 90 — figures */
 
   --fs-title-page: clamp(2.5rem, 4.05vw, 4.375rem); /* 70 — page title */
-  --fs-title-xl: clamp(2rem, 3.7vw, 4rem); /* 64 — large headline */
-  --fs-title-lg: clamp(2rem, 3.2vw, 3.5rem); /* 55 — headline */
-  --fs-title-md: clamp(1.75rem, 2.8vw, 3rem); /* 48 — small headline */
+  --fs-title-md: clamp(1.75rem, 2.8vw, 3rem); /* 48 — headline */
   --fs-title: clamp(1.75rem, 2.31vw, 2.5rem); /* 40 — section title */
   --fs-title-sm: clamp(1.375rem, 1.85vw, 2rem); /* 32 — card title */
   --fs-title-xs: clamp(1.125rem, 1.39vw, 1.5rem); /* 24 — small title */
@@ -81,34 +81,25 @@
      digit that carries meaning — stays at 14px or above. 12 and 11px are
      only for mono uppercase micro labels (tags, meta, small toplines) and
      for glyph badges. */
-  --fs-label-lg: 0.875rem; /* 14 — button, smallest reading size */
-  --fs-label-md: 0.8125rem; /* 13 — navigation, meta */
-  --fs-label: 0.75rem; /* 12 — small print */
-  --fs-micro: 0.6875rem; /* 11 — badges */
+  --fs-label-lg: 0.875rem; /* 14 — button, navigation, smallest reading size */
+  --fs-label: 0.75rem; /* 12 — small print, meta, badges */
 
   /* --- Line height -------------------------------------------------------
-     `--lh-heading` (1.1) and `--lh-title` (1.15) are still two values.
-     Merging them moves every heading on the site by one to three pixels,
-     the homepage included — a design decision, not a clean-up. Open. */
+     Four values since 2026-10-14, down from ten. Everything that is a
+     headline sits on 1.1, everything that is read on 1.5; the wordmarks
+     keep their touching lines, the long reads their air. The in-between
+     values (1, 1.05, 1.15, 1.2, 1.3, 1.45) meant the same thing in
+     slightly different numbers. */
   --lh-display: 0.92; /* wordmarks: lines touch */
-  --lh-tight: 1; /* large headlines, numerals */
-  --lh-headline: 1.05; /* page titles, small headlines */
-  --lh-heading: 1.1; /* base rule for h1–h6 */
-  --lh-title: 1.15; /* section and card titles */
-  --lh-snug: 1.2; /* short lines: tile names, column heads, labels */
-  --lh-compact: 1.3; /* dense small text: captions, meta, table cells */
-  --lh-text: 1.45; /* copy inside components */
-  --lh-body: 1.5; /* longer copy */
+  --lh-heading: 1.1; /* every headline and title, numerals, labels */
+  --lh-text: 1.5; /* every text that is read */
   --lh-loose: 1.6; /* legal texts, articles */
 
-  /* --- Letter spacing ------------------------------------------------- */
-  --tracking-tighter: -0.03em; /* display */
-  --tracking-tight: -0.02em; /* large headlines */
-  --tracking-snug: -0.01em; /* titles */
-  --tracking-mono: 0.04em; /* mono, mixed case */
-  --tracking-wide: 0.06em;
-  --tracking-wider: 0.08em; /* mono, uppercase */
-  --tracking-widest: 0.1em;
+  /* --- Tracking ------------------------------------------------------------
+     Two values since 2026-10-14, down from seven: the sans headlines run a
+     little tighter, the mono labels a little wider. Body text has none. */
+  --tracking-tight: -0.02em; /* sans headlines and display */
+  --tracking-mono: 0.06em; /* mono, upper and mixed case */
 
   /* --- Spacing -----------------------------------------------------------
      Three kinds, one rule each:
@@ -291,25 +282,24 @@
 
      Put `font:` first in a rule: the shorthand resets font-variant and
      friends, so anything written above it is lost. */
-  --font-title-page: var(--fw-medium) var(--fs-title-page) / var(--lh-headline)
+  --font-title-page: var(--fw-medium) var(--fs-title-page) / var(--lh-heading)
     var(--f-sans);
   --tracking-title-page: var(--tracking-tight);
 
-  --font-headline-xl: var(--fw-medium) var(--fs-title-xl) / var(--lh-tight)
-    var(--f-sans);
-  --font-headline: var(--fw-medium) var(--fs-title-lg) / var(--lh-tight)
-    var(--f-sans);
-  --font-headline-md: var(--fw-medium) var(--fs-title-md) / var(--lh-headline)
+  --font-headline: var(--fw-medium) var(--fs-title-md) / var(--lh-heading)
     var(--f-sans);
   --tracking-headline: var(--tracking-tight);
 
-  --font-section-title: var(--fw-regular) var(--fs-title) / var(--lh-title)
+  --font-section-title: var(--fw-regular) var(--fs-title) / var(--lh-heading)
     var(--f-sans);
-  --tracking-section-title: var(--tracking-snug);
+  --tracking-section-title: var(--tracking-tight);
 
-  --font-card-title: var(--fw-regular) var(--fs-title-sm) / var(--lh-title)
+  --font-card-title: var(--fw-regular) var(--fs-title-sm) / var(--lh-heading)
     var(--f-sans);
-  --tracking-card-title: var(--tracking-snug);
+  --tracking-card-title: var(--tracking-tight);
+  --font-title-xs: var(--fw-regular) var(--fs-title-xs) / var(--lh-heading)
+    var(--f-sans);
+  --tracking-title-xs: var(--tracking-tight);
 
   --font-lead: var(--fw-regular) var(--fs-text-large) / var(--lh-text)
     var(--f-sans);
@@ -317,14 +307,16 @@
     var(--f-sans);
   --font-body-long: var(--fw-regular) var(--fs-text-main) / var(--lh-loose)
     var(--f-sans);
-  --font-small: var(--fw-regular) var(--fs-text-small) / var(--lh-body)
+  --font-small: var(--fw-regular) var(--fs-text-small) / var(--lh-text)
     var(--f-sans);
 
   /* Mono labels are uppercase as well; add `text-transform: uppercase`.
      The topline keeps 1.4: it is the homepage's value on 25 blocks. */
-  --font-topline: var(--fw-light) var(--fs-text-small) / 1.4 var(--f-mono);
-  --font-label: var(--fw-light) var(--fs-label) / var(--lh-snug) var(--f-mono);
-  --tracking-label: var(--tracking-wider);
+  --font-topline: var(--fw-light) var(--fs-text-small) / var(--lh-text)
+    var(--f-mono);
+  --font-label: var(--fw-light) var(--fs-label) / var(--lh-heading)
+    var(--f-mono);
+  --tracking-label: var(--tracking-mono);
 
   /* --- Spacing roles --------------------------------------------------- */
   /* Where a page without a hero starts: below the navigation. */
@@ -375,8 +367,8 @@
    `npm run check:css` rejects them there. */
 :root {
   --fs-h1: var(--fs-title-page);
-  --fs-h1-sm: var(--fs-title-xl);
-  --fs-h1-xs: var(--fs-title-lg);
+  --fs-h1-sm: var(--fs-title-page);
+  --fs-h1-xs: var(--fs-title-md);
   --fs-h2-lg: var(--fs-title-md);
   --fs-h2: var(--fs-title);
   --fs-h2-sm: var(--fs-title);

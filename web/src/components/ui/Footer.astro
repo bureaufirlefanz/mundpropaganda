@@ -272,8 +272,8 @@ const columns = (
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: 13.2cqw;
-    line-height: 0.98;
-    letter-spacing: var(--tracking-snug);
+    line-height: var(--lh-display);
+    letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
     white-space: nowrap;
     color: var(--c-text);
@@ -369,14 +369,14 @@ const columns = (
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     color: var(--c-text);
   }
 
   .c-footer__locations address {
     font-style: normal;
-    line-height: var(--lh-body);
+    line-height: var(--lh-text);
   }
 
   /* Tage links, Zeit rechts. `max-content 1fr` und keine zwei gleichen
@@ -394,7 +394,7 @@ const columns = (
     gap: 0 var(--sp-3);
     margin-top: var(--sp-3);
     font-size: var(--fs-text-small);
-    line-height: var(--lh-body);
+    line-height: var(--lh-text);
     /* NICHT `--c-text-muted`: Das ist Braun auf Durchsichtig und für den
        hellen Grund der Seite gedacht. Der Fuß ist dunkel, die Zeile wäre
        Braun auf Braun gewesen. Aufgefallen ist es nie, weil im Datensatz
@@ -425,7 +425,7 @@ const columns = (
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     color: var(--c-text);
   }
@@ -440,7 +440,7 @@ const columns = (
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
   }
 

@@ -277,7 +277,7 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-text-small);
-    letter-spacing: var(--tracking-widest);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
   }
 
@@ -298,8 +298,8 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     padding: 7px 10px;
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
-    font-size: var(--fs-label-md);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--fs-label-lg);
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     border-radius: var(--r-sm);
     transition: color var(--d-fast) var(--e-swift);
@@ -411,7 +411,7 @@ const action = (await resolved([nav?.action ?? null], here))[0];
     font-family: var(--f-mono);
     font-weight: var(--fw-light);
     font-size: var(--fs-label);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     color: var(--c-text-muted);
   }

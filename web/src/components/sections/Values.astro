@@ -92,15 +92,15 @@ const { topline, headline, text, items } = Astro.props;
     margin-top: var(--sp-4);
     font-size: var(--fs-title);
     font-weight: var(--fw-medium);
-    line-height: var(--lh-title);
-    letter-spacing: var(--tracking-snug);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--tracking-tight);
   }
 
   .s-values__text {
     max-width: var(--measure-text);
     margin-top: var(--sp-5);
     font-size: var(--fs-text-main);
-    line-height: var(--lh-body);
+    line-height: var(--lh-text);
     /* The dark surface maps `--c-text-muted` to light grey at 65 %. */
     color: var(--c-text-muted);
   }
@@ -147,7 +147,7 @@ const { topline, headline, text, items } = Astro.props;
   .s-values__item-text {
     max-width: var(--measure-narrow);
     font-size: var(--fs-text-main);
-    line-height: var(--lh-body);
+    line-height: var(--lh-text);
     color: var(--c-text-muted);
   }
 
