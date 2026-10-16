@@ -153,6 +153,7 @@ const showDock = anchors.length >= 4;
                 alt={section.alt ?? ""}
                 variant={section.variant}
               />
+              {section.body && <Prose body={section.body} compact />}
             </div>
           );
 
@@ -175,6 +176,7 @@ const showDock = anchors.length >= 4;
                 note={section.note}
                 disclaimer={section.disclaimer}
               />
+              {section.body && <Prose body={section.body} compact />}
             </>
           );
 
@@ -194,6 +196,7 @@ const showDock = anchors.length >= 4;
                 lines={section.lines}
                 note={section.note}
               />
+              {section.body && <Prose body={section.body} compact />}
             </div>
           );
 
@@ -227,6 +230,7 @@ const showDock = anchors.length >= 4;
                 />
               )}
               <Steps steps={section.steps} />
+              {section.body && <Prose body={section.body} compact />}
             </div>
           );
 

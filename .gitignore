@@ -49,3 +49,5 @@ assets/raw/*
 # through Sanity (studio/scripts/copy/), so nothing here is needed to build.
 texte/*.zip
 texte/FLAGS-*.md
+texte/*.docx
+texte/blogs/

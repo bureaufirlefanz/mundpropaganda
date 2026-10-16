@@ -128,3 +128,67 @@ export const blockContentMember = defineArrayMember({
     ],
   },
 });
+
+/**
+ * A table in the running text.
+ *
+ * Added with the Veneers posts of 2026-10-16: three of them carry a price or
+ * comparison table, and the SEO brief is explicit that "table format is the
+ * ranking format": Google lifts a real `<table>` into the snippet, a list of
+ * sentences it does not. Rendering a table as paragraphs would have thrown
+ * that away.
+ *
+ * Deliberately small: rows of plain text cells, the first row is the header.
+ * No merged cells, no formatting inside a cell. Sanity has no native table
+ * type and a nested array of arrays is not allowed, hence a row object.
+ */
+export const tableMember = defineArrayMember({
+  type: "object",
+  name: "table",
+  title: "Tabelle",
+  fields: [
+    defineField({
+      name: "caption",
+      title: "Überschrift",
+      type: "string",
+      description: "Wahlfrei. Steht klein über der Tabelle.",
+    }),
+    defineField({
+      name: "rows",
+      title: "Zeilen",
+      type: "array",
+      description:
+        "Die erste Zeile ist die Kopfzeile. Jede Zeile braucht gleich viele Zellen.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "tableRow",
+          title: "Zeile",
+          fields: [
+            defineField({
+              name: "cells",
+              title: "Zellen",
+              type: "array",
+              of: [defineArrayMember({ type: "string" })],
+              validation: (r) => r.required().min(1),
+            }),
+          ],
+          preview: {
+            select: { cells: "cells" },
+            prepare: ({ cells }) => ({
+              title: (cells ?? []).join(" · "),
+            }),
+          },
+        }),
+      ],
+      validation: (r) => r.required().min(2),
+    }),
+  ],
+  preview: {
+    select: { title: "caption", rows: "rows" },
+    prepare: ({ title, rows }) => ({
+      title: title || "Tabelle",
+      subtitle: `${rows?.length ?? 0} Zeilen`,
+    }),
+  },
+});

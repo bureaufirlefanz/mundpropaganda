@@ -98,7 +98,15 @@ export default defineConfig({
 
   /* The emergency page was `/notdienst` from 2026-10-13 to 2026-10-14; since
      then it is a service like the others. */
-  redirects: { "/notdienst": "/leistungen/notdienst" },
+  redirects: {
+    "/notdienst": "/leistungen/notdienst",
+    /* Two posts changed their slug with the copy delivery of 15.10.2026:
+       the Turkey post lost its placeholder address, the practice-choice post
+       was re-anchored by the SEO agency on a new keyword. */
+    "/magazin/veneers-aus-der-tuerkei": "/magazin/veneers-tuerkei-vergleich",
+    "/magazin/beste-veneers-zahnaerzte-berlin":
+      "/magazin/guten-zahnarzt-fuer-veneers-erkennen",
+  },
 
   /* Nötig für die Vorschau-Route: Sie muss je Aufruf frisch rendern, weil sie
      Entwürfe zeigt. Alles Übrige bleibt vorgerendert.

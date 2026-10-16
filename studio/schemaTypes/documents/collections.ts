@@ -9,7 +9,11 @@ import { UserIcon } from "@sanity/icons/User";
 import { CaseIcon } from "@sanity/icons/Case";
 import { HeartIcon } from "@sanity/icons/Heart";
 import { slugAvailable, slugIsFree, RESERVED_SLUGS } from "../../lib/paths";
-import { blockContentMember, inlineImageMember } from "../objects/rich-text";
+import {
+  blockContentMember,
+  inlineImageMember,
+  tableMember,
+} from "../objects/rich-text";
 import { seoField } from "../objects/seo-field";
 
 /**
@@ -68,6 +72,7 @@ export const post = defineType({
           { title: "Behandlung", value: "behandlung" },
           { title: "Vorsorge", value: "vorsorge" },
           { title: "Material & Technik", value: "technik" },
+          { title: "Kosten & Kassen", value: "kosten" },
           { title: "Praxis", value: "praxis" },
         ],
       },
@@ -110,7 +115,7 @@ export const post = defineType({
       name: "text",
       title: "Beitrag",
       type: "array",
-      of: [blockContentMember, inlineImageMember],
+      of: [blockContentMember, inlineImageMember, tableMember],
       group: "content",
     }),
     seoField,

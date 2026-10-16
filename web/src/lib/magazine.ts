@@ -40,6 +40,7 @@ const CATEGORIES: Record<string, string> = {
   behandlung: "Behandlung",
   vorsorge: "Vorsorge",
   technik: "Material & Technik",
+  kosten: "Kosten & Kassen",
   praxis: "Praxis",
 };
 

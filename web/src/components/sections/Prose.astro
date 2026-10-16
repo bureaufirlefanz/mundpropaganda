@@ -35,8 +35,10 @@ export interface ProseNote {
 }
 
 interface Props {
-  /** Sprungmarke, erzeugt von `idFrom()` — hier wird keine gebaut. */
-  id: string;
+  /** Sprungmarke, erzeugt von `idFrom()` — hier wird keine gebaut. Ohne
+      `id` ist der Abschnitt kein Kapitel, sondern der Fließtext unter einem
+      anderen Baustein (Tabelle, Schritte, Preise) und bekommt keine Marke. */
+  id?: string;
   body: PortableTextBlock[];
   /**
    * Bild aus dem CMS — oder der Name eines gestalteten Motivs aus
@@ -47,9 +49,20 @@ interface Props {
   /** Auf welcher Seite das Bild steht. Ohne Angabe rechts. */
   side?: "left" | "right";
   note?: ProseNote | null;
+  /** Rückt den Text an den Baustein darüber heran, dessen Fortsetzung er
+      ist — der volle Abstand stünde sonst zweimal. */
+  compact?: boolean;
 }
 
-const { id, body, image, alt = "", side = "right", note } = Astro.props;
+const {
+  id,
+  body,
+  image,
+  alt = "",
+  side = "right",
+  note,
+  compact = false,
+} = Astro.props;
 
 /* Der Kasten entsteht nur, wenn er einen Text hat — ein Rahmen um nichts
    wäre schlimmer als kein Kasten. */
@@ -61,6 +74,7 @@ const hasNote = Boolean(note?.text);
     "container",
     "s-prose",
     image ? `s-prose--${side}` : "s-prose--text-only",
+    compact && "s-prose--compact",
   ]}
   id={id}
   data-toc-target={id}
@@ -195,6 +209,10 @@ const hasNote = Boolean(note?.text);
   .s-prose--text-only .s-prose__body {
     width: 100%;
     padding-inline: 0;
+  }
+
+  .s-prose--compact {
+    padding-top: 0;
   }
 
   /* Steht das Bild links, gehört der größere Abstand auf die andere Seite. */

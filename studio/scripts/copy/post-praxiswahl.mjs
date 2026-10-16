@@ -1,55 +1,32 @@
 /**
- * Die besten Zahnärzte für Veneers in Berlin — new magazine post, third
- * draft with Hannes' comments of 08.10.2026 (file v3 of 12.10.2026).
+ * Woran erkennt man einen guten Zahnarzt für Veneers? — fifth version of
+ * 15.10.2026 (`texte/blogs/MP_Blog_06_Praxiswahl_v5_2026-10-15.docx`),
+ * replacing the import of v3 (13.10.2026).
  *
- * Mapping as in `post-veneers-schaden.mjs`:
+ * The SEO agency re-anchored the post on 15.10.2026: new keyword, new title,
+ * new H1, new URL. Same document in Sanity, new slug; the old address
+ * `/magazin/beste-veneers-zahnaerzte-berlin` is redirected in
+ * `web/astro.config.mjs`.
  *
- *   H1                 → title
- *   Markenzeile        no field, not in the text (the document sets it as
- *                      an H2; in the text it would turn up in the TOC)
- *   Kategorie          → category, Standfirst → lead, Autor → author
- *   Einstieg, H2 1–4   → text; the six features as numbered h3
- *   Abschluss          → last paragraph of text; the CTA label has no field
- *   Artikelfuß         CTA button → service reference; teaser has no field
- *   Meta               → seo
+ * Mapping as in `post-veneers-schaden.mjs`.
  */
+import { make } from "../copy-blocks.mjs";
 
-let k = 0;
-const block = (style, parts) => {
-  const n = ++k;
-  const markDefs = [];
-  const children = (Array.isArray(parts) ? parts : [parts]).map((part, i) => {
-    if (typeof part === "string")
-      return { _type: "span", _key: `t${n}s${i + 1}`, text: part, marks: [] };
-    const key = `t${n}l${markDefs.length + 1}`;
-    markDefs.push({ _key: key, _type: "link", href: part.href });
-    return {
-      _type: "span",
-      _key: `t${n}s${i + 1}`,
-      text: part.text,
-      marks: [key],
-    };
-  });
-  return { _type: "block", _key: `t${n}`, style, markDefs, children };
-};
-const p = (parts) => block("normal", parts);
-const h2 = (text) => block("h2", text);
-const h3 = (text) => block("h3", text);
-
-const slug = "beste-veneers-zahnaerzte-berlin";
+const { p, h2, h3 } = make();
+const slug = "guten-zahnarzt-fuer-veneers-erkennen";
 
 export default {
-  id: `post-${slug}`,
+  id: "post-beste-veneers-zahnaerzte-berlin",
   type: "post",
-  source: "MP_Blog_06_Praxiswahl_v3_2026-10-12.docx",
+  source: "MP_Blog_06_Praxiswahl_v5_2026-10-15.docx",
 
   create: {
-    title: "Die besten Zahnärzte für Veneers in Berlin: worauf es ankommt",
+    title: "Woran erkennt man einen guten Zahnarzt für Veneers? 6 Merkmale",
     slug: { _type: "slug", current: slug },
   },
 
   set: {
-    title: "Die besten Zahnärzte für Veneers in Berlin: worauf es ankommt",
+    title: "Woran erkennt man einen guten Zahnarzt für Veneers? 6 Merkmale",
     slug: { _type: "slug", current: slug },
     date: "2026-10-13",
     category: "behandlung",
@@ -59,7 +36,7 @@ export default {
 
     text: [
       p(
-        "Diese Seite nennt keine anderen Praxen. Nicht, weil es keine guten gäbe (es gibt in Berlin viele), sondern weil eine Rangliste auf der Website einer Zahnarztpraxis nichts wert ist. Wir wären Richter in eigener Sache, und das merkst du beim Lesen sowieso.",
+        "Woran erkennt man einen guten Zahnarzt für Veneers? Nicht an einer Rangliste auf der Website einer Zahnarztpraxis. Die wäre nichts wert, weil wir Richter in eigener Sache wären, und das merkst du beim Lesen sowieso. Diese Seite nennt deshalb keine anderen Praxen. Nicht, weil es keine guten gäbe, es gibt in Berlin viele.",
       ),
       p(
         "Stattdessen steht hier, was aus unserer Sicht eine gute Veneers-Praxis ausmacht und woran du es von außen erkennen kannst, bevor du dich entscheidest, und unabhängig davon, für wen. Wenn du danach zu jemand anderem gehst und dort gut behandelt wirst, hat diese Seite ihren Zweck erfüllt.",
@@ -75,7 +52,7 @@ export default {
       ),
       h3("2. Es gibt ein Mock-up, bevor etwas beschliffen wird"),
       p(
-        "Das ist das wichtigste Merkmal auf dieser Liste. Beim Mock-up wird dir die geplante Zahnform aus Kunststoff aufgesetzt, auf ungeschliffene Zähne. Du läufst damit herum und zeigst es Leuten: Essen kannst du damit nicht, dafür ist es zu dünn. Werden alle Zähne beschliffen, bekommst du statt des Mock-ups ein laborgefertigtes Langzeitprovisorium, und damit geht auch essen. In beiden Fällen entscheidest du erst danach. Wo das nicht vorgesehen ist, siehst du dein Ergebnis zum ersten Mal, wenn es nicht mehr rückgängig zu machen ist.",
+        "Das ist das wichtigste Merkmal auf dieser Liste. Beim Mock-up wird dir die geplante Zahnform aus Kunststoff aufgesetzt, auf ungeschliffene Zähne. Du läufst damit herum und zeigst es Leuten; essen kannst du damit nicht, dafür ist es zu dünn. Entschieden wird erst danach. Wo das nicht vorgesehen ist, siehst du dein Ergebnis zum ersten Mal, wenn es nicht mehr rückgängig zu machen ist.",
       ),
       h3("3. Jemand kann dir das Material benennen"),
       p(
@@ -114,7 +91,7 @@ export default {
         "Umgekehrt gibt es Dinge, bei denen wir an deiner Stelle noch einmal nachfragen würden. Keines davon heißt automatisch, dass etwas nicht stimmt. Alle zusammen schon.",
       ),
       p(
-        "Ein konkreter Preis am Telefon, ohne dass jemand in deinen Mund gesehen hat. Ein Angebot, das nur gilt, wenn du dich heute entscheidest. Ein Behandlungsplan, in dem kein Mock-up vorkommt. Keine Antwort auf die Frage, ob es Veneers oder Kronen werden. Und Beratungsgespräche, in denen ausschließlich über das Ergebnis gesprochen wird und nie über den Weg dorthin.",
+        "Ein konkreter Preis am Telefon, ohne dass jemand in deinen Mund gesehen hat. Ein Angebot, das nur gilt, wenn du dich heute entscheidest. Ein Behandlungsplan, in dem kein Mock-up vorkommt. Alles an einem Tag. Keine Antwort auf die Frage, ob es Veneers oder Kronen werden. Und Beratungsgespräche, in denen ausschließlich über das Ergebnis gesprochen wird und nie über den Weg dorthin.",
       ),
       p(
         "Das letzte ist das verlässlichste. Wer dir zwanzig Minuten lang zeigt, wie schön es wird, und keine zwei Minuten darauf verwendet, was dabei mit deinen Zähnen passiert, verkauft dir ein Bild und keine Behandlung.",
@@ -146,37 +123,36 @@ export default {
       p([
         "Wie wir arbeiten, steht auf der Seite zu ",
         { text: "Veneers in Berlin", href: "/leistungen/veneers" },
+        ". Fälle aus unserer Praxis findest du unter ",
+        {
+          text: "Veneers vorher / nachher",
+          href: "/magazin/veneers-vorher-nachher",
+        },
         ".",
       ]),
 
       p(
-        "Wenn du eine Praxis gefunden hast, die dir zusagt, nimm diese Fragen mit. Und wenn du noch unschlüssig bist, komm zu einem Beratungsgespräch, auch dann, wenn du am Ende woanders behandeln lässt. Es kostet 99 Euro: Wir machen Fotos, ermitteln den Bedarf und scannen deine Zähne, wenn es sinnvoll ist.",
+        "Wenn du eine Praxis gefunden hast, die dir zusagt, nimm diese Fragen mit. Und wenn du noch unschlüssig bist, komm zu einem Beratungsgespräch, auch dann, wenn du am Ende woanders behandeln lässt. Es kostet 99 Euro, und wenn du dich danach für die Behandlung entscheidest, wird der Betrag angerechnet.",
       ),
     ],
 
     seo: {
       _type: "seo",
-      title: "Die besten Zahnärzte für Veneers in Berlin: Kriterien",
+      title: "Woran erkennt man einen guten Zahnarzt für Veneers?",
       description:
-        "Die besten Zahnärzte für Veneers in Berlin: sechs Merkmale, an denen du eine gute Praxis erkennst, typische Warnsignale und die richtigen Fragen.",
+        "Woran erkennt man einen guten Zahnarzt für Veneers? Sechs Merkmale einer guten Praxis, typische Warnsignale und die richtigen Fragen fürs Beratungsgespräch.",
     },
   },
 
   notes: [
-    "Date: the document says 'Veröffentlicht am [Datum]'. Set to 2026-10-13 as a placeholder; the practice must set the real date.",
-    "Slug from the document's URL /blog/beste-veneers-zahnaerzte-berlin/; the site serves it as /magazin/beste-veneers-zahnaerzte-berlin.",
-    "Title is the body H1 'Die besten Zahnärzte für Veneers in Berlin: worauf es ankommt'; the document's cover line reads without ': worauf es ankommt'.",
-    "Category 'Behandlung verstehen' → behandlung (praxis would also fit).",
-    "Markenzeile A 'Wir sagen dir nicht, wo du hingehen sollst. Nur, worauf du schauen musst' has no field and is not in the text. Choice between A, B and C is still open with Mara and Flo.",
-    "Not imported: 'Fälle aus unserer Praxis findest du unter [Veneers vorher / nachher].' No such post exists and the site has no own before/after cases yet.",
-    "seo.description is the agency's proposal; Summer Days' original promises 'welche Praxen spezialisiert sind', which the page no longer delivers. Not yet agreed with Summer Days.",
-    "The dropped mandatory H2 'Berliner Praxen mit Veneers-Schwerpunkt' (Mara, 26.09.2026) still needs Summer Days' sign-off.",
-    "Header image missing; suggested caption and alt text not imported: 'Beratungsgespräch mit digitaler Planung auf dem Bildschirm.' / 'Zahnarzt und Patientin sehen sich gemeinsam die digitale Veneer-Planung auf einem Monitor an'.",
-    "Closing CTA label 'Beratungstermin vereinbaren' has no field. Closing paragraph follows the Transparenz section without a heading of its own.",
-    "Artikelfuß: CTA button covered by the service reference. Teaser 'Weiterlesen: Was Veneers kosten' has no field and no target post.",
-    "Open with Hannes: are the 99 Euro credited against the treatment?",
-    "Link to /magazin/veneers-schaden works only once that post is published too.",
-    "Paired dashes around 'es gibt in Berlin viele' became parentheses.",
+    "Re-anchored by Kahn on 15.10.2026: slug changes from beste-veneers-zahnaerzte-berlin to guten-zahnarzt-fuer-veneers-erkennen (redirect in astro.config.mjs). Document ID stays.",
+    "Date kept at 2026-10-13 from the first import; the real date is the practice's call.",
+    "Category 'Behandlung verstehen' → behandlung.",
+    "Markenzeile 'Wir sagen dir nicht, wo du hingehen sollst. Nur, worauf du schauen musst' (variant A) has no field.",
+    "Header image missing. Suggested caption and alt text not imported: 'Beratungsgespräch mit digitaler Planung auf dem Bildschirm.' / 'Zahnarzt und Patientin sehen sich gemeinsam die digitale Veneer-Planung auf einem Monitor an'.",
+    "Link to /magazin/veneers-vorher-nachher works only once that post is published; it is blocked (no images).",
+    "Open with Mara: the Veneers service FAQ 'Woran erkenne ich eine gute Praxis für Veneers in Berlin?' should link here (Kahn, 15.10.2026).",
+    "Closing CTA label 'Beratungstermin vereinbaren' and the Artikelfuß teaser ('Weiterlesen: Was Veneers kosten') have no field.",
     "'Sie' in the six questions is deliberate: the reader addresses the dentist.",
   ],
 };

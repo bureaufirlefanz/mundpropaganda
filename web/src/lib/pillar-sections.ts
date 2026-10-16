@@ -95,6 +95,8 @@ export interface PillarIntro extends SectionBase {
   alt?: string;
   /** `centered` ist die Fassung der Pillar Pages — siehe `Intro.astro`. */
   variant?: "default" | "centered";
+  /** Fließtext unter den Spalten, mit Zwischentiteln und Verweisen. */
+  body?: PortableTextBlock[];
 }
 
 /** Eine Preiskarte. `from` setzt das „ab" davor. */
@@ -113,8 +115,11 @@ export interface PillarPricing extends SectionBase {
   headline: string;
   pricing: PillarPrice[];
   note?: string;
-  /** Pflicht, sobald Preise dastehen — siehe Briefing §8. */
-  disclaimer: string;
+  /** Der Hinweis zur Abrechnung unter den Karten — siehe Briefing §8. Seit
+      der Textlieferung vom 15.10.2026 steht er im `body`. */
+  disclaimer?: string;
+  /** Fließtext unter den Karten: Kasse, Raten, was nicht enthalten ist. */
+  body?: PortableTextBlock[];
 }
 
 /**
@@ -137,6 +142,8 @@ export interface PillarCompare extends SectionBase {
     values: { kind: "text" | "ja" | "nein" | "pille"; text?: string }[];
   }[];
   note?: string;
+  /** Fließtext unter der Tabelle: die Spalten erklärt, mit Verweisen. */
+  body?: PortableTextBlock[];
 }
 
 /** Der abgesetzte Kasten unter einem Textabschnitt. */
@@ -165,6 +172,8 @@ export interface PillarSteps extends SectionBase {
   _type: "steps";
   headline: string;
   steps: { title: string; text: string }[];
+  /** Fließtext unter den Karten, etwa der Sonderfall außerhalb der Schritte. */
+  body?: PortableTextBlock[];
 }
 
 export interface PillarFaq extends SectionBase {

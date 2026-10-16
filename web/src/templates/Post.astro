@@ -32,6 +32,7 @@ import PostCard from "../components/ui/PostCard.astro";
 import SectionDock from "../components/ui/SectionDock.astro";
 import TextHeading from "../components/ui/TextHeading.astro";
 import PostImage from "../components/ui/PostImage.astro";
+import PostTable from "../components/ui/PostTable.astro";
 import { isCmsImage } from "../lib/images";
 import { loadServiceList } from "../lib/service-list";
 import { headingsFrom, withHeadingIds } from "../lib/table-of-contents";
@@ -197,7 +198,7 @@ const serviceName = serviceSlug
                 value={blocks}
                 components={{
                   block: { h2: TextHeading, h3: TextHeading },
-                  type: { inlineImage: PostImage },
+                  type: { inlineImage: PostImage, table: PostTable },
                 }}
               />
 

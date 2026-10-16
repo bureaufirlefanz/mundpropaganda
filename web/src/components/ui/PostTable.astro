@@ -1,0 +1,110 @@
+---
+/**
+ * A table in the running text of a post.
+ *
+ * Comes from the `table` block in the Studio (`rich-text.ts`): rows of plain
+ * cells, the first row is the header. The SEO brief for the Veneers posts
+ * calls the table "the ranking format", because Google lifts a real
+ * `<table>` into a snippet. That is why this is markup and not a list.
+ *
+ * Lines only, no filled header and no zebra: the post column is narrow, and
+ * the table has to read as part of the text, not as a widget dropped into it.
+ * Narrow screens scroll the table sideways instead of crushing the columns.
+ */
+interface Props {
+  node: {
+    caption?: string | null;
+    rows?: { cells?: (string | null)[] | null }[] | null;
+  };
+}
+
+const { node } = Astro.props;
+const rows = (node.rows ?? []).map((r) => r.cells ?? []);
+const [head, ...body] = rows;
+---
+
+{
+  head && (
+    <figure class="c-posttable">
+      {node.caption && (
+        <figcaption class="c-posttable__caption">{node.caption}</figcaption>
+      )}
+      <div class="c-posttable__scroll">
+        <table class="c-posttable__table">
+          <thead>
+            <tr>
+              {head.map((cell) => (
+                <th scope="col">{cell}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {body.map((cells) => (
+              <tr>
+                {cells.map((cell, i) =>
+                  i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>,
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </figure>
+  )
+}
+
+<style>
+  .c-posttable {
+    margin-block: var(--sp-6) var(--sp-8);
+  }
+
+  .c-posttable__caption {
+    margin-bottom: var(--sp-3);
+    font: var(--font-topline);
+    letter-spacing: var(--tracking-mono);
+    color: var(--c-text-muted);
+  }
+
+  .c-posttable__scroll {
+    overflow-x: auto;
+  }
+
+  .c-posttable__table {
+    width: 100%;
+    border-collapse: collapse;
+    font: var(--font-body);
+  }
+
+  .c-posttable__table th,
+  .c-posttable__table td {
+    padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: var(--bw) solid var(--c-line);
+  }
+
+  .c-posttable__table th:last-child,
+  .c-posttable__table td:last-child {
+    padding-right: 0;
+  }
+
+  /* The header row carries the one line that says something; the row
+     headers are simply the first column, set like the text. */
+  .c-posttable__table thead th {
+    font: var(--font-small);
+    font-family: var(--f-mono);
+    font-weight: var(--fw-light);
+    letter-spacing: var(--tracking-mono);
+    color: var(--c-text-muted);
+    border-bottom-color: var(--c-text);
+  }
+
+  .c-posttable__table tbody th {
+    font-weight: var(--fw-medium);
+  }
+
+  /* Numbers and short values stay on one line; the first column may wrap. */
+  .c-posttable__table td {
+    white-space: nowrap;
+  }
+</style>
