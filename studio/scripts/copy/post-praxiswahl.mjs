@@ -123,11 +123,6 @@ export default {
       p([
         "Wie wir arbeiten, steht auf der Seite zu ",
         { text: "Veneers in Berlin", href: "/leistungen/veneers" },
-        ". Fälle aus unserer Praxis findest du unter ",
-        {
-          text: "Veneers vorher / nachher",
-          href: "/magazin/veneers-vorher-nachher",
-        },
         ".",
       ]),
 
@@ -150,7 +145,7 @@ export default {
     "Category 'Behandlung verstehen' → behandlung.",
     "Markenzeile 'Wir sagen dir nicht, wo du hingehen sollst. Nur, worauf du schauen musst' (variant A) has no field.",
     "Header image missing. Suggested caption and alt text not imported: 'Beratungsgespräch mit digitaler Planung auf dem Bildschirm.' / 'Zahnarzt und Patientin sehen sich gemeinsam die digitale Veneer-Planung auf einem Monitor an'.",
-    "Link to /magazin/veneers-vorher-nachher works only once that post is published; it is blocked (no images).",
+    "Not imported: 'Fälle aus unserer Praxis findest du unter [Veneers vorher / nachher].' That post is blocked (no images); add the sentence back when it goes live.",
     "Open with Mara: the Veneers service FAQ 'Woran erkenne ich eine gute Praxis für Veneers in Berlin?' should link here (Kahn, 15.10.2026).",
     "Closing CTA label 'Beratungstermin vereinbaren' and the Artikelfuß teaser ('Weiterlesen: Was Veneers kosten') have no field.",
     "'Sie' in the six questions is deliberate: the reader addresses the dentist.",
